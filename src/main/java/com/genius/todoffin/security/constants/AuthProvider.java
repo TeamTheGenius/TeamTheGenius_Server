@@ -1,4 +1,4 @@
-package com.genius.security.constants;
+package com.genius.todoffin.security.constants;
 
 import java.util.Arrays;
 

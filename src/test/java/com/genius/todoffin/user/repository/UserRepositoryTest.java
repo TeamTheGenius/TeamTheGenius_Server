@@ -2,7 +2,6 @@ package com.genius.todoffin.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.todoffin.user.domain.Role;
 import com.genius.todoffin.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

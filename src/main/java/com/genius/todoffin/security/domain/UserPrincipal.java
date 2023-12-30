@@ -29,4 +29,8 @@ public class UserPrincipal implements OAuth2User {
     public String getName() {
         return user.getEmail();
     }
+
+    public String getEmail() {
+        return user.getEmail();
+    }
 }

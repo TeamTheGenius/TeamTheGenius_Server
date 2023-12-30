@@ -1,29 +1,26 @@
 package com.genius.todoffin.security.info.impl;
 
 
+import static com.genius.todoffin.security.constants.OAuthAttributeKey.EMAIL_KEY;
+import static com.genius.todoffin.security.constants.OAuthAttributeKey.NAVER_PROVIDER_ID;
+
 import com.genius.todoffin.security.info.OAuth2UserInfo;
 import java.util.Map;
 
 public class NaverOAuth2UserInfo extends OAuth2UserInfo {
+    private final static String ATTRIBUTE_KEY = "response";
 
     public NaverOAuth2UserInfo(Map<String, Object> attributes) {
-        super((Map<String, Object>) attributes.get("response"));
+        super((Map<String, Object>) attributes.get(ATTRIBUTE_KEY));
     }
 
     @Override
-    public String getId() {
-        return (String) attributes.get("id");
+    public String getProviderId() {
+        return (String) attributes.get(NAVER_PROVIDER_ID.getValue());
     }
 
     @Override
     public String getEmail() {
-        return (String) attributes.get("email");
+        return (String) attributes.get(EMAIL_KEY.getValue());
     }
-
-    @Override
-    public String getName() {
-        return (String) attributes.get("name");
-    }
-
-
 }

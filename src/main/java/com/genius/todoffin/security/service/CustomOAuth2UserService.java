@@ -33,9 +33,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-        // OAuth2 로그인 진행 시 키가 되는 필드값을 이야기 한다. Primary Key와 같은 의미.
-        // 구글의 경우 기본적으로 코드를 지원하지만, 네이버 카카 등은 기본 지원하지 않는다. 구글의 기본 코드는 "sub"
-        String providerPK = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint()
+        // OAuth2 로그인 진행 시 키가 되는 필드값. Primary Key와 같은 의미.
+        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint()
                 .getUserNameAttributeName();
 
         // 서비스를 구분하는 코드

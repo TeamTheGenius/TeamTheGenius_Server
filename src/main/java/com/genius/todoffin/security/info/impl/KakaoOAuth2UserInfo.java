@@ -4,12 +4,13 @@ import com.genius.todoffin.security.info.OAuth2UserInfo;
 import java.util.Map;
 
 public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
+    private final static String ATTRIBUTE_KEY = "kakao_account";
 
-    private Integer id;
+    private Long id;
 
     public KakaoOAuth2UserInfo(Map<String, Object> attributes) {
-        super((Map<String, Object>) attributes.get("kakao_account"));
-        this.id = (Integer) attributes.get("id");
+        super((Map<String, Object>) attributes.get(ATTRIBUTE_KEY));
+        this.id = (Long) attributes.get("id");
     }
 
     @Override

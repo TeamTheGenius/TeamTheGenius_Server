@@ -48,7 +48,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         User user = getUser(email, providerType);
 
-        return new UserPrincipal(user, oAuth2UserInfo.getAttributes());
+        return new UserPrincipal(user, attributes, userNameAttributeName);
     }
 
     private User getUser(String email, ProviderType providerType) {

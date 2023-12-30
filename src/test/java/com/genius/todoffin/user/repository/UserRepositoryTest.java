@@ -2,7 +2,8 @@ package com.genius.todoffin.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.todoffin.user.domain.User;
+import com.genius.todoffin.user.entity.Role;
+import com.genius.todoffin.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

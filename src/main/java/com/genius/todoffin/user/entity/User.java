@@ -2,7 +2,13 @@ package com.genius.todoffin.user.entity;
 
 
 import com.genius.todoffin.common.BaseTimeEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -34,20 +40,15 @@ public class User extends BaseTimeEntity {
     private String interest;
 
 
-    // 임시
-    private String password;
-
-
     @Builder
     public User(String provider, String email, Role role, String nickname, String information,
-                String interest, String password) {
+                String interest) {
         this.provider = provider;
         this.email = email;
         this.role = role;
         this.nickname = nickname;
         this.information = information;
         this.interest = interest;
-        this.password = password;
     }
 
 }

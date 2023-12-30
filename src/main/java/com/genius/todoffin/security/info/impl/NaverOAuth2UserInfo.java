@@ -1,6 +1,7 @@
-package com.genius.todoffin.user.dto;
+package com.genius.todoffin.security.info.impl;
 
 
+import com.genius.todoffin.security.info.OAuth2UserInfo;
 import java.util.Map;
 
 public class NaverOAuth2UserInfo extends OAuth2UserInfo {

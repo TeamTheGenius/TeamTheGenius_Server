@@ -1,5 +1,8 @@
 package com.genius.todoffin.security.config;
 
+
+import com.genius.todoffin.security.handler.OAuth2SuccessHandler;
+import com.genius.todoffin.security.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +21,8 @@ public class SecurityConfig {
     private static final String permitURI[] = {"/api/auth/**", "/swagger-ui.html", "/swagger-ui/**"
             , "/v3/api-docs/**", "/v3/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**"};
     private static final String permittedRoles[] = {"USER", "ADMIN"};
-//    private final CustomOAuth2UserService customOAuthService;
-//    private final OAuthSuccessHandler successHandler;
+    private final CustomOAuth2UserService customOAuthService;
+    private final OAuth2SuccessHandler successHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -28,24 +31,22 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .formLogin().disable()
                 .anonymous().and()
-                .authorizeRequests()
-                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                .requestMatchers(permitURI).permitAll()
-                .anyRequest().hasAnyRole(permittedRoles)
-                .and()
+                .authorizeHttpRequests(request -> request
+                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                        .requestMatchers(permitURI).permitAll()
+                        .anyRequest().hasAnyRole(permittedRoles))
 
                 // JWT 사용으로 인한 세션 미사용
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                .sessionManagement(configurer -> configurer
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // OAuth 로그인 설정
-                .oauth2Login();
-//                .successHandler(successHandler)
-//                .authorizationEndpoint()
+                .oauth2Login()
+                .successHandler(successHandler)
+                .authorizationEndpoint()
 
-//                .and()
-//                .userInfoEndpoint().userService(customOAuthService);
+                .and()
+                .userInfoEndpoint().userService(customOAuthService);
 
         return http.build();
     }

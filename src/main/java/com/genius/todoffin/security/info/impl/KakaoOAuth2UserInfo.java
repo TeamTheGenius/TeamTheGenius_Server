@@ -1,7 +1,7 @@
 package com.genius.todoffin.security.info.impl;
 
-import static com.genius.todoffin.security.constants.OAuthAttributeKey.EMAIL_KEY;
-import static com.genius.todoffin.security.constants.OAuthAttributeKey.KAKAO_PROVIDER_ID;
+import static com.genius.todoffin.security.constants.OAuthRule.EMAIL_KEY;
+import static com.genius.todoffin.security.constants.OAuthRule.KAKAO_PROVIDER_ID;
 
 import com.genius.todoffin.security.info.OAuth2UserInfo;
 import java.util.Map;

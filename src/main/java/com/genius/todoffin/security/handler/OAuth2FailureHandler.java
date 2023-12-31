@@ -11,11 +11,14 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
+    private final String REDIRECT_URL = "http://localhost:3000";
+    private final String ERROR_PARAM_PREFIX = "error";
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
                                         AuthenticationException exception) throws IOException, ServletException {
-        String redirectUrl = UriComponentsBuilder.fromUriString("http://localhost:3000")
-                .queryParam("error", exception.getLocalizedMessage())
+        String redirectUrl = UriComponentsBuilder.fromUriString(REDIRECT_URL)
+                .queryParam(ERROR_PARAM_PREFIX, exception.getLocalizedMessage())
                 .build()
                 .toUriString();
 

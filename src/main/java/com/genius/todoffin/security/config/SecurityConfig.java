@@ -18,8 +18,7 @@ import org.springframework.web.cors.CorsUtils;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
-    private static final String permitURI[] = {"/api/auth/**", "/swagger-ui.html", "/swagger-ui/**"
-            , "/v3/api-docs/**", "/v3/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**"};
+    private static final String permitURI[] = {"/v3/**", "/swagger-ui/**"};
     private static final String permittedRoles[] = {"USER", "ADMIN"};
     private final CustomOAuth2UserService customOAuthService;
     private final OAuth2SuccessHandler successHandler;

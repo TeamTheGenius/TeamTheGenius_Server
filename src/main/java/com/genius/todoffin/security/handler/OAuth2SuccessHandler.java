@@ -17,8 +17,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final String SIGNUP_URL = "http://localhost:3000/login/signup";
-    private final String MAIN_URL = "http://localhost:3000/main";
+    private final String SIGNUP_URL = "http://localhost:5173/login/signup";
+    private final String MAIN_URL = "http://localhost:5173/main";
     private final UserRepository userRepository;
 
     @Override

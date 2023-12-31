@@ -1,5 +1,6 @@
 package com.genius.todoffin.common.domain;
 
+
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -22,6 +23,6 @@ public class BaseTimeEntity {
 
     @LastModifiedDate
     private LocalDateTime modifiedDate;
-    
+
     private LocalDateTime deletedDate;
 }

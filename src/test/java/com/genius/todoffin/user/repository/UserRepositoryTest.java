@@ -2,8 +2,9 @@ package com.genius.todoffin.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.todoffin.user.domain.Role;
-import com.genius.todoffin.user.domain.User;
+import com.genius.todoffin.security.constants.ProviderType;
+import com.genius.todoffin.user.entity.Role;
+import com.genius.todoffin.user.entity.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ class UserRepositoryTest {
     public void email을_통해_저장한_User_객체를_찾을수있다() {
         //given
         String email = "test@naver.com";
-        String provider = "NAVER";
+        ProviderType provider = ProviderType.GOOGLE;
         String nickname = "test_nickname";
         User user = getUnsavedUser(email, provider, nickname);
 
@@ -41,7 +42,7 @@ class UserRepositoryTest {
     public void email_provider를_통해_저장한_User_객체를_찾을수있다() {
         //given
         String email = "test@naver.com";
-        String provider = "NAVER";
+        ProviderType provider = ProviderType.GOOGLE;
         String nickname = "test_nickname";
         User user = getUnsavedUser(email, provider, nickname);
 
@@ -57,7 +58,7 @@ class UserRepositoryTest {
     }
 
 
-    private User getUnsavedUser(String email, String provider, String nickname) {
+    private User getUnsavedUser(String email, ProviderType provider, String nickname) {
         return User.builder()
                 .email(email)
                 .provider(provider)

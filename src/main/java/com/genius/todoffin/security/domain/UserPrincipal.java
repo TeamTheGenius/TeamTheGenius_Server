@@ -1,6 +1,5 @@
 package com.genius.todoffin.security.domain;
 
-import com.genius.todoffin.user.entity.Role;
 import com.genius.todoffin.user.entity.User;
 import java.util.Collections;
 import java.util.Map;
@@ -13,7 +12,7 @@ public class UserPrincipal extends DefaultOAuth2User {
     private User user;
 
     public UserPrincipal(User user, Map<String, Object> attributes, String nameAttributeKey) {
-        super(Collections.singletonList(new SimpleGrantedAuthority(Role.USER.getKey())),
+        super(Collections.singletonList(new SimpleGrantedAuthority(user.getRole().getKey())),
                 attributes,
                 nameAttributeKey);
         this.user = user;

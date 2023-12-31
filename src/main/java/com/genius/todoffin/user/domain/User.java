@@ -27,6 +27,7 @@ public class User extends BaseTimeEntity {
     @NotNull
     @Enumerated(EnumType.STRING)
     private ProviderType provider;
+
     @NotNull
     private String email;
 
@@ -52,8 +53,13 @@ public class User extends BaseTimeEntity {
         this.interest = interest;
     }
 
+    public void updateUser(String nickname, String information, String interest) {
+        this.nickname = nickname;
+        this.information = information;
+        this.interest = interest;
+    }
 
-    public String getAuthorities() {
-        return role.getKey();
+    public void updateRole(Role role) {
+        this.role = role;
     }
 }

@@ -1,8 +1,12 @@
 package com.genius.todoffin.security.handler;
 
+import static com.genius.todoffin.security.constants.OAuthRule.EMAIL_KEY;
+
 import com.genius.todoffin.user.domain.Role;
 import com.genius.todoffin.user.domain.User;
 import com.genius.todoffin.user.repository.UserRepository;
+import com.genius.todoffin.util.exception.BusinessException;
+import com.genius.todoffin.util.exception.ErrorCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,18 +31,18 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getName();
 
-        //TODO: 추후 Utils의 ErrorCode를 활용하여 orElseThrow에 에러 코드 넣기
         User user = userRepository.findByEmail(email)
-                .orElseThrow();
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         Role role = user.getRole();
 
-        String redirectUrl = getRedirectUrlByRole(role);
+        String redirectUrl = getRedirectUrlByRole(role, email);
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
-    private String getRedirectUrlByRole(Role role) {
+    private String getRedirectUrlByRole(Role role, String email) {
         if (role == Role.NOT_REGISTERED) {
             return UriComponentsBuilder.fromUriString(SIGNUP_URL)
+                    .queryParam(EMAIL_KEY.getValue(), email)
                     .build()
                     .toUriString();
         }

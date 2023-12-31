@@ -1,6 +1,6 @@
 package com.genius.todoffin.security.domain;
 
-import com.genius.todoffin.user.entity.User;
+import com.genius.todoffin.user.domain.User;
 import java.util.Collections;
 import java.util.Map;
 import lombok.Getter;

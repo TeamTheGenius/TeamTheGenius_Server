@@ -1,7 +1,7 @@
 package com.genius.todoffin.security.handler;
 
-import com.genius.todoffin.user.entity.Role;
-import com.genius.todoffin.user.entity.User;
+import com.genius.todoffin.user.domain.Role;
+import com.genius.todoffin.user.domain.User;
 import com.genius.todoffin.user.repository.UserRepository;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

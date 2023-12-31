@@ -1,4 +1,4 @@
-package com.genius.todoffin.user.entity;
+package com.genius.todoffin.user.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

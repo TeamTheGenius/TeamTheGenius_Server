@@ -22,8 +22,8 @@ import org.springframework.web.cors.CorsUtils;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
-    private static final String permitURI[] = {"/v3/**", "/swagger-ui/**", "/api/auth/**"};
-    private static final String permittedRoles[] = {"USER", "ADMIN"};
+    private static final String PERMIT_URI[] = {"/v3/**", "/swagger-ui/**", "/api/auth/**"};
+    private static final String PERMITTED_ROLES[] = {"USER", "ADMIN"};
     private final CustomOAuth2UserService customOAuthService;
     private final OAuth2SuccessHandler successHandler;
 
@@ -51,8 +51,8 @@ public class SecurityConfig {
                 .anonymous().and()
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers(permitURI).permitAll()
-                        .anyRequest().hasAnyRole(permittedRoles))
+                        .requestMatchers(PERMIT_URI).permitAll()
+                        .anyRequest().hasAnyRole(PERMITTED_ROLES))
 
                 // JWT 사용으로 인한 세션 미사용
                 .sessionManagement(configurer -> configurer

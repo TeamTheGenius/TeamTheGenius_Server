@@ -13,5 +13,12 @@ import org.springframework.http.HttpStatus;
 @NoArgsConstructor
 public class CommonResponse {
     private HttpStatus code;
+    private int resultCode;
     private String message;
+
+    public CommonResponse(HttpStatus code, String message) {
+        this.code = code;
+        this.resultCode = code.value();
+        this.message = message;
+    }
 }

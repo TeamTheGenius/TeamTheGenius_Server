@@ -11,7 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
-    private final String REDIRECT_URL = "http://localhost:3000";
+    private final String REDIRECT_URL = "http://localhost:5173";
     private final String ERROR_PARAM_PREFIX = "error";
 
     @Override

@@ -33,9 +33,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        Role role = user.getRole();
 
-        String redirectUrl = getRedirectUrlByRole(role, email);
+        String redirectUrl = getRedirectUrlByRole(user.getRole(), email);
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 

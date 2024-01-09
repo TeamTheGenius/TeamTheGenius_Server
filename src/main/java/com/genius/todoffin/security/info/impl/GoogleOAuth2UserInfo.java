@@ -1,7 +1,7 @@
 package com.genius.todoffin.security.info.impl;
 
 
-import static com.genius.todoffin.security.constants.OAuthRule.EMAIL_KEY;
+import static com.genius.todoffin.security.constants.OAuthRule.COMMON_USER_KEY;
 import static com.genius.todoffin.security.constants.OAuthRule.GOOGLE_PROVIDER_ID;
 
 import com.genius.todoffin.security.info.OAuth2UserInfo;
@@ -14,12 +14,12 @@ public class GoogleOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
-    public String getProviderId() {
+    public String getProviderCode() {
         return (String) attributes.get(GOOGLE_PROVIDER_ID.getValue());
     }
 
     @Override
-    public String getEmail() {
-        return (String) attributes.get(EMAIL_KEY.getValue());
+    public String getUserIdentifier() {
+        return (String) attributes.get(COMMON_USER_KEY.getValue());
     }
 }

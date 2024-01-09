@@ -32,7 +32,7 @@ class UserRepositoryTest {
 
         //then
         assertThat(savedUser.getId()).isEqualTo(foundUser.getId());
-        assertThat(savedUser.getEmail()).isEqualTo(foundUser.getEmail());
+        assertThat(savedUser.getIdentifier()).isEqualTo(foundUser.getIdentifier());
         assertThat(savedUser.getProvider()).isEqualTo(foundUser.getProvider());
         assertThat(savedUser.getNickname()).isEqualTo(foundUser.getNickname());
     }
@@ -52,7 +52,7 @@ class UserRepositoryTest {
 
         //then
         assertThat(savedUser.getId()).isEqualTo(foundUser.getId());
-        assertThat(savedUser.getEmail()).isEqualTo(foundUser.getEmail());
+        assertThat(savedUser.getIdentifier()).isEqualTo(foundUser.getIdentifier());
         assertThat(savedUser.getProvider()).isEqualTo(foundUser.getProvider());
         assertThat(savedUser.getNickname()).isEqualTo(foundUser.getNickname());
     }

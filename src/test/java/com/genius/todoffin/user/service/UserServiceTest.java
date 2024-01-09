@@ -7,6 +7,7 @@ import com.genius.todoffin.user.domain.Role;
 import com.genius.todoffin.user.domain.User;
 import com.genius.todoffin.user.dto.SignupRequest;
 import com.genius.todoffin.user.repository.UserRepository;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class UserServiceTest {
                 .email(email)
                 .nickname("nickname")
                 .information("information")
-                .interest("interest")
+                .interest(List.of("관심사1", "관심사2"))
                 .build();
 
         //when
@@ -42,9 +43,8 @@ class UserServiceTest {
 
         Long signupUserId = userService.signup(signupRequest);
         User foundUser = userService.findUserById(signupUserId);
-
         //then
-        assertThat(user.getEmail()).isEqualTo(foundUser.getEmail());
+        assertThat(user.getIdentifier()).isEqualTo(foundUser.getIdentifier());
         assertThat(user.getNickname()).isEqualTo(foundUser.getNickname());
         assertThat(user.getProvider()).isEqualTo(foundUser.getProvider());
         assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());

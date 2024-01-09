@@ -3,6 +3,7 @@ package com.genius.todoffin.security.constants;
 import java.util.Arrays;
 
 public enum ProviderType {
+    GITHUB,
     KAKAO,
     NAVER,
     GOOGLE,

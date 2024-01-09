@@ -37,26 +37,26 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint()
                 .getUserNameAttributeName();
 
-        // 서비스를 구분하는 코드
-        String providerId = userRequest.getClientRegistration().getRegistrationId();
+        // 서비스를 구분하는 코드 ex) Github, Naver
+        String providerCode = userRequest.getClientRegistration().getRegistrationId();
 
-        ProviderType providerType = ProviderType.from(providerId);
+        ProviderType providerType = ProviderType.from(providerCode);
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, attributes);
-        String email = oAuth2UserInfo.getEmail();
+        String userIdentifier = oAuth2UserInfo.getUserIdentifier();
 
-        User user = getUser(email, providerType);
+        User user = getUser(userIdentifier, providerType);
 
         return new UserPrincipal(user, attributes, userNameAttributeName);
     }
 
-    private User getUser(String email, ProviderType providerType) {
-        Optional<User> optionalUser = userRepository.findByOAuthInfo(email, providerType);
+    private User getUser(String userIdentifier, ProviderType providerType) {
+        Optional<User> optionalUser = userRepository.findByOAuthInfo(userIdentifier, providerType);
 
         if (optionalUser.isEmpty()) {
             User unregisteredUser = User.builder()
-                    .email(email)
+                    .identifier(userIdentifier)
                     .role(Role.NOT_REGISTERED)
                     .provider(providerType)
                     .build();

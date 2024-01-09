@@ -29,7 +29,7 @@ public class User extends BaseTimeEntity {
     private ProviderType provider;
 
     @NotNull
-    private String email;
+    private String identifier;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -43,10 +43,10 @@ public class User extends BaseTimeEntity {
 
 
     @Builder
-    public User(ProviderType provider, String email, Role role, String nickname, String information,
+    public User(ProviderType provider, String identifier, Role role, String nickname, String information,
                 String interest) {
         this.provider = provider;
-        this.email = email;
+        this.identifier = identifier;
         this.role = role;
         this.nickname = nickname;
         this.information = information;

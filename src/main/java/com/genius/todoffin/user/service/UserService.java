@@ -24,8 +24,8 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public User findUserByIdentifier(String email) {
-        return userRepository.findByIdentifier(email)
+    public User findUserByIdentifier(String identifier) {
+        return userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 

@@ -39,7 +39,7 @@ class UserServiceTest {
                 .build();
 
         //when
-        User user = userService.findUserByEmail(email);
+        User user = userService.findUserByIdentifier(email);
 
         Long signupUserId = userService.signup(signupRequest);
         User foundUser = userService.findUserById(signupUserId);
@@ -56,7 +56,7 @@ class UserServiceTest {
         userRepository.save(User.builder()
                 .role(Role.NOT_REGISTERED)
                 .provider(ProviderType.NAVER)
-                .email("test@naver.com")
+                .identifier("test@naver.com")
                 .build());
     }
 }

@@ -2,7 +2,7 @@ package com.genius.todoffin.user.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.todoffin.security.constants.ProviderType;
+import com.genius.todoffin.security.constants.ProviderInfo;
 import com.genius.todoffin.user.domain.Role;
 import com.genius.todoffin.user.domain.User;
 import com.genius.todoffin.user.dto.SignupRequest;
@@ -46,7 +46,7 @@ class UserServiceTest {
         //then
         assertThat(user.getIdentifier()).isEqualTo(foundUser.getIdentifier());
         assertThat(user.getNickname()).isEqualTo(foundUser.getNickname());
-        assertThat(user.getProvider()).isEqualTo(foundUser.getProvider());
+        assertThat(user.getProviderInfo()).isEqualTo(foundUser.getProviderInfo());
         assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());
         assertThat(user.getInterest()).isEqualTo(foundUser.getInterest());
     }
@@ -55,7 +55,7 @@ class UserServiceTest {
     private void saveUnsignedUser() {
         userRepository.save(User.builder()
                 .role(Role.NOT_REGISTERED)
-                .provider(ProviderType.NAVER)
+                .provider(ProviderInfo.NAVER)
                 .identifier("test@naver.com")
                 .build());
     }

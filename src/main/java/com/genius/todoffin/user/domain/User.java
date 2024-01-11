@@ -2,7 +2,7 @@ package com.genius.todoffin.user.domain;
 
 
 import com.genius.todoffin.common.domain.BaseTimeEntity;
-import com.genius.todoffin.security.constants.ProviderType;
+import com.genius.todoffin.security.constants.ProviderInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -26,7 +26,7 @@ public class User extends BaseTimeEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private ProviderType provider;
+    private ProviderInfo providerInfo;
 
     @NotNull
     private String identifier;
@@ -43,9 +43,9 @@ public class User extends BaseTimeEntity {
 
 
     @Builder
-    public User(ProviderType provider, String identifier, Role role, String nickname, String information,
+    public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,
                 String interest) {
-        this.provider = provider;
+        this.providerInfo = providerInfo;
         this.identifier = identifier;
         this.role = role;
         this.nickname = nickname;

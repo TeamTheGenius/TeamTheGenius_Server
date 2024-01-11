@@ -1,6 +1,6 @@
 package com.genius.todoffin.security.service;
 
-import com.genius.todoffin.security.constants.ProviderType;
+import com.genius.todoffin.security.constants.ProviderInfo;
 import com.genius.todoffin.security.domain.UserPrincipal;
 import com.genius.todoffin.security.info.OAuth2UserInfo;
 import com.genius.todoffin.security.info.OAuth2UserInfoFactory;
@@ -40,25 +40,25 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // 서비스를 구분하는 코드 ex) Github, Naver
         String providerCode = userRequest.getClientRegistration().getRegistrationId();
 
-        ProviderType providerType = ProviderType.from(providerCode);
+        ProviderInfo providerInfo = ProviderInfo.from(providerCode);
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, attributes);
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerInfo, attributes);
         String userIdentifier = oAuth2UserInfo.getUserIdentifier();
 
-        User user = getUser(userIdentifier, providerType);
+        User user = getUser(userIdentifier, providerInfo);
 
         return new UserPrincipal(user, attributes, userNameAttributeName);
     }
 
-    private User getUser(String userIdentifier, ProviderType providerType) {
-        Optional<User> optionalUser = userRepository.findByOAuthInfo(userIdentifier, providerType);
+    private User getUser(String userIdentifier, ProviderInfo providerInfo) {
+        Optional<User> optionalUser = userRepository.findByOAuthInfo(userIdentifier, providerInfo);
 
         if (optionalUser.isEmpty()) {
             User unregisteredUser = User.builder()
                     .identifier(userIdentifier)
                     .role(Role.NOT_REGISTERED)
-                    .provider(providerType)
+                    .provider(providerInfo)
                     .build();
             return userRepository.save(unregisteredUser);
         }

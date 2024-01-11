@@ -1,7 +1,6 @@
 package com.genius.todoffin.security.info.impl;
 
-import static com.genius.todoffin.security.constants.OAuthRule.GITHUB_PROVIDER_ID;
-import static com.genius.todoffin.security.constants.OAuthRule.GITHUB_USER_IDENTIFIER;
+import static com.genius.todoffin.security.constants.ProviderInfo.GITHUB;
 
 import com.genius.todoffin.security.info.OAuth2UserInfo;
 import java.util.Map;
@@ -14,11 +13,11 @@ public class GithubOAuth2UserInfo extends OAuth2UserInfo {
 
     @Override
     public String getProviderCode() {
-        return (String) attributes.get(GITHUB_PROVIDER_ID.getValue());
+        return (String) attributes.get(GITHUB.getProviderCode());
     }
 
     @Override
     public String getUserIdentifier() {
-        return (String) attributes.get(GITHUB_USER_IDENTIFIER.getValue());
+        return (String) attributes.get(GITHUB.getIdentifier());
     }
 }

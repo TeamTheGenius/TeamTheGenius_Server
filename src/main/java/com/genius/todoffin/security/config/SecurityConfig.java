@@ -24,7 +24,7 @@ import org.springframework.web.cors.CorsUtils;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
-    private static final String PERMIT_URI[] = {"/v3/**", "/swagger-ui/**", "/api/auth/**"};
+    private static final String PERMITTED_URI[] = {"/v3/**", "/swagger-ui/**", "/api/auth/**"};
     private static final String PERMITTED_ROLES[] = {"USER", "ADMIN"};
     private final CustomCorsConfigurationSource customCorsConfigurationSource;
     private final CustomOAuth2UserService customOAuthService;
@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .formLogin(FormLoginConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-                        .requestMatchers(PERMIT_URI).permitAll()
+                        .requestMatchers(PERMITTED_URI).permitAll()
                         .anyRequest().hasAnyRole(PERMITTED_ROLES))
 
                 // JWT 사용으로 인한 세션 미사용

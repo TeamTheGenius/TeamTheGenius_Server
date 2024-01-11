@@ -2,7 +2,7 @@ package com.genius.todoffin.user.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.todoffin.security.constants.ProviderType;
+import com.genius.todoffin.security.constants.ProviderInfo;
 import com.genius.todoffin.user.domain.Role;
 import com.genius.todoffin.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
@@ -22,9 +22,9 @@ class UserRepositoryTest {
     public void email을_통해_저장한_User_객체를_찾을수있다() {
         //given
         String email = "test@naver.com";
-        ProviderType provider = ProviderType.GOOGLE;
+        ProviderInfo providerInfo = ProviderInfo.GOOGLE;
         String nickname = "test_nickname";
-        User user = getUnsavedUser(email, provider, nickname);
+        User user = getUnsavedUser(email, providerInfo, nickname);
 
         //when
         User savedUser = userRepository.save(user);
@@ -33,7 +33,7 @@ class UserRepositoryTest {
         //then
         assertThat(savedUser.getId()).isEqualTo(foundUser.getId());
         assertThat(savedUser.getIdentifier()).isEqualTo(foundUser.getIdentifier());
-        assertThat(savedUser.getProvider()).isEqualTo(foundUser.getProvider());
+        assertThat(savedUser.getProviderInfo()).isEqualTo(foundUser.getProviderInfo());
         assertThat(savedUser.getNickname()).isEqualTo(foundUser.getNickname());
     }
 
@@ -42,26 +42,26 @@ class UserRepositoryTest {
     public void email_provider를_통해_저장한_User_객체를_찾을수있다() {
         //given
         String email = "test@naver.com";
-        ProviderType provider = ProviderType.GOOGLE;
+        ProviderInfo providerInfo = ProviderInfo.GOOGLE;
         String nickname = "test_nickname";
-        User user = getUnsavedUser(email, provider, nickname);
+        User user = getUnsavedUser(email, providerInfo, nickname);
 
         //when
         User savedUser = userRepository.save(user);
-        User foundUser = userRepository.findByOAuthInfo(email, provider).get();
+        User foundUser = userRepository.findByOAuthInfo(email, providerInfo).get();
 
         //then
         assertThat(savedUser.getId()).isEqualTo(foundUser.getId());
         assertThat(savedUser.getIdentifier()).isEqualTo(foundUser.getIdentifier());
-        assertThat(savedUser.getProvider()).isEqualTo(foundUser.getProvider());
+        assertThat(savedUser.getProviderInfo()).isEqualTo(foundUser.getProviderInfo());
         assertThat(savedUser.getNickname()).isEqualTo(foundUser.getNickname());
     }
 
 
-    private User getUnsavedUser(String email, ProviderType provider, String nickname) {
+    private User getUnsavedUser(String email, ProviderInfo providerInfo, String nickname) {
         return User.builder()
                 .email(email)
-                .provider(provider)
+                .provider(providerInfo)
                 .role(Role.USER)
                 .nickname(nickname)
                 .build();

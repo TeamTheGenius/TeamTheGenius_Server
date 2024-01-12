@@ -31,7 +31,7 @@ public class UserService {
 
     @Transactional
     public Long signup(SignupRequest requestUser) {
-        User targetUser = findUserByIdentifier(requestUser.email());
+        User targetUser = findUserByIdentifier(requestUser.identifier());
 
         //TODO: Converter 클래스 만들어서 적용하기
         String interest = String.join(",", requestUser.interest());

@@ -1,7 +1,5 @@
 package com.genius.todoffin.security.handler;
 
-import static com.genius.todoffin.security.constants.OAuthRule.COMMON_USER_KEY;
-
 import com.genius.todoffin.user.domain.Role;
 import com.genius.todoffin.user.domain.User;
 import com.genius.todoffin.user.repository.UserRepository;
@@ -38,10 +36,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
-    private String getRedirectUrlByRole(Role role, String email) {
+    private String getRedirectUrlByRole(Role role, String identifier) {
         if (role == Role.NOT_REGISTERED) {
             return UriComponentsBuilder.fromUriString(SIGNUP_URL)
-                    .queryParam(COMMON_USER_KEY.getValue(), email)
+                    .queryParam("identifier", identifier)
                     .build()
                     .toUriString();
         }

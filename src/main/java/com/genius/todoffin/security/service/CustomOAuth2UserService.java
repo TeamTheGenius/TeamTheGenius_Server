@@ -58,7 +58,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             User unregisteredUser = User.builder()
                     .identifier(userIdentifier)
                     .role(Role.NOT_REGISTERED)
-                    .provider(providerInfo)
+                    .providerInfo(providerInfo)
                     .build();
             return userRepository.save(unregisteredUser);
         }

@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByIdentifier(String identifier);
 
-    @Query("select u from User u where u.identifier = :identifier and u.provider = :provider")
+    @Query("select u from User u where u.identifier = :identifier and u.providerInfo = :providerInfo")
     Optional<User> findByOAuthInfo(@Param("identifier") String identifier,
-                                   @Param("provider") ProviderInfo providerInfo);
+                                   @Param("providerInfo") ProviderInfo providerInfo);
 }

@@ -111,4 +111,14 @@ public class JwtService {
                 .getBody()
                 .getSubject();
     }
+
+    public void logout(User requestUser, HttpServletResponse response) {
+        tokenRepository.deleteById(requestUser.getIdentifier());
+
+        Cookie accessCookie = jwtUtil.resetToken(ACCESS_PREFIX);
+        Cookie refreshCookie = jwtUtil.resetToken(REFRESH_PREFIX);
+
+        response.addCookie(accessCookie);
+        response.addCookie(refreshCookie);
+    }
 }

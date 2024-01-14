@@ -57,7 +57,7 @@ public class JwtUtil {
         return Arrays.stream(cookies)
                 .filter(cookie -> cookie.getName().equals(tokenType.getValue()))
                 .findFirst()
-                .map(String::valueOf)
+                .map(Cookie::getValue)
                 .orElseThrow(() -> new BusinessException(TOKEN_NOT_FOUND));
     }
 
@@ -68,5 +68,12 @@ public class JwtUtil {
 
     private String encodeToBase64(String secretKey) {
         return Base64.getEncoder().encodeToString(secretKey.getBytes());
+    }
+
+    public Cookie resetToken(JwtRule tokenType) {
+        Cookie cookie = new Cookie(tokenType.getValue(), null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        return cookie;
     }
 }

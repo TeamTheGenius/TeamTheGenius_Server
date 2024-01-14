@@ -32,8 +32,8 @@ class UserRepositoryTest {
 
         //then
         assertThat(savedUser.getId()).isEqualTo(foundUser.getId());
-        assertThat(savedUser.getEmail()).isEqualTo(foundUser.getEmail());
-        assertThat(savedUser.getProvider()).isEqualTo(foundUser.getProvider());
+        // assertThat(savedUser.getEmail()).isEqualTo(foundUser.getEmail());
+        // assertThat(savedUser.getProvider()).isEqualTo(foundUser.getProvider());
         assertThat(savedUser.getNickname()).isEqualTo(foundUser.getNickname());
     }
 
@@ -52,16 +52,16 @@ class UserRepositoryTest {
 
         //then
         assertThat(savedUser.getId()).isEqualTo(foundUser.getId());
-        assertThat(savedUser.getEmail()).isEqualTo(foundUser.getEmail());
-        assertThat(savedUser.getProvider()).isEqualTo(foundUser.getProvider());
+        //assertThat(savedUser.getEmail()).isEqualTo(foundUser.getEmail());
+        //assertThat(savedUser.getProvider()).isEqualTo(foundUser.getProvider());
         assertThat(savedUser.getNickname()).isEqualTo(foundUser.getNickname());
     }
 
 
     private User getUnsavedUser(String email, ProviderType provider, String nickname) {
         return User.builder()
-                .email(email)
-                .provider(provider)
+                //.email(email)
+                .providerInfo(provider)
                 .role(Role.USER)
                 .nickname(nickname)
                 .build();

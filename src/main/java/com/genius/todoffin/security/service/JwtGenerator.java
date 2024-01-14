@@ -29,11 +29,12 @@ public class JwtGenerator {
                 .compact();
     }
 
-    public String generateRefreshToken(final String REFRESH_SECRET, final long REFRESH_EXPIRATION) {
+    public String generateRefreshToken(final String REFRESH_SECRET, final long REFRESH_EXPIRATION, User requestUser) {
         Long now = System.currentTimeMillis();
 
         return Jwts.builder()
                 .setHeader(createHeader())
+                .setSubject(requestUser.getIdentifier())
                 .setExpiration(new Date(now + REFRESH_EXPIRATION))
                 .signWith(getSigningKey(REFRESH_SECRET), SignatureAlgorithm.HS256)
                 .compact();

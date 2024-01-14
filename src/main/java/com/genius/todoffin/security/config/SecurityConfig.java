@@ -5,6 +5,8 @@ import com.genius.todoffin.security.filter.JwtAuthenticationFilter;
 import com.genius.todoffin.security.handler.OAuth2FailureHandler;
 import com.genius.todoffin.security.handler.OAuth2SuccessHandler;
 import com.genius.todoffin.security.service.CustomOAuth2UserService;
+import com.genius.todoffin.security.service.JwtService;
+import com.genius.todoffin.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,10 +26,12 @@ import org.springframework.web.cors.CorsUtils;
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
-    private static final String PERMITTED_URI[] = {"/v3/**", "/swagger-ui/**", "/api/auth/**"};
+    public static final String PERMITTED_URI[] = {"/v3/**", "/swagger-ui/**", "/api/auth/**"};
     private static final String PERMITTED_ROLES[] = {"USER", "ADMIN"};
     private final CustomCorsConfigurationSource customCorsConfigurationSource;
     private final CustomOAuth2UserService customOAuthService;
+    private final JwtService jwtService;
+    private final UserService userService;
     private final OAuth2SuccessHandler successHandler;
     private final OAuth2FailureHandler failureHandler;
 
@@ -50,7 +54,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // JWT 검증 필터 추가
-                .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userService),
+                        UsernamePasswordAuthenticationFilter.class)
 
                 // OAuth 로그인 설정
                 .oauth2Login(customConfigurer -> customConfigurer

@@ -3,10 +3,7 @@ package com.genius.todoffin.security.service;
 import com.genius.todoffin.user.domain.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtGenerator {
 
-    public String generateAccessToken(final String ACCESS_SECRET, final long ACCESS_EXPIRATION, User requestUser) {
+    public String generateAccessToken(final Key ACCESS_SECRET, final long ACCESS_EXPIRATION, User requestUser) {
         Long now = System.currentTimeMillis();
 
         return Jwts.builder()
@@ -25,18 +22,18 @@ public class JwtGenerator {
                 .setClaims(createClaims(requestUser))
                 .setSubject(String.valueOf(requestUser.getId()))
                 .setExpiration(new Date(now + ACCESS_EXPIRATION))
-                .signWith(getSigningKey(ACCESS_SECRET), SignatureAlgorithm.HS256)
+                .signWith(ACCESS_SECRET, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(final String REFRESH_SECRET, final long REFRESH_EXPIRATION, User requestUser) {
+    public String generateRefreshToken(final Key REFRESH_SECRET, final long REFRESH_EXPIRATION, User requestUser) {
         Long now = System.currentTimeMillis();
 
         return Jwts.builder()
                 .setHeader(createHeader())
                 .setSubject(requestUser.getIdentifier())
                 .setExpiration(new Date(now + REFRESH_EXPIRATION))
-                .signWith(getSigningKey(REFRESH_SECRET), SignatureAlgorithm.HS256)
+                .signWith(REFRESH_SECRET, SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -52,14 +49,5 @@ public class JwtGenerator {
         claims.put("Identifier", requestUser.getIdentifier());
         claims.put("Role", requestUser.getRole());
         return claims;
-    }
-
-    public Key getSigningKey(String secretKey) {
-        String encodedKey = encodeToBase64(secretKey);
-        return Keys.hmacShaKeyFor(encodedKey.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private String encodeToBase64(String secretKey) {
-        return Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 }

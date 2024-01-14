@@ -3,28 +3,16 @@ package com.genius.todoffin.security.service;
 import static com.genius.todoffin.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.todoffin.security.constants.JwtRule.JWT_ISSUE_HEADER;
 import static com.genius.todoffin.security.constants.JwtRule.REFRESH_PREFIX;
-import static com.genius.todoffin.util.exception.ErrorCode.INVALID_CLAIM_JWT;
-import static com.genius.todoffin.util.exception.ErrorCode.INVALID_EXPIRED_JWT;
-import static com.genius.todoffin.util.exception.ErrorCode.INVALID_JWT;
-import static com.genius.todoffin.util.exception.ErrorCode.INVALID_MALFORMED_JWT;
-import static com.genius.todoffin.util.exception.ErrorCode.UNSUPPORTED_JWT;
 
 import com.genius.todoffin.security.constants.JwtRule;
 import com.genius.todoffin.security.domain.Token;
 import com.genius.todoffin.security.repository.TokenRepository;
 import com.genius.todoffin.user.domain.User;
-import com.genius.todoffin.util.exception.BusinessException;
-import io.jsonwebtoken.ClaimJwtException;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.security.Key;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -36,32 +24,43 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 @Slf4j
 public class JwtService {
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtGenerator jwtGenerator;
+    private final JwtUtil jwtUtil;
     private final TokenRepository tokenRepository;
 
-    @Value("${jwt.access-secret}")
-    private String ACCESS_SECRET;
-    @Value("${jwt.refresh-secret}")
-    private String REFRESH_SECRET;
-    @Value("${jwt.access-expiration}")
-    private long ACCESS_EXPIRATION;
-    @Value("${jwt.refresh-expiration}")
-    private long REFRESH_EXPIRATION;
+    private final Key ACCESS_SECRET_KEY;
+    private final Key REFRESH_SECRET_KEY;
+    private final long ACCESS_EXPIRATION;
+    private final long REFRESH_EXPIRATION;
 
+    public JwtService(CustomUserDetailsService customUserDetailsService, JwtGenerator jwtGenerator,
+                      JwtUtil jwtUtil, TokenRepository tokenRepository,
+                      @Value("${jwt.access-secret}") String ACCESS_SECRET_KEY,
+                      @Value("${jwt.refresh-secret}") String REFRESH_SECRET_KEY,
+                      @Value("${jwt.access-expiration}") long ACCESS_EXPIRATION,
+                      @Value("${jwt.refresh-expiration}") long REFRESH_EXPIRATION) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.jwtGenerator = jwtGenerator;
+        this.jwtUtil = jwtUtil;
+        this.tokenRepository = tokenRepository;
+        this.ACCESS_SECRET_KEY = jwtUtil.getSigningKey(ACCESS_SECRET_KEY);
+        this.REFRESH_SECRET_KEY = jwtUtil.getSigningKey(REFRESH_SECRET_KEY);
+        this.ACCESS_EXPIRATION = ACCESS_EXPIRATION;
+        this.REFRESH_EXPIRATION = REFRESH_EXPIRATION;
+    }
 
     public void generateAccessToken(HttpServletResponse response, User requestUser) {
-        String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET, ACCESS_EXPIRATION, requestUser);
+        String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET_KEY, ACCESS_EXPIRATION, requestUser);
         ResponseCookie cookie = setTokenToCookie(ACCESS_PREFIX.getValue(), accessToken, ACCESS_EXPIRATION / 1000);
         response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
     }
 
     @Transactional
     public void generateRefreshToken(HttpServletResponse response, User requestUser) {
-        String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET, REFRESH_EXPIRATION, requestUser);
+        String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET_KEY, REFRESH_EXPIRATION, requestUser);
         ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
         response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
 
@@ -78,26 +77,20 @@ public class JwtService {
     }
 
     public boolean validateAccessToken(String token) {
-        Key signingKey = jwtGenerator.getSigningKey(ACCESS_SECRET);
-        return validateToken(token, signingKey);
+        return jwtUtil.validateToken(token, ACCESS_SECRET_KEY);
     }
 
     public boolean validateRefreshToken(String token, String identifier) {
-        Key signingKey = jwtGenerator.getSigningKey(REFRESH_SECRET);
-        return validateToken(token, signingKey) && tokenRepository.existsById(identifier);
+        return jwtUtil.validateToken(token, REFRESH_SECRET_KEY) && tokenRepository.existsById(identifier);
     }
 
     public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenType) {
         Cookie[] cookies = request.getCookies();
-        if (tokenType == ACCESS_PREFIX) {
-            return cookies[0].getValue();
-        }
-        return cookies[1].getValue();
+        return jwtUtil.resolveTokenFromCookie(cookies, tokenType);
     }
 
     public Authentication getAuthentication(String token) {
-        Key key = jwtGenerator.getSigningKey(ACCESS_SECRET);
-        UserDetails principal = customUserDetailsService.loadUserByUsername(getUserPk(token, key));
+        UserDetails principal = customUserDetailsService.loadUserByUsername(getUserPk(token, ACCESS_SECRET_KEY));
         return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
     }
 
@@ -110,33 +103,12 @@ public class JwtService {
                 .getSubject();
     }
 
-    public String getIdentifierFromToken(String refreshToken) {
+    public String getIdentifierFromRefresh(String refreshToken) {
         return Jwts.parserBuilder()
-                .setSigningKey(REFRESH_SECRET)
+                .setSigningKey(REFRESH_SECRET_KEY)
                 .build()
                 .parseClaimsJws(refreshToken)
                 .getBody()
                 .getSubject();
-    }
-
-    private boolean validateToken(String token, Key secretKey) {
-        try {
-            Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        } catch (ExpiredJwtException e) {
-            log.error(INVALID_EXPIRED_JWT.getMessage());
-            return false;
-        } catch (MalformedJwtException e) {
-            throw new BusinessException(INVALID_MALFORMED_JWT);
-        } catch (ClaimJwtException e) {
-            throw new BusinessException(INVALID_CLAIM_JWT);
-        } catch (UnsupportedJwtException e) {
-            throw new BusinessException(UNSUPPORTED_JWT);
-        } catch (JwtException e) {
-            throw new BusinessException(INVALID_JWT);
-        }
     }
 }

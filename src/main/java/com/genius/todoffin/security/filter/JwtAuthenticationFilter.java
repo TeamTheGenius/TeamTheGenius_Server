@@ -1,8 +1,9 @@
 package com.genius.todoffin.security.filter;
 
 import static com.genius.todoffin.security.config.SecurityConfig.PERMITTED_URI;
+import static com.genius.todoffin.security.constants.JwtRule.ACCESS_PREFIX;
+import static com.genius.todoffin.security.constants.JwtRule.REFRESH_PREFIX;
 
-import com.genius.todoffin.security.constants.JwtRule;
 import com.genius.todoffin.security.service.JwtService;
 import com.genius.todoffin.user.domain.User;
 import com.genius.todoffin.user.service.UserService;
@@ -32,29 +33,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String accessToken = jwtService.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
+        String accessToken = jwtService.resolveTokenFromCookie(request, ACCESS_PREFIX);
         if (jwtService.validateAccessToken(accessToken)) {
-            Authentication authentication = jwtService.getAuthentication(accessToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            setAuthenticationToContext(accessToken);
             filterChain.doFilter(request, response);
             return;
         }
 
-        String refreshToken = jwtService.resolveTokenFromCookie(request, JwtRule.REFRESH_PREFIX);
-        String identifier = jwtService.getIdentifierFromToken(refreshToken);
+        String refreshToken = jwtService.resolveTokenFromCookie(request, REFRESH_PREFIX);
+        String identifier = jwtService.getIdentifierFromRefresh(refreshToken);
         if (jwtService.validateRefreshToken(refreshToken, identifier)) {
             User user = userService.findUserByIdentifier(identifier);
             jwtService.generateAccessToken(response, user);
             jwtService.generateRefreshToken(response, user);
         }
 
-        Authentication authentication = jwtService.getAuthentication(accessToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        setAuthenticationToContext(accessToken);
         filterChain.doFilter(request, response);
     }
 
     private boolean isPermittedURI(String requestURI) {
         return Arrays.stream(PERMITTED_URI)
                 .anyMatch(permitted -> permitted.contains(requestURI));
+    }
+
+    private void setAuthenticationToContext(String accessToken) {
+        Authentication authentication = jwtService.getAuthentication(accessToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

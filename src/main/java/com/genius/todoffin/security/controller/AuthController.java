@@ -27,7 +27,7 @@ public class AuthController {
     @PostMapping("/auth")
     public ResponseEntity<CommonResponse> generateToken(HttpServletResponse response,
                                                         @RequestBody TokenRequest tokenRequest) {
-        User requestUser = userService.findUserById(tokenRequest.userId());
+        User requestUser = userService.findUserByIdentifier(tokenRequest.identifier());
         jwtService.generateAccessToken(response, requestUser);
         jwtService.generateRefreshToken(response);
 

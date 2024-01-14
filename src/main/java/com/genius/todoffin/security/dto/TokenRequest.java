@@ -1,4 +1,4 @@
 package com.genius.todoffin.security.dto;
 
-public record TokenRequest(long userId) {
+public record TokenRequest(String identifier) {
 }

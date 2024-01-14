@@ -29,7 +29,7 @@ public class AuthController {
                                                         @RequestBody TokenRequest tokenRequest) {
         User requestUser = userService.findUserByIdentifier(tokenRequest.identifier());
         jwtService.generateAccessToken(response, requestUser);
-        jwtService.generateRefreshToken(response);
+        jwtService.generateRefreshToken(response, requestUser);
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())

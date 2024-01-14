@@ -1,5 +1,7 @@
 package com.genius.todoffin.security.service;
 
+import com.genius.todoffin.security.domain.Token;
+import com.genius.todoffin.security.repository.TokenRepository;
 import com.genius.todoffin.user.domain.User;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class JwtService {
     private final JwtGenerator jwtGenerator;
+    private final TokenRepository tokenRepository;
 
     @Value("${jwt.access-secret}")
     private String ACCESS_SECRET;
@@ -32,10 +35,12 @@ public class JwtService {
         response.addHeader("Set-Cookie", cookie.toString());
     }
 
-    public void generateRefreshToken(HttpServletResponse response) {
+    public void generateRefreshToken(HttpServletResponse response, User requestUser) {
         String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET, REFRESH_EXPIRATION);
         ResponseCookie cookie = setTokenToCookie("refresh-token", refreshToken, REFRESH_EXPIRATION / 1000);
         response.addHeader("Set-Cookie", cookie.toString());
+
+        tokenRepository.save(new Token(requestUser.getIdentifier(), refreshToken));
     }
 
     private ResponseCookie setTokenToCookie(String tokenType, String token, long maxAgeSeconds) {

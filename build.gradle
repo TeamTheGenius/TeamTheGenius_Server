@@ -37,6 +37,9 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.7'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.10.7'
 
+    // MongoDB
+    implementation 'org.springframework.data:spring-data-mongodb:4.2.0'
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'

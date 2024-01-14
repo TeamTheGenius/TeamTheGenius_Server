@@ -1,5 +1,9 @@
 package com.genius.todoffin.security.service;
 
+import static com.genius.todoffin.security.constants.JwtRule.ACCESS_PREFIX;
+import static com.genius.todoffin.security.constants.JwtRule.JWT_ISSUE_HEADER;
+import static com.genius.todoffin.security.constants.JwtRule.REFRESH_PREFIX;
+
 import com.genius.todoffin.security.domain.Token;
 import com.genius.todoffin.security.repository.TokenRepository;
 import com.genius.todoffin.user.domain.User;
@@ -31,14 +35,14 @@ public class JwtService {
 
     public void generateAccessToken(HttpServletResponse response, User requestUser) {
         String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET, ACCESS_EXPIRATION, requestUser);
-        ResponseCookie cookie = setTokenToCookie("access-token", accessToken, ACCESS_EXPIRATION / 1000);
-        response.addHeader("Set-Cookie", cookie.toString());
+        ResponseCookie cookie = setTokenToCookie(ACCESS_PREFIX.getValue(), accessToken, ACCESS_EXPIRATION / 1000);
+        response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
     }
 
     public void generateRefreshToken(HttpServletResponse response, User requestUser) {
         String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET, REFRESH_EXPIRATION);
-        ResponseCookie cookie = setTokenToCookie("refresh-token", refreshToken, REFRESH_EXPIRATION / 1000);
-        response.addHeader("Set-Cookie", cookie.toString());
+        ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
+        response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
 
         tokenRepository.save(new Token(requestUser.getIdentifier(), refreshToken));
     }

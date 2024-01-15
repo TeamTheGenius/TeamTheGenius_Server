@@ -5,6 +5,7 @@ import static com.genius.todoffin.security.constants.JwtRule.JWT_ISSUE_HEADER;
 import static com.genius.todoffin.security.constants.JwtRule.REFRESH_PREFIX;
 
 import com.genius.todoffin.security.constants.JwtRule;
+import com.genius.todoffin.security.constants.TokenStatus;
 import com.genius.todoffin.security.domain.Token;
 import com.genius.todoffin.security.repository.TokenRepository;
 import com.genius.todoffin.user.domain.User;
@@ -52,10 +53,12 @@ public class JwtService {
         this.REFRESH_EXPIRATION = REFRESH_EXPIRATION;
     }
 
-    public void generateAccessToken(HttpServletResponse response, User requestUser) {
+    public String generateAccessToken(HttpServletResponse response, User requestUser) {
         String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET_KEY, ACCESS_EXPIRATION, requestUser);
         ResponseCookie cookie = setTokenToCookie(ACCESS_PREFIX.getValue(), accessToken, ACCESS_EXPIRATION / 1000);
         response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
+
+        return accessToken;
     }
 
     @Transactional
@@ -67,8 +70,8 @@ public class JwtService {
         tokenRepository.save(new Token(requestUser.getIdentifier(), refreshToken));
     }
 
-    private ResponseCookie setTokenToCookie(String tokenType, String token, long maxAgeSeconds) {
-        return ResponseCookie.from(tokenType, token)
+    private ResponseCookie setTokenToCookie(String tokenPrefix, String token, long maxAgeSeconds) {
+        return ResponseCookie.from(tokenPrefix, token)
                 .path("/")
                 .maxAge(maxAgeSeconds)
                 .httpOnly(true)
@@ -77,16 +80,17 @@ public class JwtService {
     }
 
     public boolean validateAccessToken(String token) {
-        return jwtUtil.validateToken(token, ACCESS_SECRET_KEY);
+        return jwtUtil.getTokenStatus(token, ACCESS_SECRET_KEY) == TokenStatus.AUTHENTICATED;
     }
 
     public boolean validateRefreshToken(String token, String identifier) {
-        return jwtUtil.validateToken(token, REFRESH_SECRET_KEY) && tokenRepository.existsById(identifier);
+        boolean isRefreshValid = jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == TokenStatus.AUTHENTICATED;
+        return isRefreshValid && tokenRepository.existsById(identifier);
     }
 
-    public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenType) {
+    public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenPrefix) {
         Cookie[] cookies = request.getCookies();
-        return jwtUtil.resolveTokenFromCookie(cookies, tokenType);
+        return jwtUtil.resolveTokenFromCookie(cookies, tokenPrefix);
     }
 
     public Authentication getAuthentication(String token) {

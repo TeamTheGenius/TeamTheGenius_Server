@@ -14,24 +14,24 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtGenerator {
 
-    public String generateAccessToken(final Key ACCESS_SECRET, final long ACCESS_EXPIRATION, User requestUser) {
+    public String generateAccessToken(final Key ACCESS_SECRET, final long ACCESS_EXPIRATION, User user) {
         Long now = System.currentTimeMillis();
 
         return Jwts.builder()
                 .setHeader(createHeader())
-                .setClaims(createClaims(requestUser))
-                .setSubject(String.valueOf(requestUser.getId()))
+                .setClaims(createClaims(user))
+                .setSubject(String.valueOf(user.getId()))
                 .setExpiration(new Date(now + ACCESS_EXPIRATION))
                 .signWith(ACCESS_SECRET, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public String generateRefreshToken(final Key REFRESH_SECRET, final long REFRESH_EXPIRATION, User requestUser) {
+    public String generateRefreshToken(final Key REFRESH_SECRET, final long REFRESH_EXPIRATION, User user) {
         Long now = System.currentTimeMillis();
 
         return Jwts.builder()
                 .setHeader(createHeader())
-                .setSubject(requestUser.getIdentifier())
+                .setSubject(user.getIdentifier())
                 .setExpiration(new Date(now + REFRESH_EXPIRATION))
                 .signWith(REFRESH_SECRET, SignatureAlgorithm.HS256)
                 .compact();
@@ -44,10 +44,10 @@ public class JwtGenerator {
         return header;
     }
 
-    private Map<String, Object> createClaims(User requestUser) {
+    private Map<String, Object> createClaims(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("Identifier", requestUser.getIdentifier());
-        claims.put("Role", requestUser.getRole());
+        claims.put("Identifier", user.getIdentifier());
+        claims.put("Role", user.getRole());
         return claims;
     }
 }

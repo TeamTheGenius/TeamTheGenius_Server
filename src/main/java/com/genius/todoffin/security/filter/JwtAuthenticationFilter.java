@@ -41,15 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         String refreshToken = jwtService.resolveTokenFromCookie(request, REFRESH_PREFIX);
-        String identifier = jwtService.getIdentifierFromRefresh(refreshToken);
-        if (jwtService.validateRefreshToken(refreshToken, identifier)) {
-            User user = userService.findUserByIdentifier(identifier);
-            jwtService.generateAccessToken(response, user);
-            jwtService.generateRefreshToken(response, user);
-        }
+        User user = findUserByRefreshToken(refreshToken);
 
-        setAuthenticationToContext(accessToken);
-        filterChain.doFilter(request, response);
+        if (jwtService.validateRefreshToken(refreshToken, user.getIdentifier())) {
+            String reissuedAccessToken = jwtService.generateAccessToken(response, user);
+            jwtService.generateRefreshToken(response, user);
+
+            setAuthenticationToContext(reissuedAccessToken);
+        }
     }
 
     private boolean isPermittedURI(String requestURI) {
@@ -58,6 +57,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     String replace = permitted.replace("*", "");
                     return requestURI.contains(replace);
                 });
+    }
+
+    private User findUserByRefreshToken(String refreshToken) {
+        String identifier = jwtService.getIdentifierFromRefresh(refreshToken);
+        return userService.findUserByIdentifier(identifier);
     }
 
     private void setAuthenticationToContext(String accessToken) {

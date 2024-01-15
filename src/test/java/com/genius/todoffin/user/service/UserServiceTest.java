@@ -32,7 +32,7 @@ class UserServiceTest {
         String email = "test@naver.com";
         saveUnsignedUser();
         SignupRequest signupRequest = SignupRequest.builder()
-                .email(email)
+                .identifier(email)
                 .nickname("nickname")
                 .information("information")
                 .interest(List.of("관심사1", "관심사2"))
@@ -55,7 +55,7 @@ class UserServiceTest {
     private void saveUnsignedUser() {
         userRepository.save(User.builder()
                 .role(Role.NOT_REGISTERED)
-                .provider(ProviderInfo.NAVER)
+                .providerInfo(ProviderInfo.NAVER)
                 .identifier("test@naver.com")
                 .build());
     }

@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return Arrays.stream(PERMITTED_URI)
                 .anyMatch(permitted -> {
                     String replace = permitted.replace("*", "");
-                    return replace.contains(requestURI);
+                    return requestURI.contains(replace);
                 });
     }
 

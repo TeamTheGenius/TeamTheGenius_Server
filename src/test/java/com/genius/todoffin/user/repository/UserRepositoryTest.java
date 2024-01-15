@@ -1,5 +1,6 @@
 package com.genius.todoffin.user.repository;
 
+import static com.genius.todoffin.security.constants.ProviderInfo.GITHUB;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.todoffin.security.constants.ProviderInfo;
@@ -28,7 +29,7 @@ class UserRepositoryTest {
 
         //when
         User savedUser = userRepository.save(user);
-        User foundUser = userRepository.findByEmail(email).get();
+        User foundUser = userRepository.findByIdentifier(email).get();
 
         //then
         assertThat(savedUser.getId()).isEqualTo(foundUser.getId());
@@ -57,11 +58,25 @@ class UserRepositoryTest {
         assertThat(savedUser.getNickname()).isEqualTo(foundUser.getNickname());
     }
 
+    @Test
+    @DisplayName("User nickname 중복 방지 테스트")
+    public void checkNicknameDuplicate() {
+        //given
+        User user1 = getUnsavedUser("SSung023", GITHUB, "nickname");
 
-    private User getUnsavedUser(String email, ProviderInfo providerInfo, String nickname) {
+        //when
+        User savedUser = userRepository.save(user1);
+        User nickname = userRepository.findByNickname("nickname").get();
+
+        //then
+        assertThat(nickname).isEqualTo(savedUser);
+    }
+
+
+    private User getUnsavedUser(String identifier, ProviderInfo providerInfo, String nickname) {
         return User.builder()
-                .email(email)
-                .provider(providerInfo)
+                .identifier(identifier)
+                .providerInfo(providerInfo)
                 .role(Role.USER)
                 .nickname(nickname)
                 .build();

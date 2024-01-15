@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByEmail(String email);
+     Optional<User> findByIdentifier(String identifier);
 
-    @Query("select u from User u where u.email = :email and u.provider = :provider")
-    Optional<User> findByOAuthInfo(@Param("email") String email, @Param("provider") ProviderType provider);
+     @Query("select u from User u where u.identifier = :identifier and u.providerInfo = :provider")
+     Optional<User> findByOAuthInfo(@Param("identifier") String identifier, @Param("provider") ProviderType provider);
 }

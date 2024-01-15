@@ -2,26 +2,27 @@ package com.genius.todoffin.challenge.domain;
 
 import com.genius.todoffin.user.domain.User;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Comment;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "hits")
 public class Hits {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "hits_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instance_id")
-    @Comment("인스턴스 PK")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Instance instance;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @Comment("유저 PK")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private User user;
 }

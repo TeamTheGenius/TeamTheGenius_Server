@@ -1,14 +1,16 @@
 package com.genius.todoffin.challenge.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "topic")
 public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +25,7 @@ public class Topic {
 
     private int point_per_person;
 
-    @OneToMany
-    @JoinColumn(name = "instance_id")
+    @OneToMany(mappedBy = "topic")
     private List<Instance> instanceList;
 
     public Topic(String title, String description, String tags, int point_per_person) {

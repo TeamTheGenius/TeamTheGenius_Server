@@ -24,14 +24,14 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    public User findUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+    public User findUserByEmail(String identifier) {
+        return userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
     @Transactional
     public Long signup(SignupRequest requestUser) {
-        User targetUser = findUserByEmail(requestUser.email());
+        User targetUser = findUserByEmail(requestUser.identifier());
 
         //TODO: Converter 클래스 만들어서 적용하기
         String interest = String.join(",", requestUser.interest());

@@ -5,6 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
+
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,6 +27,7 @@ public class BaseTimeEntity {
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime modifiedDate;
+
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedDate;

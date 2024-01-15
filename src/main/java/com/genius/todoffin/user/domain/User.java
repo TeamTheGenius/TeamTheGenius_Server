@@ -6,17 +6,15 @@ import com.genius.todoffin.common.domain.BaseTimeEntity;
 import com.genius.todoffin.security.constants.ProviderType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "user")
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,22 +32,18 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @NotNull
     @Column(unique = true, length = 10)
     private String nickname;
 
-    @NotNull
     private String interest;
 
     @Column(length = 100)
     private String information;
 
-    @OneToMany
-    @JoinColumn(name = "hits_id")
+    @OneToMany(mappedBy = "user")
     private List<Hits> hitsList = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "participantInfo_id")
+    @OneToMany(mappedBy = "user")
     private List<ParticipantInfo> participantInfoList = new ArrayList<>();
 
 

@@ -2,33 +2,36 @@ package com.genius.todoffin.challenge.domain;
 
 import com.genius.todoffin.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Comment;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.Fetch;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
+@Table(name = "instance")
 public class Instance extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "instance_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
-    @Comment("토픽 PK")
     private Topic topic;
 
-    @OneToMany
-    @JoinColumn(name = "hits_id")
+    @OneToMany(mappedBy = "instance")
     private List<Hits> hitsList = new ArrayList<>();
 
-    @OneToMany
-    @JoinColumn(name = "participantInfo_id")
+    @OneToMany(mappedBy = "instance")
     private List<ParticipantInfo> participantInfoList = new ArrayList<>();
 
     private String title;
@@ -41,9 +44,13 @@ public class Instance extends BaseTimeEntity {
 
     private int point_per_person;
 
+    @NotNull
+    @ColumnDefault("0")
     private int like_count;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
+    @ColumnDefault("'PRE_ACTIVITY'")
     private Progress progress;
 
     public Instance(String title, String description, int participants, String tags, int point_per_person, int like_count, Progress progress) {

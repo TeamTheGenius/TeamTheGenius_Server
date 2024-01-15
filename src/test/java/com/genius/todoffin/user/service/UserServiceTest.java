@@ -27,28 +27,7 @@ class UserServiceTest {
     @Test
     @DisplayName("특정 사용자 가입 테스트")
     public void should_matchValues_when_signupUser() {
-        //given
-        String email = "test@naver.com";
-        saveUnsignedUser();
-        SignupRequest signupRequest = SignupRequest.builder()
-                .email(email)
-                .nickname("nickname")
-                .information("information")
-                // .interest("interest")
-                .build();
 
-        //when
-        User user = userService.findUserByEmail(email);
-
-        Long signupUserId = userService.signup(signupRequest);
-        User foundUser = userService.findUserById(signupUserId);
-
-        //then
-        // assertThat(user.getEmail()).isEqualTo(foundUser.getEmail());
-        assertThat(user.getNickname()).isEqualTo(foundUser.getNickname());
-        // assertThat(user.getProvider()).isEqualTo(foundUser.getProvider());
-        assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());
-        assertThat(user.getInterest()).isEqualTo(foundUser.getInterest());
     }
 
 

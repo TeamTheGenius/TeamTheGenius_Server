@@ -2,30 +2,35 @@ package com.genius.todoffin.challenge.domain;
 
 import com.genius.todoffin.user.domain.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Comment;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
+@Table(name = "participantInfo")
 public class ParticipantInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "participantInfo_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instance_id")
-    @Comment("instance_FK")
     private Instance instance;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @Comment("user_FK")
     private User user;
 
+    @NotNull
     @Column(name = "join_status")
+    @ColumnDefault("0")
     private Boolean joinStatus;
 
     @Enumerated(EnumType.STRING)

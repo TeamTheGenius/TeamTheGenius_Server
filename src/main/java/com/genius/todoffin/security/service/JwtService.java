@@ -62,12 +62,13 @@ public class JwtService {
     }
 
     @Transactional
-    public void generateRefreshToken(HttpServletResponse response, User requestUser) {
+    public String generateRefreshToken(HttpServletResponse response, User requestUser) {
         String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET_KEY, REFRESH_EXPIRATION, requestUser);
         ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
         response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
 
         tokenRepository.save(new Token(requestUser.getIdentifier(), refreshToken));
+        return refreshToken;
     }
 
     private ResponseCookie setTokenToCookie(String tokenPrefix, String token, long maxAgeSeconds) {

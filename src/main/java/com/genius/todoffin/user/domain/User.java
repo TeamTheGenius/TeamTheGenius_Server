@@ -3,13 +3,23 @@ package com.genius.todoffin.user.domain;
 import com.genius.todoffin.challenge.domain.Hits;
 import com.genius.todoffin.challenge.domain.ParticipantInfo;
 import com.genius.todoffin.common.domain.BaseTimeEntity;
-import com.genius.todoffin.security.constants.ProviderType;
-import jakarta.persistence.*;
+import com.genius.todoffin.security.constants.ProviderInfo;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
@@ -23,7 +33,7 @@ public class User extends BaseTimeEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private ProviderType providerInfo;
+    private ProviderInfo providerInfo;
 
     @NotNull
     private String identifier;
@@ -48,7 +58,8 @@ public class User extends BaseTimeEntity {
 
 
     @Builder
-    public User(ProviderType providerInfo, String identifier, Role role, String nickname, String interest, String information) {
+    public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,
+                String interest) {
         this.providerInfo = providerInfo;
         this.identifier = identifier;
         this.role = role;

@@ -1,7 +1,5 @@
 package com.genius.todoffin.security.handler;
 
-import static com.genius.todoffin.security.constants.OAuthRule.EMAIL_KEY;
-
 import com.genius.todoffin.user.domain.Role;
 import com.genius.todoffin.user.domain.User;
 import com.genius.todoffin.user.repository.UserRepository;
@@ -33,16 +31,15 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         User user = userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        Role role = user.getRole();
 
-        String redirectUrl = getRedirectUrlByRole(role, identifier);
+        String redirectUrl = getRedirectUrlByRole(user.getRole(), identifier);
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
-    private String getRedirectUrlByRole(Role role, String email) {
+    private String getRedirectUrlByRole(Role role, String identifier) {
         if (role == Role.NOT_REGISTERED) {
             return UriComponentsBuilder.fromUriString(SIGNUP_URL)
-                    .queryParam(EMAIL_KEY.getValue(), email)
+                    .queryParam("identifier", identifier)
                     .build()
                     .toUriString();
         }

@@ -1,6 +1,6 @@
 package com.genius.todoffin.security.service;
 
-import com.genius.todoffin.security.constants.ProviderType;
+import com.genius.todoffin.security.constants.ProviderInfo;
 import com.genius.todoffin.security.domain.UserPrincipal;
 import com.genius.todoffin.security.info.OAuth2UserInfo;
 import com.genius.todoffin.security.info.OAuth2UserInfoFactory;
@@ -37,28 +37,28 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint()
                 .getUserNameAttributeName();
 
-        // 서비스를 구분하는 코드
-        String providerId = userRequest.getClientRegistration().getRegistrationId();
+        // 서비스를 구분하는 코드 ex) Github, Naver
+        String providerCode = userRequest.getClientRegistration().getRegistrationId();
 
-        ProviderType providerType = ProviderType.from(providerId);
+        ProviderInfo providerInfo = ProviderInfo.from(providerCode);
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerType, attributes);
-        String email = oAuth2UserInfo.getEmail();
+        OAuth2UserInfo oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(providerInfo, attributes);
+        String userIdentifier = oAuth2UserInfo.getUserIdentifier();
 
-        User user = getUser(email, providerType);
+        User user = getUser(userIdentifier, providerInfo);
 
         return new UserPrincipal(user, attributes, userNameAttributeName);
     }
 
-    private User getUser(String identifier, ProviderType providerType) {
-        Optional<User> optionalUser = userRepository.findByOAuthInfo(identifier, providerType);
+    private User getUser(String userIdentifier, ProviderInfo providerInfo) {
+        Optional<User> optionalUser = userRepository.findByOAuthInfo(userIdentifier, providerInfo);
 
         if (optionalUser.isEmpty()) {
             User unregisteredUser = User.builder()
-                    // .email(email)
+                    .identifier(userIdentifier)
                     .role(Role.NOT_REGISTERED)
-                    .providerInfo(providerType)
+                    .providerInfo(providerInfo)
                     .build();
             return userRepository.save(unregisteredUser);
         }

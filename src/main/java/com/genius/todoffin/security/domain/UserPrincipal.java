@@ -20,6 +20,6 @@ public class UserPrincipal extends DefaultOAuth2User {
 
     @Override
     public String getName() {
-        return user.getEmail();
+        return user.getIdentifier();
     }
 }

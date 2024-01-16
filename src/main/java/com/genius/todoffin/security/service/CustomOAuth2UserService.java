@@ -51,14 +51,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         return new UserPrincipal(user, attributes, userNameAttributeName);
     }
 
-    private User getUser(String email, ProviderType providerType) {
-        Optional<User> optionalUser = userRepository.findByOAuthInfo(email, providerType);
+    private User getUser(String identifier, ProviderType providerType) {
+        Optional<User> optionalUser = userRepository.findByOAuthInfo(identifier, providerType);
 
         if (optionalUser.isEmpty()) {
             User unregisteredUser = User.builder()
-                    .email(email)
+                    // .email(email)
                     .role(Role.NOT_REGISTERED)
-                    .provider(providerType)
+                    .providerInfo(providerType)
                     .build();
             return userRepository.save(unregisteredUser);
         }

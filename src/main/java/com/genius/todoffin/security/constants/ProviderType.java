@@ -5,8 +5,7 @@ import java.util.Arrays;
 public enum ProviderType {
     KAKAO,
     NAVER,
-    GOOGLE,
-    FACEBOOK;
+    GOOGLE;
 
     public static ProviderType from(String provider) {
         String upperCastedProvider = provider.toUpperCase();

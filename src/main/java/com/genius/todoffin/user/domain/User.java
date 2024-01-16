@@ -1,6 +1,7 @@
 package com.genius.todoffin.user.domain;
 
-
+import com.genius.todoffin.challenge.domain.Hits;
+import com.genius.todoffin.challenge.domain.ParticipantInfo;
 import com.genius.todoffin.common.domain.BaseTimeEntity;
 import com.genius.todoffin.security.constants.ProviderInfo;
 import jakarta.persistence.Column;
@@ -10,14 +11,20 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "user")
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,15 +38,23 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String identifier;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Column(unique = true, length = 16)
+    @Column(unique = true, length = 10)
     private String nickname;
 
-    @Column(length = 160)
-    private String information;
     private String interest;
+
+    @Column(length = 100)
+    private String information;
+
+    @OneToMany(mappedBy = "user")
+    private List<Hits> hitsList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
 
 
     @Builder
@@ -49,8 +64,8 @@ public class User extends BaseTimeEntity {
         this.identifier = identifier;
         this.role = role;
         this.nickname = nickname;
-        this.information = information;
         this.interest = interest;
+        this.information = information;
     }
 
     public void updateUser(String nickname, String information, String interest) {

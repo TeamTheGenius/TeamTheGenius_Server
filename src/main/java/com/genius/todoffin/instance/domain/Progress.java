@@ -1,4 +1,4 @@
-package com.genius.todoffin.challenge.domain;
+package com.genius.todoffin.instance.domain;
 
 import lombok.Getter;
 

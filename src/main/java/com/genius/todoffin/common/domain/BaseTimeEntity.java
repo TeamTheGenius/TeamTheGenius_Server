@@ -6,7 +6,6 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.ToString;
 import org.springframework.data.annotation.CreatedDate;
@@ -19,7 +18,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseTimeEntity {
 
-    // User 테이블
     @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdDate;
@@ -28,16 +26,6 @@ public class BaseTimeEntity {
     @Column(name = "updated_at")
     private LocalDateTime modifiedDate;
 
-
     @Column(name = "deleted_at")
     private LocalDateTime deletedDate;
-
-
-    // ======================================================
-    // Instance 테이블
-    @Column(name = "started_at")
-    private LocalDateTime startedDate;
-
-    @Column(name = "completed_at")
-    private LocalDateTime completedDate;
 }

@@ -1,5 +1,6 @@
-package com.genius.todoffin.challenge.domain;
+package com.genius.todoffin.topic.domain;
 
+import com.genius.todoffin.instance.domain.Instance;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,6 +18,9 @@ public class Topic {
     @Column(name = "topic_id")
     private Long id;
 
+    @OneToMany(mappedBy = "topic")
+    private List<Instance> instanceList;
+
     private String title;
 
     private String description;
@@ -24,9 +28,6 @@ public class Topic {
     private String tags;
 
     private int point_per_person;
-
-    @OneToMany(mappedBy = "topic")
-    private List<Instance> instanceList;
 
     public Topic(String title, String description, String tags, int point_per_person) {
         this.title = title;

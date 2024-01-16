@@ -1,6 +1,9 @@
-package com.genius.todoffin.challenge.domain;
+package com.genius.todoffin.instance.domain;
 
+import com.genius.todoffin.participantinfo.domain.ParticipantInfo;
+import com.genius.todoffin.topic.domain.Topic;
 import com.genius.todoffin.common.domain.BaseTimeEntity;
+import com.genius.todoffin.hits.domain.Hits;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -8,8 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.Fetch;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,21 +21,21 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 @Table(name = "instance")
-public class Instance extends BaseTimeEntity {
+public class Instance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "instance_id")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id")
-    private Topic topic;
 
     @OneToMany(mappedBy = "instance")
     private List<Hits> hitsList = new ArrayList<>();
 
     @OneToMany(mappedBy = "instance")
     private List<ParticipantInfo> participantInfoList = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_id")
+    private Topic topic;
 
     private String title;
 
@@ -53,7 +56,14 @@ public class Instance extends BaseTimeEntity {
     @ColumnDefault("'PRE_ACTIVITY'")
     private Progress progress;
 
-    public Instance(String title, String description, int participants, String tags, int point_per_person, int like_count, Progress progress) {
+    @Column(name = "started_at")
+    private LocalDateTime startedDate;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedDate;
+
+
+    public Instance(String title, String description, int participants, String tags, int point_per_person, int like_count, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate) {
         this.title = title;
         this.description = description;
         this.participants = participants;
@@ -61,5 +71,7 @@ public class Instance extends BaseTimeEntity {
         this.point_per_person = point_per_person;
         this.like_count = like_count;
         this.progress = progress;
+        this.startedDate = startedDate;
+        this.completedDate = completedDate;
     }
 }

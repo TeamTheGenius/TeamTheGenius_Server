@@ -1,5 +1,6 @@
-package com.genius.todoffin.challenge.domain;
+package com.genius.todoffin.participantinfo.domain;
 
+import com.genius.todoffin.instance.domain.Instance;
 import com.genius.todoffin.user.domain.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -29,15 +30,16 @@ public class ParticipantInfo {
     private User user;
 
     @NotNull
+    @Enumerated(EnumType.STRING)
     @Column(name = "join_status")
-    @ColumnDefault("0")
-    private Boolean joinStatus;
+    @ColumnDefault("'NO'")
+    private JoinStatus joinStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "join_result")
     private JoinResult joinResult;
 
-    public ParticipantInfo(Boolean joinStatus, JoinResult joinResult) {
+    public ParticipantInfo(JoinStatus joinStatus, JoinResult joinResult) {
         this.joinStatus = joinStatus;
         this.joinResult = joinResult;
     }

@@ -1,7 +1,7 @@
 package com.genius.todoffin.user.domain;
 
-import com.genius.todoffin.challenge.domain.Hits;
-import com.genius.todoffin.challenge.domain.ParticipantInfo;
+import com.genius.todoffin.hits.domain.Hits;
+import com.genius.todoffin.participantinfo.domain.ParticipantInfo;
 import com.genius.todoffin.common.domain.BaseTimeEntity;
 import com.genius.todoffin.security.constants.ProviderType;
 import jakarta.persistence.*;
@@ -21,6 +21,12 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
+    @OneToMany(mappedBy = "user")
+    private List<Hits> hitsList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private ProviderType providerInfo;
@@ -39,12 +45,6 @@ public class User extends BaseTimeEntity {
 
     @Column(length = 100)
     private String information;
-
-    @OneToMany(mappedBy = "user")
-    private List<Hits> hitsList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
 
 
     @Builder

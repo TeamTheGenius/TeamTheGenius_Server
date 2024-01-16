@@ -1,5 +1,6 @@
-package com.genius.todoffin.challenge.domain;
+package com.genius.todoffin.hits.domain;
 
+import com.genius.todoffin.instance.domain.Instance;
 import com.genius.todoffin.user.domain.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;

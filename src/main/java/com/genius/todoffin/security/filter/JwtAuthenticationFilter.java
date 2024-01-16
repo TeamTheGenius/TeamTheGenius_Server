@@ -48,14 +48,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             jwtService.generateRefreshToken(response, user);
 
             setAuthenticationToContext(reissuedAccessToken);
+            filterChain.doFilter(request, response);
+            return;
         }
+
+        jwtService.logout(user, response);
     }
 
     private boolean isPermittedURI(String requestURI) {
         return Arrays.stream(PERMITTED_URI)
                 .anyMatch(permitted -> {
                     String replace = permitted.replace("*", "");
-                    return requestURI.contains(replace);
+                    return requestURI.contains(replace) || replace.contains(requestURI);
                 });
     }
 

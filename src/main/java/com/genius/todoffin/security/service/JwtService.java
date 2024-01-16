@@ -85,6 +85,7 @@ public class JwtService {
 
     public boolean validateRefreshToken(String token, String identifier) {
         boolean isRefreshValid = jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == TokenStatus.AUTHENTICATED;
+
         return isRefreshValid && tokenRepository.existsById(identifier);
     }
 

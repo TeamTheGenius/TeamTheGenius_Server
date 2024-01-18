@@ -1,5 +1,8 @@
 package com.genius.todoffin.user.repository;
 
+import static com.genius.todoffin.security.constants.ProviderType.GOOGLE;
+import static com.genius.todoffin.security.constants.ProviderType.NAVER;
+import static com.genius.todoffin.user.domain.Role.USER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.todoffin.security.constants.ProviderType;
@@ -9,19 +12,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
+@Rollback(value = false)
 class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
-
-    @Test
-    @DisplayName("email을 통해 저장한 User 객체 찾은 후, 검증")
-    public void email을_통해_저장한_User_객체를_찾을수있다() {
-
-    }
 
     @Test
     @DisplayName("User 객체 저장 테스트")

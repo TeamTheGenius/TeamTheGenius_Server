@@ -24,13 +24,6 @@ class UserServiceTest {
     @Autowired
     private UserService userService;
 
-    @Test
-    @DisplayName("특정 사용자 가입 테스트")
-    public void should_matchValues_when_signupUser() {
-
-    }
-
-
     private void saveUnsignedUser() {
         userRepository.save(User.builder()
                 .role(Role.NOT_REGISTERED)

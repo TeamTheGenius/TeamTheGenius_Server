@@ -1,7 +1,11 @@
 package com.genius.gitget.user.domain;
 
-import com.genius.gitget.challenge.domain.Hits;
-import com.genius.gitget.challenge.domain.ParticipantInfo;
+import com.genius.gitget.hits.domain.Hits;
+import com.genius.gitget.participantinfo.domain.ParticipantInfo;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 import com.genius.gitget.common.domain.BaseTimeEntity;
 import com.genius.gitget.security.constants.ProviderInfo;
 import jakarta.persistence.Column;
@@ -13,9 +17,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +31,12 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
+
+    @OneToMany(mappedBy = "user")
+    private List<Hits> hitsList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -49,13 +56,6 @@ public class User extends BaseTimeEntity {
 
     @Column(length = 100)
     private String information;
-
-    @OneToMany(mappedBy = "user")
-    private List<Hits> hitsList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
-
 
     @Builder
     public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,

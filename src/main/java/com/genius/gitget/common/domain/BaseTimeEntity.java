@@ -1,6 +1,5 @@
 package com.genius.gitget.common.domain;
 
-
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -27,16 +26,6 @@ public class BaseTimeEntity {
     @Column(name = "updated_at")
     private LocalDateTime modifiedDate;
 
-
     @Column(name = "deleted_at")
     private LocalDateTime deletedDate;
-
-
-    // ======================================================
-    // Instance 테이블
-    @Column(name = "started_at")
-    private LocalDateTime startedDate;
-
-    @Column(name = "completed_at")
-    private LocalDateTime completedDate;
 }

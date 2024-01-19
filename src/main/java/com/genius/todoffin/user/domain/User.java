@@ -21,12 +21,6 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @OneToMany(mappedBy = "user")
-    private List<Hits> hitsList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
-
     @NotNull
     @Enumerated(EnumType.STRING)
     private ProviderType providerInfo;
@@ -67,4 +61,13 @@ public class User extends BaseTimeEntity {
     public void updateRole(Role role) {
         this.role = role;
     }
+
+
+    @OneToMany(mappedBy = "user")
+    private List<Hits> hitsList = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "user")
+    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
+
 }

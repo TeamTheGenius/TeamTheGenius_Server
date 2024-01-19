@@ -111,5 +111,4 @@ public class UserTest {
                 .role(USER)
                 .build();
     }
-
 }

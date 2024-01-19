@@ -59,7 +59,7 @@ public class HitsTest {
                 .role(USER)
                 .build();
         instance1 = new Instance("1일 1커밋", "챌린지 세부사항입니다." ,10, "BE, CS",
-                100, 32, Progress.ACTIVITY, LocalDateTime.now(), LocalDateTime.now().plusDays(3));
+                100, Progress.ACTIVITY, LocalDateTime.now(), LocalDateTime.now().plusDays(3));
 
         userRepository.save(user1);
         userRepository.save(user2);

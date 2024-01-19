@@ -47,7 +47,6 @@ public class Instance {
 
     private int point_per_person;
 
-
     @NotNull
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'PRE_ACTIVITY'")
@@ -69,5 +68,13 @@ public class Instance {
         this.progress = progress;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
+    }
+
+    //== 연관관계 편의 메서드 ==//
+    public void setTopic(Topic topic) {
+        this.topic = topic;
+        if (!topic.getInstanceList().contains(this)) {
+            topic.getInstanceList().add(this);
+        }
     }
 }

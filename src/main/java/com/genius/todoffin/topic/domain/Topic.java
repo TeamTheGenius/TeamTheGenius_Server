@@ -35,4 +35,12 @@ public class Topic {
         this.tags = tags;
         this.point_per_person = point_per_person;
     }
+
+    //== 연관관계 편의 메서드 ==//
+    public void setInstance(Instance instance) {
+        instanceList.add(instance);
+        if (instance.getTopic() != this) {
+            instance.setTopic(this);
+        }
+    }
 }

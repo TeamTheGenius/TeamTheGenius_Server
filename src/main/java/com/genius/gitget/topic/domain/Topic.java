@@ -43,4 +43,16 @@ public class Topic {
             instance.setTopic(this);
         }
     }
+
+    //== 비즈니스 로직 ==//
+    public void hasInstanceUpdate(String description) {
+        this.description = description;
+    }
+
+    public void hasNotInstanceUpdate(String title, String description, String tags, int point_per_person) {
+        this.title = title;
+        this.description = description;
+        this.tags = tags;
+        this.point_per_person = point_per_person;
+    }
 }

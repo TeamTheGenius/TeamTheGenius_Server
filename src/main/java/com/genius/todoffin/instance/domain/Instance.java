@@ -47,9 +47,6 @@ public class Instance {
 
     private int point_per_person;
 
-    @NotNull
-    @ColumnDefault("0")
-    private int like_count;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -63,13 +60,12 @@ public class Instance {
     private LocalDateTime completedDate;
 
 
-    public Instance(String title, String description, int participants, String tags, int point_per_person, int like_count, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate) {
+    public Instance(String title, String description, int participants, String tags, int point_per_person, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate) {
         this.title = title;
         this.description = description;
         this.participants = participants;
         this.tags = tags;
         this.point_per_person = point_per_person;
-        this.like_count = like_count;
         this.progress = progress;
         this.startedDate = startedDate;
         this.completedDate = completedDate;

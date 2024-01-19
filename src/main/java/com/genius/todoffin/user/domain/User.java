@@ -70,4 +70,6 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user")
     private List<ParticipantInfo> participantInfoList = new ArrayList<>();
 
+
+
 }

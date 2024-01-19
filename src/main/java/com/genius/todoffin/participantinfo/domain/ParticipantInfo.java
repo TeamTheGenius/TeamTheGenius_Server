@@ -38,8 +38,6 @@ public class ParticipantInfo {
     private JoinStatus joinStatus;
 
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'PROCESSING'")
-    @NotNull
     @Column(name = "join_result")
     private JoinResult joinResult;
 

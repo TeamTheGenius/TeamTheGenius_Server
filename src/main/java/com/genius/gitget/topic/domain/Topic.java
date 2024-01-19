@@ -36,6 +36,7 @@ public class Topic {
         this.point_per_person = point_per_person;
     }
 
+
     //== 연관관계 편의 메서드 ==//
     public void setInstance(Instance instance) {
         instanceList.add(instance);
@@ -43,4 +44,5 @@ public class Topic {
             instance.setTopic(this);
         }
     }
+
 }

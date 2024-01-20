@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "topic")
+
 public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

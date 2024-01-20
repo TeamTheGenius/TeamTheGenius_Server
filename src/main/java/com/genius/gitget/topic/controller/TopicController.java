@@ -39,7 +39,7 @@ public class TopicController {
 
     // 토픽 수정 요청
     @PatchMapping("/admin/topic/{topicId}")
-    public ResponseEntity<Topic> updateTopic(@PathVariable Long topicId, Topic topicDetails) {
+    public ResponseEntity<Topic> updateTopic(@PathVariable Long topicId, Topic topicDetails ) {
         Topic updatedTopic = topicService.updateTopic(topicId, topicDetails);
         return ResponseEntity.ok(updatedTopic);
     }

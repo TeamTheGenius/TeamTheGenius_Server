@@ -3,6 +3,8 @@ package com.genius.gitget.topic.service;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -15,8 +17,8 @@ public class TopicService {
     private final TopicRepository topicRepository;
 
     // 토픽 리스트 요청
-    public List<Topic> getAllTopics() {
-        return topicRepository.findAll();
+    public Page<Topic> getAllTopics(Pageable pageable) {
+        return topicRepository.findAll(pageable);
     }
 
     // 토픽 상세정보 요청

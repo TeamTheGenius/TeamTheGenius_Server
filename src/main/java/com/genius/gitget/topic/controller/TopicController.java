@@ -4,11 +4,16 @@ import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.service.TopicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,8 +24,13 @@ public class TopicController {
 
     // 토픽 리스트 요청
     @GetMapping("/admin/topic")
-    public List<Topic> getAllTopics() {
-        return topicService.getAllTopics();
+    public Page<Topic> getAllTopics(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @RequestParam Optional<String> sortBy) {
+        return topicService.getAllTopics(
+                PageRequest.of(
+                page.orElse(0),
+                size.orElse(5),
+                Sort.Direction.ASC, sortBy.orElse("id"))
+        );
     }
 
     // 토픽 상세 정보 요청

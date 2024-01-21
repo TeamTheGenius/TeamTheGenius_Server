@@ -3,6 +3,7 @@ package com.genius.gitget.topic.domain;
 import com.genius.gitget.instance.domain.Instance;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,11 +31,14 @@ public class Topic {
 
     private int point_per_person;
 
-    public Topic(String title, String description, String tags, int point_per_person) {
+    @Builder
+    public Topic(String title, String description, String tags, int point_per_person, Instance instance) {
         this.title = title;
         this.description = description;
         this.tags = tags;
         this.point_per_person = point_per_person;
+        setInstance(instance);
+
     }
 
     //== 연관관계 편의 메서드 ==//

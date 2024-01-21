@@ -1,6 +1,7 @@
 package com.genius.gitget.topic.service;
 
 import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.dto.TopicDTO;
 import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.util.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,14 @@ public class TopicService {
     }
 
     // 토픽 생성 요청
-    public Topic createTopic(Topic topic) {
+    public Topic createTopic(TopicDTO topicDTO) {
+        Topic topic = Topic.builder()
+                .title(topicDTO.title())
+                .description(topicDTO.description())
+                .tags(topicDTO.tags())
+                .point_per_person(topicDTO.point_per_person())
+                .build();
+
         return topicRepository.save(topic);
     }
 
@@ -42,15 +50,14 @@ public class TopicService {
      * 사용자가 수정 완료 후 저장 요청: 사용자가 수정을 완료하고 저장 버튼을 클릭하면, 프론트엔드는 수정된 데이터를 백엔드에 전송합니다.
      * 백엔드에서 최종 데이터 처리: 백엔드는 받은 데이터의 유효성을 검증하고, 조건에 따라 토픽을 업데이트합니다.
      * */
-    public Topic updateTopic(Long id, Topic topicDetails) {
+    public Topic updateTopic(Long id, TopicDTO topicDTO) {
         Topic topic = getTopicById(id);
         // 서버에서 한번 더 검사
         boolean hasInstance = !topic.getInstanceList().isEmpty();
         if (hasInstance) {
-            topic.hasInstanceUpdate(topicDetails.getDescription());
+            topic.hasInstanceUpdate(topicDTO.description());
         } else {
-            topic.hasNotInstanceUpdate(topicDetails.getTitle(), topicDetails.getDescription(),
-                    topicDetails.getTags(), topicDetails.getPoint_per_person());
+            topic.hasNotInstanceUpdate(topicDTO.title(), topicDTO.description(), topicDTO.tags(), topicDTO.point_per_person());
         }
         return topicRepository.save(topic);
     }

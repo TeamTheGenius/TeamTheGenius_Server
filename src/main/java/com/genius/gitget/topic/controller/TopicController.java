@@ -1,6 +1,7 @@
 package com.genius.gitget.topic.controller;
 
 import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.dto.TopicDTO;
 import com.genius.gitget.topic.service.TopicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,15 +43,15 @@ public class TopicController {
 
     // 토픽 생성 요청
     @PostMapping("/")
-    public ResponseEntity<Topic> createTopic(@Valid Topic topic) {
-        Topic createdTopic = topicService.createTopic(topic);
+    public ResponseEntity<Topic> createTopic(@Valid TopicDTO topicDTO) {
+        Topic createdTopic = topicService.createTopic(topicDTO);
         return new ResponseEntity<>(createdTopic, HttpStatus.CREATED);
     }
 
     // 토픽 수정 요청
     @PatchMapping("/{id}")
-    public ResponseEntity<Topic> updateTopic(@PathVariable Long id, Topic topicDetails) {
-        Topic updatedTopic = topicService.updateTopic(id, topicDetails);
+    public ResponseEntity<Topic> updateTopic(@PathVariable Long id, TopicDTO topicDTO) {
+        Topic updatedTopic = topicService.updateTopic(id, topicDTO);
         return ResponseEntity.ok(updatedTopic);
     }
 

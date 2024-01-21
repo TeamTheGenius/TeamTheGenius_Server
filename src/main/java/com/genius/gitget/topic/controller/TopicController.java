@@ -17,13 +17,13 @@ import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/topic")
 public class TopicController {
 
     private final TopicService topicService;
 
     // 토픽 리스트 요청
-    @GetMapping("/admin/topic")
+    @GetMapping("/")
     public Page<Topic> getAllTopics(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @RequestParam Optional<String> sortBy) {
         return topicService.getAllTopics(
                 PageRequest.of(
@@ -34,30 +34,30 @@ public class TopicController {
     }
 
     // 토픽 상세 정보 요청
-    @GetMapping("/admin/topic/{topicId}")
-    public ResponseEntity<Topic> getTopicById(@PathVariable Long topicId) {
-        Topic topic = topicService.getTopicById(topicId);
+    @GetMapping("/{id}")
+    public ResponseEntity<Topic> getTopicById(@PathVariable Long id) {
+        Topic topic = topicService.getTopicById(id);
         return ResponseEntity.ok(topic);
     }
 
     // 토픽 생성 요청
-    @PostMapping("/admin/topic")
+    @PostMapping("/")
     public ResponseEntity<Topic> createTopic(@Valid Topic topic) {
         Topic createdTopic = topicService.createTopic(topic);
         return new ResponseEntity<>(createdTopic, HttpStatus.CREATED);
     }
 
     // 토픽 수정 요청
-    @PatchMapping("/admin/topic/{topicId}")
-    public ResponseEntity<Topic> updateTopic(@PathVariable Long topicId, Topic topicDetails ) {
-        Topic updatedTopic = topicService.updateTopic(topicId, topicDetails);
+    @PatchMapping("/{id}")
+    public ResponseEntity<Topic> updateTopic(@PathVariable Long id, Topic topicDetails) {
+        Topic updatedTopic = topicService.updateTopic(id, topicDetails);
         return ResponseEntity.ok(updatedTopic);
     }
 
     // 토픽 삭제 요청
-    @DeleteMapping("/admin/topic/{topicId}")
-    public ResponseEntity<HttpStatus> deleteTopic(@PathVariable Long topicId) {
-        topicService.deleteTopic(topicId);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteTopic(@PathVariable Long id) {
+        topicService.deleteTopic(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

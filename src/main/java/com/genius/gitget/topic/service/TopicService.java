@@ -2,14 +2,11 @@ package com.genius.gitget.topic.service;
 
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
+import com.genius.gitget.util.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +21,7 @@ public class TopicService {
     // 토픽 상세정보 요청
     public Topic getTopicById(Long id) {
         return topicRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 토픽을 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException("해당 토픽을 찾을 수 없습니다."));
     }
 
     // 토픽 생성 요청
@@ -45,8 +42,8 @@ public class TopicService {
      * 사용자가 수정 완료 후 저장 요청: 사용자가 수정을 완료하고 저장 버튼을 클릭하면, 프론트엔드는 수정된 데이터를 백엔드에 전송합니다.
      * 백엔드에서 최종 데이터 처리: 백엔드는 받은 데이터의 유효성을 검증하고, 조건에 따라 토픽을 업데이트합니다.
      * */
-    public Topic updateTopic(Long topicId, Topic topicDetails) {
-        Topic topic = getTopicById(topicId);
+    public Topic updateTopic(Long id, Topic topicDetails) {
+        Topic topic = getTopicById(id);
         // 서버에서 한번 더 검사
         boolean hasInstance = !topic.getInstanceList().isEmpty();
         if (hasInstance) {
@@ -59,16 +56,8 @@ public class TopicService {
     }
 
     // 토픽 삭제 요청
-    public void deleteTopic(Long topicId) {
-        Topic topic = getTopicById(topicId);
+    public void deleteTopic(Long id) {
+        Topic topic = getTopicById(id);
         topicRepository.delete(topic);
-    }
-
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    private class ResourceNotFoundException extends RuntimeException {
-        public ResourceNotFoundException(String message) {
-            super(message);
-        }
     }
 }

@@ -6,6 +6,7 @@ import com.genius.gitget.hits.domain.Hits;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -40,7 +41,7 @@ public class Instance {
 
     private String description;
 
-    private int participants;
+    private int participants; // 논의 필요
 
     private String tags;
 
@@ -57,14 +58,22 @@ public class Instance {
     @Column(name = "completed_at")
     private LocalDateTime completedDate;
 
-
-    public Instance(String title, String description, int participants, String tags, int point_per_person, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate) {
+    @Builder
+    public Instance(String title, String description, int participants, String tags, int point_per_person, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate, Topic topic) {
         this.title = title;
         this.description = description;
         this.participants = participants;
         this.tags = tags;
         this.point_per_person = point_per_person;
         this.progress = progress;
+        this.startedDate = startedDate;
+        this.completedDate = completedDate;
+        setTopic(topic);
+    }
+
+    public void updateInstance(String description, int point_per_person, LocalDateTime startedDate, LocalDateTime completedDate) {
+        this.description = description;
+        this.point_per_person = point_per_person;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
     }

@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,7 +22,7 @@ public class Topic {
     private Long id;
 
     @OneToMany(mappedBy = "topic")
-    private List<Instance> instanceList;
+    private List<Instance> instanceList = new ArrayList<>();
 
     private String title;
 
@@ -37,8 +38,6 @@ public class Topic {
         this.description = description;
         this.tags = tags;
         this.point_per_person = point_per_person;
-        setInstance(instance);
-
     }
 
     //== 연관관계 편의 메서드 ==//

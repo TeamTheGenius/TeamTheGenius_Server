@@ -68,7 +68,6 @@ public class Instance {
         this.progress = progress;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
-        setTopic(topic);
     }
 
     public void updateInstance(String description, int point_per_person, LocalDateTime startedDate, LocalDateTime completedDate) {

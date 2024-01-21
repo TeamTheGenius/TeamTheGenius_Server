@@ -24,14 +24,10 @@ public class TopicController {
     private final TopicService topicService;
 
     // 토픽 리스트 요청
+    //@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @RequestParam Optional<String> sortBy
     @GetMapping("/")
-    public Page<Topic> getAllTopics(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @RequestParam Optional<String> sortBy) {
-        return topicService.getAllTopics(
-                PageRequest.of(
-                page.orElse(0),
-                size.orElse(5),
-                Sort.Direction.ASC, sortBy.orElse("id"))
-        );
+    public Page<Topic> getAllTopics() {
+        return topicService.getAllTopics();
     }
 
     // 토픽 상세 정보 요청

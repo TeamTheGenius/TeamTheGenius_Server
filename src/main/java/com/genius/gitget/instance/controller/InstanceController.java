@@ -21,14 +21,10 @@ public class InstanceController {
     private final InstanceService instanceService;
 
     // 인스턴스 리스트 조회
+    // @RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @RequestParam Optional<String> sortBy
     @GetMapping("/")
-    public Page<Instance> getAllInstances(@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @RequestParam Optional<String> sortBy) {
-        return instanceService.getAllInstances(
-                PageRequest.of(
-                        page.orElse(0),
-                        size.orElse(5),
-                        Sort.Direction.ASC, sortBy.orElse("id"))
-        );
+    public Page<Instance> getAllInstances() {
+        return instanceService.getAllInstances();
     }
 
     // 인스턴스 단건 조회

@@ -29,15 +29,17 @@ public class InstanceService {
                 .point_per_person(instanceDTO.pointPerPerson())
                 .startedDate(instanceDTO.startedAt())
                 .completedDate(instanceDTO.completedAt())
-                .topic(topic)
                 .build();
+
+        topic.setInstance(instance);
+        instance.setTopic(topic);
 
         return instanceRepository.save(instance);
     }
 
     // 인스턴스 리스트 조회
-    public Page<Instance> getAllInstances(Pageable pageable) {
-        return instanceRepository.findAllSortById(pageable);
+    public Page<Instance> getAllInstances() {
+        return instanceRepository.findByIdOrderByIdDesc();
     }
 
     // 인스턴스 단건 조회

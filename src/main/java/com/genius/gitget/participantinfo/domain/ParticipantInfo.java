@@ -52,6 +52,7 @@ public class ParticipantInfo {
         addParticipantInfoForInstance(instance);
         setUser(user);
         setInstance(instance);
+
     }
 
     private void setUser(User user) {

@@ -38,8 +38,8 @@ public class InstanceService {
     }
 
     // 인스턴스 리스트 조회
-    public Page<Instance> getAllInstances() {
-        return instanceRepository.findByIdOrderByIdDesc();
+    public Page<Instance> getAllInstances(Pageable pageable) {
+        return instanceRepository.findByIdOrderByIdDesc(pageable);
     }
 
     // 인스턴스 단건 조회

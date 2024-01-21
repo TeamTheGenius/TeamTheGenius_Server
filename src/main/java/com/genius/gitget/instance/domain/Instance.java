@@ -41,8 +41,6 @@ public class Instance {
 
     private String description;
 
-    private int participants; // 논의 필요
-
     private String tags;
 
     private int point_per_person;
@@ -59,10 +57,9 @@ public class Instance {
     private LocalDateTime completedDate;
 
     @Builder
-    public Instance(String title, String description, int participants, String tags, int point_per_person, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate, Topic topic) {
+    public Instance(String title, String description, String tags, int point_per_person, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate, Topic topic) {
         this.title = title;
         this.description = description;
-        this.participants = participants;
         this.tags = tags;
         this.point_per_person = point_per_person;
         this.progress = progress;
@@ -75,6 +72,10 @@ public class Instance {
         this.point_per_person = point_per_person;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
+    }
+
+    public int getJoinPeopleCount() {
+        return participantInfoList.size();
     }
 
     //== 연관관계 편의 메서드 ==//

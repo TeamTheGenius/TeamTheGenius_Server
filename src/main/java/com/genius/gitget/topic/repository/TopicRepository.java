@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface TopicRepository extends JpaRepository<Topic, Long> {
     @Query("select t from Topic t ORDER BY t.id DESC ")
-    Page<Topic> findByIdOrderByIdDesc();
+    Page<Topic> findByIdOrderByIdDesc(Pageable pageable);
 }

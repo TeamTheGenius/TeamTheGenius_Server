@@ -3,6 +3,7 @@ package com.genius.gitget.topic.controller;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.dto.TopicDTO;
 import com.genius.gitget.topic.service.TopicService;
+import com.genius.gitget.util.response.dto.CommonResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,11 +24,14 @@ public class TopicController {
 
     private final TopicService topicService;
 
+
     // 토픽 리스트 요청
-    //@RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @RequestParam Optional<String> sortBy
     @GetMapping("/")
-    public Page<Topic> getAllTopics() {
-        return topicService.getAllTopics();
+    public ResponseEntity<Page<Topic>> getAllTopics(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "id") String sortBy) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, sortBy);
+        Page<Topic> topics = topicService.getAllTopics(pageRequest);
+
+        return ResponseEntity.ok(topics);
     }
 
     // 토픽 상세 정보 요청
@@ -39,14 +43,14 @@ public class TopicController {
 
     // 토픽 생성 요청
     @PostMapping("/")
-    public ResponseEntity<Topic> createTopic(@Valid TopicDTO topicDTO) {
+    public ResponseEntity<Topic> createTopic(@RequestBody @Valid TopicDTO topicDTO) {
         Topic createdTopic = topicService.createTopic(topicDTO);
-        return new ResponseEntity<>(createdTopic, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdTopic);
     }
 
     // 토픽 수정 요청
     @PatchMapping("/{id}")
-    public ResponseEntity<Topic> updateTopic(@PathVariable Long id, TopicDTO topicDTO) {
+    public ResponseEntity<Topic> updateTopic(@PathVariable Long id, @RequestBody @Valid TopicDTO topicDTO) {
         Topic updatedTopic = topicService.updateTopic(id, topicDTO);
         return ResponseEntity.ok(updatedTopic);
     }

@@ -4,7 +4,12 @@ import com.genius.gitget.hits.repository.HitsRepository;
 import com.genius.gitget.instance.domain.Instance;
 import com.genius.gitget.instance.domain.Progress;
 import com.genius.gitget.instance.repository.InstanceRepository;
+import com.genius.gitget.participantinfo.domain.JoinResult;
+import com.genius.gitget.participantinfo.domain.JoinStatus;
+import com.genius.gitget.participantinfo.domain.ParticipantInfo;
+import com.genius.gitget.participantinfo.repository.ParticipantInfoRepository;
 import com.genius.gitget.security.constants.ProviderInfo;
+import com.genius.gitget.security.service.CustomOAuth2UserService;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.topic.service.TopicService;
@@ -16,9 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -35,29 +43,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Rollback(value = false)
 public class TopicControllerTest {
-
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    InstanceRepository instanceRepository;
-    @Autowired
-    HitsRepository hitsRepository;
-    @Autowired
-    TopicRepository topicRepository;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private TopicService topicService;
-
-    protected MediaType contentType =
-            new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
-
-    private User user1, user2;
-    private Instance instance1;
-    private Topic topic1;
 
     @BeforeEach
     public void setup() {
@@ -94,33 +81,96 @@ public class TopicControllerTest {
                 .tags("BE, CS")
                 .build();
 
+        topic2 = Topic.builder()
+                .title("1일 2커밋")
+                .description("간단한 설명란")
+                .point_per_person(300)
+                .tags("BE, CS")
+                .build();
+
+
+        participantInfo1 = ParticipantInfo.builder()
+                .joinResult(JoinResult.PROCESSING)
+                .joinStatus(JoinStatus.YES)
+        .build();
+
+        participantInfo2 = ParticipantInfo.builder()
+                .joinResult(JoinResult.SUCCESS)
+                .joinStatus(JoinStatus.YES)
+                .build();
+
+
         userRepository.save(user1);
         userRepository.save(user2);
 
         topicRepository.save(topic1);
+        topicRepository.save(topic2);
+
         topic1.setInstance(instance1);
         instance1.setTopic(topic1);
         instanceRepository.save(instance1);
+
+        participantInfo1.setUserAndInstance(user1, instance1);
+        participantInfoRepository.save(participantInfo1);
+        participantInfo2.setUserAndInstance(user2, instance1);
+        participantInfoRepository.save(participantInfo2);
+
     }
+
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    InstanceRepository instanceRepository;
+    @Autowired
+    HitsRepository hitsRepository;
+    @Autowired
+    TopicRepository topicRepository;
+    @Autowired
+    ParticipantInfoRepository participantInfoRepository;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private TopicService topicService;
+
+    protected MediaType contentType =
+            new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
+
+    private User user1, user2;
+    private Instance instance1;
+    private Topic topic1, topic2;
+    private ParticipantInfo participantInfo1;
+    private ParticipantInfo participantInfo2;
+
 
     @Test
     public void 토픽_조회() throws Exception {
+        Pageable pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
+        List<Topic> topics = Arrays.asList(topic1, topic2);
+        PageImpl<Topic> topicPage = new PageImpl<>(topics, pageable, topics.size());
 
+        when(topicService.getAllTopics(pageable)).thenReturn(topicPage);
 
+        for (Topic topic : topicPage) {
+            System.out.println("topic.getInstanceList() = " + topic.getInstanceList());
+            System.out.println("topic.getTitle() = " + topic.getTitle());
+        }
+
+        System.out.println("topics.size() = " + topics.size());
+        
         // When & Then
-        mockMvc.perform(get("/api/admin/topic"))
+        mockMvc.perform(get("/api/admin/topic?page=0&size=5")
+                        .contentType(contentType))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value(1L))
-                .andExpect(jsonPath("$[0].title").value("1일 1커밋"))
-                .andExpect(jsonPath("$[0].tags").value("BE, CS"))
-                .andExpect(jsonPath("$[0].description").value("챌린지입니다."))
-                .andExpect(jsonPath("$[0].point_per_person").value(500))
-                .andExpect(jsonPath("$[1].id").value(2L))
-                .andExpect(jsonPath("$[1].title").value("블로그 작성"))
-                .andExpect(jsonPath("$[1].tags").value("BE"))
-                .andExpect(jsonPath("$[1].description").value("챌린지 테스트입니다."))
-                .andExpect(jsonPath("$[1].point_per_person").value(1500));
-
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].title").value("1일 1커밋"))
+                .andExpect(jsonPath("$.content[0].tags").value("BE, CS"))
+                .andExpect(jsonPath("$.content[0].description").value("간단한 설명란"))
+                .andExpect(jsonPath("$.content[0].point_per_person").value(300))
+                .andExpect(jsonPath("$.content[1].title").value("1일 2커밋"))
+                .andExpect(jsonPath("$.content[1].tags").value("BE, CS"))
+                .andExpect(jsonPath("$.content[1].description").value("간단한 설명란"))
+                .andExpect(jsonPath("$.content[1].point_per_person").value(300));
     }
 }

@@ -15,8 +15,8 @@ public class TopicService {
     private final TopicRepository topicRepository;
 
     // 토픽 리스트 요청
-    public Page<Topic> getAllTopics() {
-        return topicRepository.findByIdOrderByIdDesc();
+    public Page<Topic> getAllTopics(Pageable pageable) {
+        return topicRepository.findByIdOrderByIdDesc(pageable);
     }
 
     // 토픽 상세정보 요청

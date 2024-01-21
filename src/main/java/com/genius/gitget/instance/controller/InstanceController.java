@@ -21,10 +21,12 @@ public class InstanceController {
     private final InstanceService instanceService;
 
     // 인스턴스 리스트 조회
-    // @RequestParam Optional<Integer> page, @RequestParam Optional<Integer> size, @RequestParam Optional<String> sortBy
     @GetMapping("/")
-    public Page<Instance> getAllInstances() {
-        return instanceService.getAllInstances();
+    public ResponseEntity<Page<Instance>> getAllInstances(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "id") String sortBy) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, sortBy);
+        Page<Instance> instances = instanceService.getAllInstances(pageRequest);
+
+        return ResponseEntity.ok(instances);
     }
 
     // 인스턴스 단건 조회
@@ -36,7 +38,7 @@ public class InstanceController {
 
     // 인스턴스 생성
     @PostMapping("/{topicId}")
-    public ResponseEntity<Instance> createInstance(@PathVariable Long topicId, @Valid @RequestBody InstanceDTO instanceDTO) {
+    public ResponseEntity<Instance> createInstance(@PathVariable Long topicId, @RequestBody @Valid InstanceDTO instanceDTO) {
         Instance createdInstance = instanceService.createInstance(topicId, instanceDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdInstance);
     }
@@ -52,6 +54,6 @@ public class InstanceController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInstance(@PathVariable Long id) {
         instanceService.deleteInstance(id);
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

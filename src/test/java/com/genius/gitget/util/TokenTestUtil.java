@@ -1,0 +1,40 @@
+package com.genius.gitget.util;
+
+import static com.genius.gitget.security.constants.JwtRule.ACCESS_PREFIX;
+
+import com.genius.gitget.security.domain.UserPrincipal;
+import com.genius.gitget.security.service.JwtService;
+import com.genius.gitget.user.domain.User;
+import jakarta.servlet.http.Cookie;
+import lombok.RequiredArgsConstructor;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class TokenTestUtil {
+    private final JwtService jwtService;
+
+    public Cookie createAccessCookie() {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        User user = userPrincipal.getUser();
+
+        MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
+
+        String accessCookie = jwtService.generateAccessToken(httpServletResponse, user);
+        return new Cookie(ACCESS_PREFIX.getValue(), accessCookie);
+    }
+
+    public Cookie createRefreshCookie() {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        User user = userPrincipal.getUser();
+
+        MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
+
+        String refreshCookie = jwtService.generateRefreshToken(httpServletResponse, user);
+        return new Cookie(ACCESS_PREFIX.getValue(), refreshCookie);
+    }
+}

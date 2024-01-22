@@ -6,6 +6,8 @@ import com.genius.gitget.instance.domain.Instance;
 import com.genius.gitget.instance.domain.Progress;
 import com.genius.gitget.instance.repository.InstanceRepository;
 import com.genius.gitget.security.constants.ProviderInfo;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.user.domain.User;
 import com.genius.gitget.user.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
@@ -35,9 +37,12 @@ public class HitsTest {
     InstanceRepository instanceRepository;
     @Autowired
     HitsRepository hitsRepository;
+    @Autowired
+    TopicRepository topicRepository;
 
     private User user1, user2;
     private Instance instance1;
+    private Topic topic1;
 
     @BeforeEach
     public void setup() {
@@ -56,11 +61,30 @@ public class HitsTest {
                 .interest("영화")
                 .role(USER)
                 .build();
-        instance1 = new Instance("1일 1커밋", "챌린지 세부사항입니다." ,10, "BE, CS",
-                100, Progress.ACTIVITY, LocalDateTime.now(), LocalDateTime.now().plusDays(3));
+
+        instance1 = Instance.builder()
+                .title("1일 1커밋")
+                .description("챌린지 세부사항입니다.")
+                .point_per_person(10)
+                .tags("BE, CS")
+                .progress(Progress.ACTIVITY)
+                .startedDate(LocalDateTime.now())
+                .completedDate(LocalDateTime.now().plusDays(3))
+                .build();
+
+        topic1 = Topic.builder()
+                    .title("1일 1커밋")
+                    .description("간단한 설명란")
+                    .point_per_person(300)
+                    .tags("BE, CS")
+                    .build();
 
         userRepository.save(user1);
         userRepository.save(user2);
+
+        topicRepository.save(topic1);
+        topic1.setInstance(instance1);
+        instance1.setTopic(topic1);
         instanceRepository.save(instance1);
     }
 

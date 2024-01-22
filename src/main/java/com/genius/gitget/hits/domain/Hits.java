@@ -44,27 +44,19 @@ public class Hits {
     public void setUserAndInstance(User user, Instance instance) {
         addHitsForUser(user);
         addHitsForInstance(instance);
-        setUser(user);
-        setInstance(instance);
-    }
-
-    private void setUser(User user) {
-        this.user = user;
     }
 
     private void addHitsForUser(User user) {
         if (!(user.getHitsList().contains(this))) {
             user.getHitsList().add(this);
         }
-    }
-
-    private void setInstance(Instance instance) {
-        this.instance = instance;
+        this.user = user;
     }
 
     private void addHitsForInstance(Instance instance) {
         if (!(instance.getHitsList().contains(this))) {
             instance.getHitsList().add(this);
         }
+        this.instance = instance;
     }
 }

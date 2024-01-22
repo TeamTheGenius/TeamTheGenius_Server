@@ -1,6 +1,9 @@
 package com.genius.gitget.instance.service;
 
-import com.genius.gitget.instance.dto.InstanceDTO;
+import com.genius.gitget.instance.dto.InstanceCreateRequest;
+import com.genius.gitget.instance.dto.InstanceDetailResponse;
+import com.genius.gitget.instance.dto.InstancePagingResponse;
+import com.genius.gitget.instance.dto.InstanceUpdateRequest;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.util.exception.BusinessException;
 import com.genius.gitget.instance.domain.Instance;
@@ -10,59 +13,75 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import static com.genius.gitget.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
+import static com.genius.gitget.util.exception.ErrorCode.TOPIC_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class InstanceService {
 
     private final InstanceRepository instanceRepository;
     private final TopicRepository topicRepository;
 
     // 인스턴스 생성
-    public Instance createInstance(Long topicId, InstanceDTO instanceDTO) {
-        // 해당 토픽있는지 확인.
-        Topic topic = topicRepository.findById(topicId)
-                .orElseThrow(() -> new BusinessException("Topic not found with id: " + topicId));
+    @Transactional
+    public void createInstance(InstanceCreateRequest instanceCreateRequest) {
+        Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
+                .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
         Instance instance = Instance.builder()
-                .description(instanceDTO.description())
-                .point_per_person(instanceDTO.pointPerPerson())
-                .startedDate(instanceDTO.startedAt())
-                .completedDate(instanceDTO.completedAt())
+                .description(instanceCreateRequest.description())
+                .pointPerPerson(instanceCreateRequest.pointPerPerson())
+                .startedDate(instanceCreateRequest.startedAt())
+                .completedDate(instanceCreateRequest.completedAt())
                 .build();
 
-        topic.setInstance(instance);
         instance.setTopic(topic);
 
-        return instanceRepository.save(instance);
+        instanceRepository.save(instance);
     }
 
-    // 인스턴스 리스트 조회
-    public Page<Instance> getAllInstances(Pageable pageable) {
-        return instanceRepository.findByIdOrderByIdDesc(pageable);
+
+    public Page<InstancePagingResponse> getAllInstances(Pageable pageable) {
+        Page<Instance> instances = instanceRepository.findAllById(pageable);
+        return instances.map(instance -> new InstancePagingResponse(instance.getTopic().getId(), instance.getId(), instance.getTitle(), instance.getStartedDate(), instance.getCompletedDate()));
+
     }
 
     // 인스턴스 단건 조회
-    public Instance getInstanceById(Long id) {
-        return instanceRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Instance not found with id: " + id));
+    public InstanceDetailResponse getInstanceById(Long id) {
+        Instance instanceDetails = instanceRepository.findById(id).orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
+        return new InstanceDetailResponse(
+                instanceDetails.getTopic().getId(),
+                instanceDetails.getId(),
+                instanceDetails.getTitle(),
+                instanceDetails.getDescription(),
+                instanceDetails.getPointPerPerson(),
+                instanceDetails.getTags(),
+                instanceDetails.getStartedDate(),
+                instanceDetails.getCompletedDate()
+        );
     }
 
-    // 인스턴스 삭제
+    @Transactional
     public void deleteInstance(Long id) {
         Instance instance = instanceRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Instance not found with id: " + id));
+                .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
         instanceRepository.delete(instance);
     }
 
     // 인스턴스 수정
-    public Instance updateInstance(Long id, InstanceDTO instanceDTO) {
+    @Transactional
+    public void updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest) {
         Instance existingInstance = instanceRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Instance not found with id: " + id));
+                .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
-        existingInstance.updateInstance(instanceDTO.description(), instanceDTO.pointPerPerson(),
-                instanceDTO.startedAt(), instanceDTO.completedAt());
+        existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.pointPerPerson(),
+                instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());
 
-        return instanceRepository.save(existingInstance);
+        instanceRepository.save(existingInstance);
     }
 }

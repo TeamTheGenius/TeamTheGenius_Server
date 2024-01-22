@@ -30,33 +30,25 @@ public class Topic {
 
     private String tags;
 
-    private int point_per_person;
+    private int pointPerPerson;
 
     @Builder
-    public Topic(String title, String description, String tags, int point_per_person, Instance instance) {
+    public Topic(String title, String description, String tags, int pointPerPerson) {
         this.title = title;
         this.description = description;
         this.tags = tags;
-        this.point_per_person = point_per_person;
-    }
-
-    //== 연관관계 편의 메서드 ==//
-    public void setInstance(Instance instance) {
-        instanceList.add(instance);
-        if (instance.getTopic() != this) {
-            instance.setTopic(this);
-        }
+        this.pointPerPerson = pointPerPerson;
     }
 
     //== 비즈니스 로직 ==//
-    public void hasInstanceUpdate(String description) {
+    public void updateExistInstance(String description) {
         this.description = description;
     }
 
-    public void hasNotInstanceUpdate(String title, String description, String tags, int point_per_person) {
+    public void createInstance(String title, String description, String tags, int pointPerPerson) {
         this.title = title;
         this.description = description;
         this.tags = tags;
-        this.point_per_person = point_per_person;
+        this.pointPerPerson = pointPerPerson;
     }
 }

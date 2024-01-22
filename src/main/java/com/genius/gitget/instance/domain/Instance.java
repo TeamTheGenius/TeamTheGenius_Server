@@ -43,7 +43,7 @@ public class Instance {
 
     private String tags;
 
-    private int point_per_person;
+    private int pointPerPerson;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -57,19 +57,19 @@ public class Instance {
     private LocalDateTime completedDate;
 
     @Builder
-    public Instance(String title, String description, String tags, int point_per_person, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate, Topic topic) {
+    public Instance(String title, String description, String tags, int pointPerPerson, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate) {
         this.title = title;
         this.description = description;
         this.tags = tags;
-        this.point_per_person = point_per_person;
+        this.pointPerPerson = pointPerPerson;
         this.progress = progress;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
     }
 
-    public void updateInstance(String description, int point_per_person, LocalDateTime startedDate, LocalDateTime completedDate) {
+    public void updateInstance(String description, int pointPerPerson, LocalDateTime startedDate, LocalDateTime completedDate) {
         this.description = description;
-        this.point_per_person = point_per_person;
+        this.pointPerPerson = pointPerPerson;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
     }

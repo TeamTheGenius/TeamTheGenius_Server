@@ -50,28 +50,19 @@ public class ParticipantInfo {
     public void setUserAndInstance(User user, Instance instance) {
         addParticipantInfoForUser(user);
         addParticipantInfoForInstance(instance);
-        setUser(user);
-        setInstance(instance);
-
-    }
-
-    private void setUser(User user) {
-        this.user = user;
     }
 
     private void addParticipantInfoForUser(User user) {
         if(!(user.getParticipantInfoList().contains(this))) {
             user.getParticipantInfoList().add(this);
         }
-    }
-
-    private void setInstance(Instance instance) {
-        this.instance = instance;
+        this.user = user;
     }
 
     private void addParticipantInfoForInstance(Instance instance) {
         if(!(instance.getParticipantInfoList().contains(this))) {
             instance.getParticipantInfoList().add(this);
         }
+        this.instance = instance;
     }
 }

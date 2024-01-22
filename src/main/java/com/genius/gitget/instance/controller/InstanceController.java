@@ -1,59 +1,72 @@
 package com.genius.gitget.instance.controller;
 
-import com.genius.gitget.instance.domain.Instance;
-import com.genius.gitget.instance.dto.InstanceDTO;
+import com.genius.gitget.instance.dto.InstanceCreateRequest;
+import com.genius.gitget.instance.dto.InstanceDetailResponse;
+import com.genius.gitget.instance.dto.InstancePagingResponse;
+import com.genius.gitget.instance.dto.InstanceUpdateRequest;
 import com.genius.gitget.instance.service.InstanceService;
+import com.genius.gitget.util.exception.SuccessCode;
+import com.genius.gitget.util.response.dto.CommonResponse;
+import com.genius.gitget.util.response.dto.PagingResponse;
+import com.genius.gitget.util.response.dto.SingleResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
-
 @RestController
-@RequestMapping("/api/instance")
+@RequestMapping("/api/admin/instance")
 @RequiredArgsConstructor
 public class InstanceController {
     private final InstanceService instanceService;
 
     // 인스턴스 리스트 조회
-    @GetMapping("/")
-    public ResponseEntity<Page<Instance>> getAllInstances(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size, @RequestParam(defaultValue = "id") String sortBy) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.Direction.ASC, sortBy);
-        Page<Instance> instances = instanceService.getAllInstances(pageRequest);
+    @GetMapping
+    public ResponseEntity<PagingResponse<InstancePagingResponse>> getAllInstances(@PageableDefault(size = 5, direction = Sort.Direction.ASC, sort = "id")Pageable pageable) {
+        Page<InstancePagingResponse> instances = instanceService.getAllInstances(pageable);
 
-        return ResponseEntity.ok(instances);
+        return ResponseEntity.ok().body(
+                new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), instances)
+        );
     }
 
     // 인스턴스 단건 조회
     @GetMapping("/{id}")
-    public ResponseEntity<Instance> getInstanceById(@PathVariable Long id) {
-        Instance instanceById = instanceService.getInstanceById(id);
-        return ResponseEntity.ok(instanceById);
+    public ResponseEntity<SingleResponse<InstanceDetailResponse>> getInstanceById(@PathVariable Long id) {
+        InstanceDetailResponse instanceDetails = instanceService.getInstanceById(id);
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), instanceDetails)
+        );
     }
 
     // 인스턴스 생성
-    @PostMapping("/{topicId}")
-    public ResponseEntity<Instance> createInstance(@PathVariable Long topicId, @RequestBody @Valid InstanceDTO instanceDTO) {
-        Instance createdInstance = instanceService.createInstance(topicId, instanceDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdInstance);
+    @PostMapping
+    public ResponseEntity<CommonResponse> createInstance(@RequestBody @Valid InstanceCreateRequest instanceCreateRequest) {
+        instanceService.createInstance(instanceCreateRequest);
+        return ResponseEntity.ok().body(
+                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.CREATED.getMessage())
+        );
     }
 
     // 인스턴스 수정
     @PatchMapping("/{id}")
-    public ResponseEntity<Instance> updateInstance(@PathVariable Long id, @RequestBody @Valid InstanceDTO instanceDTO) {
-        Instance updatedInstance = instanceService.updateInstance(id, instanceDTO);
-        return ResponseEntity.ok(updatedInstance);
+    public ResponseEntity<CommonResponse> updateInstance(@PathVariable Long id, @RequestBody @Valid InstanceUpdateRequest instanceUpdateRequest) {
+        instanceService.updateInstance(id, instanceUpdateRequest);
+        return ResponseEntity.ok().body(
+                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.CREATED.getMessage())
+        );
     }
 
     // 인스턴스 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteInstance(@PathVariable Long id) {
+    public ResponseEntity<CommonResponse> deleteInstance(@PathVariable Long id) {
         instanceService.deleteInstance(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok().body(
+                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.CREATED.getMessage())
+        );
     }
 }

@@ -5,6 +5,7 @@ import static com.genius.gitget.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.genius.gitget.file.dto.UploadDTO;
 import com.genius.gitget.util.exception.BusinessException;
 import java.io.File;
 import java.io.IOException;
@@ -69,10 +70,10 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile("sky.png");
 
         //when
-        File targetFile = fileUtil.getTargetFile(multipartFile);
+        UploadDTO uploadDTO = fileUtil.getUploadInfo(multipartFile, "profile");
 
         //then
-        assertThat(targetFile.toString()).contains(uploadPath);
+        assertThat(uploadDTO.fileURI()).contains(uploadPath);
     }
 
 

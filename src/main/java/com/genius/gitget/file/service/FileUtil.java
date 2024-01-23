@@ -3,8 +3,9 @@ package com.genius.gitget.file.service;
 import static com.genius.gitget.util.exception.ErrorCode.IMAGE_NOT_EXIST;
 import static com.genius.gitget.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 
+import com.genius.gitget.file.domain.FileType;
+import com.genius.gitget.file.dto.UploadDTO;
 import com.genius.gitget.util.exception.BusinessException;
-import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -21,13 +22,17 @@ public class FileUtil {
         this.uploadPath = uploadPath;
     }
 
-    public File getTargetFile(MultipartFile file) {
-        //TODO: file의 타입에 따라 저장하는 경로 다르게 하는 로직 추가
-
+    public UploadDTO getUploadInfo(MultipartFile file, String typeStr) {
         String originalFilename = file.getOriginalFilename();
         String savedFilename = getSavedFilename(originalFilename);
+        FileType fileType = FileType.fineType(typeStr);
 
-        return new File(uploadPath + savedFilename);
+        return UploadDTO.builder()
+                .fileType(fileType)
+                .originalFilename(originalFilename)
+                .savedFilename(savedFilename)
+                .fileURI(uploadPath + fileType.getPath() + savedFilename)
+                .build();
     }
 
     public void validateFile(MultipartFile file) {
@@ -45,7 +50,7 @@ public class FileUtil {
     }
 
 
-    private String getSavedFilename(String originalFilename) {
+    public String getSavedFilename(String originalFilename) {
         String uuid = UUID.randomUUID().toString();
         String extension = extractExtension(originalFilename);
 

@@ -47,7 +47,7 @@ public class Instance {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'PRE_ACTIVITY'")
+    // @Column(columnDefinition = "varchar(255) default 'PRE_ACTIVITY'")
     private Progress progress;
 
     @Column(name = "started_at")

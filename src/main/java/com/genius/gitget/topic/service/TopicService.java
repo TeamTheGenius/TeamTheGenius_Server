@@ -35,7 +35,7 @@ public class TopicService {
     // 토픽 생성 요청
     @Transactional
     public void createTopic(TopicCreateRequest topicCreateRequest) {
-        Topic.builder()
+        Topic topic = Topic.builder()
                 .title(topicCreateRequest.title())
                 .description(topicCreateRequest.description())
                 .tags(topicCreateRequest.tags())
@@ -43,6 +43,7 @@ public class TopicService {
                 // 이미지
                 // 유의사항
                 .build();
+        topicRepository.save(topic);
     }
 
     @Transactional

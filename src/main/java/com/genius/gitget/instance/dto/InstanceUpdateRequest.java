@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public record InstanceUpdateRequest (
         Long topicId,
-        Long instanceId,
+        String title,
         String description,
         int pointPerPerson,
         LocalDateTime startedAt,

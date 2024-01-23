@@ -1,12 +1,17 @@
 package com.genius.gitget.file.service;
 
 import com.genius.gitget.file.domain.Files;
+import com.genius.gitget.file.dto.FileResponse;
 import com.genius.gitget.file.dto.UploadDTO;
 import com.genius.gitget.file.repository.FilesRepository;
+import com.genius.gitget.util.exception.BusinessException;
+import com.genius.gitget.util.exception.ErrorCode;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +26,7 @@ public class FilesService {
 
 
     @Transactional
-    public Long uploadFile(MultipartFile receivedFile, String typeStr) throws IOException {
+    public FileResponse uploadFile(MultipartFile receivedFile, String typeStr) throws IOException {
         fileUtil.validateFile(receivedFile);
 
         UploadDTO uploadDTO = fileUtil.getUploadInfo(receivedFile, typeStr);
@@ -36,7 +41,7 @@ public class FilesService {
                 .build();
 
         Files savedFile = filesRepository.save(file);
-        return savedFile.getId();
+        return new FileResponse(savedFile.getId());
     }
 
     private void saveFile(MultipartFile receivedFile, String fileURI) throws IOException {
@@ -48,4 +53,10 @@ public class FilesService {
         receivedFile.transferTo(targetFile);
     }
 
+    public UrlResource getFile(Long fileId) throws MalformedURLException {
+        Files files = filesRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
+
+        return new UrlResource("file:" + files.getFileURI());
+    }
 }

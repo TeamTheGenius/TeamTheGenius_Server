@@ -1,10 +1,10 @@
 package com.genius.gitget.topic.service;
 
-import com.genius.gitget.topic.dto.TopicDetailResponse;
-import com.genius.gitget.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.dto.TopicCreateRequest;
+import com.genius.gitget.topic.dto.TopicDetailResponse;
 import com.genius.gitget.topic.dto.TopicPagingResponse;
+import com.genius.gitget.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.util.exception.BusinessException;
 import com.genius.gitget.util.exception.ErrorCode;
@@ -29,14 +29,14 @@ public class TopicService {
     // 토픽 상세정보 요청
     public TopicDetailResponse getTopicById(Long id) {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
-        return new TopicDetailResponse(topic.getId(), topic.getTitle(), topic.getTags(), topic.getDescription(), topic.getPointPerPerson());
+        return new TopicDetailResponse(topic.getId(), topic.getTitle(), topic.getTags(), topic.getDescription(),
+                topic.getPointPerPerson());
     }
 
     // 토픽 생성 요청
     @Transactional
     public void createTopic(TopicCreateRequest topicCreateRequest) {
         Topic topic = Topic.builder()
-        Topic.builder()
                 .title(topicCreateRequest.title())
                 .description(topicCreateRequest.description())
                 .tags(topicCreateRequest.tags())
@@ -57,7 +57,8 @@ public class TopicService {
         if (hasInstance) {
             topic.updateExistInstance(topicUpdateRequest.description());
         } else {
-            topic.createInstance(topicUpdateRequest.title(), topicUpdateRequest.description(), topicUpdateRequest.tags(), topicUpdateRequest.pointPerPerson());
+            topic.createInstance(topicUpdateRequest.title(), topicUpdateRequest.description(),
+                    topicUpdateRequest.tags(), topicUpdateRequest.pointPerPerson());
         }
         topicRepository.save(topic);
     }

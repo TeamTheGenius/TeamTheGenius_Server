@@ -19,12 +19,9 @@ import lombok.NoArgsConstructor;
 public class Files extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "attachment_id")
+    @Column(name = "files_id")
     private Long id;
 
-    //TODO: User 연관관계 설정 필요(Profile)
-    //TODO: Topic 연관관계 설정 필요
-    //TODO: Instance 연관관계 설정 필요
     //TODO: 추후 PET쪽과 연관관계 설정 필요
 
     @Enumerated(value = EnumType.STRING)

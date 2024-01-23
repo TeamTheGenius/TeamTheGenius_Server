@@ -6,6 +6,7 @@ import com.genius.gitget.hits.domain.Hits;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -40,15 +41,13 @@ public class Instance {
 
     private String description;
 
-    private int participants;
-
     private String tags;
 
-    private int point_per_person;
+    private int pointPerPerson;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @ColumnDefault("'PRE_ACTIVITY'")
+    // @Column(columnDefinition = "varchar(255) default 'PRE_ACTIVITY'")
     private Progress progress;
 
     @Column(name = "started_at")
@@ -57,16 +56,26 @@ public class Instance {
     @Column(name = "completed_at")
     private LocalDateTime completedDate;
 
-
-    public Instance(String title, String description, int participants, String tags, int point_per_person, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate) {
+    @Builder
+    public Instance(String title, String description, String tags, int pointPerPerson, Progress progress, LocalDateTime startedDate, LocalDateTime completedDate) {
         this.title = title;
         this.description = description;
-        this.participants = participants;
         this.tags = tags;
-        this.point_per_person = point_per_person;
+        this.pointPerPerson = pointPerPerson;
         this.progress = progress;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
+    }
+
+    public void updateInstance(String description, int pointPerPerson, LocalDateTime startedDate, LocalDateTime completedDate) {
+        this.description = description;
+        this.pointPerPerson = pointPerPerson;
+        this.startedDate = startedDate;
+        this.completedDate = completedDate;
+    }
+
+    public int getJoinPeopleCount() {
+        return participantInfoList.size();
     }
 
     //== 연관관계 편의 메서드 ==//

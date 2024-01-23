@@ -34,8 +34,6 @@ public class InstanceService {
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
         Instance instance = Instance.builder()
-                .title(instanceCreateRequest.title())
-                .tags(instanceCreateRequest.tags())
                 .description(instanceCreateRequest.description())
                 .pointPerPerson(instanceCreateRequest.pointPerPerson())
                 .startedDate(instanceCreateRequest.startedAt())

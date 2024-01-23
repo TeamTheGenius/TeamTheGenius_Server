@@ -54,8 +54,8 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // JWT 검증 필터 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userService),
-                        UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userService),
+//                        UsernamePasswordAuthenticationFilter.class)
 
                 // OAuth 로그인 설정
                 .oauth2Login(customConfigurer -> customConfigurer

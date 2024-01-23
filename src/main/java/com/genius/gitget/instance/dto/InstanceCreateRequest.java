@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 public record InstanceCreateRequest(
         Long topicId,
-        Long instanceId,
         String title,
         String tags,
         String description,

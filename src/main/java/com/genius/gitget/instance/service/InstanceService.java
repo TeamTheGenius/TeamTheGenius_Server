@@ -1,5 +1,6 @@
 package com.genius.gitget.instance.service;
 
+import com.genius.gitget.instance.domain.Progress;
 import com.genius.gitget.instance.dto.InstanceCreateRequest;
 import com.genius.gitget.instance.dto.InstanceDetailResponse;
 import com.genius.gitget.instance.dto.InstancePagingResponse;
@@ -37,6 +38,7 @@ public class InstanceService {
                 .pointPerPerson(instanceCreateRequest.pointPerPerson())
                 .startedDate(instanceCreateRequest.startedAt())
                 .completedDate(instanceCreateRequest.completedAt())
+                .progress(Progress.PRE_ACTIVITY)
                 .build();
 
         instance.setTopic(topic);

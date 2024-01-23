@@ -3,7 +3,7 @@ package com.genius.gitget.file.controller;
 import static com.genius.gitget.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.file.service.FilesService;
-import com.genius.gitget.util.response.dto.CommonResponse;
+import com.genius.gitget.util.response.dto.SingleResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,19 +17,19 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth/file")
+@RequestMapping("/api/file")
 public class FilesController {
     private final FilesService filesService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse> addImageTestCode(
+    public ResponseEntity<SingleResponse<Long>> uploadImage(
             @RequestPart(value = "image") MultipartFile image,
             @RequestPart(value = "type") String type) throws IOException {
 
-        filesService.uploadFile(image, type);
+        Long savedFileId = filesService.uploadFile(image, type);
 
         return ResponseEntity.ok().body(
-                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), savedFileId)
         );
     }
 }

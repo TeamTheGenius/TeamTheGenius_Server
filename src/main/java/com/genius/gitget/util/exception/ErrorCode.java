@@ -17,7 +17,11 @@ public enum ErrorCode {
     UNSUPPORTED_JWT(HttpStatus.BAD_REQUEST, "지원하지 않는 JWT 형식입니다."),
     INVALID_JWT(HttpStatus.BAD_REQUEST, "JWT가 유효하지 않습니다."),
 
-    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "Cookie에 토큰이 존재하지 않습니다.");
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "Cookie에 토큰이 존재하지 않습니다."),
+
+    IMAGE_NOT_EXIST(HttpStatus.BAD_REQUEST, "Image가 존재하지 않습니다."),
+    NOT_SUPPORTED_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 확장자입니다."),
+    NOT_SUPPORTED_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "");
 
     private final HttpStatus status;
     private final String message;

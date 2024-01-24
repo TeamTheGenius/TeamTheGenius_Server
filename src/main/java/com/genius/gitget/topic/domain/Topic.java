@@ -45,6 +45,7 @@ public class Topic {
 
     private int pointPerPerson;
 
+
     @Builder
     public Topic(String title, String description, String tags, int pointPerPerson) {
         this.title = title;

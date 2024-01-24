@@ -1,14 +1,23 @@
 package com.genius.gitget.topic.domain;
 
+import com.genius.gitget.file.domain.Files;
 import com.genius.gitget.instance.domain.Instance;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -20,6 +29,10 @@ public class Topic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "topic_id")
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "files_id")
+    private Files files;
 
     @OneToMany(mappedBy = "topic")
     private List<Instance> instanceList = new ArrayList<>();
@@ -51,5 +64,17 @@ public class Topic {
         this.description = description;
         this.tags = tags;
         this.pointPerPerson = pointPerPerson;
+    }
+
+    //== 연관관계 편의 메서드 ==//
+    public void setInstance(Instance instance) {
+        instanceList.add(instance);
+        if (instance.getTopic() != this) {
+            instance.setTopic(this);
+        }
+    }
+    
+    public void setFiles(Files files) {
+        this.files = files;
     }
 }

@@ -1,22 +1,25 @@
 package com.genius.gitget.user.domain;
 
+import com.genius.gitget.common.domain.BaseTimeEntity;
+import com.genius.gitget.file.domain.Files;
 import com.genius.gitget.hits.domain.Hits;
 import com.genius.gitget.participantinfo.domain.ParticipantInfo;
-import jakarta.validation.constraints.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import com.genius.gitget.common.domain.BaseTimeEntity;
 import com.genius.gitget.security.constants.ProviderInfo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,6 +34,10 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "files_id")
+    private Files files;
 
     @OneToMany(mappedBy = "user")
     private List<Hits> hitsList = new ArrayList<>();
@@ -76,5 +83,10 @@ public class User extends BaseTimeEntity {
 
     public void updateRole(Role role) {
         this.role = role;
+    }
+
+    //=== 연관관계 편의 메서드 ===//
+    public void setFiles(Files files) {
+        this.files = files;
     }
 }

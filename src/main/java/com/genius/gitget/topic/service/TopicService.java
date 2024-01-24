@@ -36,7 +36,6 @@ public class TopicService {
     @Transactional
     public void createTopic(TopicCreateRequest topicCreateRequest) {
         Topic topic = Topic.builder()
-        Topic.builder()
                 .title(topicCreateRequest.title())
                 .description(topicCreateRequest.description())
                 .tags(topicCreateRequest.tags())

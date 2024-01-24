@@ -44,6 +44,7 @@ public class TopicService {
                 // 유의사항
                 .build();
         topicRepository.save(topic);
+
     }
 
     @Transactional

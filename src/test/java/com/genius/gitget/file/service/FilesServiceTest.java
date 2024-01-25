@@ -10,14 +10,5 @@ class FilesServiceTest {
     @Autowired
     private FilesService filesService;
 
-    @Test
-    @DisplayName("")
-    public void (){
-        //given
 
-        //when
-
-        //then
-
-    }
 }

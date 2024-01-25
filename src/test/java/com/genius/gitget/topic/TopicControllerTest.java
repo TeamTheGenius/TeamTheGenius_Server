@@ -1,5 +1,13 @@
 package com.genius.gitget.topic;
 
+import static com.genius.gitget.security.constants.ProviderInfo.GOOGLE;
+import static com.genius.gitget.user.domain.Role.ADMIN;
+import static com.genius.gitget.user.domain.Role.USER;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.genius.gitget.hits.repository.HitsRepository;
 import com.genius.gitget.instance.domain.Instance;
 import com.genius.gitget.instance.domain.Progress;
@@ -9,42 +17,62 @@ import com.genius.gitget.participantinfo.domain.JoinStatus;
 import com.genius.gitget.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.participantinfo.repository.ParticipantInfoRepository;
 import com.genius.gitget.security.constants.ProviderInfo;
-import com.genius.gitget.security.service.CustomOAuth2UserService;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.topic.service.TopicService;
 import com.genius.gitget.user.domain.User;
 import com.genius.gitget.user.repository.UserRepository;
+import com.genius.gitget.util.TokenTestUtil;
+import com.genius.gitget.util.WithMockCustomUser;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.genius.gitget.security.constants.ProviderInfo.GOOGLE;
-import static com.genius.gitget.user.domain.Role.ADMIN;
-import static com.genius.gitget.user.domain.Role.USER;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
+@Transactional
 @AutoConfigureMockMvc
-@Rollback(value = false)
 public class TopicControllerTest {
+
+    protected MediaType contentType =
+            new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(),
+                    StandardCharsets.UTF_8);
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    InstanceRepository instanceRepository;
+    @Autowired
+    HitsRepository hitsRepository;
+    @Autowired
+    TopicRepository topicRepository;
+    @Autowired
+    ParticipantInfoRepository participantInfoRepository;
+    @Autowired
+    private TokenTestUtil tokenTestUtil;
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private TopicService topicService;
+    private User user1, user2;
+    private Instance instance1;
+    private Topic topic1, topic2;
+    private ParticipantInfo participantInfo1;
+    private ParticipantInfo participantInfo2;
 
     @BeforeEach
     public void setup() {
@@ -67,7 +95,7 @@ public class TopicControllerTest {
         instance1 = Instance.builder()
                 .title("1일 1커밋")
                 .description("챌린지 세부사항입니다.")
-                .point_per_person(10)
+                .pointPerPerson(10)
                 .tags("BE, CS")
                 .progress(Progress.ACTIVITY)
                 .startedDate(LocalDateTime.now())
@@ -77,28 +105,26 @@ public class TopicControllerTest {
         topic1 = Topic.builder()
                 .title("1일 1커밋")
                 .description("간단한 설명란")
-                .point_per_person(300)
+                .pointPerPerson(300)
                 .tags("BE, CS")
                 .build();
 
         topic2 = Topic.builder()
                 .title("1일 2커밋")
                 .description("간단한 설명란")
-                .point_per_person(300)
+                .pointPerPerson(300)
                 .tags("BE, CS")
                 .build();
-
 
         participantInfo1 = ParticipantInfo.builder()
                 .joinResult(JoinResult.PROCESSING)
                 .joinStatus(JoinStatus.YES)
-        .build();
+                .build();
 
         participantInfo2 = ParticipantInfo.builder()
                 .joinResult(JoinResult.SUCCESS)
                 .joinStatus(JoinStatus.YES)
                 .build();
-
 
         userRepository.save(user1);
         userRepository.save(user2);
@@ -117,40 +143,14 @@ public class TopicControllerTest {
 
     }
 
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    InstanceRepository instanceRepository;
-    @Autowired
-    HitsRepository hitsRepository;
-    @Autowired
-    TopicRepository topicRepository;
-    @Autowired
-    ParticipantInfoRepository participantInfoRepository;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private TopicService topicService;
-
-    protected MediaType contentType =
-            new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), StandardCharsets.UTF_8);
-
-    private User user1, user2;
-    private Instance instance1;
-    private Topic topic1, topic2;
-    private ParticipantInfo participantInfo1;
-    private ParticipantInfo participantInfo2;
-
-
     @Test
+    @WithMockCustomUser
     public void 토픽_조회() throws Exception {
         Pageable pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
         List<Topic> topics = Arrays.asList(topic1, topic2);
         PageImpl<Topic> topicPage = new PageImpl<>(topics, pageable, topics.size());
 
-        when(topicService.getAllTopics(pageable)).thenReturn(topicPage);
+//        when(topicService.getAllTopics(pageable)).thenReturn(topicPage);
 
         for (Topic topic : topicPage) {
             System.out.println("topic.getInstanceList() = " + topic.getInstanceList());
@@ -158,9 +158,10 @@ public class TopicControllerTest {
         }
 
         System.out.println("topics.size() = " + topics.size());
-        
+
         // When & Then
         mockMvc.perform(get("/api/admin/topic?page=0&size=5")
+                        .cookie(tokenTestUtil.createAccessCookie())
                         .contentType(contentType))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))

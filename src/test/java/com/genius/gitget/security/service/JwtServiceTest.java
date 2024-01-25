@@ -22,7 +22,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
-@Transactional(readOnly = true)
+@Transactional
 @Slf4j
 @ActiveProfiles({"jwt"})
 class JwtServiceTest {

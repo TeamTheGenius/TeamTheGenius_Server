@@ -31,6 +31,8 @@ public class AuthController {
     public ResponseEntity<CommonResponse> generateToken(HttpServletResponse response,
                                                         @RequestBody TokenRequest tokenRequest) {
         User requestUser = userService.findUserByIdentifier(tokenRequest.identifier());
+        jwtService.validateUser(requestUser);
+
         jwtService.generateAccessToken(response, requestUser);
         jwtService.generateRefreshToken(response, requestUser);
 

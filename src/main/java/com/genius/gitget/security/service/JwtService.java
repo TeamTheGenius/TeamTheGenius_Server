@@ -3,12 +3,17 @@ package com.genius.gitget.security.service;
 import static com.genius.gitget.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.security.constants.JwtRule.JWT_ISSUE_HEADER;
 import static com.genius.gitget.security.constants.JwtRule.REFRESH_PREFIX;
+import static com.genius.gitget.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
+import static com.genius.gitget.util.exception.ErrorCode.TOKEN_NOT_FOUND;
 
 import com.genius.gitget.security.constants.JwtRule;
 import com.genius.gitget.security.constants.TokenStatus;
 import com.genius.gitget.security.domain.Token;
 import com.genius.gitget.security.repository.TokenRepository;
+import com.genius.gitget.user.domain.Role;
 import com.genius.gitget.user.domain.User;
+import com.genius.gitget.util.exception.BusinessException;
+import com.genius.gitget.util.exception.ErrorCode;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,6 +58,12 @@ public class JwtService {
         this.REFRESH_EXPIRATION = REFRESH_EXPIRATION;
     }
 
+    public void validateUser(User requestUser) {
+        if (requestUser.getRole() == Role.NOT_REGISTERED) {
+            throw new BusinessException(NOT_AUTHENTICATED_USER);
+        }
+    }
+
     public String generateAccessToken(HttpServletResponse response, User requestUser) {
         String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET_KEY, ACCESS_EXPIRATION, requestUser);
         ResponseCookie cookie = setTokenToCookie(ACCESS_PREFIX.getValue(), accessToken, ACCESS_EXPIRATION / 1000);
@@ -92,6 +103,9 @@ public class JwtService {
 
     public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenPrefix) {
         Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            throw new BusinessException(TOKEN_NOT_FOUND);
+        }
         return jwtUtil.resolveTokenFromCookie(cookies, tokenPrefix);
     }
 
@@ -110,6 +124,9 @@ public class JwtService {
     }
 
     public String getIdentifierFromRefresh(String refreshToken) {
+        if (refreshToken == null || refreshToken == "") {
+            throw new BusinessException(ErrorCode.INVALID_JWT);
+        }
         return Jwts.parserBuilder()
                 .setSigningKey(REFRESH_SECRET_KEY)
                 .build()

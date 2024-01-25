@@ -1,5 +1,9 @@
 package com.genius.gitget.hits;
 
+import static com.genius.gitget.security.constants.ProviderInfo.GOOGLE;
+import static com.genius.gitget.user.domain.Role.ADMIN;
+import static com.genius.gitget.user.domain.Role.USER;
+
 import com.genius.gitget.hits.domain.Hits;
 import com.genius.gitget.hits.repository.HitsRepository;
 import com.genius.gitget.instance.domain.Instance;
@@ -10,25 +14,16 @@ import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.user.domain.User;
 import com.genius.gitget.user.repository.UserRepository;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-
-import static com.genius.gitget.security.constants.ProviderInfo.GOOGLE;
-import static com.genius.gitget.security.constants.ProviderType.NAVER;
-import static com.genius.gitget.user.domain.Role.ADMIN;
-import static com.genius.gitget.user.domain.Role.USER;
 
 @SpringBootTest
 @Transactional
-@Rollback(value = false)
-
 public class HitsTest {
 
     @Autowired
@@ -65,7 +60,7 @@ public class HitsTest {
         instance1 = Instance.builder()
                 .title("1일 1커밋")
                 .description("챌린지 세부사항입니다.")
-                .point_per_person(10)
+                .pointPerPerson(10)
                 .tags("BE, CS")
                 .progress(Progress.ACTIVITY)
                 .startedDate(LocalDateTime.now())
@@ -73,11 +68,11 @@ public class HitsTest {
                 .build();
 
         topic1 = Topic.builder()
-                    .title("1일 1커밋")
-                    .description("간단한 설명란")
-                    .point_per_person(300)
-                    .tags("BE, CS")
-                    .build();
+                .title("1일 1커밋")
+                .description("간단한 설명란")
+                .pointPerPerson(300)
+                .tags("BE, CS")
+                .build();
 
         userRepository.save(user1);
         userRepository.save(user2);

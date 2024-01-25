@@ -2,7 +2,6 @@ package com.genius.gitget.security.service;
 
 import static com.genius.gitget.util.exception.ErrorCode.INVALID_EXPIRED_JWT;
 import static com.genius.gitget.util.exception.ErrorCode.INVALID_JWT;
-import static com.genius.gitget.util.exception.ErrorCode.TOKEN_NOT_FOUND;
 
 import com.genius.gitget.security.constants.JwtRule;
 import com.genius.gitget.security.constants.TokenStatus;
@@ -34,7 +33,7 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token);
             return TokenStatus.AUTHENTICATED;
-        } catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException | IllegalArgumentException e) {
             log.error(INVALID_EXPIRED_JWT.getMessage());
             return TokenStatus.EXPIRED;
         } catch (JwtException e) {
@@ -47,7 +46,7 @@ public class JwtUtil {
                 .filter(cookie -> cookie.getName().equals(tokenPrefix.getValue()))
                 .findFirst()
                 .map(Cookie::getValue)
-                .orElseThrow(() -> new BusinessException(TOKEN_NOT_FOUND));
+                .orElse("");
     }
 
     public Key getSigningKey(String secretKey) {

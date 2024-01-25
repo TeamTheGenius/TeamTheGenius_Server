@@ -3,9 +3,11 @@ package com.genius.gitget.user.controller;
 import static com.genius.gitget.util.exception.SuccessCode.CREATED;
 import static com.genius.gitget.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.security.dto.TokenDTO;
 import com.genius.gitget.user.dto.SignupRequest;
 import com.genius.gitget.user.service.UserService;
 import com.genius.gitget.util.response.dto.CommonResponse;
+import com.genius.gitget.util.response.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,10 +32,12 @@ public class UserController {
     }
 
     @PostMapping("/auth/signup")
-    public ResponseEntity<CommonResponse> signup(@RequestBody SignupRequest signupRequest) {
-        userService.signup(signupRequest);
+    public ResponseEntity<SingleResponse<TokenDTO>> signup(@RequestBody SignupRequest signupRequest) {
+        Long signupUserId = userService.signup(signupRequest);
+        String identifier = userService.findUserById(signupUserId).getIdentifier();
+
         return ResponseEntity.ok().body(
-                new CommonResponse(CREATED.getStatus(), CREATED.getMessage())
+                new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), new TokenDTO(identifier))
         );
     }
 }

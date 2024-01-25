@@ -3,7 +3,7 @@ package com.genius.gitget.security.controller;
 import static com.genius.gitget.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.security.domain.UserPrincipal;
-import com.genius.gitget.security.dto.TokenRequest;
+import com.genius.gitget.security.dto.TokenDTO;
 import com.genius.gitget.security.service.JwtService;
 import com.genius.gitget.user.domain.User;
 import com.genius.gitget.user.service.UserService;

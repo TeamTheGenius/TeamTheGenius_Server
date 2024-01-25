@@ -29,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/auth")
     public ResponseEntity<CommonResponse> generateToken(HttpServletResponse response,
-                                                        @RequestBody TokenRequest tokenRequest) {
+                                                        @RequestBody TokenDTO tokenRequest) {
         User requestUser = userService.findUserByIdentifier(tokenRequest.identifier());
         jwtService.validateUser(requestUser);
 

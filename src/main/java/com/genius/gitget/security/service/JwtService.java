@@ -98,7 +98,10 @@ public class JwtService {
     public boolean validateRefreshToken(String token, String identifier) {
         boolean isRefreshValid = jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == TokenStatus.AUTHENTICATED;
 
-        return isRefreshValid && tokenRepository.existsById(identifier);
+        Token storedToken = tokenRepository.findByIdentifier(identifier);
+        boolean isTokenMatched = storedToken.getToken().equals(token);
+
+        return isRefreshValid && isTokenMatched;
     }
 
     public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenPrefix) {

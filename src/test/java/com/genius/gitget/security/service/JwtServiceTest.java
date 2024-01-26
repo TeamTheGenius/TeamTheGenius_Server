@@ -2,6 +2,7 @@ package com.genius.gitget.security.service;
 
 import static com.genius.gitget.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.security.constants.JwtRule.REFRESH_PREFIX;
+import static com.genius.gitget.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -129,6 +130,17 @@ class JwtServiceTest {
         assertThat(refreshToken).isEqualTo(resolvedToken);
     }
 
+    @Test
+    @DisplayName("사용자가 아직 가입하지 않은 회원이 JWT 발급을 요청한다면, 예외를 발생시킨다.")
+    public void should_throwException_when_userIsNotRegistered() {
+        //given
+        User user = getUnregisteredUser();
+
+        //when & then
+        assertThatThrownBy(() -> jwtService.validateUser(user))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(NOT_AUTHENTICATED_USER.getMessage());
+    }
 
     private User getSavedUser() {
         return userRepository.save(User.builder()
@@ -138,6 +150,14 @@ class JwtServiceTest {
                 .role(Role.USER)
                 .interest("interest1,interest2")
                 .information("information")
+                .build());
+    }
+
+    private User getUnregisteredUser() {
+        return userRepository.save(User.builder()
+                .providerInfo(ProviderInfo.GITHUB)
+                .identifier("identifier")
+                .role(Role.NOT_REGISTERED)
                 .build());
     }
 }

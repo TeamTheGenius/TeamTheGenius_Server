@@ -27,6 +27,16 @@ public class TokenTestUtil {
         return new Cookie(ACCESS_PREFIX.getValue(), accessCookie);
     }
 
+    public String createAccessToken() {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        User user = userPrincipal.getUser();
+
+        MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
+
+        return jwtService.generateAccessToken(httpServletResponse, user);
+    }
+
     public Cookie createRefreshCookie() {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
@@ -36,5 +46,15 @@ public class TokenTestUtil {
 
         String refreshCookie = jwtService.generateRefreshToken(httpServletResponse, user);
         return new Cookie(ACCESS_PREFIX.getValue(), refreshCookie);
+    }
+
+    public String createRefreshToken() {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        User user = userPrincipal.getUser();
+
+        MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
+
+        return jwtService.generateRefreshToken(httpServletResponse, user);
     }
 }

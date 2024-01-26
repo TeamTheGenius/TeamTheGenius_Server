@@ -98,7 +98,10 @@ public class JwtService {
     public boolean validateRefreshToken(String token, String identifier) {
         boolean isRefreshValid = jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == TokenStatus.AUTHENTICATED;
 
-        return isRefreshValid && tokenRepository.existsById(identifier);
+        Token storedToken = tokenRepository.findByIdentifier(identifier);
+        boolean isTokenMatched = storedToken.getToken().equals(token);
+
+        return isRefreshValid && isTokenMatched;
     }
 
     public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenPrefix) {
@@ -124,15 +127,16 @@ public class JwtService {
     }
 
     public String getIdentifierFromRefresh(String refreshToken) {
-        if (refreshToken == null || refreshToken == "") {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(REFRESH_SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(refreshToken)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
             throw new BusinessException(ErrorCode.INVALID_JWT);
         }
-        return Jwts.parserBuilder()
-                .setSigningKey(REFRESH_SECRET_KEY)
-                .build()
-                .parseClaimsJws(refreshToken)
-                .getBody()
-                .getSubject();
     }
 
     public void logout(User requestUser, HttpServletResponse response) {

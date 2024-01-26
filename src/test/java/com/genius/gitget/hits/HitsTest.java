@@ -65,7 +65,7 @@ public class HitsTest {
         instance1 = Instance.builder()
                 .title("1일 1커밋")
                 .description("챌린지 세부사항입니다.")
-                .point_per_person(10)
+                .pointPerPerson(10)
                 .tags("BE, CS")
                 .progress(Progress.ACTIVITY)
                 .startedDate(LocalDateTime.now())
@@ -75,7 +75,7 @@ public class HitsTest {
         topic1 = Topic.builder()
                     .title("1일 1커밋")
                     .description("간단한 설명란")
-                    .point_per_person(300)
+                    .pointPerPerson(300)
                     .tags("BE, CS")
                     .build();
 

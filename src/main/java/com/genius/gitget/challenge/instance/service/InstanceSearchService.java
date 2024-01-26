@@ -2,7 +2,7 @@ package com.genius.gitget.challenge.instance.service;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.dto.search.SearchDTO;
+import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,8 +15,8 @@ public class InstanceSearchService {
 
     private final SearchRepository searchRepository;
 
-    public Page<InstanceSearchResponse> searchInstances(SearchDTO searchDTO, Pageable pageable) {
-        Page<Instance> finByTitleContaining = searchRepository.findByTitleContainingOrderByStartedDateDesc(searchDTO.keyword(), pageable);
+    public Page<InstanceSearchResponse> searchInstances(InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
+        Page<Instance> finByTitleContaining = searchRepository.findByTitleContainingOrderByStartedDateDesc(instanceSearchRequest.keyword(), pageable);
         return finByTitleContaining.map(this::convertToInstanceSearchResponse);
     }
 

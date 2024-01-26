@@ -1,7 +1,7 @@
 package com.genius.gitget.challenge.instance.controller;
 
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.dto.search.SearchDTO;
+import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -24,9 +24,9 @@ public class HomeController {
 
     @GetMapping("/challenges")
     public ResponseEntity<PagingResponse<InstanceSearchResponse>> searchInstances
-            (@RequestParam("keyword") SearchDTO searchDTO, Pageable pageable) {
+            (@RequestParam("instanceSearchRequest") InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
         Page<InstanceSearchResponse> searchResults
-                = instanceSearchService.searchInstances(searchDTO, pageable);
+                = instanceSearchService.searchInstances(instanceSearchRequest, pageable);
 
         return ResponseEntity.ok().body(
                 new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), searchResults)

@@ -1,17 +1,17 @@
 package com.genius.gitget.user.controller;
 
-import static com.genius.gitget.util.exception.ErrorCode.DUPLICATED_NICKNAME;
-import static com.genius.gitget.util.exception.SuccessCode.SUCCESS;
+import static com.genius.gitget.global.util.exception.ErrorCode.DUPLICATED_NICKNAME;
+import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.genius.gitget.security.constants.ProviderInfo;
-import com.genius.gitget.user.domain.Role;
-import com.genius.gitget.user.domain.User;
-import com.genius.gitget.user.repository.UserRepository;
+import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.challenge.user.domain.Role;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,23 +1,24 @@
 package com.genius.gitget.security.service;
 
-import static com.genius.gitget.security.constants.JwtRule.ACCESS_PREFIX;
-import static com.genius.gitget.security.constants.JwtRule.REFRESH_PREFIX;
-import static com.genius.gitget.util.exception.ErrorCode.INVALID_JWT;
-import static com.genius.gitget.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
-import static com.genius.gitget.util.exception.ErrorCode.TOKEN_NOT_FOUND;
+import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
+import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
+import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_JWT;
+import static com.genius.gitget.global.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
+import static com.genius.gitget.global.util.exception.ErrorCode.TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.genius.gitget.security.constants.JwtRule;
-import com.genius.gitget.security.constants.ProviderInfo;
-import com.genius.gitget.security.repository.TokenRepository;
-import com.genius.gitget.user.domain.Role;
-import com.genius.gitget.user.domain.User;
-import com.genius.gitget.user.repository.UserRepository;
+import com.genius.gitget.global.security.constants.JwtRule;
+import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.global.security.repository.TokenRepository;
+import com.genius.gitget.global.security.service.JwtService;
+import com.genius.gitget.challenge.user.domain.Role;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;
-import com.genius.gitget.util.exception.BusinessException;
-import com.genius.gitget.util.exception.ErrorCode;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -224,7 +225,7 @@ class JwtServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(INVALID_JWT.getMessage());
     }
-    
+
 
     private User getSavedUser() {
         return userRepository.save(User.builder()

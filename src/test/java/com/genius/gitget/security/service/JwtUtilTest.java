@@ -2,7 +2,8 @@ package com.genius.gitget.security.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.gitget.security.constants.JwtRule;
+import com.genius.gitget.global.security.constants.JwtRule;
+import com.genius.gitget.global.security.service.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;

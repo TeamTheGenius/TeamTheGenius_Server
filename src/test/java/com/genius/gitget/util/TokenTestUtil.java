@@ -1,11 +1,11 @@
 package com.genius.gitget.util;
 
-import static com.genius.gitget.security.constants.JwtRule.ACCESS_PREFIX;
-import static com.genius.gitget.security.constants.JwtRule.REFRESH_PREFIX;
+import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
+import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 
-import com.genius.gitget.security.domain.UserPrincipal;
-import com.genius.gitget.security.service.JwtService;
-import com.genius.gitget.user.domain.User;
+import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.global.security.service.JwtService;
+import com.genius.gitget.challenge.user.domain.User;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mock.web.MockHttpServletResponse;

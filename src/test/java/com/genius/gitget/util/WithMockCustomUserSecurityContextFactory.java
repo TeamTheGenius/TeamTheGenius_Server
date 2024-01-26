@@ -1,11 +1,11 @@
 package com.genius.gitget.util;
 
-import com.genius.gitget.security.service.CustomUserDetailsService;
-import com.genius.gitget.user.domain.Role;
-import com.genius.gitget.user.domain.User;
-import com.genius.gitget.user.dto.SignupRequest;
-import com.genius.gitget.user.repository.UserRepository;
-import com.genius.gitget.user.service.UserService;
+import com.genius.gitget.global.security.service.CustomUserDetailsService;
+import com.genius.gitget.challenge.user.domain.Role;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.dto.SignupRequest;
+import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.challenge.user.service.UserService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

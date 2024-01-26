@@ -1,16 +1,17 @@
 package com.genius.gitget.user.domain;
 
-import com.genius.gitget.user.repository.UserRepository;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
-import static com.genius.gitget.security.constants.ProviderInfo.GOOGLE;
-import static com.genius.gitget.security.constants.ProviderInfo.NAVER;
-import static com.genius.gitget.user.domain.Role.ADMIN;
-import static com.genius.gitget.user.domain.Role.USER;
+import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
+import static com.genius.gitget.global.security.constants.ProviderInfo.NAVER;
+import static com.genius.gitget.challenge.user.domain.Role.ADMIN;
+import static com.genius.gitget.challenge.user.domain.Role.USER;
 import static org.assertj.core.api.Assertions.*;
 import static org.xmlunit.util.Linqy.count;
 

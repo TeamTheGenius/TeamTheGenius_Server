@@ -2,8 +2,9 @@ package com.genius.gitget.file.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.gitget.file.domain.FileType;
-import com.genius.gitget.file.domain.Files;
+import com.genius.gitget.global.file.domain.FileType;
+import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.repository.FilesRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

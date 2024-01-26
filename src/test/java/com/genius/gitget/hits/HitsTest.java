@@ -1,34 +1,29 @@
 package com.genius.gitget.hits;
 
-import com.genius.gitget.hits.domain.Hits;
-import com.genius.gitget.hits.repository.HitsRepository;
-import com.genius.gitget.instance.domain.Instance;
-import com.genius.gitget.instance.domain.Progress;
-import com.genius.gitget.instance.repository.InstanceRepository;
-import com.genius.gitget.security.constants.ProviderInfo;
-import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.repository.TopicRepository;
-import com.genius.gitget.user.domain.User;
-import com.genius.gitget.user.repository.UserRepository;
+import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
+import static com.genius.gitget.challenge.user.domain.Role.ADMIN;
+import static com.genius.gitget.challenge.user.domain.Role.USER;
+
+import com.genius.gitget.challenge.hits.domain.Hits;
+import com.genius.gitget.challenge.hits.repository.HitsRepository;
+import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.challenge.instance.domain.Progress;
+import com.genius.gitget.challenge.instance.repository.InstanceRepository;
+import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.repository.UserRepository;
+import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-
-import static com.genius.gitget.security.constants.ProviderInfo.GOOGLE;
-import static com.genius.gitget.security.constants.ProviderType.NAVER;
-import static com.genius.gitget.user.domain.Role.ADMIN;
-import static com.genius.gitget.user.domain.Role.USER;
 
 @SpringBootTest
 @Transactional
-@Rollback(value = false)
-
 public class HitsTest {
 
     @Autowired
@@ -73,11 +68,11 @@ public class HitsTest {
                 .build();
 
         topic1 = Topic.builder()
-                    .title("1일 1커밋")
-                    .description("간단한 설명란")
-                    .pointPerPerson(300)
-                    .tags("BE, CS")
-                    .build();
+                .title("1일 1커밋")
+                .description("간단한 설명란")
+                .pointPerPerson(300)
+                .tags("BE, CS")
+                .build();
 
         userRepository.save(user1);
         userRepository.save(user2);

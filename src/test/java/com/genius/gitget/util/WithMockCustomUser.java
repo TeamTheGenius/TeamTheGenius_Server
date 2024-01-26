@@ -1,7 +1,7 @@
 package com.genius.gitget.util;
 
-import com.genius.gitget.security.constants.ProviderInfo;
-import com.genius.gitget.user.domain.Role;
+import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.challenge.user.domain.Role;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import org.springframework.security.test.context.support.WithSecurityContext;

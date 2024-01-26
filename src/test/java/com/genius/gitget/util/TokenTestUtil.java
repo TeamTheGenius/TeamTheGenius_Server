@@ -1,6 +1,7 @@
 package com.genius.gitget.util;
 
 import static com.genius.gitget.security.constants.JwtRule.ACCESS_PREFIX;
+import static com.genius.gitget.security.constants.JwtRule.REFRESH_PREFIX;
 
 import com.genius.gitget.security.domain.UserPrincipal;
 import com.genius.gitget.security.service.JwtService;
@@ -45,7 +46,7 @@ public class TokenTestUtil {
         MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
         String refreshCookie = jwtService.generateRefreshToken(httpServletResponse, user);
-        return new Cookie(ACCESS_PREFIX.getValue(), refreshCookie);
+        return new Cookie(REFRESH_PREFIX.getValue(), refreshCookie);
     }
 
     public String createRefreshToken() {

@@ -127,15 +127,16 @@ public class JwtService {
     }
 
     public String getIdentifierFromRefresh(String refreshToken) {
-        if (refreshToken == null || refreshToken == "") {
+        try {
+            return Jwts.parserBuilder()
+                    .setSigningKey(REFRESH_SECRET_KEY)
+                    .build()
+                    .parseClaimsJws(refreshToken)
+                    .getBody()
+                    .getSubject();
+        } catch (Exception e) {
             throw new BusinessException(ErrorCode.INVALID_JWT);
         }
-        return Jwts.parserBuilder()
-                .setSigningKey(REFRESH_SECRET_KEY)
-                .build()
-                .parseClaimsJws(refreshToken)
-                .getBody()
-                .getSubject();
     }
 
     public void logout(User requestUser, HttpServletResponse response) {

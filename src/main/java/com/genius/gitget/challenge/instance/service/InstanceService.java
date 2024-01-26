@@ -1,9 +1,9 @@
 package com.genius.gitget.challenge.instance.service;
 
-import com.genius.gitget.challenge.instance.dto.InstanceCreateRequest;
-import com.genius.gitget.challenge.instance.dto.InstanceDetailResponse;
-import com.genius.gitget.challenge.instance.dto.InstancePagingResponse;
-import com.genius.gitget.challenge.instance.dto.InstanceUpdateRequest;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
+import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -34,6 +34,7 @@ public class InstanceService {
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
         Instance instance = Instance.builder()
+                .title(instanceCreateRequest.title())
                 .description(instanceCreateRequest.description())
                 .pointPerPerson(instanceCreateRequest.pointPerPerson())
                 .startedDate(instanceCreateRequest.startedAt())

@@ -1,9 +1,9 @@
 package com.genius.gitget.challenge.instance.controller;
 
-import com.genius.gitget.challenge.instance.dto.InstanceCreateRequest;
-import com.genius.gitget.challenge.instance.dto.InstanceDetailResponse;
-import com.genius.gitget.challenge.instance.dto.InstancePagingResponse;
-import com.genius.gitget.challenge.instance.dto.InstanceUpdateRequest;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
+import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;

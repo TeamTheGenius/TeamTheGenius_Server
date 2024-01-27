@@ -3,12 +3,12 @@ package com.genius.gitget.user.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.genius.gitget.challenge.user.service.UserService;
-import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.util.List;
@@ -52,7 +52,7 @@ class UserServiceTest {
         assertThat(user.getNickname()).isEqualTo(foundUser.getNickname());
         assertThat(user.getProviderInfo()).isEqualTo(foundUser.getProviderInfo());
         assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());
-        assertThat(user.getInterest()).isEqualTo(foundUser.getInterest());
+        assertThat(user.getTags()).isEqualTo(foundUser.getTags());
     }
 
     @Test
@@ -71,7 +71,7 @@ class UserServiceTest {
         assertThat(user.getNickname()).isEqualTo(foundUser.getNickname());
         assertThat(user.getRole()).isEqualTo(foundUser.getRole());
         assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());
-        assertThat(user.getInterest()).isEqualTo(foundUser.getInterest());
+        assertThat(user.getTags()).isEqualTo(foundUser.getTags());
     }
 
     @Test
@@ -90,7 +90,7 @@ class UserServiceTest {
         assertThat(user.getNickname()).isEqualTo(foundUser.getNickname());
         assertThat(user.getRole()).isEqualTo(foundUser.getRole());
         assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());
-        assertThat(user.getInterest()).isEqualTo(foundUser.getInterest());
+        assertThat(user.getTags()).isEqualTo(foundUser.getTags());
     }
 
     @Test
@@ -119,7 +119,7 @@ class UserServiceTest {
                 .identifier("identifier")
                 .role(Role.USER)
                 .information("information")
-                .interest("interest1,interest2")
+                .tags("interest1,interest2")
                 .nickname("nickname")
                 .providerInfo(ProviderInfo.GITHUB)
                 .build());

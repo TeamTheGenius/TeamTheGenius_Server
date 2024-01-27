@@ -1,13 +1,16 @@
 package com.genius.gitget.topic;
 
-import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
 import static com.genius.gitget.challenge.user.domain.Role.ADMIN;
 import static com.genius.gitget.challenge.user.domain.Role.USER;
+import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.admin.topic.service.TopicService;
 import com.genius.gitget.challenge.hits.repository.HitsRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -16,12 +19,9 @@ import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
-import com.genius.gitget.global.security.constants.ProviderInfo;
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
-import com.genius.gitget.admin.topic.service.TopicService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;
 import java.nio.charset.StandardCharsets;
@@ -80,7 +80,7 @@ public class TopicControllerTest {
                 .providerInfo(ProviderInfo.NAVER)
                 .nickname("kimdozzi")
                 .information("백엔드")
-                .interest("운동")
+                .tags("운동")
                 .role(ADMIN)
                 .build();
 
@@ -88,7 +88,7 @@ public class TopicControllerTest {
                 .providerInfo(GOOGLE)
                 .nickname("SEONG")
                 .information("프론트엔드")
-                .interest("영화")
+                .tags("영화")
                 .role(USER)
                 .build();
 

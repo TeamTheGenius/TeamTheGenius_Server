@@ -1,19 +1,19 @@
 package com.genius.gitget.hits;
 
-import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
 import static com.genius.gitget.challenge.user.domain.Role.ADMIN;
 import static com.genius.gitget.challenge.user.domain.Role.USER;
+import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
 
+import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.hits.repository.HitsRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.global.security.constants.ProviderInfo;
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.security.constants.ProviderInfo;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +45,7 @@ public class HitsTest {
                 .providerInfo(ProviderInfo.NAVER)
                 .nickname("kimdozzi")
                 .information("백엔드")
-                .interest("운동")
+                .tags("운동")
                 .role(ADMIN)
                 .build();
 
@@ -53,7 +53,7 @@ public class HitsTest {
                 .providerInfo(GOOGLE)
                 .nickname("SEONG")
                 .information("프론트엔드")
-                .interest("영화")
+                .tags("영화")
                 .role(USER)
                 .build();
 

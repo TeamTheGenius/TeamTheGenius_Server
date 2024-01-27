@@ -8,10 +8,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.security.constants.ProviderInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -95,7 +95,7 @@ class UserControllerTest {
                 .identifier("identifier")
                 .role(Role.USER)
                 .information("information")
-                .interest("interest1,interest2")
+                .tags("interest1,interest2")
                 .nickname("nickname")
                 .providerInfo(ProviderInfo.GITHUB)
                 .build());

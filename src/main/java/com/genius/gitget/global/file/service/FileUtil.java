@@ -31,6 +31,7 @@ public class FileUtil {
         UrlResource urlResource = new UrlResource("file:" + files.getFileURI());
 
         byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
+        return new String(encode, StandardCharsets.UTF_8);
     }
 
     public UploadDTO getUploadInfo(MultipartFile file, String typeStr) {

@@ -1,12 +1,13 @@
 package com.genius.gitget.file.service;
 
-import static com.genius.gitget.util.exception.ErrorCode.IMAGE_NOT_EXIST;
-import static com.genius.gitget.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
+import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.genius.gitget.file.dto.UploadDTO;
-import com.genius.gitget.util.exception.BusinessException;
+import com.genius.gitget.global.file.dto.UploadDTO;
+import com.genius.gitget.global.file.service.FileUtil;
+import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

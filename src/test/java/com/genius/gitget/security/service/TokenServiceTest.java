@@ -2,8 +2,9 @@ package com.genius.gitget.security.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.gitget.security.domain.Token;
-import com.genius.gitget.security.repository.TokenRepository;
+import com.genius.gitget.global.security.domain.Token;
+import com.genius.gitget.global.security.repository.TokenRepository;
+import com.genius.gitget.global.security.service.TokenService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

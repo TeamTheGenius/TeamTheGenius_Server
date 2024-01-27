@@ -1,11 +1,12 @@
 package com.genius.gitget.user.repository;
 
-import static com.genius.gitget.security.constants.ProviderInfo.GITHUB;
+import static com.genius.gitget.global.security.constants.ProviderInfo.GITHUB;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.gitget.security.constants.ProviderInfo;
-import com.genius.gitget.user.domain.Role;
-import com.genius.gitget.user.domain.User;
+import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.challenge.user.domain.Role;
+import com.genius.gitget.challenge.user.domain.User;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

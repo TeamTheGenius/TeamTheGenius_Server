@@ -2,7 +2,7 @@ package com.genius.gitget.challenge.home.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.challenge.home.dto.RecommendationResponse;
+import com.genius.gitget.challenge.home.dto.HomeInstanceResponse;
 import com.genius.gitget.challenge.home.service.HomeService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SlicingResponse;
@@ -24,11 +24,11 @@ public class HomeController {
     private final HomeService homeService;
 
     @GetMapping("/recommend")
-    public ResponseEntity<SlicingResponse<RecommendationResponse>> getRecommendations(
+    public ResponseEntity<SlicingResponse<HomeInstanceResponse>> getRecommendations(
             @PageableDefault(size = 10, sort = "participantCnt", direction = Direction.DESC) Pageable pageable,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
-        Slice<RecommendationResponse> recommendations = homeService.getRecommendations(
+        Slice<HomeInstanceResponse> recommendations = homeService.getRecommendations(
                 userPrincipal.getUser(), pageable);
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), recommendations)

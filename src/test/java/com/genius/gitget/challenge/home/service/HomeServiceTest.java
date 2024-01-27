@@ -63,7 +63,7 @@ class HomeServiceTest {
                         .tags(tags)
                         .title(title)
                         .description("description")
-                        .progress(Progress.ACTIVITY)
+                        .progress(Progress.PRE_ACTIVITY)
                         .pointPerPerson(100)
                         .startedDate(now)
                         .completedDate(now.plusDays(1))

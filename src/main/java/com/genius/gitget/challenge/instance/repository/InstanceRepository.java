@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.instance.repository;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.challenge.instance.domain.Progress;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +15,6 @@ public interface InstanceRepository extends JpaRepository<Instance, Long> {
     @Query("select i from Instance i ORDER BY i.id DESC ")
     Page<Instance> findAllById(Pageable pageable);
 
-    @Query("select i from Instance i where i.tags in :targetTags")
-    Slice<Instance> findSuggestions(@Param("targetTags") List<String> targetTags, Pageable pageable);
+    @Query("select i from Instance i where i.progress = :progress and i.tags in :userTags")
+    Slice<Instance> findRecommendations(@Param("userTags") List<String> userTags, Progress progress, Pageable pageable);
 }

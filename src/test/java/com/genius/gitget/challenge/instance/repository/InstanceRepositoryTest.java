@@ -35,7 +35,7 @@ class InstanceRepositoryTest {
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "FE", 3);
         getSavedInstance("title3", "FE", 20);
-        Slice<Instance> suggestions = instanceRepository.findSuggestions(userTags, pageRequest);
+        Slice<Instance> suggestions = instanceRepository.findRecommendations(userTags, Progress.ACTIVITY, pageRequest);
 
         //then
         assertThat(suggestions.getContent().size()).isEqualTo(3);

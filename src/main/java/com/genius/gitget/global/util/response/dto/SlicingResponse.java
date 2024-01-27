@@ -1,8 +1,12 @@
 package com.genius.gitget.global.util.response.dto;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 
+@Getter
+@RequiredArgsConstructor
 public class SlicingResponse<T> extends CommonResponse {
     private Slice<T> data;
 

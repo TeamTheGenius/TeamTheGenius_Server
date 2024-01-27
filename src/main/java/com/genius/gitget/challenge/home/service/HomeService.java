@@ -1,6 +1,6 @@
 package com.genius.gitget.challenge.home.service;
 
-import com.genius.gitget.challenge.home.dto.RecommendPagingResponse;
+import com.genius.gitget.challenge.home.dto.RecommendationResponse;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -22,10 +22,10 @@ public class HomeService {
     private final InstanceRepository instanceRepository;
 
 
-    public Slice<RecommendPagingResponse> getRecommendations(User user, Pageable pageable) {
+    public Slice<RecommendationResponse> getRecommendations(User user, Pageable pageable) {
         List<String> userTags = Arrays.stream(user.getTags().split(",")).toList();
 
         Slice<Instance> suggestions = instanceRepository.findRecommendations(userTags, Progress.ACTIVITY, pageable);
-        return suggestions.map(RecommendPagingResponse::createByEntity);
+        return suggestions.map(RecommendationResponse::createByEntity);
     }
 }

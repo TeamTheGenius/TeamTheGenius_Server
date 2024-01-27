@@ -1,5 +1,6 @@
 package com.genius.gitget.challenge.instance.domain;
 
+
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;

@@ -104,7 +104,7 @@ class UserServiceTest {
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.DUPLICATED_NICKNAME.getMessage());
     }
-
+    
 
     private void saveUnsignedUser() {
         userRepository.save(User.builder()

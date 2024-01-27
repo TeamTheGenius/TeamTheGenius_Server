@@ -4,14 +4,14 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import lombok.Builder;
 
 @Builder
-public record RecommendationResponse(
+public record HomeInstanceResponse(
         String title,
         int participantCnt,
         int pointPerPerson,
         String encodedImage
 ) {
-    public static RecommendationResponse createByEntity(Instance instance) {
-        return RecommendationResponse.builder()
+    public static HomeInstanceResponse createByEntity(Instance instance) {
+        return HomeInstanceResponse.builder()
                 .title(instance.getTitle())
                 .participantCnt(instance.getParticipantCnt())
                 .pointPerPerson(instance.getPointPerPerson())

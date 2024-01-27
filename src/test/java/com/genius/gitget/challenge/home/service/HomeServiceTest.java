@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
-import com.genius.gitget.challenge.home.dto.RecommendationResponse;
+import com.genius.gitget.challenge.home.dto.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -43,7 +43,7 @@ class HomeServiceTest {
         User user = User.builder().tags("BE").build();
 
         //when
-        Slice<RecommendationResponse> recommendations = homeService.getRecommendations(user, pageRequest);
+        Slice<HomeInstanceResponse> recommendations = homeService.getRecommendations(user, pageRequest);
 
         //then
         assertThat(recommendations.getContent().size()).isEqualTo(2);

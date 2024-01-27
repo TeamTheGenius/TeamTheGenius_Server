@@ -41,7 +41,7 @@ public class FilesService {
                 .build();
 
         Files savedFile = filesRepository.save(file);
-        return new FileResponse(savedFile.getId());
+        return new FileResponse(savedFile.getId(), fileUtil.encodedImage(file));
     }
 
     private void saveFile(MultipartFile receivedFile, String fileURI) throws IOException {
@@ -51,6 +51,13 @@ public class FilesService {
             targetFile.mkdirs();
         }
         receivedFile.transferTo(targetFile);
+    }
+
+    public FileResponse getEncodedFile(Long fileId) throws IOException {
+        Files files = filesRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
+
+        return new FileResponse(fileId, fileUtil.encodedImage(files));
     }
 
     public UrlResource getFile(Long fileId) throws MalformedURLException {

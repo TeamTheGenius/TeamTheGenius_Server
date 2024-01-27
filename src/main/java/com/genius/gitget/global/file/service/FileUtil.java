@@ -4,12 +4,17 @@ import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 
 import com.genius.gitget.global.file.domain.FileType;
+import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +25,13 @@ public class FileUtil {
 
     public FileUtil(@Value("${file.upload.path}") String uploadPath) {
         this.uploadPath = uploadPath;
+    }
+
+    public String encodedImage(Files files) throws IOException {
+        UrlResource urlResource = new UrlResource("file:" + files.getFileURI());
+
+        byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
+        return new String(encode, StandardCharsets.UTF_8);
     }
 
     public UploadDTO getUploadInfo(MultipartFile file, String typeStr) {

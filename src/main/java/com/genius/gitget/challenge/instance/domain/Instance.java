@@ -1,9 +1,9 @@
 package com.genius.gitget.challenge.instance.domain;
 
-import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.global.file.domain.Files;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -60,6 +60,8 @@ public class Instance {
 
     private int pointPerPerson;
 
+    private int participantCnt;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     // @Column(columnDefinition = "varchar(255) default 'PRE_ACTIVITY'")
@@ -91,8 +93,8 @@ public class Instance {
         this.completedDate = completedDate;
     }
 
-    public int getJoinPeopleCount() {
-        return participantInfoList.size();
+    public void updateParticipantCnt(int amount) {
+        this.participantCnt += amount;
     }
 
     //== 연관관계 편의 메서드 ==//

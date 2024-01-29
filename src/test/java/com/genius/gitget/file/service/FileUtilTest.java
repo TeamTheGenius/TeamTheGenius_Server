@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -24,11 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 @ActiveProfiles({"file"})
 class FileUtilTest {
-    @Autowired
-    private FileUtil fileUtil;
-
     @Value("${file.upload.path}")
-    private String uploadPath;
+    private String UPLOAD_PATH;
 
     @Test
     @DisplayName("file을 전달받았을 때, originFilename가 null일 때 예외를 발생해야 한다.")
@@ -37,7 +33,7 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile(null);
 
         //when&then
-        assertThatThrownBy(() -> fileUtil.validateFile(multipartFile))
+        assertThatThrownBy(() -> FileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(IMAGE_NOT_EXIST.getMessage());
     }
@@ -49,7 +45,7 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile("");
 
         //when&then
-        assertThatThrownBy(() -> fileUtil.validateFile(multipartFile))
+        assertThatThrownBy(() -> FileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(IMAGE_NOT_EXIST.getMessage());
     }
@@ -61,7 +57,7 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile("sky.pdf");
 
         //when&then
-        assertThatThrownBy(() -> fileUtil.validateFile(multipartFile))
+        assertThatThrownBy(() -> FileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_SUPPORTED_EXTENSION.getMessage());
     }
@@ -73,10 +69,10 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile("sky.png");
 
         //when
-        UploadDTO uploadDTO = fileUtil.getUploadInfo(multipartFile, "profile");
+        UploadDTO uploadDTO = FileUtil.getUploadInfo(multipartFile, "profile", UPLOAD_PATH);
 
         //then
-        assertThat(uploadDTO.fileURI()).contains(uploadPath);
+        assertThat(uploadDTO.fileURI()).contains(UPLOAD_PATH);
     }
 
 

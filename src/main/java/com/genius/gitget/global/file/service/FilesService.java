@@ -10,8 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,17 +20,20 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class FilesService {
-    private final FileUtil fileUtil;
+    private final String UPLOAD_PATH;
     private final FilesRepository filesRepository;
 
+    public FilesService(@Value("${file.upload.path}") String UPLOAD_PATH, FilesRepository filesRepository) {
+        this.UPLOAD_PATH = UPLOAD_PATH;
+        this.filesRepository = filesRepository;
+    }
 
     @Transactional
-    public FileResponse uploadFile(MultipartFile receivedFile, String typeStr) throws IOException {
-        fileUtil.validateFile(receivedFile);
+    public Files uploadFile(MultipartFile receivedFile, String typeStr) throws IOException {
+        FileUtil.validateFile(receivedFile);
 
-        UploadDTO uploadDTO = fileUtil.getUploadInfo(receivedFile, typeStr);
+        UploadDTO uploadDTO = FileUtil.getUploadInfo(receivedFile, typeStr, UPLOAD_PATH);
 
         saveFile(receivedFile, uploadDTO.fileURI());
 
@@ -41,8 +44,7 @@ public class FilesService {
                 .fileURI(uploadDTO.fileURI())
                 .build();
 
-        Files savedFile = filesRepository.save(file);
-        return new FileResponse(savedFile.getId(), fileUtil.encodedImage(file));
+        return filesRepository.save(file);
     }
 
     private void saveFile(MultipartFile receivedFile, String fileURI) throws IOException {
@@ -63,7 +65,7 @@ public class FilesService {
             return FileResponse.createNotExistFile();
         }
 
-        return new FileResponse(files.get().getId(), fileUtil.encodedImage(files.get()));
+        return FileResponse.createExistFile(files.get());
     }
 
     public UrlResource getFile(Long fileId) throws MalformedURLException {

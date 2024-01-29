@@ -35,7 +35,7 @@ public class TopicService {
 
     // 토픽 생성 요청
     @Transactional
-    public void createTopic(TopicCreateRequest topicCreateRequest) {
+    public Long createTopic(TopicCreateRequest topicCreateRequest) {
         Topic topic = Topic.builder()
                 .title(topicCreateRequest.title())
                 .description(topicCreateRequest.description())
@@ -44,8 +44,10 @@ public class TopicService {
                 // 이미지
                 // 유의사항
                 .build();
-        topicRepository.save(topic);
+        Topic savedTopic = topicRepository.save(topic);
 
+        // 생성된 토픽을 ID로 조회 가능하도록 수정 (01/29)
+        return savedTopic.getId();
     }
 
     @Transactional
@@ -57,7 +59,7 @@ public class TopicService {
         if (hasInstance) {
             topic.updateExistInstance(topicUpdateRequest.description());
         } else {
-            topic.createInstance(topicUpdateRequest.title(), topicUpdateRequest.description(),
+            topic.updateNotExistInstance(topicUpdateRequest.title(), topicUpdateRequest.description(),
                     topicUpdateRequest.tags(), topicUpdateRequest.pointPerPerson());
         }
         topicRepository.save(topic);

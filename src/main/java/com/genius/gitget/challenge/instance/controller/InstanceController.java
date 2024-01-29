@@ -60,7 +60,7 @@ public class InstanceController {
                                                          @RequestBody @Valid InstanceUpdateRequest instanceUpdateRequest) {
         instanceService.updateInstance(id, instanceUpdateRequest);
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.CREATED.getMessage())
+                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
         );
     }
 
@@ -69,7 +69,7 @@ public class InstanceController {
     public ResponseEntity<CommonResponse> deleteInstance(@PathVariable Long id) {
         instanceService.deleteInstance(id);
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.CREATED.getMessage())
+                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
         );
     }
 }

@@ -29,7 +29,7 @@ public class InstanceService {
 
     // 인스턴스 생성
     @Transactional
-    public void createInstance(InstanceCreateRequest instanceCreateRequest) {
+    public Long createInstance(InstanceCreateRequest instanceCreateRequest) {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
@@ -44,7 +44,9 @@ public class InstanceService {
 
         instance.setTopic(topic);
 
-        instanceRepository.save(instance);
+        Instance savedInstance = instanceRepository.save(instance);
+
+        return savedInstance.getId();
     }
 
 
@@ -80,13 +82,15 @@ public class InstanceService {
 
     // 인스턴스 수정
     @Transactional
-    public void updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest) {
+    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest) {
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.pointPerPerson(),
                 instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());
 
-        instanceRepository.save(existingInstance);
+        Instance savedInstance = instanceRepository.save(existingInstance);
+
+        return savedInstance.getId();
     }
 }

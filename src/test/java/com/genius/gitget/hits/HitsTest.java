@@ -78,7 +78,6 @@ public class HitsTest {
         userRepository.save(user2);
 
         topicRepository.save(topic1);
-        topic1.setInstance(instance1);
         instance1.setTopic(topic1);
         instanceRepository.save(instance1);
     }

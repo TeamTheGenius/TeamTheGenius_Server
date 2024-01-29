@@ -4,7 +4,7 @@ public record FileResponse(
         Long fileId,
         String encodedFile) {
 
-    public FileResponse(Long fileId) {
-        this(fileId, null);
+    public static FileResponse createNotExistFile() {
+        return new FileResponse(0L, "none");
     }
 }

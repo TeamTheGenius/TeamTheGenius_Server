@@ -22,6 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -86,6 +87,8 @@ public class Instance {
         this.completedDate = completedDate;
     }
 
+    //== 비지니스 로직 ==//
+
     public void updateInstance(String description, int pointPerPerson, LocalDateTime startedDate,
                                LocalDateTime completedDate) {
         this.description = description;
@@ -98,15 +101,19 @@ public class Instance {
         this.participantCnt += amount;
     }
 
+    public Optional<Files> getFiles() {
+        return Optional.ofNullable(this.files);
+    }
+
+    public void setFiles(Files files) {
+        this.files = files;
+    }
+
     //== 연관관계 편의 메서드 ==//
     public void setTopic(Topic topic) {
         this.topic = topic;
         if (!topic.getInstanceList().contains(this)) {
             topic.getInstanceList().add(this);
         }
-    }
-
-    public void setFiles(Files files) {
-        this.files = files;
     }
 }

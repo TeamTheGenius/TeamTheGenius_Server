@@ -9,6 +9,7 @@ import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.UrlResource;
@@ -54,10 +55,15 @@ public class FilesService {
     }
 
     public FileResponse getEncodedFile(Long fileId) throws IOException {
-        Files files = filesRepository.findById(fileId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
+        return getEncodedFile(filesRepository.findById(fileId));
+    }
 
-        return new FileResponse(fileId, fileUtil.encodedImage(files));
+    public FileResponse getEncodedFile(Optional<Files> files) throws IOException {
+        if (files.isEmpty()) {
+            return FileResponse.createNotExistFile();
+        }
+
+        return new FileResponse(files.get().getId(), fileUtil.encodedImage(files.get()));
     }
 
     public UrlResource getFile(Long fileId) throws MalformedURLException {

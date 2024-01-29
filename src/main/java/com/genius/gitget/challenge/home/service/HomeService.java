@@ -6,7 +6,6 @@ import com.genius.gitget.challenge.home.dto.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
@@ -38,17 +37,16 @@ public class HomeService {
     }
 
     public Slice<HomeInstanceResponse> getInstancesByCondition(Pageable pageable) {
-        
+
         Slice<Instance> instances = instanceRepository.findInstanceByCondition(PRE_ACTIVITY, pageable);
         return instances.map(this::mapToHomeInstanceResponse);
     }
 
     private HomeInstanceResponse mapToHomeInstanceResponse(Instance instance) {
         try {
-            FileResponse encodedFile = filesService.getEncodedFile(instance.getFiles());
-            return HomeInstanceResponse.createByEntity(instance, encodedFile);
+            return HomeInstanceResponse.createByEntity(instance, instance.getFiles());
         } catch (IOException e) {
-            throw new BusinessException();
+            throw new BusinessException(e);
         }
     }
 }

@@ -57,15 +57,12 @@ public class FilesService {
     }
 
     public FileResponse getEncodedFile(Long fileId) throws IOException {
-        return getEncodedFile(filesRepository.findById(fileId));
-    }
-
-    public FileResponse getEncodedFile(Optional<Files> files) throws IOException {
-        if (files.isEmpty()) {
+        Optional<Files> optionalFiles = filesRepository.findById(fileId);
+        if (optionalFiles.isEmpty()) {
             return FileResponse.createNotExistFile();
         }
 
-        return FileResponse.createExistFile(files.get());
+        return FileResponse.createExistFile(optionalFiles.get());
     }
 
     public UrlResource getFile(Long fileId) throws MalformedURLException {

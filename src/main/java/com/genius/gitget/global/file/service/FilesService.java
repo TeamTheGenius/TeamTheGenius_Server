@@ -72,6 +72,19 @@ public class FilesService {
         return files;
     }
 
+    /**
+     * NOTE: 삭제하고자하는 Files 엔티티와 연관관계에 있는 엔티티에서 연관관계를 끊어줘야 합니다.
+     *
+     * @param fileId 삭제하고자하는 Files 엔티티의 PK
+     */
+    @Transactional
+    public void deleteFile(Long fileId) throws IOException {
+        Files files = filesRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
+
+        deleteFilesInStorage(files);
+    }
+
     private void deleteFilesInStorage(Files files) {
         String fileURI = files.getFileURI();
         File targetFile = new File(fileURI);

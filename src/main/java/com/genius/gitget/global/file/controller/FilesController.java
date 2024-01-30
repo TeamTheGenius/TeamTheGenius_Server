@@ -7,11 +7,13 @@ import com.genius.gitget.challenge.instance.dto.InstanceCreateRequest;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,6 +64,15 @@ public class FilesController {
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         FileResponse.createExistFile(files))
+        );
+    }
+
+    @DeleteMapping("/{fileId}")
+    public ResponseEntity<CommonResponse> deleteImage(@PathVariable Long fileId) throws IOException {
+        filesService.deleteFile(fileId);
+
+        return ResponseEntity.ok().body(
+                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
         );
     }
 }

@@ -23,11 +23,9 @@ public class HomeController {
     @PostMapping("/challenges")
     public ResponseEntity<PagingResponse<InstanceSearchResponse>> searchInstances(@RequestBody InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
 
-        System.out.println("instanceSearchRequest = " + instanceSearchRequest);
         Page<InstanceSearchResponse> searchResults
                 = instanceSearchService.searchInstances(instanceSearchRequest.getKeyword(), instanceSearchRequest.getProgress(), pageable);
 
-        System.out.println("searchResults = " + searchResults);
         return ResponseEntity.ok().body(
                 new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), searchResults)
         );

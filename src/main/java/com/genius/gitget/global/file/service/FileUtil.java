@@ -1,10 +1,11 @@
 package com.genius.gitget.global.file.service;
 
-import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
@@ -39,11 +40,22 @@ public class FileUtil {
                 .build();
     }
 
+    public static UpdateDTO getUpdateInfo(MultipartFile file, FileType fileType, final String UPLOAD_PATH) {
+        String originalFilename = file.getOriginalFilename();
+        String savedFilename = getSavedFilename(originalFilename);
+
+        return UpdateDTO.builder()
+                .originalFilename(originalFilename)
+                .savedFilename(savedFilename)
+                .fileURI(UPLOAD_PATH + fileType.getPath() + savedFilename)
+                .build();
+    }
+
     public static void validateFile(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
 
         if (originalFilename == null || Objects.equals(originalFilename, "")) {
-            throw new BusinessException(IMAGE_NOT_EXIST);
+            throw new BusinessException(FILE_NOT_EXIST);
         }
 
         String extension = extractExtension(originalFilename);

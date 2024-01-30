@@ -1,10 +1,12 @@
 package com.genius.gitget.file.service;
 
-import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.genius.gitget.global.file.domain.FileType;
+import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.file.service.FileUtil;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -35,7 +37,7 @@ class FileUtilTest {
         //when&then
         assertThatThrownBy(() -> FileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(IMAGE_NOT_EXIST.getMessage());
+                .hasMessageContaining(FILE_NOT_EXIST.getMessage());
     }
 
     @Test
@@ -47,7 +49,7 @@ class FileUtilTest {
         //when&then
         assertThatThrownBy(() -> FileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(IMAGE_NOT_EXIST.getMessage());
+                .hasMessageContaining(FILE_NOT_EXIST.getMessage());
     }
 
     @Test
@@ -73,6 +75,23 @@ class FileUtilTest {
 
         //then
         assertThat(uploadDTO.fileURI()).contains(UPLOAD_PATH);
+    }
+
+    @Test
+    @DisplayName("갱신 대상인 File을 전달했을 때, 갱신해야 할 정보들을 담은 UpdateDTO를 반환받는다.")
+    public void should_returnUpdateDTO_when_passUpdateTargetFile() {
+        //given
+        String originalFilename = "sky.png";
+        MultipartFile multipartFile = getTestMultiPartFile(originalFilename);
+        FileType fileType = FileType.PROFILE;
+
+        //when
+        UpdateDTO updateDTO = FileUtil.getUpdateInfo(multipartFile, fileType, UPLOAD_PATH);
+
+        //then
+        assertThat(updateDTO.originalFilename()).isEqualTo(originalFilename);
+        assertThat(updateDTO.fileURI()).contains(UPLOAD_PATH);
+        assertThat(updateDTO.fileURI()).contains(updateDTO.savedFilename());
     }
 
 

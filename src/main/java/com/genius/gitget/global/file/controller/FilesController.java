@@ -51,4 +51,17 @@ public class FilesController {
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), encodedFile)
         );
     }
+
+    @PostMapping("/{fileId}")
+    public ResponseEntity<SingleResponse<FileResponse>> updateImage(
+            @RequestPart(value = "files") MultipartFile multipartFile,
+            @PathVariable Long fileId
+    ) throws IOException {
+        Files files = filesService.updateFile(fileId, multipartFile);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
+                        FileResponse.createExistFile(files))
+        );
+    }
 }

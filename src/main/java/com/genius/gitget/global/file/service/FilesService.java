@@ -1,11 +1,14 @@
 package com.genius.gitget.global.file.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -47,13 +50,34 @@ public class FilesService {
         return filesRepository.save(file);
     }
 
-    private void saveFile(MultipartFile receivedFile, String fileURI) throws IOException {
+    private void saveFile(MultipartFile file, String fileURI) throws IOException {
         File targetFile = new File(fileURI);
 
         if (!targetFile.exists()) {
             targetFile.mkdirs();
         }
-        receivedFile.transferTo(targetFile);
+        file.transferTo(targetFile);
+    }
+
+    @Transactional
+    public Files updateFile(Long fileId, MultipartFile file) throws IOException {
+        Files files = filesRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
+
+        deleteFilesInStorage(files);
+
+        UpdateDTO updateDTO = FileUtil.getUpdateInfo(file, files.getFileType(), UPLOAD_PATH);
+        saveFile(file, updateDTO.fileURI());
+        files.updateFiles(updateDTO);
+        return files;
+    }
+
+    private void deleteFilesInStorage(Files files) {
+        String fileURI = files.getFileURI();
+        File targetFile = new File(fileURI);
+        if (!targetFile.delete()) {
+            throw new BusinessException(FILE_NOT_DELETED);
+        }
     }
 
     public FileResponse getEncodedFile(Long fileId) throws IOException {
@@ -67,7 +91,7 @@ public class FilesService {
 
     public UrlResource getFile(Long fileId) throws MalformedURLException {
         Files files = filesRepository.findById(fileId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
         return new UrlResource("file:" + files.getFileURI());
     }

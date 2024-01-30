@@ -1,16 +1,18 @@
-package com.genius.gitget.challenge.instance.dto;
+package com.genius.gitget.challenge.instance.dto.crud;
 
 import java.time.LocalDateTime;
 
-public record InstanceCreateRequest(
+public record InstanceDetailResponse(
         Long topicId,
+        Long instanceId,
         String title,
-        String tags,
         String description,
-        // TODO 이미지
-        // TODO 유의사항
         int pointPerPerson,
+        String tags,
+        // 이미지
+        // 유의사항
         LocalDateTime startedAt,
         LocalDateTime completedAt
 ) {
+
 }

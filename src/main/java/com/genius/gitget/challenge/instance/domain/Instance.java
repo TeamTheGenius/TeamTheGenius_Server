@@ -66,7 +66,6 @@ public class Instance {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    // @Column(columnDefinition = "varchar(255) default 'PRE_ACTIVITY'")
     private Progress progress;
 
     @Column(name = "started_at")
@@ -116,4 +115,9 @@ public class Instance {
             topic.getInstanceList().add(this);
         }
     }
+
+    public void setFiles(Files files) {
+        this.files = files;
+    }
+
 }

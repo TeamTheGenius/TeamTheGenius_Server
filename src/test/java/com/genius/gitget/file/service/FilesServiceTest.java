@@ -8,8 +8,18 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 class FilesServiceTest {
-    @Autowired
-    private FilesService filesService;
-
+//    @Autowired
+//    private FilesService filesService;
+//
+//    @Test
+//    @DisplayName("")
+//    public void (){
+//        //given
+//
+//        //when
+//
+//        //then
+//
+//    }
 
 }

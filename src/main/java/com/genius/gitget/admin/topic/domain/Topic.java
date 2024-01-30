@@ -59,20 +59,13 @@ public class Topic {
         this.description = description;
     }
 
-    public void createInstance(String title, String description, String tags, int pointPerPerson) {
+    public void updateNotExistInstance(String title, String description, String tags, int pointPerPerson) {
         this.title = title;
         this.description = description;
         this.tags = tags;
         this.pointPerPerson = pointPerPerson;
     }
 
-    //== 연관관계 편의 메서드 ==//
-    public void setInstance(Instance instance) {
-        instanceList.add(instance);
-        if (instance.getTopic() != this) {
-            instance.setTopic(this);
-        }
-    }
 
     public void setFiles(Files files) {
         this.files = files;

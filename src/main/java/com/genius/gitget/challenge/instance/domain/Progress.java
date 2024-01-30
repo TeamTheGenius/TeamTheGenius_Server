@@ -1,8 +1,15 @@
 package com.genius.gitget.challenge.instance.domain;
 
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonCreator;
 
-@Getter
 public enum Progress {
-    PRE_ACTIVITY, ACTIVITY, DONE
+    ALL,
+    PREACTIVITY,
+    ACTIVITY,
+    DONE;
+
+//    @JsonCreator
+//    public static Progress from(String s) {
+//        return Progress.valueOf(s.toUpperCase());
+//    }
 }

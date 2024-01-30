@@ -10,4 +10,6 @@ public interface InstanceRepository extends JpaRepository<Instance, Long> {
 
     @Query("select i from Instance i ORDER BY i.id DESC ")
     Page<Instance> findAllById(Pageable pageable);
+
+
 }

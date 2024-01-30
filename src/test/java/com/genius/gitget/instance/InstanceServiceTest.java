@@ -44,7 +44,7 @@ public class InstanceServiceTest {
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();

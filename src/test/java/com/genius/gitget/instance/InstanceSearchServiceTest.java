@@ -55,7 +55,7 @@ public class InstanceSearchServiceTest {
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
@@ -73,12 +73,15 @@ public class InstanceSearchServiceTest {
 
 
         //when
-        InstanceSearchRequest instanceSearchRequest = new InstanceSearchRequest("고리");
+        InstanceSearchRequest instanceSearchRequest = new InstanceSearchRequest("고리", "preactivity");
 
 
         //then
-        Page<InstanceSearchResponse> orderList = instanceSearchService.searchInstances(instanceSearchRequest, PageRequest.of(0, 3));
+        Page<InstanceSearchResponse> orderList = instanceSearchService.searchInstances("고리", "preactivity", PageRequest.of(0, 3));
 
+        for (InstanceSearchResponse instanceSearchResponse : orderList) {
+            System.out.println("instanceSearchResponse = " + instanceSearchResponse.keyword());
+        }
 
         Assertions.assertThat(orderList.getTotalElements()).isEqualTo(2);
 

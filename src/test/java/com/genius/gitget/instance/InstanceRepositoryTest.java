@@ -1,14 +1,11 @@
 package com.genius.gitget.instance;
 
-import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,7 +35,7 @@ public class InstanceRepositoryTest {
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
@@ -58,7 +55,7 @@ public class InstanceRepositoryTest {
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
@@ -79,7 +76,7 @@ public class InstanceRepositoryTest {
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
@@ -99,7 +96,7 @@ public class InstanceRepositoryTest {
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
@@ -109,7 +106,7 @@ public class InstanceRepositoryTest {
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();

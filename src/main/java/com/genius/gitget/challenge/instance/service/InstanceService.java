@@ -39,7 +39,7 @@ public class InstanceService {
                 .pointPerPerson(instanceCreateRequest.pointPerPerson())
                 .startedDate(instanceCreateRequest.startedAt())
                 .completedDate(instanceCreateRequest.completedAt())
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .build();
 
         instance.setTopic(topic);

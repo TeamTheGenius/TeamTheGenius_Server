@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,25 +37,25 @@ public class InstanceSearchRepositoryTest {
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
         Instance instance1 = Instance.builder()
-                .title("1일 1알고리즘")
+                .title("1일 2알고리즘")
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.DONE)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
         Instance instance2 = Instance.builder()
-                .title("1일 1알리리즘")
+                .title("1일 3알고리즘")
                 .description("하루에 한 문제씩 문제를 해결합니다.")
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
@@ -68,7 +67,7 @@ public class InstanceSearchRepositoryTest {
 
 
         //then
-        Page<Instance> order = searchRepository.findByTitleContainingOrderByStartedDateDesc("고리", PageRequest.of(0, 3));
+        Page<Instance> order = searchRepository.findByProgressAndTitleContainingOrderByStartedDateDesc( Progress.PREACTIVITY, "고리" , PageRequest.of(0, 3));
         for (Instance item : order) {
             System.out.println("item = " + item);
         }

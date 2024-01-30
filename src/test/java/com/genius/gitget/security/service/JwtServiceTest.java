@@ -8,17 +8,17 @@ import static com.genius.gitget.global.util.exception.ErrorCode.TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.genius.gitget.challenge.user.domain.Role;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.security.repository.TokenRepository;
 import com.genius.gitget.global.security.service.JwtService;
-import com.genius.gitget.challenge.user.domain.Role;
-import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.util.TokenTestUtil;
-import com.genius.gitget.util.WithMockCustomUser;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.util.TokenTestUtil;
+import com.genius.gitget.util.WithMockCustomUser;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -233,7 +233,7 @@ class JwtServiceTest {
                 .nickname("nickname")
                 .identifier("identifier")
                 .role(Role.USER)
-                .interest("interest1,interest2")
+                .tags("interest1,interest2")
                 .information("information")
                 .build());
     }

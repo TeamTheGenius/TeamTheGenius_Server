@@ -1,19 +1,19 @@
 package com.genius.gitget.user.domain;
 
+import static com.genius.gitget.challenge.user.domain.Role.ADMIN;
+import static com.genius.gitget.challenge.user.domain.Role.USER;
+import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
+import static com.genius.gitget.global.security.constants.ProviderInfo.NAVER;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.xmlunit.util.Linqy.count;
+
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-
-import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
-import static com.genius.gitget.global.security.constants.ProviderInfo.NAVER;
-import static com.genius.gitget.challenge.user.domain.Role.ADMIN;
-import static com.genius.gitget.challenge.user.domain.Role.USER;
-import static org.assertj.core.api.Assertions.*;
-import static org.xmlunit.util.Linqy.count;
 
 @SpringBootTest
 @Transactional
@@ -28,7 +28,7 @@ public class UserTest {
                 .providerInfo(NAVER)
                 .nickname("kimdozzi")
                 .information("백엔드")
-                .interest("운동")
+                .tags("운동")
                 .role(ADMIN)
                 .build();
 
@@ -84,7 +84,7 @@ public class UserTest {
                 .providerInfo(NAVER)
                 .nickname("kimdozzi")
                 .information("백엔드")
-                .interest("운동")
+                .tags("운동")
                 .role(ADMIN)
                 .build();
     }
@@ -94,7 +94,7 @@ public class UserTest {
                 .providerInfo(GOOGLE)
                 .nickname("SEONG")
                 .information("프론트엔드")
-                .interest("영화")
+                .tags("영화")
                 .role(USER)
                 .build();
     }

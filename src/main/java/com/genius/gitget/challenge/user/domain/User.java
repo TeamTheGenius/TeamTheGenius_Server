@@ -1,8 +1,8 @@
 package com.genius.gitget.challenge.user.domain;
 
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
+import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -59,26 +59,26 @@ public class User extends BaseTimeEntity {
     @Column(unique = true, length = 20)
     private String nickname;
 
-    private String interest;
+    private String tags;
 
     @Column(length = 100)
     private String information;
 
     @Builder
     public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,
-                String interest) {
+                String tags) {
         this.providerInfo = providerInfo;
         this.identifier = identifier;
         this.role = role;
         this.nickname = nickname;
-        this.interest = interest;
+        this.tags = tags;
         this.information = information;
     }
 
     public void updateUser(String nickname, String information, String interest) {
         this.nickname = nickname;
         this.information = information;
-        this.interest = interest;
+        this.tags = interest;
     }
 
     public void updateRole(Role role) {

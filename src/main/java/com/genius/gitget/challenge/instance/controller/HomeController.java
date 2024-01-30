@@ -20,11 +20,11 @@ import org.springframework.web.bind.annotation.*;
 public class HomeController {
     private final InstanceSearchService instanceSearchService;
 
-    @PostMapping("/challenges")
+    @PostMapping("/challenges/search")
     public ResponseEntity<PagingResponse<InstanceSearchResponse>> searchInstances(@RequestBody InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
 
         Page<InstanceSearchResponse> searchResults
-                = instanceSearchService.searchInstances(instanceSearchRequest.getKeyword(), instanceSearchRequest.getProgress(), pageable);
+                = instanceSearchService.searchInstances(instanceSearchRequest.keyword(), instanceSearchRequest.progress(), pageable);
 
         return ResponseEntity.ok().body(
                 new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), searchResults)

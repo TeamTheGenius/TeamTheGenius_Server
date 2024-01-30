@@ -105,4 +105,5 @@ public class Instance {
     public void setFiles(Files files) {
         this.files = files;
     }
+
 }

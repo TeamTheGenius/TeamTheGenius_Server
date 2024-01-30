@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.instance.domain.StringToEnum;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -24,19 +25,19 @@ public class InstanceSearchService {
     private final StringToEnum stringToEnum;
 
     public Page<InstanceSearchResponse> searchInstances(String keyword, String progress, Pageable pageable) {
-        Page<Instance> finByTitleContaining;
+        Page<Instance> findByTitleContaining;
 
         if (stringToEnum.convert(progress) == Progress.ALL) {
-            finByTitleContaining = searchRepository.findByTitleContainingOrderByStartedDateDesc(keyword, pageable);
+            findByTitleContaining = searchRepository.findByTitleContainingOrderByStartedDateDesc(keyword, pageable);
         } else {
             Progress convertProgress = stringToEnum.convert(progress); // Progress convertProgress = Progress.from(progress);
-            finByTitleContaining = searchRepository.findByProgressAndTitleContainingOrderByStartedDateDesc(convertProgress, keyword, pageable);
+            findByTitleContaining = searchRepository.findByProgressAndTitleContainingOrderByStartedDateDesc(convertProgress, keyword, pageable);
 
         }
-        return finByTitleContaining.map(this::convertToInstanceSearchResponse);
+        return findByTitleContaining.map(this::convertToInstanceSearchResponse);
     }
 
     private InstanceSearchResponse convertToInstanceSearchResponse(Instance instance) {
-        return new InstanceSearchResponse(instance.getTopic().getId(), instance.getId(), instance.getTitle(), instance.getPointPerPerson(), instance.getParticipantInfoList().size());
+        return new InstanceSearchResponse(instance);
     }
 }

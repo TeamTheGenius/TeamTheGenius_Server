@@ -35,7 +35,7 @@ class InstanceRepositoryTest {
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "FE", 3);
         getSavedInstance("title3", "FE", 20);
-        Slice<Instance> suggestions = instanceRepository.findRecommendations(userTags, Progress.PRE_ACTIVITY,
+        Slice<Instance> suggestions = instanceRepository.findRecommendations(userTags, Progress.PREACTIVITY,
                 pageRequest);
 
         //then
@@ -63,7 +63,7 @@ class InstanceRepositoryTest {
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "BE", 3);
         getSavedInstance("title3", "BE", 20);
-        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PRE_ACTIVITY, pageRequest);
+        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PREACTIVITY, pageRequest);
 
         //then
         assertThat(instances.getContent().size()).isEqualTo(3);
@@ -90,7 +90,7 @@ class InstanceRepositoryTest {
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "BE", 3);
         getSavedInstance("title3", "BE", 20);
-        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PRE_ACTIVITY, pageRequest);
+        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PREACTIVITY, pageRequest);
 
         //then
         assertThat(instances.getContent().size()).isEqualTo(3);
@@ -114,7 +114,7 @@ class InstanceRepositoryTest {
                         .tags(tags)
                         .title(title)
                         .description("description")
-                        .progress(Progress.PRE_ACTIVITY)
+                        .progress(Progress.PREACTIVITY)
                         .pointPerPerson(100)
                         .startedDate(now)
                         .completedDate(now.plusDays(1))

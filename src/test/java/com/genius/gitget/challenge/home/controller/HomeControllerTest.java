@@ -71,7 +71,7 @@ class HomeControllerTest {
                         .tags(tags)
                         .title(title)
                         .description("description")
-                        .progress(Progress.PRE_ACTIVITY)
+                        .progress(Progress.PREACTIVITY)
                         .pointPerPerson(100)
                         .startedDate(now)
                         .completedDate(now.plusDays(1))

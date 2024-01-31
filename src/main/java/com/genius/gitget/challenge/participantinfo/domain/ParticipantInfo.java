@@ -53,16 +53,16 @@ public class ParticipantInfo {
     }
 
     private void addParticipantInfoForUser(User user) {
+        this.user = user;
         if (!(user.getParticipantInfoList().contains(this))) {
             user.getParticipantInfoList().add(this);
         }
-        this.user = user;
     }
 
     private void addParticipantInfoForInstance(Instance instance) {
+        this.instance = instance;
         if (!(instance.getParticipantInfoList().contains(this))) {
             instance.getParticipantInfoList().add(this);
         }
-        this.instance = instance;
     }
 }

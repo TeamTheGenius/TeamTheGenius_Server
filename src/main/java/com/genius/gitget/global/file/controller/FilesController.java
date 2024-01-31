@@ -1,17 +1,19 @@
 package com.genius.gitget.global.file.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
+import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
+import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,22 +31,48 @@ public class FilesController {
 
     @PostMapping
     public ResponseEntity<SingleResponse<FileResponse>> uploadImage(
-            @RequestPart(value = "image") MultipartFile image,
+            @RequestPart(value = "data") InstanceCreateRequest instanceCreateRequest,
+            @RequestPart(value = "files") MultipartFile multipartFile,
             @RequestPart(value = "type") String type) throws IOException {
 
-        FileResponse fileResponse = filesService.uploadFile(image, type);
+        Files files = filesService.uploadFile(multipartFile, type);
+        FileResponse fileResponse = FileResponse.createExistFile(files);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), fileResponse)
         );
     }
 
-    @GetMapping(value = {"/{fileId}"},
-            produces = MediaType.IMAGE_JPEG_VALUE)
-    public ResponseEntity<Resource> downloadImage(@PathVariable(name = "fileId") Long fileId)
-            throws MalformedURLException {
+    @GetMapping(value = {"/{fileId}"})
+    public ResponseEntity<SingleResponse<FileResponse>> getImage(@PathVariable(name = "fileId") Long fileId)
+            throws IOException {
 
-        Resource urlResource = filesService.getFile(fileId);
-        return ResponseEntity.ok(urlResource);
+        FileResponse encodedFile = filesService.getEncodedFile(fileId);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), encodedFile)
+        );
+    }
+
+    @PostMapping("/{fileId}")
+    public ResponseEntity<SingleResponse<FileResponse>> updateImage(
+            @RequestPart(value = "files") MultipartFile multipartFile,
+            @PathVariable Long fileId
+    ) throws IOException {
+        Files files = filesService.updateFile(fileId, multipartFile);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
+                        FileResponse.createExistFile(files))
+        );
+    }
+
+    @DeleteMapping("/{fileId}")
+    public ResponseEntity<CommonResponse> deleteImage(@PathVariable Long fileId) throws IOException {
+        filesService.deleteFile(fileId);
+
+        return ResponseEntity.ok().body(
+                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
+        );
     }
 }

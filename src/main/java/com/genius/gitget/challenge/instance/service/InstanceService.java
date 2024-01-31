@@ -1,9 +1,9 @@
 package com.genius.gitget.challenge.instance.service;
 
-import com.genius.gitget.challenge.instance.dto.InstanceCreateRequest;
-import com.genius.gitget.challenge.instance.dto.InstanceDetailResponse;
-import com.genius.gitget.challenge.instance.dto.InstancePagingResponse;
-import com.genius.gitget.challenge.instance.dto.InstanceUpdateRequest;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
+import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -29,21 +29,24 @@ public class InstanceService {
 
     // 인스턴스 생성
     @Transactional
-    public void createInstance(InstanceCreateRequest instanceCreateRequest) {
+    public Long createInstance(InstanceCreateRequest instanceCreateRequest) {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
         Instance instance = Instance.builder()
+                .title(instanceCreateRequest.title())
                 .description(instanceCreateRequest.description())
                 .pointPerPerson(instanceCreateRequest.pointPerPerson())
                 .startedDate(instanceCreateRequest.startedAt())
                 .completedDate(instanceCreateRequest.completedAt())
-                .progress(Progress.PRE_ACTIVITY)
+                .progress(Progress.PREACTIVITY)
                 .build();
 
         instance.setTopic(topic);
 
-        instanceRepository.save(instance);
+        Instance savedInstance = instanceRepository.save(instance);
+
+        return savedInstance.getId();
     }
 
 
@@ -79,13 +82,15 @@ public class InstanceService {
 
     // 인스턴스 수정
     @Transactional
-    public void updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest) {
+    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest) {
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.pointPerPerson(),
                 instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());
 
-        instanceRepository.save(existingInstance);
+        Instance savedInstance = instanceRepository.save(existingInstance);
+
+        return savedInstance.getId();
     }
 }

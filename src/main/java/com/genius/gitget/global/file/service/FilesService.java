@@ -1,16 +1,20 @@
 package com.genius.gitget.global.file.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import lombok.RequiredArgsConstructor;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,17 +23,20 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class FilesService {
-    private final FileUtil fileUtil;
+    private final String UPLOAD_PATH;
     private final FilesRepository filesRepository;
 
+    public FilesService(@Value("${file.upload.path}") String UPLOAD_PATH, FilesRepository filesRepository) {
+        this.UPLOAD_PATH = UPLOAD_PATH;
+        this.filesRepository = filesRepository;
+    }
 
     @Transactional
-    public FileResponse uploadFile(MultipartFile receivedFile, String typeStr) throws IOException {
-        fileUtil.validateFile(receivedFile);
+    public Files uploadFile(MultipartFile receivedFile, String typeStr) throws IOException {
+        FileUtil.validateFile(receivedFile);
 
-        UploadDTO uploadDTO = fileUtil.getUploadInfo(receivedFile, typeStr);
+        UploadDTO uploadDTO = FileUtil.getUploadInfo(receivedFile, typeStr, UPLOAD_PATH);
 
         saveFile(receivedFile, uploadDTO.fileURI());
 
@@ -40,22 +47,64 @@ public class FilesService {
                 .fileURI(uploadDTO.fileURI())
                 .build();
 
-        Files savedFile = filesRepository.save(file);
-        return new FileResponse(savedFile.getId());
+        return filesRepository.save(file);
     }
 
-    private void saveFile(MultipartFile receivedFile, String fileURI) throws IOException {
+    private void saveFile(MultipartFile file, String fileURI) throws IOException {
         File targetFile = new File(fileURI);
 
         if (!targetFile.exists()) {
             targetFile.mkdirs();
         }
-        receivedFile.transferTo(targetFile);
+        file.transferTo(targetFile);
+    }
+
+    @Transactional
+    public Files updateFile(Long fileId, MultipartFile file) throws IOException {
+        Files files = filesRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
+
+        deleteFilesInStorage(files);
+
+        UpdateDTO updateDTO = FileUtil.getUpdateInfo(file, files.getFileType(), UPLOAD_PATH);
+        saveFile(file, updateDTO.fileURI());
+        files.updateFiles(updateDTO);
+        return files;
+    }
+
+    /**
+     * NOTE: 삭제하고자하는 Files 엔티티와 연관관계에 있는 엔티티에서 연관관계를 끊어줘야 합니다.
+     *
+     * @param fileId 삭제하고자하는 Files 엔티티의 PK
+     */
+    @Transactional
+    public void deleteFile(Long fileId) throws IOException {
+        Files files = filesRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
+
+        deleteFilesInStorage(files);
+    }
+
+    private void deleteFilesInStorage(Files files) {
+        String fileURI = files.getFileURI();
+        File targetFile = new File(fileURI);
+        if (!targetFile.delete()) {
+            throw new BusinessException(FILE_NOT_DELETED);
+        }
+    }
+
+    public FileResponse getEncodedFile(Long fileId) throws IOException {
+        Optional<Files> optionalFiles = filesRepository.findById(fileId);
+        if (optionalFiles.isEmpty()) {
+            return FileResponse.createNotExistFile();
+        }
+
+        return FileResponse.createExistFile(optionalFiles.get());
     }
 
     public UrlResource getFile(Long fileId) throws MalformedURLException {
         Files files = filesRepository.findById(fileId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
         return new UrlResource("file:" + files.getFileURI());
     }

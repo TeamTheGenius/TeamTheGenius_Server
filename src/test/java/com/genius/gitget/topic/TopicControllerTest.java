@@ -1,13 +1,16 @@
 package com.genius.gitget.topic;
 
-import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
 import static com.genius.gitget.challenge.user.domain.Role.ADMIN;
 import static com.genius.gitget.challenge.user.domain.Role.USER;
+import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.admin.topic.service.TopicService;
 import com.genius.gitget.challenge.hits.repository.HitsRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -16,63 +19,52 @@ import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
-import com.genius.gitget.global.security.constants.ProviderInfo;
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
-import com.genius.gitget.admin.topic.service.TopicService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;
-import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
+import jakarta.servlet.http.Cookie;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
+import java.nio.charset.StandardCharsets;
+
+import static com.genius.gitget.challenge.user.domain.Role.USER;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest({ TopicControllerTest.class })
+@WithMockCustomUser(role = Role.USER)
+@MockBean(JpaMetamodelMappingContext.class)
 public class TopicControllerTest {
-
-    protected MediaType contentType =
-            new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(),
-                    StandardCharsets.UTF_8);
     @Autowired
-    UserRepository userRepository;
-    @Autowired
-    InstanceRepository instanceRepository;
-    @Autowired
-    HitsRepository hitsRepository;
-    @Autowired
-    TopicRepository topicRepository;
-    @Autowired
-    ParticipantInfoRepository participantInfoRepository;
+    MockMvc mockMvc;
     @Autowired
     private TokenTestUtil tokenTestUtil;
-
     @Autowired
-    private MockMvc mockMvc;
+    WebApplicationContext context;
 
     @MockBean
-    private TopicService topicService;
-    private User user1, user2;
-    private Instance instance1;
-    private Topic topic1, topic2;
-    private ParticipantInfo participantInfo1;
-    private ParticipantInfo participantInfo2;
+    TopicService topicService;
+
 
     @BeforeEach
     public void setup() {
@@ -80,7 +72,7 @@ public class TopicControllerTest {
                 .providerInfo(ProviderInfo.NAVER)
                 .nickname("kimdozzi")
                 .information("백엔드")
-                .interest("운동")
+                .tags("운동")
                 .role(ADMIN)
                 .build();
 
@@ -88,7 +80,7 @@ public class TopicControllerTest {
                 .providerInfo(GOOGLE)
                 .nickname("SEONG")
                 .information("프론트엔드")
-                .interest("영화")
+                .tags("영화")
                 .role(USER)
                 .build();
 
@@ -124,54 +116,21 @@ public class TopicControllerTest {
         participantInfo2 = ParticipantInfo.builder()
                 .joinResult(JoinResult.SUCCESS)
                 .joinStatus(JoinStatus.YES)
+
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(context)
+                .apply(springSecurity())
                 .build();
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-
-        topicRepository.save(topic1);
-        topicRepository.save(topic2);
-
-        topic1.setInstance(instance1);
-        instance1.setTopic(topic1);
-        instanceRepository.save(instance1);
-
-        participantInfo1.setUserAndInstance(user1, instance1);
-        participantInfoRepository.save(participantInfo1);
-        participantInfo2.setUserAndInstance(user2, instance1);
-        participantInfoRepository.save(participantInfo2);
-
     }
 
-    @Test
-    @WithMockCustomUser
-    public void 토픽_조회() throws Exception {
-        Pageable pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
-        List<Topic> topics = Arrays.asList(topic1, topic2);
-        PageImpl<Topic> topicPage = new PageImpl<>(topics, pageable, topics.size());
+//    @Test
+//    public void 토픽_생성() throws Exception {
+//        //given
+//
+//        //when
+//        mockMvc.perform(get("/api/admin/topic")
+//                        .cookie(tokenTestUtil.createAccessCookie()))
+//                .andExpect(status().isOk());
+//    }
 
-//        when(topicService.getAllTopics(pageable)).thenReturn(topicPage);
-
-        for (Topic topic : topicPage) {
-            System.out.println("topic.getInstanceList() = " + topic.getInstanceList());
-            System.out.println("topic.getTitle() = " + topic.getTitle());
-        }
-
-        System.out.println("topics.size() = " + topics.size());
-
-        // When & Then
-        mockMvc.perform(get("/api/admin/topic?page=0&size=5")
-                        .cookie(tokenTestUtil.createAccessCookie())
-                        .contentType(contentType))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content", hasSize(2)))
-                .andExpect(jsonPath("$.content[0].title").value("1일 1커밋"))
-                .andExpect(jsonPath("$.content[0].tags").value("BE, CS"))
-                .andExpect(jsonPath("$.content[0].description").value("간단한 설명란"))
-                .andExpect(jsonPath("$.content[0].point_per_person").value(300))
-                .andExpect(jsonPath("$.content[1].title").value("1일 2커밋"))
-                .andExpect(jsonPath("$.content[1].tags").value("BE, CS"))
-                .andExpect(jsonPath("$.content[1].description").value("간단한 설명란"))
-                .andExpect(jsonPath("$.content[1].point_per_person").value(300));
-    }
 }

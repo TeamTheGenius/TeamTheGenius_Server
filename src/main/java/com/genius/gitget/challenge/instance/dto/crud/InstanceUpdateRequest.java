@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.instance.dto;
+package com.genius.gitget.challenge.instance.dto.crud;
 
 import java.time.LocalDateTime;
 

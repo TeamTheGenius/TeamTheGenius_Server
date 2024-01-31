@@ -10,6 +10,10 @@ public record InstanceSearchResponse(
         int participantCount
 ) {
     public InstanceSearchResponse(Instance instance) {
-        this(instance.getTopic().getId(), instance.getId(), instance.getTitle(), instance.getPointPerPerson(),instance.getJoinPeopleCount());
+        this(instance.getTopic().getId(),
+                instance.getId(),
+                instance.getTitle(),
+                instance.getPointPerPerson(),
+                instance.getParticipantCnt());
     }
 }

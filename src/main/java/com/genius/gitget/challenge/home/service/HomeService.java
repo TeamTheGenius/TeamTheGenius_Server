@@ -1,6 +1,6 @@
 package com.genius.gitget.challenge.home.service;
 
-import static com.genius.gitget.challenge.instance.domain.Progress.PRE_ACTIVITY;
+import static com.genius.gitget.challenge.instance.domain.Progress.PREACTIVITY;
 
 import com.genius.gitget.challenge.home.dto.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -30,7 +30,7 @@ public class HomeService {
     public Slice<HomeInstanceResponse> getRecommendations(User user, Pageable pageable) {
         List<String> userTags = Arrays.stream(user.getTags().split(",")).toList();
 
-        Slice<Instance> recommendations = instanceRepository.findRecommendations(userTags, PRE_ACTIVITY,
+        Slice<Instance> recommendations = instanceRepository.findRecommendations(userTags, PREACTIVITY,
                 pageable);
 
         return recommendations.map(this::mapToHomeInstanceResponse);
@@ -38,7 +38,7 @@ public class HomeService {
 
     public Slice<HomeInstanceResponse> getInstancesByCondition(Pageable pageable) {
 
-        Slice<Instance> instances = instanceRepository.findInstanceByCondition(PRE_ACTIVITY, pageable);
+        Slice<Instance> instances = instanceRepository.findInstanceByCondition(PREACTIVITY, pageable);
         return instances.map(this::mapToHomeInstanceResponse);
     }
 

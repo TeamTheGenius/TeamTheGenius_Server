@@ -3,7 +3,7 @@ package com.genius.gitget.global.file.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.challenge.instance.dto.InstanceCreateRequest;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;

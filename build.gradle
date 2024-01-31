@@ -44,7 +44,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // H2
-    runtimeOnly 'com.h2database:h2:1.4.200';
+    runtimeOnly 'com.h2database:h2:1.4.200'
+
+    // Github API for Java
+    implementation 'org.kohsuke:github-api:1.318'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

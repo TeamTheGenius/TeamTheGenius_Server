@@ -35,6 +35,7 @@ public class InstanceService {
 
         Instance instance = Instance.builder()
                 .title(instanceCreateRequest.title())
+                .tags(instanceCreateRequest.tags())
                 .description(instanceCreateRequest.description())
                 .pointPerPerson(instanceCreateRequest.pointPerPerson())
                 .startedDate(instanceCreateRequest.startedAt())

@@ -1,9 +1,10 @@
 package com.genius.gitget.challenge.instance.domain;
 
-import com.genius.gitget.global.file.domain.Files;
+
+import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.global.file.domain.Files;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,6 +62,8 @@ public class Instance {
 
     private int pointPerPerson;
 
+    private int participantCnt;
+
     @NotNull
     @Enumerated(EnumType.STRING)
     private Progress progress;
@@ -82,6 +86,8 @@ public class Instance {
         this.completedDate = completedDate;
     }
 
+    //== 비지니스 로직 ==//
+
     public void updateInstance(String description, int pointPerPerson, LocalDateTime startedDate,
                                LocalDateTime completedDate) {
         this.description = description;
@@ -90,8 +96,16 @@ public class Instance {
         this.completedDate = completedDate;
     }
 
-    public int getJoinPeopleCount() {
-        return participantInfoList.size();
+    public void updateParticipantCnt(int amount) {
+        this.participantCnt += amount;
+    }
+
+    public Optional<Files> getFiles() {
+        return Optional.ofNullable(this.files);
+    }
+
+    public void setFiles(Files files) {
+        this.files = files;
     }
 
     //== 연관관계 편의 메서드 ==//
@@ -100,10 +114,6 @@ public class Instance {
         if (!topic.getInstanceList().contains(this)) {
             topic.getInstanceList().add(this);
         }
-    }
-
-    public void setFiles(Files files) {
-        this.files = files;
     }
 
 }

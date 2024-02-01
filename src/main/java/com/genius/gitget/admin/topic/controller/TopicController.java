@@ -5,6 +5,9 @@ import com.genius.gitget.admin.topic.dto.TopicPagingResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.service.TopicService;
+import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -17,6 +20,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -47,8 +53,9 @@ public class TopicController {
 
     // 토픽 생성 요청
     @PostMapping
-    public ResponseEntity<CommonResponse> createTopic(@RequestBody @Valid TopicCreateRequest topicCreateRequest) {
-        topicService.createTopic(topicCreateRequest);
+    public ResponseEntity<CommonResponse> createTopic(@RequestPart(value = "data") TopicCreateRequest topicCreateRequest,
+                                                      @RequestPart(value = "files", required = false) MultipartFile multipartFile, @RequestPart(value = "type") String type) throws IOException {
+        topicService.createTopic(topicCreateRequest, multipartFile, type);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage())
         );
@@ -56,9 +63,9 @@ public class TopicController {
 
     // 토픽 수정 요청
     @PatchMapping("/{id}")
-    public ResponseEntity<CommonResponse> updateTopic(@PathVariable Long id,
-                                                      @RequestBody @Valid TopicUpdateRequest topicUpdateRequest) {
-        topicService.updateTopic(id, topicUpdateRequest);
+    public ResponseEntity<CommonResponse> updateTopic(@PathVariable Long id, @RequestPart(value = "data") TopicUpdateRequest topicUpdateRequest,
+                                                      @RequestPart(value = "files", required = false) MultipartFile multipartFile, @RequestPart(value = "type") String type) throws IOException {
+        topicService.updateTopic(id, topicUpdateRequest, multipartFile, type);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
         );

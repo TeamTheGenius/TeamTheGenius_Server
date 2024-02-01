@@ -17,6 +17,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/admin/instance")
@@ -47,8 +50,9 @@ public class InstanceController {
     // 인스턴스 생성
     @PostMapping
     public ResponseEntity<CommonResponse> createInstance(
-            @RequestBody @Valid InstanceCreateRequest instanceCreateRequest) {
-        instanceService.createInstance(instanceCreateRequest);
+            @RequestPart InstanceCreateRequest instanceCreateRequest,
+            @RequestPart(value = "files", required = false) MultipartFile multipartFile, @RequestPart(value = "type") String type) throws IOException {
+        instanceService.createInstance(instanceCreateRequest, multipartFile, type);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.CREATED.getMessage())
         );
@@ -56,9 +60,9 @@ public class InstanceController {
 
     // 인스턴스 수정
     @PatchMapping("/{id}")
-    public ResponseEntity<CommonResponse> updateInstance(@PathVariable Long id,
-                                                         @RequestBody @Valid InstanceUpdateRequest instanceUpdateRequest) {
-        instanceService.updateInstance(id, instanceUpdateRequest);
+    public ResponseEntity<CommonResponse> updateInstance(@PathVariable Long id, @RequestPart InstanceUpdateRequest instanceUpdateRequest,
+                                                         @RequestPart(value = "files", required = false) MultipartFile multipartFile, @RequestPart(value = "type") String type) throws IOException{
+        instanceService.updateInstance(id, instanceUpdateRequest, multipartFile, type);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
         );

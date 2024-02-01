@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
@@ -26,10 +28,11 @@ public class InstanceService {
 
     private final InstanceRepository instanceRepository;
     private final TopicRepository topicRepository;
+    private final FilesService filesService;
 
     // 인스턴스 생성
     @Transactional
-    public Long createInstance(InstanceCreateRequest instanceCreateRequest) {
+    public Long createInstance(InstanceCreateRequest instanceCreateRequest, MultipartFile multipartFile, String type) {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
@@ -83,7 +86,7 @@ public class InstanceService {
 
     // 인스턴스 수정
     @Transactional
-    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest) {
+    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest, MultipartFile multipartFile, String type) {
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 

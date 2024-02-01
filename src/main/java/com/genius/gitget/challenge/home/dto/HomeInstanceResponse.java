@@ -17,7 +17,7 @@ public record HomeInstanceResponse(
     public static HomeInstanceResponse createByEntity(Instance instance, Optional<Files> files) throws IOException {
         return HomeInstanceResponse.builder()
                 .title(instance.getTitle())
-                .participantCnt(instance.getParticipantCnt())
+                .participantCnt(instance.getParticipantCount())
                 .pointPerPerson(instance.getPointPerPerson())
                 .fileResponse(convertToFileResponse(files))
                 .build();

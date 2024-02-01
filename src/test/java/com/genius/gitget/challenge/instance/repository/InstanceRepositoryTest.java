@@ -42,15 +42,15 @@ class InstanceRepositoryTest {
         assertThat(suggestions.getContent().size()).isEqualTo(3);
         assertThat(suggestions.getContent().get(0).getTitle()).isEqualTo("title3");
         assertThat(suggestions.getContent().get(0).getTags()).isEqualTo("FE");
-        assertThat(suggestions.getContent().get(0).getParticipantCnt()).isEqualTo(20);
+        assertThat(suggestions.getContent().get(0).getParticipantCount()).isEqualTo(20);
 
         assertThat(suggestions.getContent().get(1).getTitle()).isEqualTo("title1");
         assertThat(suggestions.getContent().get(1).getTags()).isEqualTo("BE");
-        assertThat(suggestions.getContent().get(1).getParticipantCnt()).isEqualTo(10);
+        assertThat(suggestions.getContent().get(1).getParticipantCount()).isEqualTo(10);
 
         assertThat(suggestions.getContent().get(2).getTitle()).isEqualTo("title2");
         assertThat(suggestions.getContent().get(2).getTags()).isEqualTo("FE");
-        assertThat(suggestions.getContent().get(2).getParticipantCnt()).isEqualTo(3);
+        assertThat(suggestions.getContent().get(2).getParticipantCount()).isEqualTo(3);
     }
 
     @Test
@@ -69,15 +69,15 @@ class InstanceRepositoryTest {
         assertThat(instances.getContent().size()).isEqualTo(3);
         assertThat(instances.getContent().get(0).getTitle()).isEqualTo("title3");
         assertThat(instances.getContent().get(0).getTags()).isEqualTo("BE");
-        assertThat(instances.getContent().get(0).getParticipantCnt()).isEqualTo(20);
+        assertThat(instances.getContent().get(0).getParticipantCount()).isEqualTo(20);
 
         assertThat(instances.getContent().get(1).getTitle()).isEqualTo("title2");
         assertThat(instances.getContent().get(1).getTags()).isEqualTo("BE");
-        assertThat(instances.getContent().get(1).getParticipantCnt()).isEqualTo(3);
+        assertThat(instances.getContent().get(1).getParticipantCount()).isEqualTo(3);
 
         assertThat(instances.getContent().get(2).getTitle()).isEqualTo("title1");
         assertThat(instances.getContent().get(2).getTags()).isEqualTo("BE");
-        assertThat(instances.getContent().get(2).getParticipantCnt()).isEqualTo(10);
+        assertThat(instances.getContent().get(2).getParticipantCount()).isEqualTo(10);
     }
 
     @Test
@@ -96,15 +96,15 @@ class InstanceRepositoryTest {
         assertThat(instances.getContent().size()).isEqualTo(3);
         assertThat(instances.getContent().get(0).getTitle()).isEqualTo("title3");
         assertThat(instances.getContent().get(0).getTags()).isEqualTo("BE");
-        assertThat(instances.getContent().get(0).getParticipantCnt()).isEqualTo(20);
+        assertThat(instances.getContent().get(0).getParticipantCount()).isEqualTo(20);
 
         assertThat(instances.getContent().get(1).getTitle()).isEqualTo("title1");
         assertThat(instances.getContent().get(1).getTags()).isEqualTo("BE");
-        assertThat(instances.getContent().get(1).getParticipantCnt()).isEqualTo(10);
+        assertThat(instances.getContent().get(1).getParticipantCount()).isEqualTo(10);
 
         assertThat(instances.getContent().get(2).getTitle()).isEqualTo("title2");
         assertThat(instances.getContent().get(2).getTags()).isEqualTo("BE");
-        assertThat(instances.getContent().get(2).getParticipantCnt()).isEqualTo(3);
+        assertThat(instances.getContent().get(2).getParticipantCount()).isEqualTo(3);
     }
 
     private Instance getSavedInstance(String title, String tags, int participantCnt) {
@@ -120,7 +120,7 @@ class InstanceRepositoryTest {
                         .completedDate(now.plusDays(1))
                         .build()
         );
-        instance.updateParticipantCnt(participantCnt);
+        instance.updateParticipantCount(participantCnt);
         return instance;
     }
 }

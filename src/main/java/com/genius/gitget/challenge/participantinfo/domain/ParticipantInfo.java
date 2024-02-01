@@ -1,9 +1,23 @@
 package com.genius.gitget.challenge.participantinfo.domain;
 
+import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.user.domain.User;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,6 +44,9 @@ public class ParticipantInfo {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @OneToMany(mappedBy = "participantInfo")
+    private List<Certification> certificationList = new ArrayList<>();
+
     @Enumerated(EnumType.STRING)
     @Column(name = "join_status")
     @NotNull
@@ -39,6 +56,8 @@ public class ParticipantInfo {
     @Enumerated(EnumType.STRING)
     @Column(name = "join_result")
     private JoinResult joinResult;
+
+    private String repositoryName;
 
     @Builder
     public ParticipantInfo(JoinStatus joinStatus, JoinResult joinResult) {

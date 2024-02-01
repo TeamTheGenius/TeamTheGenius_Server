@@ -64,6 +64,8 @@ public class User extends BaseTimeEntity {
     @Column(length = 100)
     private String information;
 
+    private String githubToken;
+
     @Builder
     public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,
                 String tags) {
@@ -75,6 +77,7 @@ public class User extends BaseTimeEntity {
         this.information = information;
     }
 
+    //=== 비지니스 로직 ===//
     public void updateUser(String nickname, String information, String interest) {
         this.nickname = nickname;
         this.information = information;
@@ -83,6 +86,10 @@ public class User extends BaseTimeEntity {
 
     public void updateRole(Role role) {
         this.role = role;
+    }
+
+    public void updateGithubPersonalToken(String githubToken) {
+        this.githubToken = githubToken;
     }
 
     //=== 연관관계 편의 메서드 ===//

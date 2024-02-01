@@ -2,11 +2,11 @@ package com.genius.gitget.global.security.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.security.dto.TokenDTO;
 import com.genius.gitget.global.security.service.JwtService;
-import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class AuthController {
         );
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/auth/logout")
     public ResponseEntity<CommonResponse> logout(HttpServletResponse response) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();

@@ -115,5 +115,4 @@ public class Instance {
             topic.getInstanceList().add(this);
         }
     }
-
 }

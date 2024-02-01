@@ -14,10 +14,9 @@ import org.springframework.security.crypto.encrypt.AesBytesEncryptor;
 @RequiredArgsConstructor
 public class AppConfig {
     private final Environment env;
-    
+
     @Bean
     public AesBytesEncryptor aesBytesEncryptor() {
-        String property = env.getProperty("github.encryptSecretKey");
         return new AesBytesEncryptor(
                 env.getProperty("github.encryptSecretKey"),
                 env.getProperty("github.salt"));

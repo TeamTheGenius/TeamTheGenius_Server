@@ -14,6 +14,6 @@ public record InstanceSearchResponse(
                 instance.getId(),
                 instance.getTitle(),
                 instance.getPointPerPerson(),
-                instance.getParticipantCnt());
+                instance.getParticipantCount());
     }
 }

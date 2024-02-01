@@ -62,7 +62,7 @@ public class Instance {
 
     private int pointPerPerson;
 
-    private int participantCnt;
+    private int participantCount;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -96,8 +96,8 @@ public class Instance {
         this.completedDate = completedDate;
     }
 
-    public void updateParticipantCnt(int amount) {
-        this.participantCnt += amount;
+    public void updateParticipantCount(int amount) {
+        this.participantCount += amount;
     }
 
     public Optional<Files> getFiles() {
@@ -115,5 +115,4 @@ public class Instance {
             topic.getInstanceList().add(this);
         }
     }
-
 }

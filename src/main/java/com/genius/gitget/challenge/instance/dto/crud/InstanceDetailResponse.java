@@ -9,8 +9,7 @@ public record InstanceDetailResponse(
         String description,
         int pointPerPerson,
         String tags,
-        // 이미지
-        // 유의사항
+        String notice,
         LocalDateTime startedAt,
         LocalDateTime completedAt
 ) {

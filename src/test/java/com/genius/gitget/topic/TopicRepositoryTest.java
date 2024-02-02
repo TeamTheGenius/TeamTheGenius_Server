@@ -55,7 +55,7 @@ public class TopicRepositoryTest {
         if (!topic.getInstanceList().isEmpty()) {
             savedTopic.updateExistInstance("(수정) 하루에 두 문제씩 문제를 해결합니다.");
         } else {
-            savedTopic.updateNotExistInstance("1일 1커밋", "하루에 1커밋 하기", "CS", 300);
+            savedTopic.updateNotExistInstance("1일 1커밋", "하루에 1커밋 하기", "CS", "유의사항",300);
         }
         assertEquals(topic.getId(), savedTopic.getId());
         assertEquals(topic.getTitle(), savedTopic.getTitle());

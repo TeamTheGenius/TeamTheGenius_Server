@@ -6,7 +6,6 @@ public record InstancePagingResponse(
         Long topicId,
         Long instanceId,
         String title,
-        // 이미지
         LocalDateTime startedAt,
         LocalDateTime completedAt
 ) {

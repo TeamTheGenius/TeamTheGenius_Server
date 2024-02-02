@@ -44,7 +44,7 @@ public class TopicController {
 
     // 토픽 상세 정보 요청
     @GetMapping("/{id}")
-    public ResponseEntity<SingleResponse<TopicDetailResponse>> getTopicById(@PathVariable Long id) {
+    public ResponseEntity<SingleResponse<TopicDetailResponse>> getTopicById(@PathVariable Long id) throws IOException {
         TopicDetailResponse topicDetail = topicService.getTopicById(id);
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), topicDetail)
@@ -73,7 +73,7 @@ public class TopicController {
 
     // 토픽 삭제 요청
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse> deleteTopic(@PathVariable Long id) {
+    public ResponseEntity<CommonResponse> deleteTopic(@PathVariable Long id) throws IOException {
         topicService.deleteTopic(id);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())

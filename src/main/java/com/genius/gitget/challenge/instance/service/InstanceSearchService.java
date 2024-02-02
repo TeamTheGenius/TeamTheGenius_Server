@@ -2,7 +2,6 @@ package com.genius.gitget.challenge.instance.service;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.global.web.StringToEnum;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
 import lombok.RequiredArgsConstructor;

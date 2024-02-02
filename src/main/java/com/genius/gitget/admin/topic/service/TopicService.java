@@ -8,6 +8,7 @@ import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
@@ -25,26 +26,23 @@ import java.io.IOException;
 @Transactional(readOnly = true)
 public class TopicService {
     private final TopicRepository topicRepository;
-    public final FilesService filesService;
+    private final FilesService filesService;
 
     // 토픽 리스트 요청
     public Page<TopicPagingResponse> getAllTopics(Pageable pageable) {
         Page<Topic> topics = topicRepository.findAllById(pageable);
-        return topics.map(topic -> new TopicPagingResponse(topic.getId(), topic.getTitle()));
+        return topics.map(this::mapToTopicPagingResponse);
     }
 
     // 토픽 상세정보 요청
-    public TopicDetailResponse getTopicById(Long id) {
+    public TopicDetailResponse getTopicById(Long id) throws IOException {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
-        return new TopicDetailResponse(topic.getId(), topic.getTitle(), topic.getTags(), topic.getDescription(),
-                topic.getPointPerPerson());
+        return TopicDetailResponse.createByEntity(topic,topic.getFiles());
     }
 
     // 토픽 생성 요청
     @Transactional
     public Long createTopic(TopicCreateRequest topicCreateRequest, MultipartFile multipartFile, String type) throws IOException {
-        // TODO 이미지 타입 체크 필요
-
         Files uploadedFile = filesService.uploadFile(multipartFile, type);
 
         Topic topic = Topic.builder()
@@ -52,8 +50,7 @@ public class TopicService {
                 .description(topicCreateRequest.description())
                 .tags(topicCreateRequest.tags())
                 .pointPerPerson(topicCreateRequest.pointPerPerson())
-                // 이미지
-                // 유의사항
+                .notice(topicCreateRequest.notice())
                 .build();
 
         topic.setFiles(uploadedFile);
@@ -65,8 +62,10 @@ public class TopicService {
     }
 
     @Transactional
-    public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest, MultipartFile multipartFile, String type) {
+    public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest, MultipartFile multipartFile, String type) throws IOException {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
+
+        filesService.updateFile(id, multipartFile);
 
         // 서버에서 한번 더 검사
         boolean hasInstance = !topic.getInstanceList().isEmpty();
@@ -74,15 +73,24 @@ public class TopicService {
             topic.updateExistInstance(topicUpdateRequest.description());
         } else {
             topic.updateNotExistInstance(topicUpdateRequest.title(), topicUpdateRequest.description(),
-                    topicUpdateRequest.tags(), topicUpdateRequest.pointPerPerson());
+                    topicUpdateRequest.tags(), topicUpdateRequest.notice(), topicUpdateRequest.pointPerPerson());
         }
         topicRepository.save(topic);
     }
 
     // 토픽 삭제 요청
     @Transactional
-    public void deleteTopic(Long id) {
+    public void deleteTopic(Long id) throws IOException {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
+        filesService.deleteFile(id);
         topicRepository.delete(topic);
+    }
+
+    private TopicPagingResponse mapToTopicPagingResponse(Topic topic) {
+        try {
+            return TopicPagingResponse.createByEntity(topic, topic.getFiles());
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
     }
 }

@@ -41,6 +41,7 @@ public class InstanceService {
                 .tags(instanceCreateRequest.tags())
                 .description(instanceCreateRequest.description())
                 .pointPerPerson(instanceCreateRequest.pointPerPerson())
+                .notice(instanceCreateRequest.notice())
                 .startedDate(instanceCreateRequest.startedAt())
                 .completedDate(instanceCreateRequest.completedAt())
                 .progress(Progress.PREACTIVITY)
@@ -72,6 +73,7 @@ public class InstanceService {
                 instanceDetails.getDescription(),
                 instanceDetails.getPointPerPerson(),
                 instanceDetails.getTags(),
+                instanceDetails.getNotice(),
                 instanceDetails.getStartedDate(),
                 instanceDetails.getCompletedDate()
         );
@@ -90,7 +92,7 @@ public class InstanceService {
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
-        existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.pointPerPerson(),
+        existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(), instanceUpdateRequest.pointPerPerson(),
                 instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());
 
         Instance savedInstance = instanceRepository.save(existingInstance);

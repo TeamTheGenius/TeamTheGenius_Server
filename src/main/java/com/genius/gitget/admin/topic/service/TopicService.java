@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -64,7 +65,10 @@ public class TopicService {
     public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest, MultipartFile multipartFile, String type) throws IOException {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
 
-        filesService.updateFile(id, multipartFile);
+        Optional<Files> findTopicFile = topic.getFiles();
+        Long findTopicFileId = findTopicFile.get().getId();
+
+        filesService.updateFile(findTopicFileId, multipartFile);
 
         // 서버에서 한번 더 검사
         boolean hasInstance = !topic.getInstanceList().isEmpty();
@@ -81,7 +85,11 @@ public class TopicService {
     @Transactional
     public void deleteTopic(Long id) throws IOException {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
-        filesService.deleteFile(id);
+
+        Optional<Files> findTopicFile = topic.getFiles();
+        Long findTopicFileId = findTopicFile.get().getId();
+
+        filesService.deleteFile(findTopicFileId);
         topic.setFiles(null);
         topicRepository.delete(topic);
     }

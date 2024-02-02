@@ -17,9 +17,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
@@ -28,14 +31,14 @@ import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class InstanceService {
-
     private final InstanceRepository instanceRepository;
     private final TopicRepository topicRepository;
     private final FilesService filesService;
 
     // 인스턴스 생성
     @Transactional
-    public Long createInstance(InstanceCreateRequest instanceCreateRequest, MultipartFile multipartFile, String type) throws IOException {
+    public Long createInstance(InstanceCreateRequest instanceCreateRequest,
+                                MultipartFile multipartFile, String type) throws IOException {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
@@ -73,22 +76,30 @@ public class InstanceService {
         return InstanceDetailResponse.createByEntity(instanceDetails, instanceDetails.getFiles());
     }
 
+    // 인스턴스 삭제
     @Transactional
     public void deleteInstance(Long id) throws IOException{
         Instance instance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
-        filesService.deleteFile(id);
+
+        Optional<Files> findInstanceFile = instance.getFiles();
+        Long findInstanceFileId = findInstanceFile.get().getId();
+
+        filesService.deleteFile(findInstanceFileId);
         instance.setFiles(null);
         instanceRepository.delete(instance);
     }
 
     // 인스턴스 수정
     @Transactional
-    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest, MultipartFile multipartFile, String type) throws IOException{
+    public Long updateInstance(Long id,  InstanceUpdateRequest instanceUpdateRequest,
+                               MultipartFile multipartFile, String type) throws IOException{
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
-        filesService.updateFile(id, multipartFile);
+        Optional<Files> findInstanceFile = existingInstance.getFiles();
+        Long findInstanceFileId = findInstanceFile.get().getId();
+        filesService.updateFile(findInstanceFileId, multipartFile);
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(), instanceUpdateRequest.pointPerPerson(),
                 instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());

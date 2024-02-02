@@ -1,10 +1,13 @@
 package com.genius.gitget.challenge.instance.controller;
 
+import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
+import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.service.InstanceService;
+import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/admin/instance")
@@ -50,7 +54,7 @@ public class InstanceController {
     // 인스턴스 생성
     @PostMapping
     public ResponseEntity<CommonResponse> createInstance(
-            @RequestPart InstanceCreateRequest instanceCreateRequest,
+            @RequestPart(value = "data") InstanceCreateRequest instanceCreateRequest,
             @RequestPart(value = "files", required = false) MultipartFile multipartFile, @RequestPart(value = "type") String type) throws IOException {
         instanceService.createInstance(instanceCreateRequest, multipartFile, type);
         return ResponseEntity.ok().body(
@@ -60,8 +64,9 @@ public class InstanceController {
 
     // 인스턴스 수정
     @PatchMapping("/{id}")
-    public ResponseEntity<CommonResponse> updateInstance(@PathVariable Long id, @RequestPart InstanceUpdateRequest instanceUpdateRequest,
+    public ResponseEntity<CommonResponse> updateInstance(@PathVariable Long id, @RequestPart(value = "data") InstanceUpdateRequest instanceUpdateRequest,
                                                          @RequestPart(value = "files", required = false) MultipartFile multipartFile, @RequestPart(value = "type") String type) throws IOException{
+
         instanceService.updateInstance(id, instanceUpdateRequest, multipartFile, type);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())

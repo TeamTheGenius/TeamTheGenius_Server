@@ -29,8 +29,8 @@ public class InstanceController {
 
     // 인스턴스 리스트 조회
     @GetMapping
-    public ResponseEntity<PagingResponse<InstancePagingResponse>> getAllInstances(
-            @PageableDefault(size = 5, direction = Sort.Direction.ASC, sort = "id") Pageable pageable) {
+    public ResponseEntity<PagingResponse<InstancePagingResponse>> getAllInstances (
+            @PageableDefault(size = 5, direction = Sort.Direction.ASC, sort = "id") Pageable pageable) throws IOException{
         Page<InstancePagingResponse> instances = instanceService.getAllInstances(pageable);
 
         return ResponseEntity.ok().body(
@@ -40,7 +40,7 @@ public class InstanceController {
 
     // 인스턴스 단건 조회
     @GetMapping("/{id}")
-    public ResponseEntity<SingleResponse<InstanceDetailResponse>> getInstanceById(@PathVariable Long id) {
+    public ResponseEntity<SingleResponse<InstanceDetailResponse>> getInstanceById(@PathVariable Long id) throws IOException{
         InstanceDetailResponse instanceDetails = instanceService.getInstanceById(id);
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), instanceDetails)
@@ -70,7 +70,7 @@ public class InstanceController {
 
     // 인스턴스 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<CommonResponse> deleteInstance(@PathVariable Long id) {
+    public ResponseEntity<CommonResponse> deleteInstance(@PathVariable Long id) throws IOException{
         instanceService.deleteInstance(id);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())

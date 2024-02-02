@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -17,6 +18,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
@@ -32,9 +35,11 @@ public class InstanceService {
 
     // 인스턴스 생성
     @Transactional
-    public Long createInstance(InstanceCreateRequest instanceCreateRequest, MultipartFile multipartFile, String type) {
+    public Long createInstance(InstanceCreateRequest instanceCreateRequest, MultipartFile multipartFile, String type) throws IOException {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
+
+        Files uploadedFile = filesService.uploadFile(multipartFile, type);
 
         Instance instance = Instance.builder()
                 .title(instanceCreateRequest.title())
@@ -48,49 +53,42 @@ public class InstanceService {
                 .build();
 
         instance.setTopic(topic);
+        instance.setFiles(uploadedFile);
 
         Instance savedInstance = instanceRepository.save(instance);
 
         return savedInstance.getId();
     }
 
-
-    public Page<InstancePagingResponse> getAllInstances(Pageable pageable) {
+    // 인스턴스 리스트 조회
+    public Page<InstancePagingResponse> getAllInstances(Pageable pageable) throws IOException {
         Page<Instance> instances = instanceRepository.findAllById(pageable);
-        return instances.map(instance -> new InstancePagingResponse(instance.getTopic().getId(), instance.getId(),
-                instance.getTitle(), instance.getStartedDate(), instance.getCompletedDate()));
-
+        return instances.map(this::mapToInstancePagingResponse);
     }
 
     // 인스턴스 단건 조회
-    public InstanceDetailResponse getInstanceById(Long id) {
+    public InstanceDetailResponse getInstanceById(Long id) throws IOException {
         Instance instanceDetails = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
-        return new InstanceDetailResponse(
-                instanceDetails.getTopic().getId(),
-                instanceDetails.getId(),
-                instanceDetails.getTitle(),
-                instanceDetails.getDescription(),
-                instanceDetails.getPointPerPerson(),
-                instanceDetails.getTags(),
-                instanceDetails.getNotice(),
-                instanceDetails.getStartedDate(),
-                instanceDetails.getCompletedDate()
-        );
+        return InstanceDetailResponse.createByEntity(instanceDetails, instanceDetails.getFiles());
     }
 
     @Transactional
-    public void deleteInstance(Long id) {
+    public void deleteInstance(Long id) throws IOException{
         Instance instance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
+        filesService.deleteFile(id);
+        instance.setFiles(null);
         instanceRepository.delete(instance);
     }
 
     // 인스턴스 수정
     @Transactional
-    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest, MultipartFile multipartFile, String type) {
+    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest, MultipartFile multipartFile, String type) throws IOException{
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
+
+        filesService.updateFile(id, multipartFile);
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(), instanceUpdateRequest.pointPerPerson(),
                 instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());
@@ -98,5 +96,13 @@ public class InstanceService {
         Instance savedInstance = instanceRepository.save(existingInstance);
 
         return savedInstance.getId();
+    }
+
+    private InstancePagingResponse mapToInstancePagingResponse(Instance instance) {
+        try {
+            return InstancePagingResponse.createByEntity(instance, instance.getFiles());
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
     }
 }

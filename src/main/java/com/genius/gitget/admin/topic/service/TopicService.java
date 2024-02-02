@@ -57,7 +57,6 @@ public class TopicService {
 
         Topic savedTopic = topicRepository.save(topic);
 
-        // 생성된 토픽을 ID로 조회 가능하도록 수정 (01/29)
         return savedTopic.getId();
     }
 
@@ -83,6 +82,7 @@ public class TopicService {
     public void deleteTopic(Long id) throws IOException {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
         filesService.deleteFile(id);
+        topic.setFiles(null);
         topicRepository.delete(topic);
     }
 

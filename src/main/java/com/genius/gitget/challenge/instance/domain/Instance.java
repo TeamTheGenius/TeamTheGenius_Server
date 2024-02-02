@@ -93,7 +93,6 @@ public class Instance {
     }
 
     //== 비지니스 로직 ==//
-
     public void updateInstance(String description, String notice, int pointPerPerson, LocalDateTime startedDate,
                                LocalDateTime completedDate) {
         this.description = description;

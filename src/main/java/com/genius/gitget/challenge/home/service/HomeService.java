@@ -24,8 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class HomeService {
     private final InstanceRepository instanceRepository;
-    private final FilesService filesService;
-
 
     public Slice<HomeInstanceResponse> getRecommendations(User user, Pageable pageable) {
         List<String> userTags = Arrays.stream(user.getTags().split(",")).toList();

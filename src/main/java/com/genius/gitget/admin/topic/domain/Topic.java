@@ -14,6 +14,8 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,14 +45,17 @@ public class Topic {
 
     private String tags;
 
+    private String notice;
+
     private int pointPerPerson;
 
 
     @Builder
-    public Topic(String title, String description, String tags, int pointPerPerson) {
+    public Topic(String title, String description, String tags, String notice, int pointPerPerson) {
         this.title = title;
         this.description = description;
         this.tags = tags;
+        this.notice = notice;
         this.pointPerPerson = pointPerPerson;
     }
 
@@ -59,15 +64,19 @@ public class Topic {
         this.description = description;
     }
 
-    public void updateNotExistInstance(String title, String description, String tags, int pointPerPerson) {
+    public void updateNotExistInstance(String title, String description, String tags, String notice, int pointPerPerson) {
         this.title = title;
         this.description = description;
         this.tags = tags;
+        this.notice = notice;
         this.pointPerPerson = pointPerPerson;
     }
 
-
     public void setFiles(Files files) {
         this.files = files;
+    }
+
+    public Optional<Files> getFiles() {
+        return Optional.ofNullable(this.files);
     }
 }

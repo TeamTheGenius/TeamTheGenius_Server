@@ -17,9 +17,10 @@ public enum FileType {
 
     private final String path;
 
-    public static FileType fineType(String targetType) {
+    public static FileType findType(String targetType) {
+        String lowerTargetType = targetType.toLowerCase();
         return Arrays.stream(FileType.values())
-                .filter(type -> type.path.contains(targetType))
+                .filter(type -> type.path.contains(lowerTargetType))
                 .findFirst()
                 .orElseThrow(() -> new BusinessException(NOT_SUPPORTED_IMAGE_TYPE));
     }

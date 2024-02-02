@@ -83,6 +83,7 @@ public class FilesService {
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
         deleteFilesInStorage(files);
+        filesRepository.delete(files);
     }
 
     private void deleteFilesInStorage(Files files) {

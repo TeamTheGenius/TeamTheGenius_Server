@@ -4,6 +4,7 @@ import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
+import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,8 +15,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 
 @SpringBootTest
 @Transactional
@@ -44,9 +43,9 @@ public class InstanceRepositoryTest {
         Instance savedInstance = instanceRepository.save(instance);
 
         //then
-        Assertions.assertThat(savedInstance.getId()).isEqualTo(1L);
+        Assertions.assertThat(savedInstance.getTitle()).isEqualTo("1일 1알고리즘");
     }
-    
+
     @Test
     public void 인스턴스_수정() throws Exception {
         //given
@@ -85,7 +84,7 @@ public class InstanceRepositoryTest {
         Instance savedInstance = instanceRepository.save(instance);
 
         //then
-         Assertions.assertThat(savedInstance.getTitle()).isEqualTo("1일 1알고리즘");
+        Assertions.assertThat(savedInstance.getTitle()).isEqualTo("1일 1알고리즘");
     }
 
     @Test

@@ -52,7 +52,7 @@ public class HomeController {
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                Sort.by(Direction.DESC, "participantCnt"));
+                Sort.by(Direction.DESC, "participantCount"));
 
         Slice<HomeInstanceResponse> recommendations = homeService.getRecommendations(
                 userPrincipal.getUser(), pageRequest);
@@ -64,7 +64,7 @@ public class HomeController {
     @GetMapping("/popular")
     public ResponseEntity<SlicingResponse<HomeInstanceResponse>> getPopularInstances(Pageable pageable) {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                Sort.by(Direction.DESC, "participantCnt"));
+                Sort.by(Direction.DESC, "participantCount"));
 
         Slice<HomeInstanceResponse> recommendations = homeService.getInstancesByCondition(pageRequest);
         return ResponseEntity.ok().body(

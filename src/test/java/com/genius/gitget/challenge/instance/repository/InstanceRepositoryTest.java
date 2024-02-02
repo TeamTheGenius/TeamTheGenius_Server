@@ -29,13 +29,13 @@ class InstanceRepositoryTest {
     public void should_returnInstances_containsUserTags() {
         //given
         List<String> userTags = List.of("BE", "FE", "AI");
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Direction.DESC, "participantCnt"));
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Direction.DESC, "participantCount"));
 
         //when
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "FE", 3);
         getSavedInstance("title3", "FE", 20);
-        Slice<Instance> suggestions = instanceRepository.findRecommendations(userTags, Progress.PRE_ACTIVITY,
+        Slice<Instance> suggestions = instanceRepository.findRecommendations(userTags, Progress.PREACTIVITY,
                 pageRequest);
 
         //then
@@ -63,7 +63,7 @@ class InstanceRepositoryTest {
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "BE", 3);
         getSavedInstance("title3", "BE", 20);
-        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PRE_ACTIVITY, pageRequest);
+        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PREACTIVITY, pageRequest);
 
         //then
         assertThat(instances.getContent().size()).isEqualTo(3);
@@ -84,13 +84,13 @@ class InstanceRepositoryTest {
     @DisplayName("인스턴스들 중, 참여 인원 수가 많은 순서대로 인스턴스들을 정렬하여 반환받을 수 있다.")
     public void should_returnInstances_orderByParticipantCnt() {
         //given
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Direction.DESC, "participantCnt"));
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Direction.DESC, "participantCount"));
 
         //when
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "BE", 3);
         getSavedInstance("title3", "BE", 20);
-        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PRE_ACTIVITY, pageRequest);
+        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PREACTIVITY, pageRequest);
 
         //then
         assertThat(instances.getContent().size()).isEqualTo(3);
@@ -114,7 +114,7 @@ class InstanceRepositoryTest {
                         .tags(tags)
                         .title(title)
                         .description("description")
-                        .progress(Progress.PRE_ACTIVITY)
+                        .progress(Progress.PREACTIVITY)
                         .pointPerPerson(100)
                         .startedDate(now)
                         .completedDate(now.plusDays(1))

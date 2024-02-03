@@ -34,7 +34,7 @@ class HomeServiceTest {
     @DisplayName("사용자가 설정한 태그에 맞는 추천 인스턴스들을 페이징 형태로 받아올 수 있다.")
     public void should_getSuggestions_when_passUserTags() {
         //given
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Direction.DESC, "participantCnt"));
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Direction.DESC, "participantCount"));
         getSavedInstance("title1", "BE", 20);
         getSavedInstance("title2", "BE", 10);
         getSavedInstance("title3", "FE", 10);
@@ -69,7 +69,7 @@ class HomeServiceTest {
                         .completedDate(now.plusDays(1))
                         .build()
         );
-        instance.updateParticipantCnt(participantCnt);
+        instance.updateParticipantCount(participantCnt);
         instance.setTopic(getSavedTopic());
         return instance;
     }

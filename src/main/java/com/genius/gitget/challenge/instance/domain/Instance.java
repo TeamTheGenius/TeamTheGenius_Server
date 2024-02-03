@@ -62,7 +62,11 @@ public class Instance {
 
     private int pointPerPerson;
 
-    private int participantCnt;
+    private int participantCount;
+
+    private String notice;
+
+    private String certificationMethod;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -75,29 +79,31 @@ public class Instance {
     private LocalDateTime completedDate;
 
     @Builder
-    public Instance(String title, String description, String tags, int pointPerPerson, Progress progress,
+    public Instance(String title, String description, String tags, int pointPerPerson, Progress progress, String notice, String certificationMethod,
                     LocalDateTime startedDate, LocalDateTime completedDate) {
         this.title = title;
         this.description = description;
         this.tags = tags;
         this.pointPerPerson = pointPerPerson;
+        this.notice = notice;
+        this.certificationMethod = certificationMethod;
         this.progress = progress;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
     }
 
     //== 비지니스 로직 ==//
-
-    public void updateInstance(String description, int pointPerPerson, LocalDateTime startedDate,
+    public void updateInstance(String description, String notice, int pointPerPerson, LocalDateTime startedDate,
                                LocalDateTime completedDate) {
         this.description = description;
+        this.notice = notice;
         this.pointPerPerson = pointPerPerson;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
     }
 
-    public void updateParticipantCnt(int amount) {
-        this.participantCnt += amount;
+    public void updateParticipantCount(int amount) {
+        this.participantCount += amount;
     }
 
     public Optional<Files> getFiles() {

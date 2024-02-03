@@ -1,13 +1,32 @@
 package com.genius.gitget.challenge.instance.dto.crud;
 
-import java.time.LocalDateTime;
+import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.FileResponse;
+import lombok.Builder;
 
-public record InstancePagingResponse(
-        Long topicId,
-        Long instanceId,
-        String title,
-        // 이미지
-        LocalDateTime startedAt,
-        LocalDateTime completedAt
-) {
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+@Builder
+public record InstancePagingResponse (Long topicId, Long instanceId, String title,
+                                      LocalDateTime startedAt, LocalDateTime completedAt, FileResponse fileResponse) {
+    public static InstancePagingResponse createByEntity(Instance instance, Optional<Files> files) throws IOException {
+        return InstancePagingResponse.builder()
+                .topicId(instance.getTopic().getId())
+                .instanceId(instance.getId())
+                .title(instance.getTitle())
+                .startedAt(instance.getStartedDate())
+                .completedAt(instance.getCompletedDate())
+                .fileResponse(convertToFileResponse(files))
+                .build();
+    }
+
+    private static FileResponse convertToFileResponse(Optional<Files> files) throws IOException {
+        if (files.isEmpty()) {
+            return FileResponse.createNotExistFile();
+        }
+        return FileResponse.createExistFile(files.get());
+    }
 }

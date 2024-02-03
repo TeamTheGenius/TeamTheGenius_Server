@@ -30,7 +30,7 @@ public class FileUtil {
     public static UploadDTO getUploadInfo(MultipartFile file, String typeStr, final String UPLOAD_PATH) {
         String originalFilename = file.getOriginalFilename();
         String savedFilename = getSavedFilename(originalFilename);
-        FileType fileType = FileType.fineType(typeStr);
+        FileType fileType = FileType.findType(typeStr);
 
         return UploadDTO.builder()
                 .fileType(fileType)

@@ -20,7 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final String SIGNUP_URL = "http://localhost:5173/login/signup";
-    private final String MAIN_URL = "http://localhost:5173/main";
+    private final String AUTH_URL = "http://localhost:5173/auth";
     private final UserRepository userRepository;
 
     @Override
@@ -44,7 +44,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                     .toUriString();
         }
 
-        return UriComponentsBuilder.fromHttpUrl(MAIN_URL)
+        return UriComponentsBuilder.fromHttpUrl(AUTH_URL)
+                .queryParam("identifier", identifier)
                 .build()
                 .toUriString();
     }

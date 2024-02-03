@@ -77,7 +77,7 @@ class HomeControllerTest {
                         .completedDate(now.plusDays(1))
                         .build()
         );
-        instance.updateParticipantCnt(participantCnt);
+        instance.updateParticipantCount(participantCnt);
         instance.setTopic(getSavedTopic());
         return instance;
     }

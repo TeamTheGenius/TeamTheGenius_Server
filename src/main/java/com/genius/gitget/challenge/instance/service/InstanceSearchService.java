@@ -2,15 +2,11 @@ package com.genius.gitget.challenge.instance.service;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.instance.domain.StringToEnum;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

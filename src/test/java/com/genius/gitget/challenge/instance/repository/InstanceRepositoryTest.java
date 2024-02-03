@@ -61,7 +61,8 @@ class InstanceRepositoryTest {
 
         //when
         Instance savedInstance = instanceRepository.save(instance);
-        savedInstance.updateInstance("수정되었습니다.", 10000, LocalDateTime.now(), LocalDateTime.now().plusDays(5));
+        savedInstance.updateInstance("수정되었습니다.", "수정된 유의사항", 10000, LocalDateTime.now(),
+                LocalDateTime.now().plusDays(5));
 
         //then
         Assertions.assertThat(instance.getDescription()).isEqualTo(savedInstance.getDescription());
@@ -125,7 +126,7 @@ class InstanceRepositoryTest {
         //then
         Assertions.assertThat(instances.getTotalElements()).isEqualTo(2);
     }
-    
+
 
     @Test
     @DisplayName("인스턴스들 중, 사용자의 tag가 포함되어 있는 인스턴스들을 반환받을 수 있다.")

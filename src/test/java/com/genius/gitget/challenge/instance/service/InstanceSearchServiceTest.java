@@ -9,6 +9,8 @@ import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
+import com.genius.gitget.util.file.FileTestUtil;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -59,19 +61,9 @@ public class InstanceSearchServiceTest {
 
         Topic savedTopic = topicRepository.save(topic);
 
-        instanceService.createInstance(
-                new InstanceCreateRequest(savedTopic.getId(), instance.getTitle(), instance.getTags(),
-                        instance.getDescription(),
-                        instance.getPointPerPerson(), instance.getStartedDate(), instance.getCompletedDate()));
-
-        instanceService.createInstance(
-                new InstanceCreateRequest(savedTopic.getId(), instance.getTitle(), instance.getTags(),
-                        instance.getDescription(),
-                        instance.getPointPerPerson(), instance.getStartedDate(), instance.getCompletedDate()));
-
-        instanceService.createInstance(
-                new InstanceCreateRequest(savedTopic.getId(), "테스트", instance.getTags(), instance.getDescription(),
-                        instance.getPointPerPerson(), instance.getStartedDate(), instance.getCompletedDate()));
+        createInstance(savedTopic, instance, instance.getTitle());
+        createInstance(savedTopic, instance, instance.getTitle());
+        createInstance(savedTopic, instance, "title");
 
         //when
         InstanceSearchRequest instanceSearchRequest = new InstanceSearchRequest("고리", "preactivity");
@@ -86,5 +78,19 @@ public class InstanceSearchServiceTest {
 
         Assertions.assertThat(orderList.getTotalElements()).isEqualTo(2);
 
+    }
+
+    private void createInstance(Topic savedTopic, Instance instance, String title) throws IOException {
+        instanceService.createInstance(
+                InstanceCreateRequest.builder()
+                        .topicId(savedTopic.getId())
+                        .title(title)
+                        .tags(instance.getTags())
+                        .description(instance.getDescription())
+                        .notice(instance.getNotice())
+                        .pointPerPerson(instance.getPointPerPerson())
+                        .startedAt(instance.getStartedDate())
+                        .completedAt(instance.getCompletedDate()).build(),
+                FileTestUtil.getMultipartFile("name"), "instance");
     }
 }

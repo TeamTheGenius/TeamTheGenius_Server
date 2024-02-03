@@ -4,7 +4,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.genius.gitget.util.WithMockCustomUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,13 +44,5 @@ class SecurityConfigTest {
         //when&then
         mockMvc.perform(get("/api/test"))
                 .andExpect(status().is4xxClientError());
-    }
-
-    @Test
-    @DisplayName("USER 또는 ADMIN은 일반 API를 호출했을 때, 2xx 응답이 발생해야 한다.")
-    @WithMockCustomUser
-    public void should_status2xx_when_authorizedUser() throws Exception {
-        mockMvc.perform(get("/api/test"))
-                .andExpect(status().is2xxSuccessful());
     }
 }

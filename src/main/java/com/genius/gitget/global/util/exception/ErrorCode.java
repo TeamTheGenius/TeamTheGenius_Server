@@ -12,6 +12,7 @@ public enum ErrorCode {
     TOPIC_HAVE_INSTANCE(HttpStatus.BAD_REQUEST, "해당 토픽은 인스턴스를 가지고 있으므로 삭제할 수 없습니다."),
 
     INSTANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 인스턴스를 찾을 수 없습니다."),
+    PARTICIPANT_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 참여 정보를 찾을 수 없습니다"),
 
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다"),
@@ -31,6 +32,7 @@ public enum ErrorCode {
     FILE_NOT_DELETED(HttpStatus.BAD_REQUEST, "파일(이미지)이 정상적으로 삭제되지 않았습니다."),
 
     GITHUB_CONNECTION_FAILED(HttpStatus.BAD_REQUEST, "Github 연결이 실패했습니다."),
+    GITHUB_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "저장된 Github Token을 찾을 수 없습니다."),
     GITHUB_ID_INCORRECT(HttpStatus.BAD_REQUEST, "소셜로그인에 사용한 Github 계정과 일치하지 않습니다."),
     GITHUB_REPOSITORY_INCORRECT(HttpStatus.BAD_REQUEST, "해당 레포지토리와 연결이 되지 않습니다.");
 

@@ -8,7 +8,7 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GithubService {
 
-    public GitHub getGithubConnection(String personalKey) {
+    public GitHub getGithubConnection(String githubToken) {
         try {
-            GitHub gitHub = new GitHubBuilder().withOAuthToken(personalKey).build();
+            GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
             gitHub.checkApiUrlValidity();
             return gitHub;
         } catch (IOException e) {
@@ -47,16 +47,11 @@ public class GithubService {
 
     public void validateGithubRepository(GitHub gitHub, String repositoryName) {
         try {
-            GHRepository repository = gitHub.getRepository(repositoryName);
-            validateRepositoryName(repository.getFullName(), repositoryName);
+            gitHub.getRepository(repositoryName);
+        } catch (GHFileNotFoundException e) {
+            throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
         } catch (IllegalArgumentException | IOException e) {
             throw new BusinessException(e);
-        }
-    }
-
-    private void validateRepositoryName(String repoFullName, String repoName) {
-        if (!repoFullName.equals(repoName)) {
-            throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.certification.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.certification.dto.GithubTokenRequest;
+import com.genius.gitget.challenge.certification.dto.RepositoryRequest;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
@@ -26,6 +27,20 @@ public class CertificationController {
             @RequestBody GithubTokenRequest githubTokenRequest
     ) {
         certificationService.registerGithubPersonalToken(userPrincipal.getUser(), githubTokenRequest.githubToken());
+
+        return ResponseEntity.ok().body(
+                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
+        );
+    }
+
+    @PostMapping("/register/repository")
+    public ResponseEntity<CommonResponse> registerRepository(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody RepositoryRequest repositoryRequest
+    ) {
+
+        certificationService.registerRepository(userPrincipal.getUser(), repositoryRequest.instanceId(),
+                repositoryRequest.repositoryName());
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())

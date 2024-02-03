@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.certification.service;
 
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
+import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.challenge.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CertificationService {
     private final GithubService githubService;
     private final EncryptUtil encryptUtil;
+    private final ParticipantInfoService participantInfoService;
 
 
     @Transactional
@@ -24,5 +26,16 @@ public class CertificationService {
 
         String encryptedToken = encryptUtil.encryptPersonalToken(githubToken);
         user.updateGithubPersonalToken(encryptedToken);
+    }
+
+    @Transactional
+    public void registerRepository(User user, Long instanceId, String repository) {
+        String githubToken = encryptUtil.decryptPersonalToken(user.getGithubToken());
+        GitHub gitHub = githubService.getGithubConnection(githubToken);
+
+        String repositoryFullName = user.getIdentifier() + "/" + repository;
+        githubService.validateGithubRepository(gitHub, repositoryFullName);
+
+        participantInfoService.joinNewInstance(user, instanceId, repositoryFullName);
     }
 }

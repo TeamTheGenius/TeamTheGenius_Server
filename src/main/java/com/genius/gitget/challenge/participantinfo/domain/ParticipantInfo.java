@@ -60,10 +60,17 @@ public class ParticipantInfo {
     private String repositoryName;
 
     @Builder
-    public ParticipantInfo(JoinStatus joinStatus, JoinResult joinResult) {
+    public ParticipantInfo(JoinStatus joinStatus, JoinResult joinResult, String repositoryName) {
         this.joinStatus = joinStatus;
         this.joinResult = joinResult;
+        this.repositoryName = repositoryName;
     }
+
+    //=== 비지니스 로직 ===//
+    public void updateRepository(String repository) {
+        this.repositoryName = repository;
+    }
+
 
     /*== 연관관계 편의 메서드 ==*/
     public void setUserAndInstance(User user, Instance instance) {

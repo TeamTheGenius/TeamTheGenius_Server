@@ -7,8 +7,7 @@ public record InstanceCreateRequest(
         String title,
         String tags,
         String description,
-        // TODO 이미지
-        // TODO 유의사항
+        String notice,
         int pointPerPerson,
         LocalDateTime startedAt,
         LocalDateTime completedAt

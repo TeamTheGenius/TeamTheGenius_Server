@@ -6,6 +6,7 @@ import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.repository.FilesRepository;
@@ -27,6 +28,7 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class TopicService {
     private final TopicRepository topicRepository;
+    private final InstanceRepository instanceRepository;
     private final FilesService filesService;
 
     // 토픽 리스트 요청
@@ -89,9 +91,13 @@ public class TopicService {
         Optional<Files> findTopicFile = topic.getFiles();
         Long findTopicFileId = findTopicFile.get().getId();
 
-        filesService.deleteFile(findTopicFileId);
-        topic.setFiles(null);
-        topicRepository.delete(topic);
+        try {
+            topicRepository.delete(topic);
+            filesService.deleteFile(findTopicFileId);
+            topic.setFiles(null);
+        } catch (Exception e) {
+            throw new BusinessException(ErrorCode.TOPIC_HAVE_INSTANCE);
+        }
     }
 
     private TopicPagingResponse mapToTopicPagingResponse(Topic topic) {

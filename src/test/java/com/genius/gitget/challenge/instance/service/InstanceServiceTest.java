@@ -9,6 +9,7 @@ import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
+import com.genius.gitget.util.file.FileTestUtil;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -34,6 +35,7 @@ public class InstanceServiceTest {
 
     private Instance instance;
     private Topic topic;
+    private String fileType;
 
     @BeforeEach
     public void setup() {
@@ -52,18 +54,18 @@ public class InstanceServiceTest {
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
                 .build();
+        fileType = "instance";
     }
 
     @Test
     public void 인스턴스_생성() throws Exception {
         //given
         Topic savedTopic = topicRepository.save(topic);
-        InstanceCreateRequest instanceCreateRequest = new InstanceCreateRequest(savedTopic.getId(), instance.getTitle(),
-                instance.getTags(), instance.getDescription(),
-                instance.getPointPerPerson(), instance.getStartedDate(), instance.getCompletedDate());
+        InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
 
         //when
-        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest);
+        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
+                FileTestUtil.getMultipartFile("name"), fileType);
 
         //then
         Optional<Instance> byId = instanceRepository.findById(savedInstanceId);
@@ -75,16 +77,21 @@ public class InstanceServiceTest {
         //given
         Topic savedTopic = topicRepository.save(topic);
 
-        InstanceCreateRequest instanceCreateRequest = new InstanceCreateRequest(savedTopic.getId(), instance.getTitle(),
-                instance.getTags(), instance.getDescription(),
-                instance.getPointPerPerson(), instance.getStartedDate(), instance.getCompletedDate());
-        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest);
+        InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
+        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
+                FileTestUtil.getMultipartFile("name"), fileType);
 
-        InstanceUpdateRequest instanceUpdateRequest = new InstanceUpdateRequest(savedTopic.getId(), "이것은 수정본이지롱",
-                instance.getPointPerPerson(), instance.getStartedDate(), instance.getCompletedDate());
+        InstanceUpdateRequest instanceUpdateRequest = InstanceUpdateRequest.builder()
+                .topicId(savedTopic.getId())
+                .description("이것은 수정본이지롱")
+                .pointPerPerson(instance.getPointPerPerson())
+                .startedAt(instance.getStartedDate())
+                .completedAt(instance.getCompletedDate())
+                .build();
 
         //when
-        Long updatedInstanceId = instanceService.updateInstance(savedInstanceId, instanceUpdateRequest);
+        Long updatedInstanceId = instanceService.updateInstance(savedInstanceId, instanceUpdateRequest,
+                FileTestUtil.getMultipartFile("name"), fileType);
 
         //then
         Optional<Instance> byId = instanceRepository.findById(updatedInstanceId);
@@ -96,15 +103,27 @@ public class InstanceServiceTest {
         //given
         Topic savedTopic = topicRepository.save(topic);
 
-        InstanceCreateRequest instanceCreateRequest = new InstanceCreateRequest(savedTopic.getId(), instance.getTitle(),
-                instance.getTags(), instance.getDescription(),
-                instance.getPointPerPerson(), instance.getStartedDate(), instance.getCompletedDate());
-        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest);
+        InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
+        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
+                FileTestUtil.getMultipartFile("name"), fileType);
 
         //when
         InstanceDetailResponse instanceById = instanceService.getInstanceById(savedInstanceId);
 
         //then
         Assertions.assertThat(instanceById.title()).isEqualTo(instanceCreateRequest.title());
+    }
+
+    private InstanceCreateRequest getInstanceCreateRequest(Topic savedTopic, Instance instance) {
+        return InstanceCreateRequest.builder()
+                .topicId(savedTopic.getId())
+                .title(instance.getTitle())
+                .tags(instance.getTags())
+                .description(instance.getDescription())
+                .notice(instance.getNotice())
+                .pointPerPerson(instance.getPointPerPerson())
+                .startedAt(instance.getStartedDate())
+                .completedAt(instance.getCompletedDate())
+                .build();
     }
 }

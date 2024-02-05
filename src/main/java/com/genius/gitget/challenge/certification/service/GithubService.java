@@ -6,9 +6,14 @@ import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITOR
 
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHFileNotFoundException;
+import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHPullRequestSearchBuilder;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
 import org.springframework.stereotype.Service;
@@ -17,8 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor
 public class GithubService {
+    private final int PAGE_SIZE = 10;
 
     public GitHub getGithubConnection(String githubToken) {
         try {
@@ -53,5 +58,27 @@ public class GithubService {
         } catch (IllegalArgumentException | IOException e) {
             throw new BusinessException(e);
         }
+    }
+
+    public List<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName, LocalDate createdAt) {
+        try {
+            GHRepository repository = gitHub.getRepository(repositoryName);
+            GHPullRequestSearchBuilder builder = gitHub.searchPullRequests()
+                    .repo(repository)
+                    .author(getGHUser(gitHub))
+                    .created(createdAt);
+
+            return builder.list()._iterator(PAGE_SIZE).nextPage();
+
+        } catch (GHFileNotFoundException e) {
+            throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    private GHUser getGHUser(GitHub gitHub) throws IOException {
+        String accountId = gitHub.getMyself().getLogin();
+        return gitHub.getUser(accountId);
     }
 }

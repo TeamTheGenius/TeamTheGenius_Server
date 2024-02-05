@@ -1,13 +1,17 @@
 package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_ID_INCORRECT;
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITORY_INCORRECT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GitHub;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,6 +88,36 @@ class GithubServiceTest {
         //when & then
         assertThatThrownBy(() -> githubService.validateGithubRepository(gitHub, repositoryName))
                 .isInstanceOf(BusinessException.class);
+    }
+
+    @Test
+    @DisplayName("해당 레포지토리에 있는 PR을 확인할 수 있다.")
+    public void should_checkPR_when_validRepo() throws IOException {
+        //given
+        GitHub gitHub = getGitHub();
+        String repositoryName = githubId + "/" + repository;
+        LocalDate createdAt = LocalDate.of(2024, 2, 5);
+
+        //when
+        List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repositoryName, createdAt);
+
+        //then
+        assertThat(pullRequest.size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("특정 레포지토리에 연결이 되지 않으면 예외를 발생한다.")
+    public void should_throwException_when_repoConnectionInvalid() {
+        //given
+        GitHub gitHub = getGitHub();
+        String repositoryName = githubId + "/Fake";
+        LocalDate createdAt = LocalDate.of(2024, 2, 5);
+
+        //when & then
+        assertThatThrownBy(() -> githubService.getPullRequestByDate(gitHub, repositoryName, createdAt))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
+
     }
 
     private GitHub getGitHub() {

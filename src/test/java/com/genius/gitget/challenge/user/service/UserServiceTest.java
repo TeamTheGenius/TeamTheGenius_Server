@@ -1,5 +1,6 @@
 package com.genius.gitget.challenge.user.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -14,6 +15,8 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,6 +105,37 @@ class UserServiceTest {
         assertThatThrownBy(() -> userService.isNicknameDuplicate(user.getNickname()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.DUPLICATED_NICKNAME.getMessage());
+    }
+
+    @ParameterizedTest
+    @DisplayName("User 엔티티로부터 깃허브 토큰을 불러올 때 길이가 0이거나, 공백으로 이루어져 있다면 예외가 발생한다.")
+    @ValueSource(strings = {"", "  "})
+    public void should_throwException_when_githubTokenInvalid(String githubToken) {
+        //given
+        User user = getSavedUser();
+
+        //when
+        user.updateGithubPersonalToken(githubToken);
+
+        //then
+        assertThatThrownBy(() -> userService.getGithubToken(user))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("User 엔티티로부터 깃허브 토큰을 불러올 때 null 이라면 예외가 발생한다.")
+    public void should_throwException_when_githubTokenNull() {
+        //given
+        User user = getSavedUser();
+
+        //when
+        user.updateGithubPersonalToken(null);
+
+        //then
+        assertThatThrownBy(() -> userService.getGithubToken(user))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
     }
 
 

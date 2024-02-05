@@ -1,13 +1,10 @@
 package com.genius.gitget.challenge.user.domain;
 
-import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
-
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
-import com.genius.gitget.global.util.exception.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -96,12 +93,6 @@ public class User extends BaseTimeEntity {
         this.githubToken = githubToken;
     }
 
-    public String getGithubToken() {
-        if (githubToken == null || githubToken.isEmpty() || githubToken.isBlank()) {
-            throw new BusinessException(GITHUB_TOKEN_NOT_FOUND);
-        }
-        return this.githubToken;
-    }
 
     //=== 연관관계 편의 메서드 ===//
     public void setFiles(Files files) {

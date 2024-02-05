@@ -1,8 +1,10 @@
 package com.genius.gitget.challenge.user.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.DUPLICATED_NICKNAME;
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.MEMBER_NOT_FOUND;
 
+import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final EncryptUtil encryptUtil;
 
 
     public User findUserById(Long id) {
@@ -50,5 +53,13 @@ public class UserService {
         if (userRepository.findByNickname(nickname).isPresent()) {
             throw new BusinessException(DUPLICATED_NICKNAME);
         }
+    }
+
+    public String getGithubToken(User user) {
+        String githubToken = user.getGithubToken();
+        if (githubToken == null || githubToken.isEmpty() || githubToken.isBlank()) {
+            throw new BusinessException(GITHUB_TOKEN_NOT_FOUND);
+        }
+        return encryptUtil.decryptPersonalToken(githubToken);
     }
 }

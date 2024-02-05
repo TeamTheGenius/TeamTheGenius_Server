@@ -3,9 +3,11 @@ package com.genius.gitget.challenge.certification.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITORY_INCORRECT;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -20,6 +22,9 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -151,6 +156,74 @@ class CertificationServiceTest {
         //then
         Optional<ParticipantInfo> participantInfo = participantInfoRepository.findBy(user.getId(), instance.getId());
         assertThat(participantInfo).isNotEmpty();
+    }
+
+    @Test
+    @DisplayName("특정 레포지토리에 특정 날짜에 생성된 PR 목록을 불러올 수 있다.")
+    public void should_loadPRList_when_tryJoin() throws IOException {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        certificationService.registerGithubPersonalToken(user, personalKey);
+        certificationService.registerRepository(user, instance.getId(), targetRepo);
+
+        LocalDate targetDate = LocalDate.of(2024, 2, 5);
+
+        //when
+        List<PullRequestResponse> pullRequestResponses = certificationService.verifyJoinCondition(
+                user, instance.getId(), targetDate);
+
+        //then
+        assertThat(pullRequestResponses.size()).isEqualTo(1);
+        log.info(pullRequestResponses.get(0).toString());
+    }
+
+    @Test
+    @DisplayName("사용자의 github token이 저장되어있지 않을 때 예외가 발생해야 한다.")
+    public void should_throwException_when_githubTokenNotSaved() {
+        //given
+        LocalDate targetDate = LocalDate.of(2024, 2, 5);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+
+        //when & then
+        assertThatThrownBy(() -> certificationService.verifyJoinCondition(user, instance.getId(), targetDate))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("repository가 등록되어있지 않을 때 예외가 발생해야 한다.")
+    public void should_throwException_when_repositoryNotRegistered() {
+        //given
+        LocalDate targetDate = LocalDate.of(2024, 2, 5);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        certificationService.registerGithubPersonalToken(user, personalKey);
+
+        //when & then
+        assertThatThrownBy(() -> certificationService.verifyJoinCondition(user, instance.getId(), targetDate))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(PARTICIPANT_INFO_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("특정 일자에 PR이 존재하지 않는다면 빈 리스트를 반환한다.")
+    public void should_returnEmptyList_when_prNotExist() throws IOException {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        certificationService.registerGithubPersonalToken(user, personalKey);
+        certificationService.registerRepository(user, instance.getId(), targetRepo);
+
+        LocalDate targetDate = LocalDate.of(2024, 1, 4);
+
+        //when
+        List<PullRequestResponse> pullRequestResponses = certificationService.verifyJoinCondition(
+                user, instance.getId(), targetDate);
+
+        //then
+        assertThat(pullRequestResponses.size()).isEqualTo(0);
     }
 
 

@@ -10,6 +10,7 @@ import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,5 +37,11 @@ public class ParticipantInfoService {
         participantInfo.setUserAndInstance(user, instance);
         participantInfoRepository.save(participantInfo);
         return participantInfo;
+    }
+
+    public String getRepositoryName(Long userId, Long instanceId) {
+        ParticipantInfo participantInfo = participantInfoRepository.findBy(userId, instanceId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.PARTICIPANT_INFO_NOT_FOUND));
+        return participantInfo.getRepositoryName();
     }
 }

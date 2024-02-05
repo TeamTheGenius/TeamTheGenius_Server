@@ -3,15 +3,15 @@ package com.genius.gitget.global.security.service;
 import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.JWT_ISSUE_HEADER;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
+import static com.genius.gitget.global.util.exception.ErrorCode.JWT_TOKEN_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
-import static com.genius.gitget.global.util.exception.ErrorCode.TOKEN_NOT_FOUND;
 
+import com.genius.gitget.challenge.user.domain.Role;
+import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.constants.TokenStatus;
 import com.genius.gitget.global.security.domain.Token;
 import com.genius.gitget.global.security.repository.TokenRepository;
-import com.genius.gitget.challenge.user.domain.Role;
-import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import io.jsonwebtoken.Jwts;
@@ -107,7 +107,7 @@ public class JwtService {
     public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenPrefix) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            throw new BusinessException(TOKEN_NOT_FOUND);
+            throw new BusinessException(JWT_TOKEN_NOT_FOUND);
         }
         return jwtUtil.resolveTokenFromCookie(cookies, tokenPrefix);
     }

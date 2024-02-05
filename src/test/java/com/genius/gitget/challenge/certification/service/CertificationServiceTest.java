@@ -69,9 +69,10 @@ class CertificationServiceTest {
 
         //when
         certificationService.registerGithubPersonalToken(user, personalKey);
+        User updatedUser = userRepository.findByIdentifier(githubId).get();
 
         //then
-        assertThat(user.getGithubToken()).isEqualTo(encrypted);
+        assertThat(updatedUser.getGithubToken()).isEqualTo(encrypted);
     }
 
     @Test

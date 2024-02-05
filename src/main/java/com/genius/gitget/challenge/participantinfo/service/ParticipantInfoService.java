@@ -9,6 +9,7 @@ import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ParticipantInfoService {
+    private final UserService userService;
     private final ParticipantInfoRepository participantInfoRepository;
     private final InstanceRepository instanceRepository;
 
     @Transactional
-    public ParticipantInfo joinNewInstance(User user, Long instanceId, String repositoryName) {
+    public ParticipantInfo joinNewInstance(Long userId, Long instanceId, String repositoryName) {
+        User user = userService.findUserById(userId);
         Instance instance = instanceRepository.findById(instanceId)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 

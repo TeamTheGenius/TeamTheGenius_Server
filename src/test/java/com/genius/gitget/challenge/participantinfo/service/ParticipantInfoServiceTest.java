@@ -48,7 +48,8 @@ class ParticipantInfoServiceTest {
         Instance instance = getSavedInstance();
 
         //when
-        ParticipantInfo participantInfo = participantInfoService.joinNewInstance(user, instance.getId(), targetRepo);
+        ParticipantInfo participantInfo = participantInfoService.joinNewInstance(user.getId(), instance.getId(),
+                targetRepo);
 
         //then
         assertThat(participantInfo.getJoinStatus()).isEqualTo(JoinStatus.YES);
@@ -65,7 +66,7 @@ class ParticipantInfoServiceTest {
         User user = getSavedUser(githubId);
 
         //when & then
-        assertThatThrownBy(() -> participantInfoService.joinNewInstance(user, 1L, targetRepo))
+        assertThatThrownBy(() -> participantInfoService.joinNewInstance(user.getId(), 1L, targetRepo))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.INSTANCE_NOT_FOUND.getMessage());
     }
@@ -78,7 +79,7 @@ class ParticipantInfoServiceTest {
         Instance instance = getSavedInstance();
 
         //when
-        participantInfoService.joinNewInstance(user, instance.getId(), targetRepo);
+        participantInfoService.joinNewInstance(user.getId(), instance.getId(), targetRepo);
         String repositoryName = participantInfoService.getRepositoryName(user.getId(), instance.getId());
 
         //then

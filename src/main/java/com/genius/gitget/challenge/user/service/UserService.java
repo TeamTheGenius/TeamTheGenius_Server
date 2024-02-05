@@ -35,6 +35,11 @@ public class UserService {
     }
 
     @Transactional
+    public Long save(User user) {
+        return userRepository.saveAndFlush(user).getId();
+    }
+
+    @Transactional
     public Long signup(SignupRequest requestUser) {
         User targetUser = findUserByIdentifier(requestUser.identifier());
 

@@ -5,7 +5,6 @@ import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +32,7 @@ public class CertificationService {
 
         String encryptedToken = encryptUtil.encryptPersonalToken(githubToken);
         user.updateGithubPersonalToken(encryptedToken);
+        userService.save(user);
     }
 
     @Transactional
@@ -43,11 +43,10 @@ public class CertificationService {
         String repositoryFullName = user.getIdentifier() + "/" + repository;
         githubService.validateGithubRepository(gitHub, repositoryFullName);
 
-        participantInfoService.joinNewInstance(user, instanceId, repositoryFullName);
+        participantInfoService.joinNewInstance(user.getId(), instanceId, repositoryFullName);
     }
 
-    public List<PullRequestResponse> verifyJoinCondition(User user, Long instanceId, LocalDate targetDate)
-            throws IOException {
+    public List<PullRequestResponse> verifyJoinCondition(User user, Long instanceId, LocalDate targetDate) {
         String githubToken = userService.getGithubToken(user);
         GitHub gitHub = githubService.getGithubConnection(githubToken);
 

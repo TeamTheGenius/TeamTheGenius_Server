@@ -5,6 +5,7 @@ import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.global.file.domain.Files;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -40,7 +41,7 @@ public class Instance {
     @Column(name = "instance_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "files_id")
     private Files files;
 
@@ -79,7 +80,8 @@ public class Instance {
     private LocalDateTime completedDate;
 
     @Builder
-    public Instance(String title, String description, String tags, int pointPerPerson, Progress progress, String notice, String certificationMethod,
+    public Instance(String title, String description, String tags, int pointPerPerson, Progress progress, String notice,
+                    String certificationMethod,
                     LocalDateTime startedDate, LocalDateTime completedDate) {
         this.title = title;
         this.description = description;

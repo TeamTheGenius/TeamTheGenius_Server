@@ -1,7 +1,8 @@
 package com.genius.gitget.admin.topic.domain;
 
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.global.file.domain.Files;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,7 +16,6 @@ import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,7 +32,7 @@ public class Topic {
     @Column(name = "topic_id")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "files_id")
     private Files files;
 
@@ -64,7 +64,8 @@ public class Topic {
         this.description = description;
     }
 
-    public void updateNotExistInstance(String title, String description, String tags, String notice, int pointPerPerson) {
+    public void updateNotExistInstance(String title, String description, String tags, String notice,
+                                       int pointPerPerson) {
         this.title = title;
         this.description = description;
         this.tags = tags;
@@ -72,11 +73,11 @@ public class Topic {
         this.pointPerPerson = pointPerPerson;
     }
 
-    public void setFiles(Files files) {
-        this.files = files;
-    }
-
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
+    }
+
+    public void setFiles(Files files) {
+        this.files = files;
     }
 }

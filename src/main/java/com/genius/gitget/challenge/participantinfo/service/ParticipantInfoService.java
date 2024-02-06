@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.participantinfo.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -11,7 +12,6 @@ import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRep
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.global.util.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,9 +42,13 @@ public class ParticipantInfoService {
         return participantInfo;
     }
 
+    public ParticipantInfo getParticipantInfo(Long userId, Long instanceId) {
+        return participantInfoRepository.findBy(userId, instanceId)
+                .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
+    }
+
     public String getRepositoryName(Long userId, Long instanceId) {
-        ParticipantInfo participantInfo = participantInfoRepository.findBy(userId, instanceId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.PARTICIPANT_INFO_NOT_FOUND));
+        ParticipantInfo participantInfo = getParticipantInfo(userId, instanceId);
         return participantInfo.getRepositoryName();
     }
 }

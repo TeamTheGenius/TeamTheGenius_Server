@@ -35,6 +35,10 @@ public class Certification extends BaseTimeEntity {
     @JoinColumn(name = "participantInfo_id")
     private ParticipantInfo participantInfo;
 
+    private Long userId;
+
+    private Long instanceId;
+
     private LocalDate certificatedAt;
 
     private String certificationLinks;
@@ -45,11 +49,23 @@ public class Certification extends BaseTimeEntity {
 
 
     @Builder
-    public Certification(LocalDate certificatedAt, CertificateStatus certificationStatus, String certificationLinks) {
+    public Certification(Long userId, Long instanceId, LocalDate certificatedAt, String certificationLinks,
+                         CertificateStatus certificationStatus) {
+        this.userId = userId;
+        this.instanceId = instanceId;
         this.certificatedAt = certificatedAt;
-        this.certificationStatus = certificationStatus;
         this.certificationLinks = certificationLinks;
+        this.certificationStatus = certificationStatus;
     }
+
+    //=== 비지니스 로직 ===//
+    public void updateCertification(LocalDate certificatedAt, String certificationLinks,
+                                    CertificateStatus certificationStatus) {
+        this.certificatedAt = certificatedAt;
+        this.certificationLinks = certificationLinks;
+        this.certificationStatus = certificationStatus;
+    }
+
 
     //=== 연관관계 편의 메서드 ===//
     public void setParticipantInfo(ParticipantInfo participantInfo) {

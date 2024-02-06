@@ -7,7 +7,6 @@ import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITOR
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
@@ -16,6 +15,7 @@ import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.kohsuke.github.PagedIterator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +60,8 @@ public class GithubService {
         }
     }
 
-    public List<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName, LocalDate createdAt) {
+    public PagedIterator<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName,
+                                                             LocalDate createdAt) {
         try {
             GHRepository repository = gitHub.getRepository(repositoryName);
             GHPullRequestSearchBuilder builder = gitHub.searchPullRequests()
@@ -68,7 +69,7 @@ public class GithubService {
                     .author(getGHUser(gitHub))
                     .created(createdAt);
 
-            return builder.list()._iterator(PAGE_SIZE).nextPage();
+            return builder.list()._iterator(PAGE_SIZE);
 
         } catch (GHFileNotFoundException e) {
             throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);

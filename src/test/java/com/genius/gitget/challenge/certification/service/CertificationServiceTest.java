@@ -7,7 +7,12 @@ import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.genius.gitget.challenge.certification.domain.CertificateStatus;
+import com.genius.gitget.challenge.certification.domain.Certification;
+import com.genius.gitget.challenge.certification.dto.CertificationRequest;
+import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
+import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -50,6 +55,8 @@ class CertificationServiceTest {
     private InstanceRepository instanceRepository;
     @Autowired
     private ParticipantInfoRepository participantInfoRepository;
+    @Autowired
+    private CertificationRepository certificationRepository;
 
     @Value("${github.personalKey}")
     private String personalKey;
@@ -171,7 +178,7 @@ class CertificationServiceTest {
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
 
         //when
-        List<PullRequestResponse> pullRequestResponses = certificationService.verifyJoinCondition(
+        List<PullRequestResponse> pullRequestResponses = certificationService.getPullRequestListByDate(
                 user, instance.getId(), targetDate);
 
         //then
@@ -188,7 +195,7 @@ class CertificationServiceTest {
         Instance instance = getSavedInstance();
 
         //when & then
-        assertThatThrownBy(() -> certificationService.verifyJoinCondition(user, instance.getId(), targetDate))
+        assertThatThrownBy(() -> certificationService.getPullRequestListByDate(user, instance.getId(), targetDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
     }
@@ -203,7 +210,7 @@ class CertificationServiceTest {
         certificationService.registerGithubPersonalToken(user, personalKey);
 
         //when & then
-        assertThatThrownBy(() -> certificationService.verifyJoinCondition(user, instance.getId(), targetDate))
+        assertThatThrownBy(() -> certificationService.getPullRequestListByDate(user, instance.getId(), targetDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(PARTICIPANT_INFO_NOT_FOUND.getMessage());
     }
@@ -220,11 +227,40 @@ class CertificationServiceTest {
         LocalDate targetDate = LocalDate.of(2024, 1, 4);
 
         //when
-        List<PullRequestResponse> pullRequestResponses = certificationService.verifyJoinCondition(
+        List<PullRequestResponse> pullRequestResponses = certificationService.getPullRequestListByDate(
                 user, instance.getId(), targetDate);
 
         //then
         assertThat(pullRequestResponses.size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("사용자가 연결한 레포지토리에 특정 날짜의 PR이 있으면 인증으로 간주한다")
+    public void should_certificate_when_prExist() {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        certificationService.registerGithubPersonalToken(user, personalKey);
+        certificationService.registerRepository(user, instance.getId(), targetRepo);
+
+        LocalDate targetDate = LocalDate.of(2024, 2, 5);
+
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(targetDate)
+                .build();
+
+        //when
+        CertificationResponse certificationResponse = certificationService.updateCertification(user,
+                certificationRequest);
+        Certification certification = certificationRepository.findById(certificationResponse.certificationId())
+                .get();
+
+        //then
+        assertThat(certification.getId()).isEqualTo(certificationResponse.certificationId());
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(CertificateStatus.CERTIFICATED);
+        assertThat(certificationResponse.certificatedAt()).isEqualTo(targetDate);
+        assertThat(certificationResponse.prCount()).isEqualTo(1);
     }
 
 

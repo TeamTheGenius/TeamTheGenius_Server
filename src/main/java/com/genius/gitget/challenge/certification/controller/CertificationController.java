@@ -2,16 +2,17 @@ package com.genius.gitget.challenge.certification.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.certification.dto.CertificationRequest;
+import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.GithubTokenRequest;
 import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.dto.RepositoryRequest;
 import com.genius.gitget.challenge.certification.service.CertificationService;
-import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
-import java.io.IOException;
+import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +41,6 @@ public class CertificationController {
     ) {
         certificationService.registerGithubPersonalToken(userPrincipal.getUser(), githubTokenRequest.githubToken());
 
-        User userById = userService.findUserById(userPrincipal.getUser().getId());
-
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
         );
@@ -65,13 +64,28 @@ public class CertificationController {
     public ResponseEntity<ListResponse<PullRequestResponse>> verify(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
-    ) throws IOException {
+    ) {
 
-        List<PullRequestResponse> pullRequestResponses = certificationService.verifyJoinCondition(
+        List<PullRequestResponse> pullRequestResponses = certificationService.getPullRequestListByDate(
                 userPrincipal.getUser(), instanceId, LocalDate.now());
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), pullRequestResponses)
+        );
+    }
+
+    @PostMapping("/today")
+    public ResponseEntity<SingleResponse<CertificationResponse>> certificateByGithub(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody CertificationRequest certificationRequest
+    ) {
+
+        CertificationResponse certificationResponse = certificationService.updateCertification(
+                userPrincipal.getUser(),
+                certificationRequest);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
         );
     }
 }

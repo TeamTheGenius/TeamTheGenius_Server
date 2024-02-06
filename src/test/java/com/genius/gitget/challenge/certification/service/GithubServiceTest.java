@@ -99,7 +99,8 @@ class GithubServiceTest {
         LocalDate createdAt = LocalDate.of(2024, 2, 5);
 
         //when
-        List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repositoryName, createdAt);
+        List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repositoryName, createdAt)
+                .nextPage();
 
         //then
         assertThat(pullRequest.size()).isEqualTo(1);

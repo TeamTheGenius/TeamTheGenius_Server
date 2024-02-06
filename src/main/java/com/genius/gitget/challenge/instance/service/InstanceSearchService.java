@@ -3,7 +3,9 @@ package com.genius.gitget.challenge.instance.service;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
+import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
+import com.genius.gitget.global.file.service.FilesService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -18,9 +20,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class InstanceSearchService {
 
     private final SearchRepository searchRepository;
+    private final InstanceRepository instanceRepository;
     private final StringToEnum stringToEnum;
+    private final FilesService filesService;
 
     public Page<InstanceSearchResponse> searchInstances(String keyword, String progress, Pageable pageable) {
+
+        // TODO 검색기능에 이미지 파일 같이 불러와야함.
+
         Page<Instance> findByTitleContaining;
 
         if (stringToEnum.convert(progress) == Progress.ALL) {
@@ -30,6 +37,7 @@ public class InstanceSearchService {
             findByTitleContaining = searchRepository.findByProgressAndTitleContainingOrderByStartedDateDesc(convertProgress, keyword, pageable);
 
         }
+
         return findByTitleContaining.map(this::convertToInstanceSearchResponse);
     }
 

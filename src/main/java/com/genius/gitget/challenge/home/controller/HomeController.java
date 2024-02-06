@@ -7,6 +7,7 @@ import com.genius.gitget.challenge.home.service.HomeService;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;
+import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -20,11 +21,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +33,8 @@ public class HomeController {
 
     @PostMapping("/search")
     public ResponseEntity<PagingResponse<InstanceSearchResponse>> searchInstances(
-            @RequestBody InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
+            @RequestPart(value = "data") InstanceSearchRequest instanceSearchRequest, @RequestPart(value = "files") MultipartFile multipartFile,
+            @RequestPart(value = "type") String type, Pageable pageable) {
 
         Page<InstanceSearchResponse> searchResults
                 = instanceSearchService.searchInstances(instanceSearchRequest.keyword(),

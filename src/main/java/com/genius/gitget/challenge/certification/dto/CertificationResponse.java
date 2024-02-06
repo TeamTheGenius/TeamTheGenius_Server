@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.certification.dto;
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 
@@ -28,6 +29,10 @@ public record CertificationResponse(
     }
 
     private static List<String> getPrList(String prLink) {
-        return List.of(prLink.split(","));
+        List<String> prLinkList = List.of(prLink.split(","));
+        if (prLinkList.size() == 1 && prLinkList.get(0).isEmpty()) {
+            return new ArrayList<>();
+        }
+        return prLinkList;
     }
 }

@@ -68,7 +68,6 @@ public class CertificationService {
     }
 
 
-    //TODO: 메서드 정리 및 테스트 코드 작성
     //refactor: 인증 날짜, 사용자 정보, 인스턴스 혹은 참여 정보를 DTO로 만드는 것도 괜찮을 듯
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {

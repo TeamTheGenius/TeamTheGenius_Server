@@ -263,6 +263,35 @@ class CertificationServiceTest {
         assertThat(certificationResponse.prCount()).isEqualTo(1);
     }
 
+    @Test
+    @DisplayName("사용자가 연결한 레포지토리에 특정 날짜의 PR이 존재하지 않으면 인증이 아직 안된 것으로 간주한다.")
+    public void should_notCertificate_when_prNotExist() {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        certificationService.registerGithubPersonalToken(user, personalKey);
+        certificationService.registerRepository(user, instance.getId(), targetRepo);
+
+        LocalDate targetDate = LocalDate.of(2024, 2, 6);
+
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(targetDate)
+                .build();
+
+        //when
+        CertificationResponse certificationResponse = certificationService.updateCertification(user,
+                certificationRequest);
+        Certification certification = certificationRepository.findById(certificationResponse.certificationId())
+                .get();
+
+        //then
+        assertThat(certification.getId()).isEqualTo(certificationResponse.certificationId());
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(CertificateStatus.NOT_YET);
+        assertThat(certificationResponse.certificatedAt()).isEqualTo(targetDate);
+        assertThat(certificationResponse.prCount()).isEqualTo(0);
+    }
+
 
     private User getSavedUser(String githubId) {
         return userRepository.save(

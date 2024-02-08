@@ -68,7 +68,6 @@ public class CertificationService {
     }
 
 
-    //refactor: 인증 날짜, 사용자 정보, 인스턴스 혹은 참여 정보를 DTO로 만드는 것도 괜찮을 듯
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
         String githubToken = userService.getGithubToken(user);
@@ -82,20 +81,30 @@ public class CertificationService {
                         certificationRequest.targetDate())
                 .nextPage();
 
-        Certification certification = certificationRepository.findCertificationByDate(certificationRequest.targetDate(),
+        Certification certification = getCertification(
+                user.getId(),
+                participantInfo,
+                certificationRequest,
+                ghPullRequests);
+
+        return CertificationResponse.create(certification);
+    }
+
+    private Certification getCertification(Long userId, ParticipantInfo participantInfo,
+                                           CertificationRequest certificationRequest,
+                                           List<GHPullRequest> ghPullRequests) {
+        Certification certification = certificationRepository.findCertificationByDate(
+                        certificationRequest.targetDate(),
                         participantInfo.getId())
                 .orElse(Certification.builder()
-                        .userId(user.getId())
+                        .userId(userId)
                         .instanceId(certificationRequest.instanceId())
                         .certificatedAt(certificationRequest.targetDate())
                         .certificationLinks(getPrLinks(ghPullRequests))
                         .certificationStatus(getCertificateStatus(ghPullRequests))
                         .build());
-
         certification.setParticipantInfo(participantInfo);
-        Certification savedCertification = certificationRepository.save(certification);
-
-        return CertificationResponse.create(savedCertification);
+        return certificationRepository.save(certification);
     }
 
     private String getPrLinks(List<GHPullRequest> ghPullRequests) {

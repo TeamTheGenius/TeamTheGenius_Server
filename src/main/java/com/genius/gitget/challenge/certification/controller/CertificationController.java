@@ -8,7 +8,6 @@ import com.genius.gitget.challenge.certification.dto.GithubTokenRequest;
 import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.dto.RepositoryRequest;
 import com.genius.gitget.challenge.certification.service.CertificationService;
-import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
@@ -32,7 +31,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/certification")
 public class CertificationController {
     private final CertificationService certificationService;
-    private final UserService userService;
 
     @PostMapping("/register/token")
     public ResponseEntity<CommonResponse> registerGithubToken(
@@ -43,6 +41,17 @@ public class CertificationController {
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
+        );
+    }
+
+    @GetMapping("/register/repository")
+    public ResponseEntity<ListResponse<String>> getPublicRepositories(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<String> repositories = certificationService.getPublicRepositories(userPrincipal.getUser());
+
+        return ResponseEntity.ok().body(
+                new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), repositories)
         );
     }
 

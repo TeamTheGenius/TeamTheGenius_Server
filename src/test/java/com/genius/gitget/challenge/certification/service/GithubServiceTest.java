@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -118,7 +119,19 @@ class GithubServiceTest {
         assertThatThrownBy(() -> githubService.getPullRequestByDate(gitHub, repositoryName, createdAt))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
+    }
 
+    @Test
+    @DisplayName("사용자가 가지고 있는 레포지토리 리스트들을 반환할 수 있다.")
+    public void should_returnRepositories() {
+        //given
+        GitHub gitHub = getGitHub();
+
+        //when
+        List<GHRepository> repositoryList = githubService.getRepositoryList(gitHub);
+
+        //then
+        assertThat(repositoryList.size()).isGreaterThan(0);
     }
 
     private GitHub getGitHub() {

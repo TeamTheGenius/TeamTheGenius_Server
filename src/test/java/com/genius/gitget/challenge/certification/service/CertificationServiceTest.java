@@ -292,6 +292,33 @@ class CertificationServiceTest {
         assertThat(certificationResponse.prCount()).isEqualTo(0);
     }
 
+    @Test
+    @DisplayName("github를 통해 public repository 정보들을 받아올 수 있다.")
+    public void should_returnRepositoryList_when_passGitHubToken() {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        certificationService.registerGithubPersonalToken(user, personalKey);
+
+        //when
+        List<String> repositoryList = certificationService.getPublicRepositories(user);
+
+        //then
+        assertThat(repositoryList.size()).isGreaterThan(0);
+    }
+
+    @Test
+    @DisplayName("repository 정보를 불러올 때 github token이 제대로 설정되어있지 않다면 예외를 발생해야 한다.")
+    public void should_throwException_when_loadRepository() {
+        //given
+        User user = getSavedUser(githubId);
+
+        //when & then
+        assertThatThrownBy(() -> certificationService.getPublicRepositories(user))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
+    }
+
 
     private User getSavedUser(String githubId) {
         return userRepository.save(

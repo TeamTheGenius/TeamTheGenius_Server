@@ -16,6 +16,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,8 +45,7 @@ public class CertificationService {
 
     @Transactional
     public void registerRepository(User user, Long instanceId, String repository) {
-        String githubToken = userService.getGithubToken(user);
-        GitHub gitHub = githubService.getGithubConnection(githubToken);
+        GitHub gitHub = githubService.getGithubConnection(user);
 
         String repositoryFullName = user.getIdentifier() + "/" + repository;
         githubService.validateGithubRepository(gitHub, repositoryFullName);
@@ -54,9 +54,7 @@ public class CertificationService {
     }
 
     public List<PullRequestResponse> getPullRequestListByDate(User user, Long instanceId, LocalDate targetDate) {
-        String githubToken = userService.getGithubToken(user);
-        GitHub gitHub = githubService.getGithubConnection(githubToken);
-
+        GitHub gitHub = githubService.getGithubConnection(user);
         String repositoryName = participantInfoService.getRepositoryName(user.getId(), instanceId);
 
         List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repositoryName, targetDate)
@@ -67,11 +65,18 @@ public class CertificationService {
                 .toList();
     }
 
+    public List<String> getPublicRepositories(User user) {
+        GitHub gitHub = githubService.getGithubConnection(user);
+        List<GHRepository> repositoryList = githubService.getRepositoryList(gitHub);
+        return repositoryList.stream()
+                .map(String::valueOf)
+                .toList();
+    }
+
 
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
-        String githubToken = userService.getGithubToken(user);
-        GitHub gitHub = githubService.getGithubConnection(githubToken);
+        GitHub gitHub = githubService.getGithubConnection(user);
         ParticipantInfo participantInfo = participantInfoService.getParticipantInfo(user.getId(),
                 certificationRequest.instanceId());
 

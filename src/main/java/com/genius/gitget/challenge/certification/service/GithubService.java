@@ -4,14 +4,21 @@ import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_CONNECTIO
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_ID_INCORRECT;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITORY_INCORRECT;
 
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kohsuke.github.GHDirection;
 import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHPullRequestSearchBuilder;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHRepositorySearchBuilder;
+import org.kohsuke.github.GHRepositorySearchBuilder.Sort;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
@@ -22,11 +29,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class GithubService {
+    private final UserService userService;
     private final int PAGE_SIZE = 10;
 
     public GitHub getGithubConnection(String githubToken) {
         try {
+            GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
+            gitHub.checkApiUrlValidity();
+            return gitHub;
+        } catch (IOException e) {
+            throw new BusinessException(GITHUB_CONNECTION_FAILED);
+        }
+    }
+
+    public GitHub getGithubConnection(User user) {
+        try {
+            String githubToken = userService.getGithubToken(user);
             GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
             gitHub.checkApiUrlValidity();
             return gitHub;
@@ -56,6 +76,18 @@ public class GithubService {
         } catch (GHFileNotFoundException e) {
             throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
         } catch (IllegalArgumentException | IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public List<GHRepository> getRepositoryList(GitHub gitHub) {
+        try {
+            GHRepositorySearchBuilder builder = gitHub.searchRepositories()
+                    .user(getGHUser(gitHub).getLogin())
+                    .sort(Sort.UPDATED)
+                    .order(GHDirection.DESC);
+            return builder.list().iterator().nextPage();
+        } catch (IOException e) {
             throw new BusinessException(e);
         }
     }

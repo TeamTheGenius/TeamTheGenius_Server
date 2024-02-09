@@ -9,6 +9,8 @@ import com.genius.gitget.challenge.instance.domain.QInstance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
+import com.genius.gitget.challenge.instance.dto.search.QQuerydslDTO;
+import com.genius.gitget.challenge.instance.dto.search.QuerydslDTO;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;
@@ -16,7 +18,6 @@ import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.global.file.domain.QFiles;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.util.file.FileTestUtil;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -100,30 +101,23 @@ public class QuerydslBasicTest {
         }
         // Page<InstanceSearchResponse> orderList = instanceSearchService.searchInstances("고리", "preactivity", , "instance",
         // PageRequest.of(0, 3));
-
     }
 
     @Test
     public void findDtoByQuerydsl() throws IOException {
 
-        List<Instance> list = queryFactory.selectFrom(i).fetch();
-        for (Instance instance : list) {
-            System.out.println("instance = " + instance.getTitle());
-        }
-
-        List<InstanceSearchResponse> fetch = queryFactory
-                .select(Projections.bean(InstanceSearchResponse.class,
+        List<QuerydslDTO> fetch = queryFactory.select(new QQuerydslDTO(
                         i.topic.id,
                         i.id,
+                        i.files.id,
                         i.title,
                         i.pointPerPerson,
-                        i.participantCount,
-                        i.files))
+                        i.participantCount))
                 .from(i)
                 .fetch();
 
-        for (InstanceSearchResponse instanceSearchResponse : fetch) {
-            System.out.println("instanceSearchResponse = " + instanceSearchResponse.toString());
+        for (QuerydslDTO querydslDTO : fetch) {
+            System.out.println("querydslDTO.toString() = " + querydslDTO.toString());
         }
     }
 

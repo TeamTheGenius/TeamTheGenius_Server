@@ -93,29 +93,28 @@ public class QuerydslBasicTest {
         Topic savedTopic = topicRepository.save(topic);
 
         createInstance(savedTopic, instance, instance.getTitle());
-        createInstance(savedTopic, instance, "고리");
+        createInstance(savedTopic, instance, "즘아아아아");
 
         Page<InstancePagingResponse> allInstances = instanceService.getAllInstances(PageRequest.of(0, 5));
         for (InstancePagingResponse allInstance : allInstances) {
             System.out.println("allInstance = " + allInstance);
         }
-        // Page<InstanceSearchResponse> orderList = instanceSearchService.searchInstances("고리", "preactivity", , "instance",
-        // PageRequest.of(0, 3));
     }
 
     @Test
     public void findDtoByQuerydsl() throws IOException {
 
         List<QuerydslDTO> fetch = queryFactory.select(new QQuerydslDTO(
-                        i.topic.id,
-                        i.id,
-                        i.files.id,
-                        i.title,
-                        i.pointPerPerson,
-                        i.participantCount))
+                i.topic.id, i.id, i.files.id, i.title, i.pointPerPerson, i.participantCount,
+                f.id, f.fileURI, f.originalFilename, f.savedFilename, f.fileType.stringValue()))
                 .from(i)
+                .leftJoin(f)
+                .on(i.files.id.eq(f.id))
+                .where(i.progress.eq(Progress.valueOf("PREACTIVITY")), i.title.like("%아%"))
+                .orderBy(i.startedDate.desc())
                 .fetch();
 
+        System.out.println("fetch = " + fetch.size());
         for (QuerydslDTO querydslDTO : fetch) {
             System.out.println("querydslDTO.toString() = " + querydslDTO.toString());
         }

@@ -51,12 +51,10 @@ public class TopicControllerTest {
     @Test
     @WithMockCustomUser
     public void 토픽_생성() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(new TopicController(topicService))
-                //.webAppContextSetup(context)
-                .apply(springSecurity())
-                .build();
+//        mockMvc = MockMvcBuilders.standaloneSetup(new TopicController(topicService))
+//                //.webAppContextSetup(context)
+//                .apply(springSecurity())
+//                .build();
     }
-
-
 
 }

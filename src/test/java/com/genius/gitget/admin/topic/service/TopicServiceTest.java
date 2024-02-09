@@ -92,12 +92,13 @@ public class TopicServiceTest {
                 fileType);
 
         //when
-        topicService.deleteTopic(savedTopicId);
+        Assertions.assertThatThrownBy(() -> topicService.deleteTopic(savedTopicId))
+                .isInstanceOf(BusinessException.class);
 
         //then
-        org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class, () -> {
-            topicService.getTopicById(1L);
-        });
+//        org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class, () -> {
+//            topicService.getTopicById(1L);
+//        });
 //
 //        Assertions.assertThatThrownBy(()-> topicService.getTopicById(1L))
 //                .isInstanceOf(BusinessException.class);

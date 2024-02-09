@@ -24,6 +24,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/challenges")
@@ -33,8 +35,7 @@ public class HomeController {
 
     @PostMapping("/search")
     public ResponseEntity<PagingResponse<InstanceSearchResponse>> searchInstances(
-            @RequestPart(value = "data") InstanceSearchRequest instanceSearchRequest, @RequestPart(value = "files") MultipartFile multipartFile,
-            @RequestPart(value = "type") String type, Pageable pageable) {
+            @RequestPart(value = "data") InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
 
         Page<InstanceSearchResponse> searchResults
                 = instanceSearchService.searchInstances(instanceSearchRequest.keyword(),

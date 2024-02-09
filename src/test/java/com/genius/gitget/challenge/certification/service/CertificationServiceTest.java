@@ -1,5 +1,7 @@
 package com.genius.gitget.challenge.certification.service;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITORY_INCORRECT;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
@@ -258,7 +260,7 @@ class CertificationServiceTest {
 
         //then
         assertThat(certification.getId()).isEqualTo(certificationResponse.certificationId());
-        assertThat(certificationResponse.certificateStatus()).isEqualTo(CertificateStatus.CERTIFICATED);
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(CERTIFICATED);
         assertThat(certificationResponse.certificatedAt()).isEqualTo(targetDate);
         assertThat(certificationResponse.prCount()).isEqualTo(1);
     }
@@ -319,6 +321,28 @@ class CertificationServiceTest {
                 .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
     }
 
+    @Test
+    @DisplayName("특정 사용자가 인증한 특정 기간 내에 인증된 인증 객체들을 받아올 수 있다.")
+    public void should_returnCertifications_when_passDuration() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 2, 3);
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate endDate = LocalDate.of(2024, 2, 4);
+        ParticipantInfo participantInfo = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+
+        //when
+        getSavedCertification(NOT_YET, startDate, participantInfo);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participantInfo);
+        getSavedCertification(CERTIFICATED, endDate.minusDays(1), participantInfo);
+        getSavedCertification(CERTIFICATED, endDate, participantInfo);
+
+        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+                participantInfo.getId(), currentDate);
+
+        //then
+        assertThat(weekCertification.size()).isEqualTo(3);
+    }
+
 
     private User getSavedUser(String githubId) {
         return userRepository.save(
@@ -351,5 +375,16 @@ class CertificationServiceTest {
         participantInfo.setUserAndInstance(user, instance);
 
         return participantInfo;
+    }
+
+    private Certification getSavedCertification(CertificateStatus status, LocalDate certificatedAt,
+                                                ParticipantInfo participantInfo) {
+        Certification certification = Certification.builder()
+                .certificationStatus(status)
+                .certificatedAt(certificatedAt)
+                .certificationLinks("certificationLink")
+                .build();
+        certification.setParticipantInfo(participantInfo);
+        return certificationRepository.save(certification);
     }
 }

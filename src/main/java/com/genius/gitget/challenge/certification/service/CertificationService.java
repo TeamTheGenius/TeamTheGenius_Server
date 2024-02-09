@@ -73,6 +73,14 @@ public class CertificationService {
                 .toList();
     }
 
+    public List<CertificationResponse> getWeekCertification(Long participantInfoId, LocalDate currentDate) {
+        LocalDate startDate = currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
+        List<Certification> certifications = certificationRepository.findCertificationByDuration(startDate, currentDate,
+                participantInfoId);
+        return certifications.stream()
+                .map(CertificationResponse::create)
+                .toList();
+    }
 
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
@@ -87,7 +95,6 @@ public class CertificationService {
                 .nextPage();
 
         Certification certification = getCertification(
-                user.getId(),
                 participantInfo,
                 certificationRequest,
                 ghPullRequests);
@@ -95,15 +102,13 @@ public class CertificationService {
         return CertificationResponse.create(certification);
     }
 
-    private Certification getCertification(Long userId, ParticipantInfo participantInfo,
+    private Certification getCertification(ParticipantInfo participantInfo,
                                            CertificationRequest certificationRequest,
                                            List<GHPullRequest> ghPullRequests) {
         Certification certification = certificationRepository.findCertificationByDate(
                         certificationRequest.targetDate(),
                         participantInfo.getId())
                 .orElse(Certification.builder()
-                        .userId(userId)
-                        .instanceId(certificationRequest.instanceId())
                         .certificatedAt(certificationRequest.targetDate())
                         .certificationLinks(getPrLinks(ghPullRequests))
                         .certificationStatus(getCertificateStatus(ghPullRequests))

@@ -6,6 +6,7 @@ import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.util.file.FileTestUtil;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -19,7 +20,8 @@ import org.springframework.test.annotation.Rollback;
 @Transactional
 @Rollback
 public class TopicServiceTest {
-    public Topic topic, topicA;
+    Topic topic, topicA;
+    String fileType;
     @Autowired
     TopicService topicService;
     @Autowired
@@ -40,14 +42,17 @@ public class TopicServiceTest {
                 .tags("BE, FE, CS")
                 .pointPerPerson(300)
                 .build();
+
+        fileType = "topic";
     }
 
     @Test
     public void 토픽_생성() throws Exception {
         //given
-        TopicCreateRequest topicCreateRequest = new TopicCreateRequest(topic.getTitle(), topic.getDescription(),
-                topic.getTags(), topic.getPointPerPerson());
-        Long savedTopicId = topicService.createTopic(topicCreateRequest);
+        TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
+
+        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
+                "topic");
 
         //when
         TopicDetailResponse topicById = topicService.getTopicById(savedTopicId);
@@ -59,14 +64,19 @@ public class TopicServiceTest {
     @Test
     public void 토픽_수정() throws Exception {
         //given
-        TopicCreateRequest topicCreateRequest = new TopicCreateRequest(topic.getTitle(), topic.getDescription(),
-                topic.getTags(), topic.getPointPerPerson());
-        Long savedTopicId = topicService.createTopic(topicCreateRequest);
+        TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
+        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
+                "topic");
 
         //when
-        TopicUpdateRequest topicUpdateRequest = new TopicUpdateRequest("1일 5커밋", topic.getDescription(),
-                topic.getTags(), topic.getPointPerPerson());
-        topicService.updateTopic(savedTopicId, topicUpdateRequest);
+        TopicUpdateRequest topicUpdateRequest = TopicUpdateRequest.builder()
+                .title("1일 5커밋")
+                .description(topic.getDescription())
+                .tags(topic.getTags())
+                .pointPerPerson(topic.getPointPerPerson())
+                .notice(topic.getNotice()).build();
+
+        topicService.updateTopic(savedTopicId, topicUpdateRequest, FileTestUtil.getMultipartFile("name"), fileType);
 
         //then
         Optional<Topic> findTopic = topicRepository.findById(savedTopicId);
@@ -77,9 +87,9 @@ public class TopicServiceTest {
     @Test
     public void 토픽_삭제() throws Exception {
         //given
-        TopicCreateRequest topicCreateRequest = new TopicCreateRequest(topic.getTitle(), topic.getDescription(),
-                topic.getTags(), topic.getPointPerPerson());
-        Long savedTopicId = topicService.createTopic(topicCreateRequest);
+        TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
+        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
+                fileType);
 
         //when
         topicService.deleteTopic(savedTopicId);
@@ -97,5 +107,15 @@ public class TopicServiceTest {
 //        } catch (BusinessException e) {
 //            org.junit.jupiter.api.Assertions.assertEquals("해당 토픽을 찾을 수 없습니다.", e.getMessage());
 //        }
+    }
+
+    private TopicCreateRequest getTopicCreateRequest() {
+        return TopicCreateRequest.builder()
+                .title(topic.getTitle())
+                .description(topic.getDescription())
+                .tags(topic.getTags())
+                .pointPerPerson(topic.getPointPerPerson())
+                .notice(topic.getNotice())
+                .build();
     }
 }

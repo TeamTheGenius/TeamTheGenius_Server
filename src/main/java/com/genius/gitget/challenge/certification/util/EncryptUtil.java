@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class EncryptUtil {
+public final class EncryptUtil {
     private final AesBytesEncryptor encryptor;
 
     public String encryptPersonalToken(String personalToken) {

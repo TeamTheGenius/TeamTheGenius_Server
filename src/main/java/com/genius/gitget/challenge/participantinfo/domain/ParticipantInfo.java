@@ -16,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -69,6 +70,10 @@ public class ParticipantInfo {
     //=== 비지니스 로직 ===//
     public void updateRepository(String repository) {
         this.repositoryName = repository;
+    }
+
+    public LocalDate getStartedDate() {
+        return this.getInstance().getStartedDate().toLocalDate();
     }
 
 

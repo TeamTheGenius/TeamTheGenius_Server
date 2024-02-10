@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.challenge.user.domain.User;
@@ -74,10 +75,14 @@ public class CertificationService {
     private Certification createCertification(ParticipantInfo participantInfo,
                                               CertificationRequest certificationRequest,
                                               List<GHPullRequest> ghPullRequests) {
+        int attempt = DateUtil.getCertificationAttempt(participantInfo.getStartedDate(),
+                certificationRequest.targetDate());
+
         Certification certification = certificationRepository.findCertificationByDate(
                         certificationRequest.targetDate(),
                         participantInfo.getId())
                 .orElse(Certification.builder()
+                        .certificationAttempt(attempt)
                         .certificatedAt(certificationRequest.targetDate())
                         .certificationLinks(getPrLinks(ghPullRequests))
                         .certificationStatus(getCertificateStatus(ghPullRequests))

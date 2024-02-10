@@ -47,7 +47,9 @@ public class Certification extends BaseTimeEntity {
 
 
     @Builder
-    public Certification(LocalDate certificatedAt, String certificationLinks, CertificateStatus certificationStatus) {
+    public Certification(int certificationAttempt, LocalDate certificatedAt, String certificationLinks,
+                         CertificateStatus certificationStatus) {
+        this.certificationAttempt = certificationAttempt;
         this.certificatedAt = certificatedAt;
         this.certificationLinks = certificationLinks;
         this.certificationStatus = certificationStatus;

@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.certification.controller;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -117,18 +118,14 @@ class CertificationControllerTest {
     public void should_saveToken_when_repositoryValid() throws Exception {
         //given
         Instance savedInstance = getSavedInstance();
-        String requestBody =
-                "{\"instanceId\": \"" + savedInstance.getId() + "\",\"repositoryName\" : \"" + targetRepo + "\"}";
 
         //when
         User user = userRepository.findByIdentifier(githubId).get();
         githubService.registerGithubPersonalToken(user, githubToken);
 
         //then
-        mockMvc.perform(post("/api/certification/register/repository")
-                        .cookie(tokenTestUtil.createAccessCookie())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+        mockMvc.perform(get("/api/certification/verify/repository?repositoryName=" + targetRepo)
+                        .cookie(tokenTestUtil.createAccessCookie()))
                 .andExpect(status().is2xxSuccessful());
     }
 

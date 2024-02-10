@@ -4,7 +4,6 @@ import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
-import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
@@ -29,19 +28,6 @@ public class CertificationService {
     private final CertificationRepository certificationRepository;
 
 
-    public List<PullRequestResponse> getPullRequestListByDate(User user, Long instanceId, LocalDate targetDate) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
-        String repositoryName = participantInfoService.getRepositoryName(user.getId(), instanceId);
-
-        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate)
-                .nextPage();
-
-        return pullRequest.stream()
-                .map(PullRequestResponse::create)
-                .toList();
-    }
-
-    //TODO: 해당 인증이 몇회차 인증인지 필요 -> 저장할 때 넣어야할듯
     public List<CertificationResponse> getWeekCertification(Long participantInfoId, LocalDate currentDate) {
         LocalDate startDate = currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
         List<Certification> certifications = certificationRepository.findCertificationByDuration(startDate, currentDate,

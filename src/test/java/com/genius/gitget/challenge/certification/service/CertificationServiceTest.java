@@ -3,7 +3,6 @@ package com.genius.gitget.challenge.certification.service;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
-import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -11,7 +10,6 @@ import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
-import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -25,8 +23,8 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
-import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -64,53 +62,6 @@ class CertificationServiceTest {
     @Value("${github.repository}")
     private String targetRepo;
 
-    @Test
-    @DisplayName("사용자의 github token이 저장되어있지 않을 때 예외가 발생해야 한다.")
-    public void should_throwException_when_githubTokenNotSaved() {
-        //given
-        LocalDate targetDate = LocalDate.of(2024, 2, 5);
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-
-        //when & then
-        assertThatThrownBy(() -> certificationService.getPullRequestListByDate(user, instance.getId(), targetDate))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
-    }
-
-    @Test
-    @DisplayName("repository가 등록되어있지 않을 때 예외가 발생해야 한다.")
-    public void should_throwException_when_repositoryNotRegistered() {
-        //given
-        LocalDate targetDate = LocalDate.of(2024, 2, 5);
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-        githubService.registerGithubPersonalToken(user, personalKey);
-
-        //when & then
-        assertThatThrownBy(() -> certificationService.getPullRequestListByDate(user, instance.getId(), targetDate))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(PARTICIPANT_INFO_NOT_FOUND.getMessage());
-    }
-
-    @Test
-    @DisplayName("특정 일자에 PR이 존재하지 않는다면 빈 리스트를 반환한다.")
-    public void should_returnEmptyList_when_prNotExist() throws IOException {
-        //given
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-        githubService.registerGithubPersonalToken(user, personalKey);
-        githubService.registerRepository(user, instance.getId(), targetRepo);
-
-        LocalDate targetDate = LocalDate.of(2024, 1, 4);
-
-        //when
-        List<PullRequestResponse> pullRequestResponses = certificationService.getPullRequestListByDate(
-                user, instance.getId(), targetDate);
-
-        //then
-        assertThat(pullRequestResponses.size()).isEqualTo(0);
-    }
 
     @Test
     @DisplayName("사용자가 연결한 레포지토리에 특정 날짜의 PR이 있으면 인증으로 간주한다")
@@ -118,8 +69,8 @@ class CertificationServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
+        getParticipantInfo(user, instance);
         githubService.registerGithubPersonalToken(user, personalKey);
-        githubService.registerRepository(user, instance.getId(), targetRepo);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
 
@@ -147,8 +98,8 @@ class CertificationServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
+        getParticipantInfo(user, instance);
         githubService.registerGithubPersonalToken(user, personalKey);
-        githubService.registerRepository(user, instance.getId(), targetRepo);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 6);
 
@@ -237,6 +188,7 @@ class CertificationServiceTest {
         return instanceRepository.save(
                 Instance.builder()
                         .progress(Progress.PREACTIVITY)
+                        .startedDate(LocalDateTime.of(2024, 2, 1, 11, 3))
                         .build()
         );
     }
@@ -249,29 +201,11 @@ class CertificationServiceTest {
                         .build()
         );
         participantInfo.setUserAndInstance(user, instance);
+        participantInfo.updateRepository(targetRepo);
 
         return participantInfo;
     }
 
-    @Test
-    @DisplayName("특정 레포지토리에 특정 날짜에 생성된 PR 목록을 불러올 수 있다.")
-    public void should_loadPRList_when_tryJoin() throws IOException {
-        //given
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-        githubService.registerGithubPersonalToken(user, personalKey);
-        githubService.registerRepository(user, instance.getId(), targetRepo);
-
-        LocalDate targetDate = LocalDate.of(2024, 2, 5);
-
-        //when
-        List<PullRequestResponse> pullRequestResponses = certificationService.getPullRequestListByDate(
-                user, instance.getId(), targetDate);
-
-        //then
-        assertThat(pullRequestResponses.size()).isEqualTo(1);
-        log.info(pullRequestResponses.get(0).toString());
-    }
 
     private Certification getSavedCertification(CertificateStatus status, LocalDate certificatedAt,
                                                 ParticipantInfo participantInfo) {

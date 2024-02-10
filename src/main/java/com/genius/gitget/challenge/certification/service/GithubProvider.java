@@ -93,7 +93,7 @@ public class GithubProvider {
     public PagedIterator<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName,
                                                              LocalDate createdAt) {
         try {
-            GHRepository repository = gitHub.getRepository(repositoryName);
+            GHRepository repository = gitHub.getRepository(getRepoName(gitHub, repositoryName));
             GHPullRequestSearchBuilder builder = gitHub.searchPullRequests()
                     .repo(repository)
                     .author(getGHUser(gitHub))
@@ -111,5 +111,13 @@ public class GithubProvider {
     private GHUser getGHUser(GitHub gitHub) throws IOException {
         String accountId = gitHub.getMyself().getLogin();
         return gitHub.getUser(accountId);
+    }
+
+    private String getRepoName(GitHub gitHub, String repositoryName) {
+        try {
+            return gitHub.getMyself().getLogin() + "/" + repositoryName;
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
     }
 }

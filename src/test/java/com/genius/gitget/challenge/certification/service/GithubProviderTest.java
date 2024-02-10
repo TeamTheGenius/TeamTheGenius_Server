@@ -93,14 +93,13 @@ class GithubProviderTest {
 
     @Test
     @DisplayName("해당 레포지토리에 있는 PR을 확인할 수 있다.")
-    public void should_checkPR_when_validRepo() throws IOException {
+    public void should_checkPR_when_validRepo() {
         //given
         GitHub gitHub = getGitHub();
-        String repositoryName = githubId + "/" + repository;
         LocalDate createdAt = LocalDate.of(2024, 2, 5);
 
         //when
-        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repositoryName, createdAt)
+        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repository, createdAt)
                 .nextPage();
 
         //then
@@ -112,7 +111,7 @@ class GithubProviderTest {
     public void should_throwException_when_repoConnectionInvalid() {
         //given
         GitHub gitHub = getGitHub();
-        String repositoryName = githubId + "/Fake";
+        String repositoryName = "Fake";
         LocalDate createdAt = LocalDate.of(2024, 2, 5);
 
         //when & then

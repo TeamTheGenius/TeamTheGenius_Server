@@ -9,14 +9,14 @@ import org.springframework.http.HttpStatus;
 public enum SuccessCode {
 
     // 200 OK
-    SUCCESS(HttpStatus.OK, "OK", "요청이 정상적으로 처리되었습니다.")
+    SUCCESS(HttpStatus.OK, "요청이 정상적으로 처리되었습니다."),
+    JOIN_SUCCESS(HttpStatus.OK, "챌린지 참여가 정상적으로 처리되었습니다."),
 
     // 201 CREATED
-    , CREATED(HttpStatus.CREATED, "CREATED", "정상적으로 생성되었습니다.");
+    CREATED(HttpStatus.CREATED, "정상적으로 생성되었습니다.");
 
 
     private final HttpStatus status;
-    private final String key;
     private final String message;
 }
 

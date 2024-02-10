@@ -1,16 +1,17 @@
 package com.genius.gitget.challenge.instance.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
+import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -54,13 +55,12 @@ class InstanceDetailServiceTest {
                 .build();
 
         //when
-        ParticipantInfo participantInfo = instanceDetailService.joinNewChallenge(savedUser, joinRequest);
+        JoinResponse joinResponse = instanceDetailService.joinNewChallenge(savedUser, joinRequest);
 
         //then
-        assertThat(participantInfo.getInstance().getId()).isEqualTo(instance.getId());
-        assertThat(participantInfo.getRepositoryName()).isEqualTo(targetRepo);
-        assertThat(participantInfo.getJoinStatus()).isEqualTo(JoinStatus.YES);
-        assertThat(participantInfo.getJoinResult()).isEqualTo(JoinResult.PROCESSING);
+        assertThat(joinResponse.joinStatus()).isEqualTo(JoinStatus.YES);
+        assertThat(joinResponse.joinResult()).isEqualTo(JoinResult.PROCESSING);
+        assertThat(instance.getParticipantCount()).isEqualTo(1);
     }
 
     @Test
@@ -77,6 +77,46 @@ class InstanceDetailServiceTest {
         assertThatThrownBy(() -> instanceDetailService.joinNewChallenge(savedUser, joinRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(INSTANCE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("챌린지 취소 요청을 하면 ParticipantInfo의 JoinStatus가 NO로 변경된다.")
+    public void should_joinStatusIsNo_when_quitChallenge() {
+        //given
+        User savedUser = getSavedUser(githubId);
+        Instance savedInstance = getSavedInstance();
+
+        //when
+        instanceDetailService.joinNewChallenge(savedUser, new JoinRequest(savedInstance.getId(), targetRepo));
+        JoinResponse joinResponse = instanceDetailService.quitChallenge(savedUser, savedInstance.getId());
+
+        //then
+        assertThat(joinResponse.joinStatus()).isEqualTo(JoinStatus.NO);
+    }
+
+    @Test
+    @DisplayName("챌린지 취소 요청을 할 때 인스턴스가 존재하지 않으면 예외가 발생한다.")
+    public void should_throwException_when_instanceNotExist_quitChallenge() {
+        //given
+        User savedUser = getSavedUser(githubId);
+
+        //when & then
+        assertThatThrownBy(() -> instanceDetailService.quitChallenge(savedUser, 1L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(INSTANCE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("챌린지 취소 요청을 할 때 참여 정보가 존재하지 않으면 예외가 발생한다.")
+    public void should_throwException_when_participantInfoNotExist() {
+        //given
+        User savedUser = getSavedUser(githubId);
+        Instance savedInstance = getSavedInstance();
+
+        //when & then
+        assertThatThrownBy(() -> instanceDetailService.quitChallenge(savedUser, savedInstance.getId()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(PARTICIPANT_INFO_NOT_FOUND.getMessage());
     }
 
     private User getSavedUser(String githubId) {

@@ -124,7 +124,7 @@ class CertificationControllerTest {
         githubService.registerGithubPersonalToken(user, githubToken);
 
         //then
-        mockMvc.perform(get("/api/certification/verify/repository?repositoryName=" + targetRepo)
+        mockMvc.perform(get("/api/certification/verify/repository?repo=" + targetRepo)
                         .cookie(tokenTestUtil.createAccessCookie()))
                 .andExpect(status().is2xxSuccessful());
     }

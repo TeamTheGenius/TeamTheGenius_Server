@@ -9,6 +9,6 @@ import org.springframework.data.repository.query.Param;
 public interface ParticipantInfoRepository extends JpaRepository<ParticipantInfo, Long> {
 
     @Query("select p from ParticipantInfo p where p.instance.id = :instanceId and p.user.id = :userId")
-    Optional<ParticipantInfo> findBy(@Param("userId") Long userId,
-                                     @Param("instanceId") Long instanceId);
+    Optional<ParticipantInfo> findByJoinInfo(@Param("userId") Long userId,
+                                             @Param("instanceId") Long instanceId);
 }

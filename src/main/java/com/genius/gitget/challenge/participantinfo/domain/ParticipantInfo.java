@@ -68,6 +68,10 @@ public class ParticipantInfo {
     }
 
     //=== 비지니스 로직 ===//
+    public void updateJoinStatus(JoinStatus joinStatus) {
+        this.joinStatus = joinStatus;
+    }
+
     public void updateRepository(String repository) {
         this.repositoryName = repository;
     }

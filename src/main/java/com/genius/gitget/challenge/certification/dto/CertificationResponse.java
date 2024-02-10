@@ -10,6 +10,7 @@ import lombok.Builder;
 @Builder
 public record CertificationResponse(
         Long certificationId,
+        int certificationAttempt,
         LocalDate certificatedAt,
         CertificateStatus certificateStatus,
         int prCount,
@@ -21,6 +22,7 @@ public record CertificationResponse(
 
         return CertificationResponse.builder()
                 .certificationId(certification.getId())
+                .certificationAttempt(certification.getCertificationAttempt())
                 .certificatedAt(certification.getCertificatedAt())
                 .certificateStatus(certification.getCertificationStatus())
                 .prLinks(prLinks)

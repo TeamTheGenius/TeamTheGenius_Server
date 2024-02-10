@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.genius.gitget.challenge.certification.service.CertificationService;
+import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -37,6 +38,8 @@ class CertificationControllerTest {
     TokenTestUtil tokenTestUtil;
     @Autowired
     CertificationService certificationService;
+    @Autowired
+    GithubService githubService;
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
@@ -119,7 +122,7 @@ class CertificationControllerTest {
 
         //when
         User user = userRepository.findByIdentifier(githubId).get();
-        certificationService.registerGithubPersonalToken(user, githubToken);
+        githubService.registerGithubPersonalToken(user, githubToken);
 
         //then
         mockMvc.perform(post("/api/certification/register/repository")

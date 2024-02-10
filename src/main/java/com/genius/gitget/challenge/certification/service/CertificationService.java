@@ -6,17 +6,14 @@ import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
-import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.challenge.user.service.UserService;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHPullRequest;
-import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,38 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CertificationService {
-    private final UserService userService;
-    private final GithubService githubService;
+    private final GithubProvider githubProvider;
     private final ParticipantInfoService participantInfoService;
     private final CertificationRepository certificationRepository;
-    private final EncryptUtil encryptUtil;
 
-
-    @Transactional
-    public void registerGithubPersonalToken(User user, String githubToken) {
-        GitHub gitHub = githubService.getGithubConnection(githubToken);
-        githubService.validateGithubConnection(gitHub, user.getIdentifier());
-
-        String encryptedToken = encryptUtil.encryptPersonalToken(githubToken);
-        user.updateGithubPersonalToken(encryptedToken);
-        userService.save(user);
-    }
-
-    @Transactional
-    public void registerRepository(User user, Long instanceId, String repository) {
-        GitHub gitHub = githubService.getGithubConnection(user);
-
-        String repositoryFullName = user.getIdentifier() + "/" + repository;
-        githubService.validateGithubRepository(gitHub, repositoryFullName);
-
-        participantInfoService.joinNewInstance(user.getId(), instanceId, repositoryFullName);
-    }
 
     public List<PullRequestResponse> getPullRequestListByDate(User user, Long instanceId, LocalDate targetDate) {
-        GitHub gitHub = githubService.getGithubConnection(user);
+        GitHub gitHub = githubProvider.getGithubConnection(user);
         String repositoryName = participantInfoService.getRepositoryName(user.getId(), instanceId);
 
-        List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repositoryName, targetDate)
+        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate)
                 .nextPage();
 
         return pullRequest.stream()
@@ -65,18 +40,12 @@ public class CertificationService {
                 .toList();
     }
 
-    public List<String> getPublicRepositories(User user) {
-        GitHub gitHub = githubService.getGithubConnection(user);
-        List<GHRepository> repositoryList = githubService.getRepositoryList(gitHub);
-        return repositoryList.stream()
-                .map(String::valueOf)
-                .toList();
-    }
-
+    //TODO: 해당 인증이 몇회차 인증인지 필요 -> 저장할 때 넣어야할듯
     public List<CertificationResponse> getWeekCertification(Long participantInfoId, LocalDate currentDate) {
         LocalDate startDate = currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
         List<Certification> certifications = certificationRepository.findCertificationByDuration(startDate, currentDate,
                 participantInfoId);
+
         return certifications.stream()
                 .map(CertificationResponse::create)
                 .toList();
@@ -84,17 +53,17 @@ public class CertificationService {
 
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
-        GitHub gitHub = githubService.getGithubConnection(user);
+        GitHub gitHub = githubProvider.getGithubConnection(user);
         ParticipantInfo participantInfo = participantInfoService.getParticipantInfo(user.getId(),
                 certificationRequest.instanceId());
 
-        List<GHPullRequest> ghPullRequests = githubService.getPullRequestByDate(
+        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(
                         gitHub,
                         participantInfo.getRepositoryName(),
                         certificationRequest.targetDate())
                 .nextPage();
 
-        Certification certification = getCertification(
+        Certification certification = createCertification(
                 participantInfo,
                 certificationRequest,
                 ghPullRequests);
@@ -102,9 +71,9 @@ public class CertificationService {
         return CertificationResponse.create(certification);
     }
 
-    private Certification getCertification(ParticipantInfo participantInfo,
-                                           CertificationRequest certificationRequest,
-                                           List<GHPullRequest> ghPullRequests) {
+    private Certification createCertification(ParticipantInfo participantInfo,
+                                              CertificationRequest certificationRequest,
+                                              List<GHPullRequest> ghPullRequests) {
         Certification certification = certificationRepository.findCertificationByDate(
                         certificationRequest.targetDate(),
                         participantInfo.getId())

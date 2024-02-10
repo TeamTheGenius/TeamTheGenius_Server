@@ -35,6 +35,8 @@ public class Certification extends BaseTimeEntity {
     @JoinColumn(name = "participantInfo_id")
     private ParticipantInfo participantInfo;
 
+    private int certificationAttempt;
+
     private LocalDate certificatedAt;
 
     private String certificationLinks;

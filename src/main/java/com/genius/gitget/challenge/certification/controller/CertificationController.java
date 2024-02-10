@@ -4,14 +4,11 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
-import com.genius.gitget.challenge.certification.dto.GithubTokenRequest;
 import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
-import com.genius.gitget.challenge.certification.dto.RepositoryRequest;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
-import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
@@ -35,43 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class CertificationController {
     private final CertificationService certificationService;
     private final ParticipantInfoService participantInfoService;
-
-    @PostMapping("/register/token")
-    public ResponseEntity<CommonResponse> registerGithubToken(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody GithubTokenRequest githubTokenRequest
-    ) {
-        certificationService.registerGithubPersonalToken(userPrincipal.getUser(), githubTokenRequest.githubToken());
-
-        return ResponseEntity.ok().body(
-                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
-        );
-    }
-
-    @GetMapping("/register/repository")
-    public ResponseEntity<ListResponse<String>> getPublicRepositories(
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        List<String> repositories = certificationService.getPublicRepositories(userPrincipal.getUser());
-
-        return ResponseEntity.ok().body(
-                new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), repositories)
-        );
-    }
-
-    @PostMapping("/register/repository")
-    public ResponseEntity<CommonResponse> registerRepository(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody RepositoryRequest repositoryRequest
-    ) {
-
-        certificationService.registerRepository(userPrincipal.getUser(), repositoryRequest.instanceId(),
-                repositoryRequest.repositoryName());
-
-        return ResponseEntity.ok().body(
-                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
-        );
-    }
 
     @GetMapping("/verify/{instanceId}")
     public ResponseEntity<ListResponse<PullRequestResponse>> verify(

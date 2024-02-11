@@ -11,11 +11,19 @@ public record JoinResponse(
         JoinStatus joinStatus,
         JoinResult joinResult
 ) {
-    public static JoinResponse create(ParticipantInfo participantInfo) {
+    public static JoinResponse createJoinResponse(ParticipantInfo participantInfo) {
         return JoinResponse.builder()
                 .participantId(participantInfo.getId())
                 .joinStatus(participantInfo.getJoinStatus())
                 .joinResult(participantInfo.getJoinResult())
+                .build();
+    }
+
+    public static JoinResponse createQuitResponse() {
+        return JoinResponse.builder()
+                .participantId(null)
+                .joinResult(null)
+                .joinStatus(null)
                 .build();
     }
 }

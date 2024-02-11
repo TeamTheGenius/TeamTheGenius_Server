@@ -36,7 +36,10 @@ public enum ErrorCode {
     GITHUB_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "저장된 Github Token을 찾을 수 없습니다."),
     GITHUB_ID_INCORRECT(HttpStatus.BAD_REQUEST, "소셜로그인에 사용한 Github 계정과 일치하지 않습니다."),
     GITHUB_REPOSITORY_INCORRECT(HttpStatus.BAD_REQUEST, "해당 레포지토리와 연결이 되지 않습니다."),
-    GITHUB_PR_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 레포지토리에 PR이 존재하지 않습니다.");
+    GITHUB_PR_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 레포지토리에 PR이 존재하지 않습니다."),
+
+    CAN_NOT_JOIN_INSTANCE(HttpStatus.BAD_REQUEST, "해당 인스턴스에 참여할 수 없습니다."),
+    CAN_NOT_QUIT_INSTANCE(HttpStatus.BAD_REQUEST, "해당 인스턴스의 참여를 취소할 수 없습니다.");
 
 
     private final HttpStatus status;

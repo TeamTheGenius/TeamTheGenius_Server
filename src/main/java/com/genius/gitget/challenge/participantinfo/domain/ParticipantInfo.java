@@ -67,9 +67,18 @@ public class ParticipantInfo {
         this.repositoryName = repositoryName;
     }
 
+    public static ParticipantInfo createDefaultParticipantInfo(String repositoryName) {
+        return ParticipantInfo.builder()
+                .joinStatus(JoinStatus.YES)
+                .joinResult(JoinResult.PROCESSING)
+                .repositoryName(repositoryName)
+                .build();
+    }
+
     //=== 비지니스 로직 ===//
-    public void updateJoinStatus(JoinStatus joinStatus) {
-        this.joinStatus = joinStatus;
+    public void quitInstance() {
+        this.joinStatus = JoinStatus.NO;
+        this.joinResult = JoinResult.FAIL;
     }
 
     public void updateRepository(String repository) {

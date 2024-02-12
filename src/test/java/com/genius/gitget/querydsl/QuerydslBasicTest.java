@@ -18,6 +18,7 @@ import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.global.file.domain.QFiles;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.util.file.FileTestUtil;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -103,8 +104,7 @@ public class QuerydslBasicTest {
 
     @Test
     public void findDtoByQuerydsl() throws IOException {
-
-        List<QuerydslDTO> fetch = queryFactory.select(new QQuerydslDTO(
+        List<QuerydslDTO> fetch = queryFactory.select(Projections.constructor(QuerydslDTO.class,
                 i.topic.id, i.id, i.files.id, i.title, i.pointPerPerson, i.participantCount,
                 f.id, f.fileURI, f.originalFilename, f.savedFilename, f.fileType.stringValue()))
                 .from(i)

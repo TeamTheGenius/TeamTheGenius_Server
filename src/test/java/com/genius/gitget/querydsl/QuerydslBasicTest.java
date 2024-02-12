@@ -9,7 +9,6 @@ import com.genius.gitget.challenge.instance.domain.QInstance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.dto.search.QQuerydslDTO;
 import com.genius.gitget.challenge.instance.dto.search.QuerydslDTO;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
@@ -18,6 +17,7 @@ import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.global.file.domain.QFiles;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.util.file.FileTestUtil;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -34,7 +34,6 @@ import org.springframework.data.domain.PageRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Transactional
 @SpringBootTest
@@ -66,11 +65,9 @@ public class QuerydslBasicTest {
     public void setup() throws IOException{
 
         queryFactory = new JPAQueryFactory(em);
-
         t = QTopic.topic;
         i = QInstance.instance;
         f = QFiles.files;
-
 
         Topic topic = Topic.builder()
                 .title("1일 1알고리즘")
@@ -94,7 +91,7 @@ public class QuerydslBasicTest {
         Topic savedTopic = topicRepository.save(topic);
 
         createInstance(savedTopic, instance, instance.getTitle());
-        createInstance(savedTopic, instance, "즘아아아아");
+        createInstance(savedTopic, instance, instance.getTitle());
 
         Page<InstancePagingResponse> allInstances = instanceService.getAllInstances(PageRequest.of(0, 5));
         for (InstancePagingResponse allInstance : allInstances) {
@@ -104,7 +101,7 @@ public class QuerydslBasicTest {
 
     @Test
     public void findDtoByQuerydsl() throws IOException {
-        List<QuerydslDTO> fetch = queryFactory.select(Projections.constructor(QuerydslDTO.class,
+        List<QuerydslDTO> fetch = queryFactory.select(Projections.fields(QuerydslDTO.class,
                 i.topic.id, i.id, i.files.id, i.title, i.pointPerPerson, i.participantCount,
                 f.id, f.fileURI, f.originalFilename, f.savedFilename, f.fileType.stringValue()))
                 .from(i)
@@ -118,6 +115,33 @@ public class QuerydslBasicTest {
         for (QuerydslDTO querydslDTO : fetch) {
             System.out.println("querydslDTO.toString() = " + querydslDTO.toString());
         }
+    }
+
+
+    @Test
+    public void dynamicQuery_BooleanBuilder() {
+        String instanceParam = "1일 1알고리즘";
+        Integer pointParam = 100;
+
+        List<Instance> result = searchInstance(instanceParam, pointParam);
+        Assertions.assertThat(result.size()).isEqualTo(2);
+
+    }
+
+    private List<Instance> searchInstance(String instanceCond, Integer pointCond) {
+
+        BooleanBuilder builder = new BooleanBuilder();
+        if (instanceCond != null) {
+            builder.and(i.title.eq(instanceCond));
+        }
+        if (pointCond != null) {
+            builder.and(i.pointPerPerson.eq(pointCond));
+        }
+
+        return queryFactory
+                .selectFrom(i)
+                .where(builder)
+                .fetch();
     }
 
     private void createInstance(Topic savedTopic, Instance instance, String title) throws IOException {

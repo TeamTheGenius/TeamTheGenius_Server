@@ -1,6 +1,5 @@
 package com.genius.gitget.challenge.instance.dto.search;
 
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,8 +17,6 @@ public class QuerydslDTO {
     private String originalFilename;
     private String savedFilename;
     private String fileType;
-
-    @QueryProjection
 
     public QuerydslDTO(Long topicId, Long instanceId, Long instanceFileId, String keyword, int pointPerPerson,
                        int participantCount, Long fileFileId, String fileUri, String originalFilename, String savedFilename, String fileType) {

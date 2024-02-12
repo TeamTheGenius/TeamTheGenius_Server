@@ -4,6 +4,8 @@ import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.response.AccessToken;
 import com.siot.IamportRestClient.response.IamportResponse;
+import com.siot.IamportRestClient.response.Payment;
+import com.siot.IamportRestClient.response.PaymentCancelDetail;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,4 +53,56 @@ public class IamportRestTest {
             e.printStackTrace();
         }
     }
+
+    @Test
+    public void testPaymentByImpUid() {
+        String test_imp_uid = "imp00265320";
+        try {
+            IamportResponse<Payment> payment_response = client.paymentByImpUid(test_imp_uid);
+
+            assertNotNull(payment_response.getResponse());
+            assertEquals(test_imp_uid, payment_response.getResponse().getImpUid());
+        } catch (IamportResponseException e) {
+            System.out.println("테스트 1: " + e.getMessage());
+
+            switch (e.getHttpStatusCode()) {
+                case 401:
+                    //TODO
+                    break;
+                case 500:
+                    //TODO
+                    break;
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        String test_imp_uid_cancelled = "imp00265320";
+        try {
+            IamportResponse<Payment> cancelled_response = client.paymentByImpUid(test_imp_uid_cancelled);
+
+            Payment cancelled = cancelled_response.getResponse();
+            PaymentCancelDetail[] cancelDetail = cancelled.getCancelHistory();
+
+            assertEquals(cancelDetail.length, 1);
+            assertNotNull(cancelDetail[0].getPgTid());
+        } catch (IamportResponseException e) {
+            System.out.println("테스트 2: " + e.getMessage());
+
+            switch (e.getHttpStatusCode()) {
+                case 401:
+                    //TODO
+                    break;
+                case 500:
+                    //TODO
+                    break;
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+
 }

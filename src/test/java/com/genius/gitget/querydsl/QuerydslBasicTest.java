@@ -18,6 +18,7 @@ import com.genius.gitget.global.file.domain.QFiles;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.util.file.FileTestUtil;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -142,6 +143,36 @@ public class QuerydslBasicTest {
                 .selectFrom(i)
                 .where(builder)
                 .fetch();
+    }
+
+    @Test
+    public void dynamicQuery_WhereParam() {
+        String instanceParam = "1일 1알고리즘";
+        Integer pointParam = 100;
+
+        List<Instance> result = searchInstance2(instanceParam, pointParam);
+        Assertions.assertThat(result.size()).isEqualTo(2);
+    }
+
+    private List<Instance> searchInstance2(String instanceCond, Integer pointCond) {
+        return queryFactory
+            .selectFrom(i)
+            .where(instanceCondEq(instanceCond), pointCondEq(pointCond))
+            .fetch();
+    }
+
+    private Predicate instanceCondEq(String instanceCond) {
+        if (instanceCond == null) {
+            return null;
+        }
+        return i.title.eq(instanceCond);
+    }
+
+    private Predicate pointCondEq(Integer pointCond) {
+        if (pointCond == null) {
+            return null;
+        }
+        return i.pointPerPerson.eq(pointCond);
     }
 
     private void createInstance(Topic savedTopic, Instance instance, String title) throws IOException {

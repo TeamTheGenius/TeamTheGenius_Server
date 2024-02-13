@@ -3,8 +3,10 @@ package com.genius.gitget.challenge.instance.service;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
+import com.genius.gitget.challenge.instance.dto.search.QuerydslDTO;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
+import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,25 +33,19 @@ public class InstanceSearchService {
 
     public Page<InstanceSearchResponse> searchInstances(String keyword, String progress, Pageable pageable){
 
-        // TODO 검색기능에 이미지 파일
+        Progress convertProgress = stringToEnum.convert(progress);
+        searchRepository.Search(convertProgress, keyword, pageable);
 
-        Page<Instance> findByTitleContaining;
 
-        if (stringToEnum.convert(progress) == Progress.ALL) {
-            findByTitleContaining = searchRepository.findByTitleContainingOrderByStartedDateDesc(keyword, pageable);
-        } else {
-            Progress convertProgress = stringToEnum.convert(progress); // Progress convertProgress = Progress.from(progress);
-            findByTitleContaining = searchRepository.findByProgressAndTitleContainingOrderByStartedDateDesc(convertProgress, keyword, pageable);
-        }
-
-        return findByTitleContaining.map(this::convertToInstanceSearchResponse);
+        //return search.map(this::convertToInstanceSearchResponse);
+        return null;
     }
 
-    private InstanceSearchResponse convertToInstanceSearchResponse(Instance instance) {
-        try {
-            return InstanceSearchResponse.createByEntity(instance, instance.getFiles());
-        } catch (IOException e) {
-            throw new BusinessException(e);
-        }
-    }
+//    private InstanceSearchResponse convertToInstanceSearchResponse(Instance instance) {
+//        try {
+//            return InstanceSearchResponse.createByEntity(instance, instance.getFiles());
+//        } catch (IOException e) {
+//            throw new BusinessException(e);
+//        }
+//    }
 }

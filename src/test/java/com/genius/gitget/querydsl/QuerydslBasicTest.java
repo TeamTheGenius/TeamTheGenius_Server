@@ -38,7 +38,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static com.genius.gitget.admin.topic.domain.QTopic.*;
 import static com.genius.gitget.challenge.instance.domain.Progress.*;
+import static com.genius.gitget.challenge.instance.domain.QInstance.*;
+import static com.genius.gitget.global.file.domain.QFiles.*;
 
 @Transactional
 @SpringBootTest
@@ -70,9 +73,9 @@ public class QuerydslBasicTest {
     public void setup() throws IOException{
 
         queryFactory = new JPAQueryFactory(em);
-        t = QTopic.topic;
-        i = QInstance.instance;
-        f = QFiles.files;
+        t = topic;
+        i = instance;
+        f = files;
 
         Topic topic = Topic.builder()
                 .title("1일 1알고리즘")
@@ -107,8 +110,8 @@ public class QuerydslBasicTest {
     @Test
     public void findDtoByQuerydsl() throws IOException {
         List<QuerydslDTO> fetch = queryFactory.select(Projections.fields(QuerydslDTO.class,
-                i.topic.id, i.id, i.files.id, i.title, i.pointPerPerson, i.participantCount,
-                f.id, f.fileURI, f.originalFilename, f.savedFilename))
+                i.topic.id.as("topicId"), i.id.as("instanceId"), i.title, i.pointPerPerson, i.participantCount,
+                f.fileURI, f.originalFilename, f.savedFilename))
                 .from(i)
                 .leftJoin(f)
                 .on(i.files.id.eq(f.id))

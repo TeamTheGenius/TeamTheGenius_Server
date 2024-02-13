@@ -1,6 +1,5 @@
 package com.genius.gitget.challenge.instance.service;
 
-import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
@@ -20,20 +19,22 @@ public class InstanceSearchService {
     private final SearchRepository searchRepository;
     private final StringToEnum stringToEnum;
 
-    public Page<InstanceSearchResponse> searchInstances(String keyword, String progress, Pageable pageable) {
-        Page<Instance> findByTitleContaining;
+    private final String[] progressData = {"PREACTIVITY", "ACTIVITY", "DONE"};
 
-        if (stringToEnum.convert(progress) == Progress.ALL) {
-            findByTitleContaining = searchRepository.findByTitleContainingOrderByStartedDateDesc(keyword, pageable);
-        } else {
-            Progress convertProgress = stringToEnum.convert(progress); // Progress convertProgress = Progress.from(progress);
-            findByTitleContaining = searchRepository.findByProgressAndTitleContainingOrderByStartedDateDesc(convertProgress, keyword, pageable);
+    public Page<InstanceSearchResponse> searchInstances(String keyword, String progress, Pageable pageable){
+        Progress convertProgress;
+        boolean flag = false;
 
+        for (String progressCond : progressData) {
+            if (progressCond.equals(progress)) {
+                flag = true;
+            }
         }
-        return findByTitleContaining.map(this::convertToInstanceSearchResponse);
-    }
-
-    private InstanceSearchResponse convertToInstanceSearchResponse(Instance instance) {
-        return new InstanceSearchResponse(instance);
+        if (flag) {
+            convertProgress = stringToEnum.convert(progress);
+            return searchRepository.search(convertProgress, keyword, pageable);
+        } else {
+            return searchRepository.search(null, keyword, pageable);
+        }
     }
 }

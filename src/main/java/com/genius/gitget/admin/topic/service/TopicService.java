@@ -14,6 +14,7 @@ import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class TopicService {
     private final TopicRepository topicRepository;
@@ -96,6 +98,7 @@ public class TopicService {
             filesService.deleteFile(findTopicFileId);
             topic.setFiles(null);
         } catch (Exception e) {
+            e.getStackTrace();
             throw new BusinessException(ErrorCode.TOPIC_HAVE_INSTANCE);
         }
     }

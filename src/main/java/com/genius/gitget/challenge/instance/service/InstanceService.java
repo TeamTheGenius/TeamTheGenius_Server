@@ -64,7 +64,7 @@ public class InstanceService {
     }
 
     // 인스턴스 리스트 조회
-    public Page<InstancePagingResponse> getAllInstances(Pageable pageable) throws IOException {
+    public Page<InstancePagingResponse> getAllInstances(Pageable pageable) {
         Page<Instance> instances = instanceRepository.findAllById(pageable);
         return instances.map(this::mapToInstancePagingResponse);
     }

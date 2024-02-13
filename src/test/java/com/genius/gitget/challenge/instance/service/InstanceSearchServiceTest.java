@@ -73,7 +73,7 @@ public class InstanceSearchServiceTest {
                 PageRequest.of(0, 3));
 
         for (InstanceSearchResponse instanceSearchResponse : orderList) {
-            System.out.println("instanceSearchResponse = " + instanceSearchResponse.keyword());
+            System.out.println("instanceSearchResponse = " + instanceSearchResponse.getKeyword());
         }
 
         Assertions.assertThat(orderList.getTotalElements()).isEqualTo(2);

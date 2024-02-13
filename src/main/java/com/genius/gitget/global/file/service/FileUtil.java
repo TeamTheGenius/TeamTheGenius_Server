@@ -1,6 +1,7 @@
 package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_ENCODED;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 
 import com.genius.gitget.global.file.domain.FileType;
@@ -20,11 +21,15 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileUtil {
     private static final List<String> validExtensions = List.of("jpg", "jpeg", "png", "gif");
 
-    public static String encodedImage(Files files) throws IOException {
-        UrlResource urlResource = new UrlResource("file:" + files.getFileURI());
+    public static String encodedImage(Files files) {
+        try {
+            UrlResource urlResource = new UrlResource("file:" + files.getFileURI());
 
-        byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
-        return new String(encode, StandardCharsets.UTF_8);
+            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
+            return new String(encode, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new BusinessException(IMAGE_NOT_ENCODED);
+        }
     }
 
     public static UploadDTO getUploadInfo(MultipartFile file, String typeStr, final String UPLOAD_PATH) {

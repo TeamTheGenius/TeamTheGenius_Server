@@ -2,6 +2,7 @@ package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_SAVED;
 
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
@@ -11,11 +12,9 @@ import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,7 +32,7 @@ public class FilesService {
     }
 
     @Transactional
-    public Files uploadFile(MultipartFile receivedFile, String typeStr) throws IOException {
+    public Files uploadFile(MultipartFile receivedFile, String typeStr) {
         FileUtil.validateFile(receivedFile);
 
         UploadDTO uploadDTO = FileUtil.getUploadInfo(receivedFile, typeStr, UPLOAD_PATH);
@@ -50,17 +49,21 @@ public class FilesService {
         return filesRepository.save(file);
     }
 
-    private void saveFile(MultipartFile file, String fileURI) throws IOException {
-        File targetFile = new File(fileURI);
+    private void saveFile(MultipartFile file, String fileURI) {
+        try {
+            File targetFile = new File(fileURI);
 
-        if (!targetFile.exists()) {
-            targetFile.mkdirs();
+            if (!targetFile.exists()) {
+                targetFile.mkdirs();
+            }
+            file.transferTo(targetFile);
+        } catch (IOException e) {
+            throw new BusinessException(FILE_NOT_SAVED);
         }
-        file.transferTo(targetFile);
     }
 
     @Transactional
-    public Files updateFile(Long fileId, MultipartFile file) throws IOException {
+    public Files updateFile(Long fileId, MultipartFile file) {
         Files files = filesRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
@@ -78,7 +81,7 @@ public class FilesService {
      * @param fileId 삭제하고자하는 Files 엔티티의 PK
      */
     @Transactional
-    public void deleteFile(Long fileId) throws IOException {
+    public void deleteFile(Long fileId) {
         Files files = filesRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
@@ -94,19 +97,12 @@ public class FilesService {
         }
     }
 
-    public FileResponse getEncodedFile(Long fileId) throws IOException {
+    public FileResponse getEncodedFile(Long fileId) {
         Optional<Files> optionalFiles = filesRepository.findById(fileId);
         if (optionalFiles.isEmpty()) {
             return FileResponse.createNotExistFile();
         }
 
         return FileResponse.createExistFile(optionalFiles.get());
-    }
-
-    public UrlResource getFile(Long fileId) throws MalformedURLException {
-        Files files = filesRepository.findById(fileId)
-                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
-
-        return new UrlResource("file:" + files.getFileURI());
     }
 }

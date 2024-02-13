@@ -31,10 +31,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.Commit;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
+import static com.genius.gitget.challenge.instance.domain.Progress.*;
 
 @Transactional
 @SpringBootTest
@@ -83,7 +87,7 @@ public class QuerydslBasicTest {
                 .tags("BE, FE, CS")
                 .pointPerPerson(100)
                 .notice("유의사항")
-                .progress(Progress.PREACTIVITY)
+                .progress(PREACTIVITY)
                 .startedDate(LocalDateTime.now())
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
@@ -104,7 +108,7 @@ public class QuerydslBasicTest {
     public void findDtoByQuerydsl() throws IOException {
         List<QuerydslDTO> fetch = queryFactory.select(Projections.fields(QuerydslDTO.class,
                 i.topic.id, i.id, i.files.id, i.title, i.pointPerPerson, i.participantCount,
-                f.id, f.fileURI, f.originalFilename, f.savedFilename, f.fileType.stringValue()))
+                f.id, f.fileURI, f.originalFilename, f.savedFilename))
                 .from(i)
                 .leftJoin(f)
                 .on(i.files.id.eq(f.id))
@@ -174,6 +178,42 @@ public class QuerydslBasicTest {
         }
         return i.pointPerPerson.eq(pointCond);
     }
+
+    @Test
+    public void bulkUpdate() {
+        long execute = queryFactory
+                .update(i)
+                .set(i.title, "1일 1커밋")
+                .where(i.progress.notIn(ACTIVITY, DONE))
+                .execute();
+
+        em.flush();
+        em.clear();
+
+        List<Instance> list = queryFactory
+                .selectFrom(i)
+                .fetch();
+        for (Instance instance : list) {
+            System.out.println("instance = " + instance.getTitle());
+        }
+    }
+
+    @Test
+    public void bulkAdd() {
+        queryFactory
+                .update(i)
+                .set(i.pointPerPerson, i.pointPerPerson.add(50))
+                .execute();
+    }
+
+    @Test
+    public void bulkDelete() {
+        queryFactory
+                .delete(i)
+                .where(i.pointPerPerson.gt(100))
+                .execute();
+    }
+
 
     private void createInstance(Topic savedTopic, Instance instance, String title) throws IOException {
         instanceService.createInstance(

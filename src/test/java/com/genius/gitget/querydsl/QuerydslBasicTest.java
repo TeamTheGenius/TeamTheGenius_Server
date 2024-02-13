@@ -8,14 +8,11 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.domain.QInstance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
-import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.dto.search.QuerydslDTO;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;
 import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.global.file.domain.QFiles;
-import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.util.file.FileTestUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -31,12 +28,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Commit;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 import static com.genius.gitget.admin.topic.domain.QTopic.*;
 import static com.genius.gitget.challenge.instance.domain.Progress.*;

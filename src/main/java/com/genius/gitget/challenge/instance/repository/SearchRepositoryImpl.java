@@ -25,7 +25,7 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
     }
 
     @Override
-    public Page<InstanceSearchResponse> Search(Progress progressCond, String titleCond, Pageable pageable) {
+    public Page<InstanceSearchResponse> search(Progress progressCond, String titleCond, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (progressCond != null) {

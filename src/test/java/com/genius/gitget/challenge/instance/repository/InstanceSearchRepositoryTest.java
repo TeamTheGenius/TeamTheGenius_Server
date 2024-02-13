@@ -17,7 +17,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,10 +25,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.genius.gitget.admin.topic.domain.QTopic.topic;
 import static com.genius.gitget.challenge.instance.domain.Progress.*;
-import static com.genius.gitget.challenge.instance.domain.QInstance.instance;
-import static com.genius.gitget.global.file.domain.QFiles.files;
 
 @SpringBootTest
 @Transactional
@@ -91,7 +87,7 @@ public class InstanceSearchRepositoryTest {
     public void 검색_조건_없이_테스트() throws Exception {
         for (int i = 0; i<5; i++) {
             PageRequest pageRequest = PageRequest.of(i, 2);
-            Page<InstanceSearchResponse> result = searchRepository.Search(null, null, pageRequest);
+            Page<InstanceSearchResponse> result = searchRepository.search(null, null, pageRequest);
             for (InstanceSearchResponse instanceSearchResponse : result) {
                 System.out.println("instanceSearchResponse = " + instanceSearchResponse.getInstanceId());
             }
@@ -102,7 +98,7 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_제목으로_검색_테스트() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.Search(null, "리", pageRequest);
+        Page<InstanceSearchResponse> result = searchRepository.search(null, "리", pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
             if (instanceSearchResponse != null) cnt++;
@@ -113,7 +109,7 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_현황으로_검색_테스트1() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.Search(PREACTIVITY, null, pageRequest);
+        Page<InstanceSearchResponse> result = searchRepository.search(PREACTIVITY, null, pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
             if (instanceSearchResponse != null) cnt++;
@@ -124,7 +120,7 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_현황으로_검색_테스트2() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.Search(DONE, null, pageRequest);
+        Page<InstanceSearchResponse> result = searchRepository.search(DONE, null, pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
             if (instanceSearchResponse != null) cnt++;
@@ -135,7 +131,7 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_현황으로_검색_테스트3() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.Search(ACTIVITY, null, pageRequest);
+        Page<InstanceSearchResponse> result = searchRepository.search(ACTIVITY, null, pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
             if (instanceSearchResponse != null) cnt++;
@@ -146,7 +142,7 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_현황과_챌린지_제목으로_검색_테스트() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.Search(PREACTIVITY, "1", pageRequest);
+        Page<InstanceSearchResponse> result = searchRepository.search(PREACTIVITY, "1", pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
             if (instanceSearchResponse != null) cnt++;

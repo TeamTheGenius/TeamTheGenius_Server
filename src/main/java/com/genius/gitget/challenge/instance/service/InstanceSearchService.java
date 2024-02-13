@@ -3,8 +3,6 @@ package com.genius.gitget.challenge.instance.service;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
-import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.global.util.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,18 +23,18 @@ public class InstanceSearchService {
 
     public Page<InstanceSearchResponse> searchInstances(String keyword, String progress, Pageable pageable){
         Progress convertProgress;
-        Boolean flag = Boolean.FALSE;
+        boolean flag = false;
 
         for (String progressCond : progressData) {
             if (progressCond.equals(progress)) {
-                flag = Boolean.TRUE;
+                flag = true;
             }
         }
         if (flag) {
             convertProgress = stringToEnum.convert(progress);
-            return searchRepository.Search(convertProgress, keyword, pageable);
+            return searchRepository.search(convertProgress, keyword, pageable);
         } else {
-            return searchRepository.Search(null, keyword, pageable);
+            return searchRepository.search(null, keyword, pageable);
         }
     }
 }

@@ -6,5 +6,5 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface SearchRepositoryCustom {
-    Page<InstanceSearchResponse> Search(Progress progress, String title, Pageable pageable);
+    Page<InstanceSearchResponse> search(Progress progress, String title, Pageable pageable);
 }

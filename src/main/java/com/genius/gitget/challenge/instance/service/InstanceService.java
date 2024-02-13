@@ -39,7 +39,7 @@ public class InstanceService {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
-        Files uploadedFile = filesService.uploadFile(multipartFile, type);
+        Files uploadedFile = filesService.uploadFile(topic.getFiles(), multipartFile, type);
 
         Instance instance = Instance.builder()
                 .title(instanceCreateRequest.title())

@@ -1,5 +1,6 @@
 package com.genius.gitget.global.file.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_COPIED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_ENCODED;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
@@ -9,8 +10,10 @@ import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -54,6 +57,30 @@ public class FileUtil {
                 .savedFilename(savedFilename)
                 .fileURI(UPLOAD_PATH + fileType.getPath() + savedFilename)
                 .build();
+    }
+
+    public static UploadDTO getCopyInfo(Files files, FileType fileType, final String UPLOAD_PATH) {
+        String originalFilename = files.getOriginalFilename();
+        String savedFilename = getSavedFilename(originalFilename);
+
+        return UploadDTO.builder()
+                .fileType(fileType)
+                .originalFilename(originalFilename)
+                .savedFilename(savedFilename)
+                .fileURI(UPLOAD_PATH + fileType.getPath() + savedFilename)
+                .build();
+    }
+
+    public static void copyImage(String originFilePath, String copyFilePath) {
+        File originFile = new File(originFilePath);
+        File copyFile = new File(copyFilePath);
+
+        try {
+            java.nio.file.Files.copy(originFile.toPath(), copyFile.toPath(),
+                    StandardCopyOption.COPY_ATTRIBUTES);
+        } catch (IOException e) {
+            throw new BusinessException(FILE_NOT_COPIED);
+        }
     }
 
     public static void validateFile(MultipartFile file) {

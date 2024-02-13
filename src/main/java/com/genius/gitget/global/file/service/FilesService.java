@@ -1,5 +1,6 @@
 package com.genius.gitget.global.file.service;
 
+import static com.genius.gitget.global.file.domain.FileType.INSTANCE;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_SAVED;
@@ -29,6 +30,27 @@ public class FilesService {
     public FilesService(@Value("${file.upload.path}") String UPLOAD_PATH, FilesRepository filesRepository) {
         this.UPLOAD_PATH = UPLOAD_PATH;
         this.filesRepository = filesRepository;
+    }
+
+    @Transactional
+    public Files uploadFile(Optional<Files> optionalFiles, MultipartFile receivedFile, String typeStr) {
+        if (receivedFile != null) {
+            return uploadFile(receivedFile, typeStr);
+        }
+
+        Files files = optionalFiles.orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
+        UploadDTO uploadDTO = FileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
+        //REFACTOR: 정적 팩토리 메서드로 처리하면 깔끔할 듯!
+        Files copyFiles = Files.builder()
+                .originalFilename(uploadDTO.originalFilename())
+                .savedFilename(uploadDTO.savedFilename())
+                .fileType(uploadDTO.fileType())
+                .fileURI(uploadDTO.fileURI())
+                .build();
+
+        FileUtil.copyImage(files.getFileURI(), copyFiles.getFileURI());
+
+        return filesRepository.save(copyFiles);
     }
 
     @Transactional

@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
+import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -22,6 +23,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
@@ -199,6 +201,65 @@ class InstanceDetailServiceTest {
                 .hasMessageContaining(CAN_NOT_QUIT_INSTANCE.getMessage());
     }
 
+    @Test
+    @DisplayName("사용자가 참여한 인스턴스에 대해 상세 조회를 하면 상세 페이지에 필요한 데이터들을 반환해야 한다.")
+    public void should_returnValues_when_joinedInstance() {
+        //given
+        User savedUser = getSavedUser(githubId);
+        Instance savedInstance = getSavedInstance(Progress.PREACTIVITY, LocalDate.now().plusDays(2));
+        JoinRequest joinRequest = JoinRequest.builder()
+                .instanceId(savedInstance.getId())
+                .repository(targetRepo)
+                .build();
+
+        //when
+        instanceDetailService.joinNewChallenge(savedUser, joinRequest);
+        InstanceResponse instanceResponse = instanceDetailService.getInstanceDetailInformation(savedUser,
+                savedInstance.getId());
+
+        //then
+        assertThat(instanceResponse.instanceId()).isEqualTo(savedInstance.getId());
+        assertThat(instanceResponse.remainDays()).isEqualTo(2);
+        assertThat(instanceResponse.participantCount()).isEqualTo(1);
+        assertThat(instanceResponse.pointPerPerson()).isEqualTo(100);
+        assertThat(instanceResponse.description()).isEqualTo(savedInstance.getDescription());
+        assertThat(instanceResponse.joinStatus()).isEqualTo(JoinStatus.YES);
+        assertThat(instanceResponse.hitCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("사용자가 참여하지 않은 챌린지에 대해 상세 조회를 하면 상세 페이지에 필요한 정보들을 반환할 수 있다.")
+    public void should_returnData_when_notJoinedInstance() {
+        //given
+        User savedUser = getSavedUser(githubId);
+        Instance savedInstance = getSavedInstance(Progress.PREACTIVITY, LocalDate.now().plusDays(2));
+
+        //when
+        InstanceResponse instanceResponse = instanceDetailService.getInstanceDetailInformation(savedUser,
+                savedInstance.getId());
+
+        //then
+        assertThat(instanceResponse.instanceId()).isEqualTo(savedInstance.getId());
+        assertThat(instanceResponse.remainDays()).isEqualTo(2);
+        assertThat(instanceResponse.participantCount()).isEqualTo(0);
+        assertThat(instanceResponse.pointPerPerson()).isEqualTo(100);
+        assertThat(instanceResponse.description()).isEqualTo(savedInstance.getDescription());
+        assertThat(instanceResponse.joinStatus()).isEqualTo(JoinStatus.NO);
+        assertThat(instanceResponse.hitCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("상세 정보를 요청하는 인스턴스가 존재하지 않는다면 예외가 발생해야 한다.")
+    public void should_throwException_when_requestDetail_instanceNotExist() {
+        //given
+        User savedUser = getSavedUser(githubId);
+
+        //when & then
+        assertThatThrownBy(() -> instanceDetailService.getInstanceDetailInformation(savedUser, 1L))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(INSTANCE_NOT_FOUND.getMessage());
+    }
+
     private User getSavedUser(String githubId) {
         return userRepository.save(
                 User.builder()
@@ -217,6 +278,20 @@ class InstanceDetailServiceTest {
                 Instance.builder()
                         .progress(progress)
                         .startedDate(LocalDateTime.of(2024, 2, 1, 11, 3))
+                        .build()
+        );
+    }
+
+    private Instance getSavedInstance(Progress progress, LocalDate startedDate) {
+        return instanceRepository.save(
+                Instance.builder()
+                        .progress(progress)
+                        .description("description")
+                        .notice("notice")
+                        .certificationMethod("certification method")
+                        .pointPerPerson(100)
+                        .startedDate(startedDate.atTime(12, 12))
+                        .completedDate(startedDate.plusDays(30).atTime(12, 12))
                         .build()
         );
     }

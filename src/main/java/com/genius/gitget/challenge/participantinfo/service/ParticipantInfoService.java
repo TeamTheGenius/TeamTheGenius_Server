@@ -22,4 +22,8 @@ public class ParticipantInfoService {
         return participantInfoRepository.findByJoinInfo(userId, instanceId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
     }
+
+    public boolean hasParticipantInfo(Long userId, Long instanceId) {
+        return participantInfoRepository.findByJoinInfo(userId, instanceId).isPresent();
+    }
 }

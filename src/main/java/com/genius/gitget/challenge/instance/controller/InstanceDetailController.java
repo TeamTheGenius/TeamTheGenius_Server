@@ -1,7 +1,9 @@
 package com.genius.gitget.challenge.instance.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.JOIN_SUCCESS;
+import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.service.InstanceDetailService;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +27,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/challenges")
 public class InstanceDetailController {
     private final InstanceDetailService instanceDetailService;
+
+
+    @GetMapping("/{instanceId}")
+    public ResponseEntity<SingleResponse<InstanceResponse>> getInstanceDetail(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long instanceId
+    ) {
+        InstanceResponse instanceDetailInformation = instanceDetailService.getInstanceDetailInformation(
+                userPrincipal.getUser(), instanceId);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), instanceDetailInformation)
+        );
+    }
 
     @PostMapping("/{instanceId}")
     public ResponseEntity<SingleResponse<JoinResponse>> joinChallenge(

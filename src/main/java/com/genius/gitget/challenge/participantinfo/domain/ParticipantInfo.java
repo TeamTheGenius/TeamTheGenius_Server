@@ -61,7 +61,7 @@ public class ParticipantInfo {
     private String repositoryName;
 
     @Builder
-    public ParticipantInfo(JoinStatus joinStatus, JoinResult joinResult, String repositoryName) {
+    private ParticipantInfo(JoinStatus joinStatus, JoinResult joinResult, String repositoryName) {
         this.joinStatus = joinStatus;
         this.joinResult = joinResult;
         this.repositoryName = repositoryName;
@@ -76,7 +76,7 @@ public class ParticipantInfo {
     }
 
     //=== 비지니스 로직 ===//
-    public void quitInstance() {
+    public void quitChallenge() {
         this.joinStatus = JoinStatus.NO;
         this.joinResult = JoinResult.FAIL;
     }

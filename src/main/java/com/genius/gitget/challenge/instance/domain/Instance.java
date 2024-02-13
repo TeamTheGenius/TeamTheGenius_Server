@@ -1,8 +1,6 @@
 package com.genius.gitget.challenge.instance.domain;
 
 
-import static com.genius.gitget.challenge.instance.domain.Progress.PREACTIVITY;
-
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
@@ -112,10 +110,6 @@ public class Instance {
 
     public void updateProgress(Progress progress) {
         this.progress = progress;
-    }
-
-    public boolean canJoinInstance() {
-        return this.progress == PREACTIVITY;
     }
 
     public Optional<Files> getFiles() {

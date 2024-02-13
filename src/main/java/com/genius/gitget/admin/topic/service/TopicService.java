@@ -1,18 +1,17 @@
 package com.genius.gitget.admin.topic.service;
 
+import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.dto.TopicCreateRequest;
+import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.dto.TopicPagingResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
-import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
-import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,16 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
 public class TopicService {
     private final TopicRepository topicRepository;
-    private final InstanceRepository instanceRepository;
     private final FilesService filesService;
 
     // 토픽 리스트 요청
@@ -42,12 +37,12 @@ public class TopicService {
     // 토픽 상세정보 요청
     public TopicDetailResponse getTopicById(Long id) throws IOException {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
-        return TopicDetailResponse.createByEntity(topic,topic.getFiles());
+        return TopicDetailResponse.createByEntity(topic, topic.getFiles());
     }
 
     // 토픽 생성 요청
     @Transactional
-    public Long createTopic(TopicCreateRequest topicCreateRequest, MultipartFile multipartFile, String type) throws IOException {
+    public Long createTopic(TopicCreateRequest topicCreateRequest, MultipartFile multipartFile, String type) {
         Files uploadedFile = filesService.uploadFile(multipartFile, type);
 
         Topic topic = Topic.builder()
@@ -66,7 +61,7 @@ public class TopicService {
     }
 
     @Transactional
-    public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest, MultipartFile multipartFile, String type) throws IOException {
+    public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest, MultipartFile multipartFile, String type) {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
 
         Optional<Files> findTopicFile = topic.getFiles();
@@ -87,20 +82,10 @@ public class TopicService {
 
     // 토픽 삭제 요청
     @Transactional
-    public void deleteTopic(Long id) throws IOException {
-        Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
-
-        Optional<Files> findTopicFile = topic.getFiles();
-        Long findTopicFileId = findTopicFile.get().getId();
-
-        try {
-            topicRepository.delete(topic);
-            filesService.deleteFile(findTopicFileId);
-            topic.setFiles(null);
-        } catch (Exception e) {
-            e.getStackTrace();
-            throw new BusinessException(ErrorCode.TOPIC_HAVE_INSTANCE);
-        }
+    public void deleteTopic(Long id) {
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
+        topicRepository.delete(topic);
     }
 
     private TopicPagingResponse mapToTopicPagingResponse(Topic topic) {

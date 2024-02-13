@@ -64,7 +64,7 @@ public class InstanceDetailService {
     public JoinResponse quitChallenge(User user, Long instanceId) {
         Instance instance = instanceRepository.findById(instanceId)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfo(user.getId(), instanceId);
+        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(), instanceId);
 
         if (instance.getProgress() == Progress.DONE) {
             throw new BusinessException(CAN_NOT_QUIT_INSTANCE);

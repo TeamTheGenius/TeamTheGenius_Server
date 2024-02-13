@@ -18,12 +18,18 @@ public class ParticipantInfoService {
     private final ParticipantInfoRepository participantInfoRepository;
 
 
-    public ParticipantInfo getParticipantInfo(Long userId, Long instanceId) {
+    public ParticipantInfo getParticipantInfoByJoinInfo(Long userId, Long instanceId) {
         return participantInfoRepository.findByJoinInfo(userId, instanceId)
+                .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
+    }
+
+    public ParticipantInfo findParticipantInfoById(Long participantInfoId) {
+        return participantInfoRepository.findById(participantInfoId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
     }
 
     public boolean hasParticipantInfo(Long userId, Long instanceId) {
         return participantInfoRepository.findByJoinInfo(userId, instanceId).isPresent();
     }
+
 }

@@ -146,7 +146,7 @@ class InstanceDetailServiceTest {
         instanceDetailService.joinNewChallenge(savedUser, joinRequest);
         savedInstance.updateProgress(Progress.ACTIVITY);
         instanceDetailService.quitChallenge(savedUser, savedInstance.getId());
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfo(savedUser.getId(),
+        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(savedUser.getId(),
                 savedInstance.getId());
 
         //then

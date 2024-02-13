@@ -52,12 +52,26 @@ public class CertificationController {
             @PathVariable Long instanceId,
             @RequestParam Long userId
     ) {
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfo(userId, instanceId);
+        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(userId, instanceId);
         List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
                 participantInfo.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekCertification)
+        );
+    }
+
+    @GetMapping("/total/{instanceId}")
+    public ResponseEntity<ListResponse<CertificationResponse>> getTotalCertifications(
+            @PathVariable Long instanceId,
+            @RequestParam Long userId
+    ) {
+        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(userId, instanceId);
+        List<CertificationResponse> totalCertification = certificationService.getTotalCertification(
+                participantInfo.getId(), LocalDate.now());
+
+        return ResponseEntity.ok().body(
+                new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), totalCertification)
         );
     }
 }

@@ -35,7 +35,7 @@ public class HomeController {
 
     @PostMapping("/search")
     public ResponseEntity<PagingResponse<InstanceSearchResponse>> searchInstances(
-            @RequestPart(value = "data") InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
+            @RequestBody InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
 
         Page<InstanceSearchResponse> searchResults
                 = instanceSearchService.searchInstances(instanceSearchRequest.keyword(),

@@ -3,11 +3,7 @@ package com.genius.gitget.challenge.instance.repository;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.dto.search.QInstanceSearchResponse;
-import com.genius.gitget.challenge.instance.dto.search.QQuerydslDTO;
-import com.genius.gitget.challenge.instance.dto.search.QuerydslDTO;
-import com.genius.gitget.global.file.domain.Files;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -15,12 +11,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import static com.genius.gitget.admin.topic.domain.QTopic.topic;
 import static com.genius.gitget.challenge.instance.domain.QInstance.instance;
 import static com.genius.gitget.global.file.domain.QFiles.files;
 
 import java.util.List;
-import java.util.Optional;
 
 public class SearchRepositoryImpl implements SearchRepositoryCustom {
 
@@ -34,7 +28,7 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
     public Page<InstanceSearchResponse> Search(Progress progressCond, String titleCond, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (progressCond != Progress.ALL) {
+        if (progressCond != null) {
             builder.and(instance.progress.eq(progressCond));
         }
         if (titleCond != null) {
@@ -61,6 +55,5 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
                 .where(builder);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
-
     }
 }

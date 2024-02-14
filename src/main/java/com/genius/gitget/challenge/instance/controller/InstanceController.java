@@ -56,10 +56,10 @@ public class InstanceController {
     public ResponseEntity<CommonResponse> createInstance(
             @RequestPart(value = "data") InstanceCreateRequest instanceCreateRequest,
             @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-            @RequestPart(value = "type") String type) {
+            @RequestPart(value = "type", required = false) String type) {
         instanceService.createInstance(instanceCreateRequest, multipartFile, type);
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.CREATED.getMessage())
+                new CommonResponse(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage())
         );
     }
 

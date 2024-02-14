@@ -23,8 +23,6 @@ public class Files extends BaseTimeEntity {
     @Column(name = "files_id")
     private Long id;
 
-    //TODO: 추후 PET쪽과 연관관계 설정 필요
-
     @Enumerated(value = EnumType.STRING)
     private FileType fileType;
 

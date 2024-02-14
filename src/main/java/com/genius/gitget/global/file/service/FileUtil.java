@@ -2,11 +2,13 @@ package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_COPIED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_SAVED;
 import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_ENCODED;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.CopyDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -59,23 +61,35 @@ public class FileUtil {
                 .build();
     }
 
-    public static UploadDTO getCopyInfo(Files files, FileType fileType, final String UPLOAD_PATH) {
+    public static void saveFile(MultipartFile file, String fileURI) {
+        try {
+            File targetFile = new File(fileURI);
+            createPath(fileURI);
+            file.transferTo(targetFile);
+        } catch (IOException e) {
+            throw new BusinessException(FILE_NOT_SAVED);
+        }
+    }
+
+    public static CopyDTO getCopyInfo(Files files, FileType fileType, final String UPLOAD_PATH) {
         String originalFilename = files.getOriginalFilename();
         String savedFilename = getSavedFilename(originalFilename);
 
-        return UploadDTO.builder()
+        return CopyDTO.builder()
                 .fileType(fileType)
                 .originalFilename(originalFilename)
                 .savedFilename(savedFilename)
                 .fileURI(UPLOAD_PATH + fileType.getPath() + savedFilename)
+                .folderURI(UPLOAD_PATH + fileType.getPath())
                 .build();
     }
 
-    public static void copyImage(String originFilePath, String copyFilePath) {
+    public static void copyImage(String originFilePath, CopyDTO copyDTO) {
         File originFile = new File(originFilePath);
-        File copyFile = new File(copyFilePath);
+        File copyFile = new File(copyDTO.fileURI());
 
         try {
+            createPath(copyDTO.folderURI());
             java.nio.file.Files.copy(originFile.toPath(), copyFile.toPath(),
                     StandardCopyOption.COPY_ATTRIBUTES);
         } catch (IOException e) {
@@ -107,5 +121,12 @@ public class FileUtil {
     private static String extractExtension(String filename) {
         int index = filename.lastIndexOf(".");
         return filename.substring(index + 1).toLowerCase();
+    }
+
+    private static void createPath(String uri) {
+        File file = new File(uri);
+        if (!file.exists()) {
+            file.mkdirs();
+        }
     }
 }

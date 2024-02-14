@@ -3,8 +3,11 @@ package com.genius.gitget.util.file;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+@Component
 public class FileTestUtil {
     public static MultipartFile getMultipartFile(String filename) {
         return new MultipartFile() {

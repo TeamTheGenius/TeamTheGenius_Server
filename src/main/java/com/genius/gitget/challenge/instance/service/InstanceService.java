@@ -1,31 +1,28 @@
 package com.genius.gitget.challenge.instance.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
+
+import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
-import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
+import java.io.IOException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.Optional;
-
-import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
-import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -38,11 +35,11 @@ public class InstanceService {
     // 인스턴스 생성
     @Transactional
     public Long createInstance(InstanceCreateRequest instanceCreateRequest,
-                                MultipartFile multipartFile, String type) throws IOException {
+                               MultipartFile multipartFile, String type) {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
-        Files uploadedFile = filesService.uploadFile(multipartFile, type);
+        Files uploadedFile = filesService.uploadFile(topic.getFiles(), multipartFile, type);
 
         Instance instance = Instance.builder()
                 .title(instanceCreateRequest.title())
@@ -64,13 +61,13 @@ public class InstanceService {
     }
 
     // 인스턴스 리스트 조회
-    public Page<InstancePagingResponse> getAllInstances(Pageable pageable) throws IOException {
+    public Page<InstancePagingResponse> getAllInstances(Pageable pageable) {
         Page<Instance> instances = instanceRepository.findAllById(pageable);
         return instances.map(this::mapToInstancePagingResponse);
     }
 
     // 인스턴스 단건 조회
-    public InstanceDetailResponse getInstanceById(Long id) throws IOException {
+    public InstanceDetailResponse getInstanceById(Long id) {
         Instance instanceDetails = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
         return InstanceDetailResponse.createByEntity(instanceDetails, instanceDetails.getFiles());
@@ -78,7 +75,7 @@ public class InstanceService {
 
     // 인스턴스 삭제
     @Transactional
-    public void deleteInstance(Long id) throws IOException{
+    public void deleteInstance(Long id) {
         Instance instance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
@@ -92,8 +89,8 @@ public class InstanceService {
 
     // 인스턴스 수정
     @Transactional
-    public Long updateInstance(Long id,  InstanceUpdateRequest instanceUpdateRequest,
-                               MultipartFile multipartFile, String type) throws IOException{
+    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest,
+                               MultipartFile multipartFile, String type) {
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
@@ -101,7 +98,8 @@ public class InstanceService {
         Long findInstanceFileId = findInstanceFile.get().getId();
         filesService.updateFile(findInstanceFileId, multipartFile);
 
-        existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(), instanceUpdateRequest.pointPerPerson(),
+        existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(),
+                instanceUpdateRequest.pointPerPerson(),
                 instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());
 
         Instance savedInstance = instanceRepository.save(existingInstance);

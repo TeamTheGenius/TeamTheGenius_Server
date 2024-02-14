@@ -1,11 +1,15 @@
 package com.genius.gitget.global.file.service;
 
+import static com.genius.gitget.global.file.domain.FileType.INSTANCE;
+import static com.genius.gitget.global.file.domain.FileType.TOPIC;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.global.file.domain.FileType;
+import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.CopyDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -91,6 +95,25 @@ class FileUtilTest {
         assertThat(updateDTO.originalFilename()).isEqualTo(originalFilename);
         assertThat(updateDTO.fileURI()).contains(UPLOAD_PATH);
         assertThat(updateDTO.fileURI()).contains(updateDTO.savedFilename());
+    }
+
+    @Test
+    @DisplayName("기존의 파일을 복사하려고 할 때, 복사에 필요한 정보들을 추출하여 전달할 수 있다.")
+    public void should_passInformation_when_tryToCopy() {
+        //given
+        Files files = Files.builder()
+                .originalFilename("original file name.png")
+                .savedFilename("saved file name")
+                .fileURI("file URI")
+                .fileType(TOPIC)
+                .build();
+
+        //when
+        CopyDTO copyDTO = FileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
+
+        //then
+        assertThat(copyDTO.fileType()).isEqualTo(INSTANCE);
+        assertThat(copyDTO.fileURI()).contains(UPLOAD_PATH);
     }
 
 

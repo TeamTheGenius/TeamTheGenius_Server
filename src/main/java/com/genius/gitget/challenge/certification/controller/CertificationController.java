@@ -10,6 +10,8 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/certification")
 public class CertificationController {
+    private final UserService userService;
     private final CertificationService certificationService;
     private final InstanceService instanceService;
     private final ParticipantInfoService participantInfoService;
@@ -54,9 +57,10 @@ public class CertificationController {
     @GetMapping("/week/{instanceId}")
     public ResponseEntity<ListResponse<CertificationResponse>> getCertification(
             @PathVariable Long instanceId,
-            @RequestParam Long userId
+            @RequestParam String identifier
     ) {
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(userId, instanceId);
+        User user = userService.findUserByIdentifier(identifier);
+        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(), instanceId);
         List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
                 participantInfo.getId(), LocalDate.now());
 
@@ -68,9 +72,10 @@ public class CertificationController {
     @GetMapping("/total/{instanceId}")
     public ResponseEntity<ListResponse<CertificationResponse>> getTotalCertifications(
             @PathVariable Long instanceId,
-            @RequestParam Long userId
+            @RequestParam String identifier
     ) {
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(userId, instanceId);
+        User user = userService.findUserByIdentifier(identifier);
+        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(), instanceId);
         List<CertificationResponse> totalCertification = certificationService.getTotalCertification(
                 participantInfo.getId(), LocalDate.now());
 

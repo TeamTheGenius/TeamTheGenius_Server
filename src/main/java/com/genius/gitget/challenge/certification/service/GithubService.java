@@ -45,7 +45,7 @@ public class GithubService {
         GitHub gitHub = githubProvider.getGithubConnection(user);
         List<GHRepository> repositoryList = githubProvider.getRepositoryList(gitHub);
         return repositoryList.stream()
-                .map(String::valueOf)
+                .map(GHRepository::getName)
                 .toList();
     }
 

@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.instance.domain;
 
 
 import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.global.file.domain.Files;
@@ -118,6 +119,10 @@ public class Instance {
 
     public void setFiles(Files files) {
         this.files = files;
+    }
+
+    public int getTotalAttempt() {
+        return DateUtil.getDiffBetweenDate(startedDate.toLocalDate(), completedDate.toLocalDate());
     }
 
     //== 연관관계 편의 메서드 ==//

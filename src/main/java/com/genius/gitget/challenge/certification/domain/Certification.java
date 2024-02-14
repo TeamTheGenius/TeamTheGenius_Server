@@ -35,7 +35,7 @@ public class Certification extends BaseTimeEntity {
     @JoinColumn(name = "participantInfo_id")
     private ParticipantInfo participantInfo;
 
-    private int certificationAttempt;
+    private int currentAttempt;
 
     private LocalDate certificatedAt;
 
@@ -47,9 +47,9 @@ public class Certification extends BaseTimeEntity {
 
 
     @Builder
-    public Certification(int certificationAttempt, LocalDate certificatedAt, String certificationLinks,
+    public Certification(int currentAttempt, LocalDate certificatedAt, String certificationLinks,
                          CertificateStatus certificationStatus) {
-        this.certificationAttempt = certificationAttempt;
+        this.currentAttempt = currentAttempt;
         this.certificatedAt = certificatedAt;
         this.certificationLinks = certificationLinks;
         this.certificationStatus = certificationStatus;

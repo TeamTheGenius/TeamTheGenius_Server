@@ -4,7 +4,10 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
+import com.genius.gitget.challenge.certification.dto.CertificationStatus;
 import com.genius.gitget.challenge.certification.service.CertificationService;
+import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
@@ -30,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/certification")
 public class CertificationController {
     private final CertificationService certificationService;
+    private final InstanceService instanceService;
     private final ParticipantInfoService participantInfoService;
 
     @PostMapping("/today")
@@ -72,6 +76,25 @@ public class CertificationController {
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), totalCertification)
+        );
+    }
+
+    @GetMapping("/status/{instanceId}")
+    public ResponseEntity<SingleResponse<CertificationStatus>> getCertificationStatus(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long instanceId
+    ) {
+
+        Instance instance = instanceService.findInstanceById(instanceId);
+        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(
+                userPrincipal.getUser().getId(),
+                instanceId);
+
+        CertificationStatus certificationStatus = certificationService.getCertificationStatus(
+                instance, participantInfo, LocalDate.now());
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationStatus)
         );
     }
 }

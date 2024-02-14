@@ -1,9 +1,13 @@
 package com.genius.gitget.challenge.certification.service;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
+import com.genius.gitget.challenge.certification.dto.CertificationStatus;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -34,6 +38,7 @@ public class CertificationService {
         List<Certification> certifications = certificationRepository.findCertificationByDuration(startDate, currentDate,
                 participantInfoId);
 
+        //TODO: 중간에 인증이 안된 부분이 있을 때 더미 데이터를 끼워주는게 맞을듯
         return certifications.stream()
                 .map(CertificationResponse::create)
                 .toList();
@@ -74,14 +79,14 @@ public class CertificationService {
     private Certification createCertification(ParticipantInfo participantInfo,
                                               CertificationRequest certificationRequest,
                                               List<GHPullRequest> ghPullRequests) {
-        int attempt = DateUtil.getCertificationAttempt(participantInfo.getStartedDate(),
+        int attempt = DateUtil.getDiffBetweenDate(participantInfo.getStartedDate(),
                 certificationRequest.targetDate());
 
         Certification certification = certificationRepository.findCertificationByDate(
                         certificationRequest.targetDate(),
                         participantInfo.getId())
                 .orElse(Certification.builder()
-                        .certificationAttempt(attempt)
+                        .currentAttempt(attempt)
                         .certificatedAt(certificationRequest.targetDate())
                         .certificationLinks(getPrLinks(ghPullRequests))
                         .certificationStatus(getCertificateStatus(ghPullRequests))
@@ -103,6 +108,40 @@ public class CertificationService {
         if (ghPullRequests.isEmpty()) {
             return CertificateStatus.NOT_YET;
         }
-        return CertificateStatus.CERTIFICATED;
+        return CERTIFICATED;
+    }
+
+    @Transactional
+    public CertificationStatus getCertificationStatus(Instance instance, ParticipantInfo participantInfo,
+                                                      LocalDate targetDate) {
+        //성공 인증 개수
+        int successCount = certificationRepository.findCertificationByStatus(
+                        participantInfo.getId(), CERTIFICATED, targetDate)
+                .size();
+        //실패 인증 개수
+        int failureCount = certificationRepository.findCertificationByStatus(
+                        participantInfo.getId(), NOT_YET, targetDate)
+                .size();
+
+        //targetDate 기준 현재 진행 일차
+        int currentAttempt = DateUtil.getDiffBetweenDate(instance.getStartedDate().toLocalDate(), targetDate);
+
+        //남은 인증 개수 = 전체 일차 - 오늘 회차
+        int totalAttempt = instance.getTotalAttempt();
+        int remainAttempt = totalAttempt - currentAttempt;
+
+        //성공 퍼센트
+        double successPercent = (double) successCount / (double) currentAttempt * 100;
+        double roundedPercent = Math.round(successPercent * 100 / 100.0);
+
+        return CertificationStatus.builder()
+                .successPercent(roundedPercent)
+                .totalAttempt(totalAttempt)
+                .currentAttempt(currentAttempt)
+                .pointPerPerson(instance.getPointPerPerson())
+                .successCount(successCount)
+                .failureCount(failureCount)
+                .remainCount(remainAttempt)
+                .build();
     }
 }

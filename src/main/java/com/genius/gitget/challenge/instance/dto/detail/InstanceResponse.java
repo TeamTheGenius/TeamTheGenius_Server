@@ -4,8 +4,6 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.util.exception.BusinessException;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -53,13 +51,9 @@ public record InstanceResponse(
     }
 
     private static FileResponse convertToFileResponse(Optional<Files> optionalFiles) {
-        try {
-            if (optionalFiles.isEmpty()) {
-                return FileResponse.createNotExistFile();
-            }
-            return FileResponse.createExistFile(optionalFiles.get());
-        } catch (IOException e) {
-            throw new BusinessException(e);
+        if (optionalFiles.isEmpty()) {
+            return FileResponse.createNotExistFile();
         }
+        return FileResponse.createExistFile(optionalFiles.get());
     }
 }

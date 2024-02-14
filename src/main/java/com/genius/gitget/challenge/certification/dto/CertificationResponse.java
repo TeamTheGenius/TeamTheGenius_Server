@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.certification.dto;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,7 @@ import lombok.Builder;
 public record CertificationResponse(
         Long certificationId,
         int certificationAttempt,
+        DayOfWeek dayOfWeek,
         LocalDate certificatedAt,
         CertificateStatus certificateStatus,
         int prCount,
@@ -22,7 +24,8 @@ public record CertificationResponse(
 
         return CertificationResponse.builder()
                 .certificationId(certification.getId())
-                .certificationAttempt(certification.getCertificationAttempt())
+                .certificationAttempt(certification.getCurrentAttempt())
+                .dayOfWeek(certification.getCertificatedAt().getDayOfWeek())
                 .certificatedAt(certification.getCertificatedAt())
                 .certificateStatus(certification.getCertificationStatus())
                 .prLinks(prLinks)

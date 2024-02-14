@@ -1,13 +1,12 @@
-package com.genius.gitget.challenge.home.controller;
+package com.genius.gitget.challenge.instance.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.challenge.home.dto.HomeInstanceResponse;
-import com.genius.gitget.challenge.home.service.HomeService;
+import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
+import com.genius.gitget.challenge.instance.service.InstanceHomeService;
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;
-import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -21,16 +20,17 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/challenges")
-public class HomeController {
-    private final HomeService homeService;
+public class InstanceHomeController {
+    private final InstanceHomeService instanceHomeService;
     private final InstanceSearchService instanceSearchService;
 
     @PostMapping("/search")
@@ -54,7 +54,7 @@ public class HomeController {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(Direction.DESC, "participantCount"));
 
-        Slice<HomeInstanceResponse> recommendations = homeService.getRecommendations(
+        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getRecommendations(
                 userPrincipal.getUser(), pageRequest);
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), recommendations)
@@ -66,7 +66,7 @@ public class HomeController {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(Direction.DESC, "participantCount"));
 
-        Slice<HomeInstanceResponse> recommendations = homeService.getInstancesByCondition(pageRequest);
+        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getInstancesByCondition(pageRequest);
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), recommendations)
         );
@@ -77,7 +77,7 @@ public class HomeController {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(Direction.DESC, "startedDate"));
 
-        Slice<HomeInstanceResponse> recommendations = homeService.getInstancesByCondition(pageRequest);
+        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getInstancesByCondition(pageRequest);
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), recommendations)
         );

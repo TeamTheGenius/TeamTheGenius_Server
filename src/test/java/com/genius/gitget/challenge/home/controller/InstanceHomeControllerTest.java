@@ -25,7 +25,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 @SpringBootTest
 @Transactional
-class HomeControllerTest {
+class InstanceHomeControllerTest {
     MockMvc mockMvc;
     @Autowired
     WebApplicationContext context;

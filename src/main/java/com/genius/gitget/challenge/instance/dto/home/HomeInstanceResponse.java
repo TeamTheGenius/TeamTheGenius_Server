@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.home.dto;
+package com.genius.gitget.challenge.instance.dto.home;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.domain.Files;

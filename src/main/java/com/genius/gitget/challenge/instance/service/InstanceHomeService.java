@@ -1,12 +1,11 @@
-package com.genius.gitget.challenge.home.service;
+package com.genius.gitget.challenge.instance.service;
 
 import static com.genius.gitget.challenge.instance.domain.Progress.PREACTIVITY;
 
-import com.genius.gitget.challenge.home.dto.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
 import java.util.Arrays;
@@ -22,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class HomeService {
+public class InstanceHomeService {
     private final InstanceRepository instanceRepository;
 
     public Slice<HomeInstanceResponse> getRecommendations(User user, Pageable pageable) {

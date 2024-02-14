@@ -3,16 +3,15 @@ package com.genius.gitget.global.file.service;
 import static com.genius.gitget.global.file.domain.FileType.INSTANCE;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
-import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_SAVED;
 
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.CopyDTO;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.File;
-import java.io.IOException;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,16 +38,16 @@ public class FilesService {
         }
 
         Files files = optionalFiles.orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
-        UploadDTO uploadDTO = FileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
+        CopyDTO copyDTO = FileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
         //REFACTOR: 정적 팩토리 메서드로 처리하면 깔끔할 듯!
         Files copyFiles = Files.builder()
-                .originalFilename(uploadDTO.originalFilename())
-                .savedFilename(uploadDTO.savedFilename())
-                .fileType(uploadDTO.fileType())
-                .fileURI(uploadDTO.fileURI())
+                .originalFilename(copyDTO.originalFilename())
+                .savedFilename(copyDTO.savedFilename())
+                .fileType(copyDTO.fileType())
+                .fileURI(copyDTO.fileURI())
                 .build();
 
-        FileUtil.copyImage(files.getFileURI(), copyFiles.getFileURI());
+        FileUtil.copyImage(files.getFileURI(), copyDTO);
 
         return filesRepository.save(copyFiles);
     }
@@ -59,7 +58,7 @@ public class FilesService {
 
         UploadDTO uploadDTO = FileUtil.getUploadInfo(receivedFile, typeStr, UPLOAD_PATH);
 
-        saveFile(receivedFile, uploadDTO.fileURI());
+        FileUtil.saveFile(receivedFile, uploadDTO.fileURI());
 
         Files file = Files.builder()
                 .originalFilename(uploadDTO.originalFilename())
@@ -71,19 +70,6 @@ public class FilesService {
         return filesRepository.save(file);
     }
 
-    private void saveFile(MultipartFile file, String fileURI) {
-        try {
-            File targetFile = new File(fileURI);
-
-            if (!targetFile.exists()) {
-                targetFile.mkdirs();
-            }
-            file.transferTo(targetFile);
-        } catch (IOException e) {
-            throw new BusinessException(FILE_NOT_SAVED);
-        }
-    }
-
     @Transactional
     public Files updateFile(Long fileId, MultipartFile file) {
         Files files = filesRepository.findById(fileId)
@@ -92,7 +78,7 @@ public class FilesService {
         deleteFilesInStorage(files);
 
         UpdateDTO updateDTO = FileUtil.getUpdateInfo(file, files.getFileType(), UPLOAD_PATH);
-        saveFile(file, updateDTO.fileURI());
+        FileUtil.saveFile(file, updateDTO.fileURI());
         files.updateFiles(updateDTO);
         return files;
     }

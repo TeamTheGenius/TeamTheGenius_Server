@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.CopyDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -108,11 +109,11 @@ class FileUtilTest {
                 .build();
 
         //when
-        UploadDTO copyInfo = FileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
+        CopyDTO copyDTO = FileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
 
         //then
-        assertThat(copyInfo.fileType()).isEqualTo(INSTANCE);
-        assertThat(copyInfo.fileURI()).contains(UPLOAD_PATH);
+        assertThat(copyDTO.fileType()).isEqualTo(INSTANCE);
+        assertThat(copyDTO.fileURI()).contains(UPLOAD_PATH);
     }
 
 

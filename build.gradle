@@ -64,10 +64,3 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
-
-// Querydsl 설정부
-def generatedDir = 'src/main/generated'
-
-clean {
-    delete file (generatedDir)
-}

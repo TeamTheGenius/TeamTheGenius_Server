@@ -1,4 +1,7 @@
 package com.genius.gitget.payment.repository;
 
-public class PaymentRepository {
+import com.genius.gitget.payment.domain.Payment;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
 }

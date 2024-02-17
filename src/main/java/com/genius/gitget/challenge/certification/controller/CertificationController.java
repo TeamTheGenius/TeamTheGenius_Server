@@ -2,9 +2,10 @@ package com.genius.gitget.challenge.certification.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.CertificationStatus;
+import com.genius.gitget.challenge.certification.dto.RenewRequest;
+import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceService;
@@ -39,29 +40,43 @@ public class CertificationController {
     private final InstanceService instanceService;
     private final ParticipantInfoService participantInfoService;
 
-    @PostMapping("/today")
-    public ResponseEntity<SingleResponse<CertificationResponse>> certificateByGithub(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody CertificationRequest certificationRequest
-    ) {
 
-        CertificationResponse certificationResponse = certificationService.updateCertification(
-                userPrincipal.getUser(),
-                certificationRequest);
+    @GetMapping("/{instanceId}")
+    public ResponseEntity<SingleResponse<CertificationResponse>> getInstanceInformation(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long instanceId
+    ) {
+        CertificationResponse certificationResponse = certificationService.getCertificationInformation(
+                userPrincipal.getUser(), instanceId);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
         );
     }
 
+    @PostMapping("/today")
+    public ResponseEntity<SingleResponse<RenewResponse>> certificateByGithub(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody RenewRequest renewRequest
+    ) {
+
+        RenewResponse renewResponse = certificationService.updateCertification(
+                userPrincipal.getUser(),
+                renewRequest);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), renewResponse)
+        );
+    }
+
     @GetMapping("/week/{instanceId}")
-    public ResponseEntity<ListResponse<CertificationResponse>> getCertification(
+    public ResponseEntity<ListResponse<RenewResponse>> getCertification(
             @PathVariable Long instanceId,
             @RequestParam String identifier
     ) {
         User user = userService.findUserByIdentifier(identifier);
         ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(), instanceId);
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        List<RenewResponse> weekCertification = certificationService.getWeekCertification(
                 participantInfo.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(
@@ -70,13 +85,13 @@ public class CertificationController {
     }
 
     @GetMapping("/total/{instanceId}")
-    public ResponseEntity<ListResponse<CertificationResponse>> getTotalCertifications(
+    public ResponseEntity<ListResponse<RenewResponse>> getTotalCertifications(
             @PathVariable Long instanceId,
             @RequestParam String identifier
     ) {
         User user = userService.findUserByIdentifier(identifier);
         ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(), instanceId);
-        List<CertificationResponse> totalCertification = certificationService.getTotalCertification(
+        List<RenewResponse> totalCertification = certificationService.getTotalCertification(
                 participantInfo.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(

@@ -5,12 +5,14 @@ import static com.genius.gitget.challenge.certification.domain.CertificateStatus
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
-import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.CertificationStatus;
+import com.genius.gitget.challenge.certification.dto.RenewRequest;
+import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.challenge.user.domain.User;
@@ -29,22 +31,23 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CertificationService {
     private final GithubProvider githubProvider;
+    private final InstanceService instanceService;
     private final ParticipantInfoService participantInfoService;
     private final CertificationRepository certificationRepository;
 
 
-    public List<CertificationResponse> getWeekCertification(Long participantInfoId, LocalDate currentDate) {
+    public List<RenewResponse> getWeekCertification(Long participantInfoId, LocalDate currentDate) {
         LocalDate startDate = currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
         List<Certification> certifications = certificationRepository.findCertificationByDuration(startDate, currentDate,
                 participantInfoId);
 
         //TODO: 중간에 인증이 안된 부분이 있을 때 더미 데이터를 끼워주는게 맞을듯
         return certifications.stream()
-                .map(CertificationResponse::create)
+                .map(RenewResponse::create)
                 .toList();
     }
 
-    public List<CertificationResponse> getTotalCertification(Long participantInfoId, LocalDate currentDate) {
+    public List<RenewResponse> getTotalCertification(Long participantInfoId, LocalDate currentDate) {
         ParticipantInfo participantInfo = participantInfoService.findParticipantInfoById(participantInfoId);
         Instance instance = participantInfo.getInstance();
 
@@ -52,42 +55,42 @@ public class CertificationService {
                 instance.getStartedDate().toLocalDate(), currentDate, participantInfoId);
 
         return certifications.stream()
-                .map(CertificationResponse::create)
+                .map(RenewResponse::create)
                 .toList();
     }
 
     @Transactional
-    public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
+    public RenewResponse updateCertification(User user, RenewRequest renewRequest) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
         ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(),
-                certificationRequest.instanceId());
+                renewRequest.instanceId());
 
         List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(
                         gitHub,
                         participantInfo.getRepositoryName(),
-                        certificationRequest.targetDate())
+                        renewRequest.targetDate())
                 .nextPage();
 
         Certification certification = createCertification(
                 participantInfo,
-                certificationRequest,
+                renewRequest,
                 ghPullRequests);
 
-        return CertificationResponse.create(certification);
+        return RenewResponse.create(certification);
     }
 
     private Certification createCertification(ParticipantInfo participantInfo,
-                                              CertificationRequest certificationRequest,
+                                              RenewRequest renewRequest,
                                               List<GHPullRequest> ghPullRequests) {
         int attempt = DateUtil.getDiffBetweenDate(participantInfo.getStartedDate(),
-                certificationRequest.targetDate());
+                renewRequest.targetDate());
 
         Certification certification = certificationRepository.findCertificationByDate(
-                        certificationRequest.targetDate(),
+                        renewRequest.targetDate(),
                         participantInfo.getId())
                 .orElse(Certification.builder()
                         .currentAttempt(attempt)
-                        .certificatedAt(certificationRequest.targetDate())
+                        .certificatedAt(renewRequest.targetDate())
                         .certificationLinks(getPrLinks(ghPullRequests))
                         .certificationStatus(getCertificateStatus(ghPullRequests))
                         .build());
@@ -109,6 +112,14 @@ public class CertificationService {
             return CertificateStatus.NOT_YET;
         }
         return CERTIFICATED;
+    }
+
+    public CertificationResponse getCertificationInformation(User user, Long instanceId) {
+        Instance instance = instanceService.findInstanceById(instanceId);
+        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(),
+                instanceId);
+
+        return CertificationResponse.createByEntity(instance, participantInfo.getRepositoryName());
     }
 
     @Transactional

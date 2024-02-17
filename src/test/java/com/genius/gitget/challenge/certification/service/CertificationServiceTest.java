@@ -8,8 +8,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
-import com.genius.gitget.challenge.certification.dto.CertificationRequest;
-import com.genius.gitget.challenge.certification.dto.CertificationResponse;
+import com.genius.gitget.challenge.certification.dto.RenewRequest;
+import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -74,22 +74,22 @@ class CertificationServiceTest {
 
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
 
-        CertificationRequest certificationRequest = CertificationRequest.builder()
+        RenewRequest renewRequest = RenewRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(targetDate)
                 .build();
 
         //when
-        CertificationResponse certificationResponse = certificationService.updateCertification(user,
-                certificationRequest);
-        Certification certification = certificationRepository.findById(certificationResponse.certificationId())
+        RenewResponse renewResponse = certificationService.updateCertification(user,
+                renewRequest);
+        Certification certification = certificationRepository.findById(renewResponse.certificationId())
                 .get();
 
         //then
-        assertThat(certification.getId()).isEqualTo(certificationResponse.certificationId());
-        assertThat(certificationResponse.certificateStatus()).isEqualTo(CERTIFICATED);
-        assertThat(certificationResponse.certificatedAt()).isEqualTo(targetDate);
-        assertThat(certificationResponse.prCount()).isEqualTo(1);
+        assertThat(certification.getId()).isEqualTo(renewResponse.certificationId());
+        assertThat(renewResponse.certificateStatus()).isEqualTo(CERTIFICATED);
+        assertThat(renewResponse.certificatedAt()).isEqualTo(targetDate);
+        assertThat(renewResponse.prCount()).isEqualTo(1);
     }
 
     @Test
@@ -103,22 +103,22 @@ class CertificationServiceTest {
 
         LocalDate targetDate = LocalDate.of(2024, 2, 6);
 
-        CertificationRequest certificationRequest = CertificationRequest.builder()
+        RenewRequest renewRequest = RenewRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(targetDate)
                 .build();
 
         //when
-        CertificationResponse certificationResponse = certificationService.updateCertification(user,
-                certificationRequest);
-        Certification certification = certificationRepository.findById(certificationResponse.certificationId())
+        RenewResponse renewResponse = certificationService.updateCertification(user,
+                renewRequest);
+        Certification certification = certificationRepository.findById(renewResponse.certificationId())
                 .get();
 
         //then
-        assertThat(certification.getId()).isEqualTo(certificationResponse.certificationId());
-        assertThat(certificationResponse.certificateStatus()).isEqualTo(CertificateStatus.NOT_YET);
-        assertThat(certificationResponse.certificatedAt()).isEqualTo(targetDate);
-        assertThat(certificationResponse.prCount()).isEqualTo(0);
+        assertThat(certification.getId()).isEqualTo(renewResponse.certificationId());
+        assertThat(renewResponse.certificateStatus()).isEqualTo(CertificateStatus.NOT_YET);
+        assertThat(renewResponse.certificatedAt()).isEqualTo(targetDate);
+        assertThat(renewResponse.prCount()).isEqualTo(0);
     }
 
     @Test
@@ -163,7 +163,7 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, endDate.minusDays(1), participantInfo);
         getSavedCertification(CERTIFICATED, endDate, participantInfo);
 
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        List<RenewResponse> weekCertification = certificationService.getWeekCertification(
                 participantInfo.getId(), currentDate);
 
         //then

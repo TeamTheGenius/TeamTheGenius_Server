@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
-public record CertificationRequest(
+public record RenewRequest(
         Long instanceId,
         LocalDate targetDate
 ) {

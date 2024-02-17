@@ -1,43 +1,26 @@
 package com.genius.gitget.challenge.certification.dto;
 
-import com.genius.gitget.challenge.certification.domain.CertificateStatus;
-import com.genius.gitget.challenge.certification.domain.Certification;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import com.genius.gitget.challenge.instance.domain.Instance;
 import lombok.Builder;
 
 @Builder
 public record CertificationResponse(
-        Long certificationId,
-        int certificationAttempt,
-        DayOfWeek dayOfWeek,
-        LocalDate certificatedAt,
-        CertificateStatus certificateStatus,
-        int prCount,
-        List<String> prLinks
+        Long instanceId,
+        int participantCount,
+        String period,
+        int pointPerPerson,
+        String repositoryName,
+        String certificationMethod
 ) {
 
-    public static CertificationResponse create(Certification certification) {
-        List<String> prLinks = getPrList(certification.getCertificationLinks());
-
+    public static CertificationResponse createByEntity(Instance instance, String repositoryName) {
         return CertificationResponse.builder()
-                .certificationId(certification.getId())
-                .certificationAttempt(certification.getCurrentAttempt())
-                .dayOfWeek(certification.getCertificatedAt().getDayOfWeek())
-                .certificatedAt(certification.getCertificatedAt())
-                .certificateStatus(certification.getCertificationStatus())
-                .prLinks(prLinks)
-                .prCount(prLinks.size())
+                .instanceId(instance.getId())
+                .participantCount(instance.getParticipantCount())
+                .period(instance.getStartedDate().toLocalDate() + " ~ " + instance.getCompletedDate().toLocalDate())
+                .pointPerPerson(instance.getPointPerPerson())
+                .repositoryName(repositoryName)
+                .certificationMethod(instance.getCertificationMethod())
                 .build();
-    }
-
-    private static List<String> getPrList(String prLink) {
-        List<String> prLinkList = List.of(prLink.split(","));
-        if (prLinkList.size() == 1 && prLinkList.get(0).isEmpty()) {
-            return new ArrayList<>();
-        }
-        return prLinkList;
     }
 }

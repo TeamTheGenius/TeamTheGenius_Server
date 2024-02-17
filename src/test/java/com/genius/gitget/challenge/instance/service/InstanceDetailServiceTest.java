@@ -111,6 +111,26 @@ class InstanceDetailServiceTest {
     }
 
     @Test
+    @DisplayName("챌린지 참여 요청을 했을 때, 사용자가 이미 참여한 챌린지인 경우 예외가 발생한다.")
+    public void should_throwException_when_userAlreadyJoined() {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance(Progress.PREACTIVITY);
+        JoinRequest joinRequest = JoinRequest.builder()
+                .repository(targetRepo)
+                .instanceId(instance.getId())
+                .build();
+
+        //when
+        instanceDetailService.joinNewChallenge(user, joinRequest);
+
+        //then
+        assertThatThrownBy(() -> instanceDetailService.joinNewChallenge(user, joinRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(CAN_NOT_JOIN_INSTANCE.getMessage());
+    }
+
+    @Test
     @DisplayName("아직 시작하지 않은 챌린지에 대해 취소 요청을 하면 ParticipantInfo가 삭제된다.")
     public void should_joinStatusIsNo_when_quitChallenge() {
         //given

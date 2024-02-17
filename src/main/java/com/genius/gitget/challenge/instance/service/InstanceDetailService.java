@@ -50,7 +50,7 @@ public class InstanceDetailService {
         Instance instance = instanceRepository.findById(joinRequest.instanceId())
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
-        if (instance.getProgress() != Progress.PREACTIVITY) {
+        if (canJoinChallenge(persistUser, instance)) {
             throw new BusinessException(CAN_NOT_JOIN_INSTANCE);
         }
 
@@ -58,6 +58,11 @@ public class InstanceDetailService {
         ParticipantInfo participantInfo = ParticipantInfo.createDefaultParticipantInfo(joinRequest.repository());
         participantInfo.setUserAndInstance(persistUser, instance);
         return JoinResponse.createJoinResponse(participantInfoRepository.save(participantInfo));
+    }
+
+    private boolean canJoinChallenge(User user, Instance instance) {
+        return (instance.getProgress() != Progress.PREACTIVITY) ||
+                participantInfoService.hasParticipantInfo(user.getId(), instance.getId());
     }
 
     @Transactional

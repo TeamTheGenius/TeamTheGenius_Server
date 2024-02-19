@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.participantinfo.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
 
+import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -18,14 +19,20 @@ public class ParticipantInfoService {
     private final ParticipantInfoRepository participantInfoRepository;
 
 
-    public ParticipantInfo getParticipantInfoByJoinInfo(Long userId, Long instanceId) {
+    public ParticipantInfo findByJoinInfo(Long userId, Long instanceId) {
         return participantInfoRepository.findByJoinInfo(userId, instanceId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
     }
 
-    public ParticipantInfo findParticipantInfoById(Long participantInfoId) {
+    public ParticipantInfo findById(Long participantInfoId) {
         return participantInfoRepository.findById(participantInfoId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
+    }
+
+    public Instance getInstanceById(Long participantId) {
+        return participantInfoRepository.findById(participantId)
+                .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND))
+                .getInstance();
     }
 
     public boolean hasParticipantInfo(Long userId, Long instanceId) {

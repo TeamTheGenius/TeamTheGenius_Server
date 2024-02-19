@@ -12,16 +12,16 @@ import org.springframework.data.repository.query.Param;
 public interface CertificationRepository extends JpaRepository<Certification, Long> {
 
     @Query("select c from Certification c where c.certificatedAt = :targetDate and c.participantInfo.id = :participantId")
-    Optional<Certification> findCertificationByDate(@Param("targetDate") LocalDate targetDate,
-                                                    @Param("participantId") Long participantId);
+    Optional<Certification> findByDate(@Param("targetDate") LocalDate targetDate,
+                                       @Param("participantId") Long participantId);
 
-    @Query("select c from Certification c where c.participantInfo.id = :participantId and c.certificatedAt >= :startDate and c.certificatedAt <= :endDate")
-    List<Certification> findCertificationByDuration(@Param("startDate") LocalDate startDate,
-                                                    @Param("endDate") LocalDate endDate,
-                                                    @Param("participantId") Long participantId);
+    @Query("select c from Certification c where c.participantInfo.id = :participantId and c.certificatedAt >= :startDate and c.certificatedAt <= :endDate order by c.currentAttempt desc")
+    List<Certification> findByDuration(@Param("startDate") LocalDate startDate,
+                                       @Param("endDate") LocalDate endDate,
+                                       @Param("participantId") Long participantId);
 
     @Query("select c from Certification c where c.participantInfo.id = :participantId and c.certificationStatus = :status and c.certificatedAt <= :currentDate")
-    List<Certification> findCertificationByStatus(@Param("participantId") Long participantId,
-                                                  @Param("status") CertificateStatus status,
-                                                  @Param("currentDate") LocalDate currentDate);
+    List<Certification> findByStatus(@Param("participantId") Long participantId,
+                                     @Param("status") CertificateStatus status,
+                                     @Param("currentDate") LocalDate currentDate);
 }

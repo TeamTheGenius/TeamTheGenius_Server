@@ -40,7 +40,7 @@ class ParticipantInfoServiceTest {
         getSavedParticipantInfo(savedUser, savedInstance);
 
         //when
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(savedUser.getId(),
+        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(savedUser.getId(),
                 savedInstance.getId());
 
         //then

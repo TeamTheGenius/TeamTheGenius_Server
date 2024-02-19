@@ -71,7 +71,7 @@ class CertificationRepositoryTest {
         getSavedCertification(CERTIFICATED, endDate.minusDays(1), certificationLinks, participantInfo);
         getSavedCertification(CERTIFICATED, endDate, certificationLinks, participantInfo);
 
-        List<Certification> certifications = certificationRepository.findCertificationByDuration(startDate, endDate,
+        List<Certification> certifications = certificationRepository.findByDuration(startDate, endDate,
                 participantInfo.getId());
 
         //then

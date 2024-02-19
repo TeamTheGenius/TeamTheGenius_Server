@@ -75,7 +75,7 @@ public class CertificationController {
             @RequestParam String identifier
     ) {
         User user = userService.findUserByIdentifier(identifier);
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(), instanceId);
+        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(user.getId(), instanceId);
         List<RenewResponse> weekCertification = certificationService.getWeekCertification(
                 participantInfo.getId(), LocalDate.now());
 
@@ -90,7 +90,7 @@ public class CertificationController {
             @RequestParam String identifier
     ) {
         User user = userService.findUserByIdentifier(identifier);
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(), instanceId);
+        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(user.getId(), instanceId);
         List<RenewResponse> totalCertification = certificationService.getTotalCertification(
                 participantInfo.getId(), LocalDate.now());
 
@@ -106,7 +106,7 @@ public class CertificationController {
     ) {
 
         Instance instance = instanceService.findInstanceById(instanceId);
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(
+        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(
                 userPrincipal.getUser().getId(),
                 instanceId);
 

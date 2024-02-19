@@ -17,7 +17,10 @@ import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.challenge.user.domain.User;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHPullRequest;
@@ -25,6 +28,7 @@ import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+//TODO: 일반 CertificationService와 실제로 컨트롤러에 이용할 Service 분리하기
 @Slf4j
 @Service
 @Transactional(readOnly = true)
@@ -38,31 +42,52 @@ public class CertificationService {
 
     public List<RenewResponse> getWeekCertification(Long participantInfoId, LocalDate currentDate) {
         LocalDate startDate = currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
-        List<Certification> certifications = certificationRepository.findCertificationByDuration(startDate, currentDate,
-                participantInfoId);
+        List<Certification> certifications = certificationRepository.findByDuration(
+                startDate, currentDate, participantInfoId);
+        int curAttempt = DateUtil.getDiffBetweenDate(startDate, currentDate);
 
-        //TODO: 중간에 인증이 안된 부분이 있을 때 더미 데이터를 끼워주는게 맞을듯
-        return certifications.stream()
-                .map(RenewResponse::create)
-                .toList();
+        return convertToRenewResponse(certifications, curAttempt);
     }
 
     public List<RenewResponse> getTotalCertification(Long participantInfoId, LocalDate currentDate) {
-        ParticipantInfo participantInfo = participantInfoService.findParticipantInfoById(participantInfoId);
-        Instance instance = participantInfo.getInstance();
+        Instance instance = participantInfoService.getInstanceById(participantInfoId);
+        LocalDate startDate = instance.getStartedDate().toLocalDate();
 
-        List<Certification> certifications = certificationRepository.findCertificationByDuration(
-                instance.getStartedDate().toLocalDate(), currentDate, participantInfoId);
+        List<Certification> certifications = certificationRepository.findByDuration(
+                startDate, currentDate, participantInfoId);
+        int curAttempt = DateUtil.getDiffBetweenDate(startDate, currentDate);
 
-        return certifications.stream()
-                .map(RenewResponse::create)
-                .toList();
+        return convertToRenewResponse(certifications, curAttempt);
+    }
+
+    private List<RenewResponse> convertToRenewResponse(List<Certification> certifications, int curAttempt) {
+        List<RenewResponse> result = new ArrayList<>();
+        Map<Integer, Certification> certificationMap = convertToMap(certifications);
+
+        for (int cur = 1; cur <= curAttempt; cur++) {
+            if (certificationMap.containsKey(cur)) {
+                result.add(RenewResponse.createSuccess(certificationMap.get(cur)));
+                continue;
+            }
+            result.add(RenewResponse.createFail(cur));
+        }
+
+        return result;
+    }
+
+    private Map<Integer, Certification> convertToMap(List<Certification> certifications) {
+        Map<Integer, Certification> certificationMap = new HashMap<>();
+
+        for (Certification certification : certifications) {
+            certificationMap.put(certification.getCurrentAttempt(), certification);
+        }
+        return certificationMap;
     }
 
     @Transactional
     public RenewResponse updateCertification(User user, RenewRequest renewRequest) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(),
+        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(user.getId(),
                 renewRequest.instanceId());
 
         List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(
@@ -76,7 +101,7 @@ public class CertificationService {
                 renewRequest,
                 ghPullRequests);
 
-        return RenewResponse.create(certification);
+        return RenewResponse.createSuccess(certification);
     }
 
     private Certification createCertification(ParticipantInfo participantInfo,
@@ -85,7 +110,7 @@ public class CertificationService {
         int attempt = DateUtil.getDiffBetweenDate(participantInfo.getStartedDate(),
                 renewRequest.targetDate());
 
-        Certification certification = certificationRepository.findCertificationByDate(
+        Certification certification = certificationRepository.findByDate(
                         renewRequest.targetDate(),
                         participantInfo.getId())
                 .orElse(Certification.builder()
@@ -116,7 +141,7 @@ public class CertificationService {
 
     public CertificationResponse getCertificationInformation(User user, Long instanceId) {
         Instance instance = instanceService.findInstanceById(instanceId);
-        ParticipantInfo participantInfo = participantInfoService.getParticipantInfoByJoinInfo(user.getId(),
+        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(user.getId(),
                 instanceId);
 
         return CertificationResponse.createByEntity(instance, participantInfo.getRepositoryName());
@@ -126,11 +151,11 @@ public class CertificationService {
     public CertificationStatus getCertificationStatus(Instance instance, ParticipantInfo participantInfo,
                                                       LocalDate targetDate) {
         //성공 인증 개수
-        int successCount = certificationRepository.findCertificationByStatus(
+        int successCount = certificationRepository.findByStatus(
                         participantInfo.getId(), CERTIFICATED, targetDate)
                 .size();
         //실패 인증 개수
-        int failureCount = certificationRepository.findCertificationByStatus(
+        int failureCount = certificationRepository.findByStatus(
                         participantInfo.getId(), NOT_YET, targetDate)
                 .size();
 

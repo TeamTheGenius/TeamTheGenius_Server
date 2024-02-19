@@ -19,7 +19,19 @@ public record RenewResponse(
         List<String> prLinks
 ) {
 
-    public static RenewResponse create(Certification certification) {
+    public static RenewResponse createFail(int currentAttempt) {
+        return RenewResponse.builder()
+                .certificationId(0L)
+                .certificationAttempt(currentAttempt)
+                .dayOfWeek(null)
+                .certificatedAt(null)
+                .certificateStatus(null)
+                .prLinks(null)
+                .prCount(0)
+                .build();
+    }
+
+    public static RenewResponse createSuccess(Certification certification) {
         List<String> prLinks = getPrList(certification.getCertificationLinks());
 
         return RenewResponse.builder()

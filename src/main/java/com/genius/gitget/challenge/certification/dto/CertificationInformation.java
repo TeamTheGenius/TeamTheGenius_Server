@@ -3,7 +3,7 @@ package com.genius.gitget.challenge.certification.dto;
 import lombok.Builder;
 
 @Builder
-public record CertificationStatus(
+public record CertificationInformation(
         double successPercent,
         int totalAttempt,
         int currentAttempt,

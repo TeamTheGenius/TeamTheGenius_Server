@@ -2,20 +2,23 @@ package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
+import com.genius.gitget.challenge.certification.dto.CertificationInformation;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
-import com.genius.gitget.challenge.certification.dto.CertificationStatus;
 import com.genius.gitget.challenge.certification.dto.RenewRequest;
 import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -89,8 +92,13 @@ public class CertificationService {
     @Transactional
     public RenewResponse updateCertification(User user, RenewRequest renewRequest) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
+        Instance instance = instanceService.findInstanceById(renewRequest.instanceId());
         ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(user.getId(),
                 renewRequest.instanceId());
+
+        if (instance.getProgress() != Progress.ACTIVITY) {
+            throw new BusinessException(CERTIFICATION_UNABLE);
+        }
 
         List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(
                         gitHub,
@@ -150,15 +158,13 @@ public class CertificationService {
     }
 
     @Transactional
-    public CertificationStatus getCertificationStatus(Instance instance, ParticipantInfo participantInfo,
-                                                      LocalDate targetDate) {
+    public CertificationInformation getCertificationInformation(Instance instance, ParticipantInfo participantInfo,
+                                                                LocalDate targetDate) {
         //성공 인증 개수
-        int successCount = certificationRepository.findByStatus(
-                        participantInfo.getId(), CERTIFICATED, targetDate)
+        int successCount = certificationRepository.findByStatus(participantInfo.getId(), CERTIFICATED, targetDate)
                 .size();
         //실패 인증 개수
-        int failureCount = certificationRepository.findByStatus(
-                        participantInfo.getId(), NOT_YET, targetDate)
+        int failureCount = certificationRepository.findByStatus(participantInfo.getId(), NOT_YET, targetDate)
                 .size();
 
         //targetDate 기준 현재 진행 일차
@@ -168,12 +174,8 @@ public class CertificationService {
         int totalAttempt = instance.getTotalAttempt();
         int remainAttempt = totalAttempt - currentAttempt;
 
-        //성공 퍼센트
-        double successPercent = (double) successCount / (double) currentAttempt * 100;
-        double roundedPercent = Math.round(successPercent * 100 / 100.0);
-
-        return CertificationStatus.builder()
-                .successPercent(roundedPercent)
+        return CertificationInformation.builder()
+                .successPercent(getSuccessPercent(successCount, currentAttempt))
                 .totalAttempt(totalAttempt)
                 .currentAttempt(currentAttempt)
                 .pointPerPerson(instance.getPointPerPerson())
@@ -182,4 +184,10 @@ public class CertificationService {
                 .remainCount(remainAttempt)
                 .build();
     }
+
+    private double getSuccessPercent(int successCount, int currentAttempt) {
+        double successPercent = (double) successCount / (double) currentAttempt * 100;
+        return Math.round(successPercent * 100 / 100.0);
+    }
+
 }

@@ -23,4 +23,32 @@ class DateUtilTest {
         //then
         assertThat(attempt).isEqualTo(33);
     }
+
+    @Test
+    @DisplayName("첫 주차의 인증 현황을 조회할 때 챌린지의 시작 요일이 월요일이 아니라면, 시작 날짜를 기준으로 계산한다.")
+    public void should_calculateByStartDate_when_startDateIsNotMonday() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate endDate = LocalDate.of(2024, 2, 3);
+
+        //when
+        int weekAttempt = DateUtil.getWeekAttempt(startDate, endDate);
+
+        //then
+        assertThat(weekAttempt).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("일반적으로 주차별 인증 현황을 조회할 때, 요일에 따라 계산한다.")
+    public void should_calculateByDay_when_getListGenerally() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate endDate = LocalDate.of(2024, 2, 15);
+
+        //when
+        int weekAttempt = DateUtil.getWeekAttempt(startDate, endDate);
+
+        //then
+        assertThat(weekAttempt).isEqualTo(4);
+    }
 }

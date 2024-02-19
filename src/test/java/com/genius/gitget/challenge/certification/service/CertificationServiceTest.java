@@ -11,6 +11,7 @@ import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.RenewRequest;
 import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -149,7 +150,7 @@ class CertificationServiceTest {
     }
 
     @Test
-    @DisplayName("특정 사용자가 인증한 특정 기간 내에 인증된 인증 객체들을 받아올 수 있다.")
+    @DisplayName("특정 사용자가 일주일 간 인증한 현황들을 받아올 수 있다.")
     public void should_returnCertifications_when_passDuration() {
         //given
         LocalDate currentDate = LocalDate.of(2024, 2, 3);
@@ -168,6 +169,29 @@ class CertificationServiceTest {
 
         //then
         assertThat(weekCertification.size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("특정 사용자가 일주일 간 인증한 현황들을 받아올 때, 더미 데이터를 포함하여 연속적인 데이터로 받아올 수 있다.")
+    public void should_returnList_when_dataIsNotContinuous() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate endDate = LocalDate.of(2024, 2, 29);
+        LocalDate currentDate = LocalDate.of(2024, 2, 8);
+
+        ParticipantInfo participantInfo = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+
+        //when
+        getSavedCertification(NOT_YET, startDate, participantInfo);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participantInfo);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participantInfo);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participantInfo);
+
+        List<RenewResponse> weekCertification = certificationService.getWeekCertification(
+                participantInfo.getId(), currentDate);
+
+        //then
+        assertThat(weekCertification.size()).isEqualTo(4);
     }
 
 
@@ -209,8 +233,10 @@ class CertificationServiceTest {
 
     private Certification getSavedCertification(CertificateStatus status, LocalDate certificatedAt,
                                                 ParticipantInfo participantInfo) {
+        int attempt = DateUtil.getDiffBetweenDate(participantInfo.getStartedDate(), certificatedAt);
         Certification certification = Certification.builder()
                 .certificationStatus(status)
+                .currentAttempt(attempt)
                 .certificatedAt(certificatedAt)
                 .certificationLinks("certificationLink")
                 .build();

@@ -44,7 +44,9 @@ public class CertificationService {
         LocalDate startDate = currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
         List<Certification> certifications = certificationRepository.findByDuration(
                 startDate, currentDate, participantInfoId);
-        int curAttempt = DateUtil.getDiffBetweenDate(startDate, currentDate);
+        Instance instance = participantInfoService.getInstanceById(participantInfoId);
+
+        int curAttempt = DateUtil.getWeekAttempt(instance.getStartedDate().toLocalDate(), currentDate);
 
         return convertToRenewResponse(certifications, curAttempt);
     }

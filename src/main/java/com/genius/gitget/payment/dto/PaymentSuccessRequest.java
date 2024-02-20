@@ -6,5 +6,5 @@ import lombok.Data;
 public class PaymentSuccessRequest {
     private String orderId;
     private String paymentKey;
-    private Long amount;
+    private String amount;
 }

@@ -27,4 +27,8 @@ public class BaseTimeEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedDate;
+
+    // Payment 테이블
+    @Column(name = "success_at", updatable = false)
+    private LocalDateTime successDate;
 }

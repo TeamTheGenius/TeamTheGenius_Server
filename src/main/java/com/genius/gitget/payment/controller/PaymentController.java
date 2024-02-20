@@ -4,6 +4,7 @@ import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.payment.config.TossPaymentConfig;
+import com.genius.gitget.payment.dto.PaymentFailRequest;
 import com.genius.gitget.payment.dto.PaymentRequest;
 import com.genius.gitget.payment.dto.PaymentResponse;
 import com.genius.gitget.payment.dto.PaymentSuccessRequest;
@@ -51,7 +52,7 @@ public class PaymentController {
 
     @PostMapping("/toss/fail")
     public ResponseEntity<CommonResponse> tossPaymentFail(@RequestBody PaymentFailRequest paymentFailRequest) {
-        paymentService.tossPaymentFail(paymentFailRequest.getMessage(), paymentFailRequest.getOrderId());
+        paymentService.tossPaymentFail(paymentFailRequest);
         return ResponseEntity.ok().body(new CommonResponse(
                 SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
     }

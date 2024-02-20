@@ -1,5 +1,6 @@
 package com.genius.gitget.payment.domain;
 
+import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import com.genius.gitget.payment.dto.PaymentResponse;
 import com.genius.gitget.payment.dto.PaymentSuccessResponse;
 import jakarta.persistence.Column;

@@ -28,6 +28,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // json
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 

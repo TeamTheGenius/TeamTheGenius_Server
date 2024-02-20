@@ -3,7 +3,6 @@ package com.genius.gitget.payment.controller;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
-import com.genius.gitget.payment.config.TossPaymentConfig;
 import com.genius.gitget.payment.dto.PaymentFailRequest;
 import com.genius.gitget.payment.dto.PaymentRequest;
 import com.genius.gitget.payment.dto.PaymentResponse;
@@ -25,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
 
     private final PaymentService paymentService;
-    private final TossPaymentConfig tossPaymentConfig;
 
     // 1. 프론트가 사용자가 입력한 정보를 [결제하기] 버튼을 통해 /toss 로 결제요청 api 호출
     // 현재 컨트롤러에서 사용자 정보를 저장할 것

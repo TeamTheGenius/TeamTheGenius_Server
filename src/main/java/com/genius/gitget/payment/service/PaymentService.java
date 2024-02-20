@@ -38,9 +38,9 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse requestTossPayment(Payment payment) {
-//        if (payment.getAmount() < 1000) {
-//            // TODO 처리
-//        }
+        if (payment.getAmount() < 100) {
+            throw new BusinessException(ErrorCode.FAILED_POINT_PAYMENT);
+        }
         paymentRepository.save(payment);
         return payment.paymentResponse();
     }
@@ -132,9 +132,9 @@ public class PaymentService {
     }
 
     public void tossPaymentFail(PaymentFailRequest paymentFailRequest) {
-        Payment payment = paymentRepository.findByOrderId(paymentFailRequest.getOrderId()).orElseThrow(() -> {
-            throw new BusinessException(ErrorCode.FAILED_FINAL_PAYMENT);
-        });
+        Payment payment = paymentRepository.findByOrderId(paymentFailRequest.getOrderId())
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.FAILED_FINAL_PAYMENT));
         payment.setPaymentFailStatus(paymentFailRequest.getMessage(), false);
     }
 }

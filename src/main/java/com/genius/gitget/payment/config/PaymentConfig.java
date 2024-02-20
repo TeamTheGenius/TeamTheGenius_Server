@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Getter
-public class TossPaymentConfig {
+public class PaymentConfig {
     @Value("{payment.toss.test_client_api_key}")
     private String testClientApiKey;
 

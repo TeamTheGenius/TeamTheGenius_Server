@@ -20,5 +20,5 @@ public class TossPaymentConfig {
     private String failUrl;
 
     // 토스페이먼츠에 결제 승인 요청 보낼 url
-    public static final String URL = "https://api.tosspayments.com/v1/payments/";
+    public static final String URL = "https://api.tosspayments.com/v1/payments/confirm";
 }

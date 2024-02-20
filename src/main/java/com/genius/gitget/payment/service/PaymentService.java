@@ -72,12 +72,12 @@ public class PaymentService {
 
         JSONObject obj = new JSONObject(hashMap);
 
-        String widgetSecretKey = "test_sk_Poxy1XQL8RgjajjBQvAN37nO5Wml";
+        String widgetSecretKey = tossPaymentConfig.getTestSecretKey();
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         String authorizations = "Basic " + new String(encodedBytes);
 
-        URL url = new URL("https://api.tosspayments.com/v1/payments/confirm");
+        URL url = new URL(TossPaymentConfig.URL);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestProperty("Authorization", authorizations);
         connection.setRequestProperty("Content-Type", "application/json");
@@ -92,7 +92,6 @@ public class PaymentService {
 
         InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
 
-        // 결제 성공 및 실패 비즈니스 로직을 구현하세요.
         Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
         JSONObject jsonObject = (JSONObject) parser.parse(reader);
         responseStream.close();
@@ -100,7 +99,12 @@ public class PaymentService {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_ORDERID));
 
-        PaymentSuccessResponse successResponse = PaymentSuccessResponse.builder()
+        if (!(jsonObject.get("orderId") != null && jsonObject.get("orderId") == payment.getOrderId())
+                && (jsonObject.get("paymentKey") != null && jsonObject.get("paymentKey") == payment.getPaymentKey())) {
+            throw new BusinessException(ErrorCode.FAILED_FINAL_PAYMENT);
+        }
+
+        return PaymentSuccessResponse.builder()
                 .paymentKey(payment.getPaymentKey())
                 .amount(payment.getAmount())
                 .orderName(payment.getOrderName())
@@ -108,10 +112,6 @@ public class PaymentService {
                 .orderId(payment.getOrderId())
                 .isSuccess(payment.isSuccess())
                 .build();
-
-        System.out.println("jsonObject = " + jsonObject.toJSONString());
-
-        return successResponse;
     }
 
     public Payment verifyPayment(String orderId, Long amount) {

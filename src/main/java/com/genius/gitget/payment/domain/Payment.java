@@ -1,86 +1,84 @@
 package com.genius.gitget.payment.domain;
 
-import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.payment.dto.PaymentResponse;
+import com.genius.gitget.payment.dto.PaymentSuccessResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicInsert
 @Table(name = "payment")
-public class Payment {
+public class Payment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    private Long id; // 결제 번호
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user; // 회원 번호 (FK)
+    private Long id;
 
     private String orderId;
+
     private String paymentKey;
+
     private Long amount;
 
+    private Long pointAmount;
+
     private String orderName;
-    private String CancelReason;
-    private String failReason;
+
     private boolean isSuccess;
-    private boolean isCancel;
-    @Enumerated(EnumType.STRING)
-    private PayType payType;
 
-    // TODO 생성일 처리
-    private LocalDateTime createdAt;
-
+    private String failReason;
 
     @Builder
-    public Payment(String orderId, String paymentKey, Long amount, String orderName, String cancelReason,
-                   String failReason,
-                   boolean isSuccess, boolean isCancel, PayType payType) {
+    public Payment(String orderId, String paymentKey, Long amount, Long pointAmount, String orderName,
+                   boolean isSuccess, String failReason) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
+        this.pointAmount = pointAmount;
         this.orderName = orderName;
-        CancelReason = cancelReason;
-        this.failReason = failReason;
         this.isSuccess = isSuccess;
-        this.isCancel = isCancel;
-        this.payType = payType;
+        this.failReason = failReason;
     }
 
-    public PaymentResponse paymentResponse() { // DB에 저장하게 될 결제 관련 정보들
+    public PaymentResponse paymentResponse() {
         return PaymentResponse.builder()
-                .payType(payType.name())
                 .amount(amount)
+                .pointAmount(pointAmount)
                 .orderName(orderName)
                 .orderId(orderId)
-                //.customerEmail(customer.getEmail())
-                //.customerName(customer.getName())
-                //.createdAt(String.valueOf(getCreatedAt()))
-                .isCancel(isCancel)
+                .build();
+    }
+
+    public PaymentSuccessResponse paymentSuccessResponse() {
+        return PaymentSuccessResponse.builder()
+                .orderId(orderId)
+                .paymentKey(paymentKey)
+                .amount(amount)
+                .pointAmount(pointAmount)
+                .orderName(orderName)
+                .isSuccess(isSuccess)
                 .failReason(failReason)
                 .build();
     }
 
-    //== 연관관계 편의 메서드 ==//
-    public void setUser(User user) {
-        this.user = user;
+    public void setPaymentSuccessStatus(String paymentKey, boolean isSuccess) {
+        this.paymentKey = paymentKey;
+        this.isSuccess = isSuccess;
     }
 
+    public void setPaymentFailStatus(String message, boolean isSuccess) {
+        this.failReason = message;
+        this.isSuccess = isSuccess;
+    }
 }

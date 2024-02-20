@@ -1,10 +1,13 @@
 package com.genius.gitget.payment.controller;
 
 import com.genius.gitget.global.util.exception.SuccessCode;
+import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.payment.config.TossPaymentConfig;
 import com.genius.gitget.payment.dto.PaymentRequest;
 import com.genius.gitget.payment.dto.PaymentResponse;
+import com.genius.gitget.payment.dto.PaymentSuccessRequest;
+import com.genius.gitget.payment.dto.PaymentSuccessResponse;
 import com.genius.gitget.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,6 +1,5 @@
 package com.genius.gitget.payment.dto;
 
-import com.genius.gitget.payment.domain.PayType;
 import com.genius.gitget.payment.domain.Payment;
 import java.util.UUID;
 import lombok.Builder;
@@ -8,29 +7,26 @@ import lombok.Data;
 
 @Data
 public class PaymentRequest {
-    private PayType payType;
-    private Long amount; // 가격 정보
-    private String orderName; // 주문명
-    private String successRedirectUrl; // 성공 시 리다이렉트 될 URL
-    private String failRedirectUrl; // 실패 시 리다이렉트 될 URL
+    private Long amount;
+    private String orderName;
+    private Long pointAmount;
+
 
     @Builder
-    public PaymentRequest(PayType payType, Long amount, String orderName, String successRedirectUrl,
-                          String failRedirectUrl) {
-        this.payType = payType;
+    public PaymentRequest(Long amount, String orderName, Long pointAmount) {
         this.amount = amount;
         this.orderName = orderName;
-        this.successRedirectUrl = successRedirectUrl;
-        this.failRedirectUrl = failRedirectUrl;
+        this.pointAmount = pointAmount;
     }
 
     public Payment toEntity() {
         return Payment.builder()
-                .payType(payType)
-                .amount(amount)
-                .orderName(orderName)
                 .orderId(UUID.randomUUID().toString())
+                .amount(amount)
+                .pointAmount(pointAmount)
+                .orderName(orderName)
                 .isSuccess(false)
+                .failReason("")
                 .build();
     }
 }

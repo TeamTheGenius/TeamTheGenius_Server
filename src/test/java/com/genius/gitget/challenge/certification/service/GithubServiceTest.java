@@ -15,8 +15,8 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -47,7 +47,7 @@ class GithubServiceTest {
     @Autowired
     private InstanceRepository instanceRepository;
     @Autowired
-    private ParticipantInfoRepository participantInfoRepository;
+    private ParticipantRepository participantRepository;
     @Autowired
     private CertificationRepository certificationRepository;
 
@@ -120,7 +120,7 @@ class GithubServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        ParticipantInfo participantInfo = getParticipantInfo(user, instance);
+        Participant participant = getParticipantInfo(user, instance);
 
         //when & then
         assertThatThrownBy(() -> githubService.verifyRepository(user, targetRepo))
@@ -213,26 +213,26 @@ class GithubServiceTest {
         );
     }
 
-    private ParticipantInfo getParticipantInfo(User user, Instance instance) {
-        ParticipantInfo participantInfo = participantInfoRepository.save(
-                ParticipantInfo.builder()
+    private Participant getParticipantInfo(User user, Instance instance) {
+        Participant participant = participantRepository.save(
+                Participant.builder()
                         .joinResult(JoinResult.PROCESSING)
                         .joinStatus(JoinStatus.YES)
                         .build()
         );
-        participantInfo.setUserAndInstance(user, instance);
+        participant.setUserAndInstance(user, instance);
 
-        return participantInfo;
+        return participant;
     }
 
     private Certification getSavedCertification(CertificateStatus status, LocalDate certificatedAt,
-                                                ParticipantInfo participantInfo) {
+                                                Participant participant) {
         Certification certification = Certification.builder()
                 .certificationStatus(status)
                 .certificatedAt(certificatedAt)
                 .certificationLinks("certificationLink")
                 .build();
-        certification.setParticipantInfo(participantInfo);
+        certification.setParticipant(participant);
         return certificationRepository.save(certification);
     }
 }

@@ -15,9 +15,9 @@ import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
-import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
+import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -42,13 +42,13 @@ class InstanceDetailServiceTest {
     @Autowired
     InstanceDetailService instanceDetailService;
     @Autowired
-    ParticipantInfoService participantInfoService;
+    ParticipantProvider participantProvider;
     @Autowired
     UserRepository userRepository;
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    ParticipantInfoRepository participantInfoRepository;
+    ParticipantRepository participantRepository;
 
     @Value("${github.githubId}")
     private String githubId;
@@ -140,7 +140,7 @@ class InstanceDetailServiceTest {
         //when
         instanceDetailService.joinNewChallenge(savedUser, new JoinRequest(savedInstance.getId(), targetRepo));
         JoinResponse joinResponse = instanceDetailService.quitChallenge(savedUser, savedInstance.getId());
-        Optional<ParticipantInfo> byJoinInfo = participantInfoRepository.findByJoinInfo(savedUser.getId(),
+        Optional<Participant> byJoinInfo = participantRepository.findByJoinInfo(savedUser.getId(),
                 savedInstance.getId());
 
         //then
@@ -166,13 +166,13 @@ class InstanceDetailServiceTest {
         instanceDetailService.joinNewChallenge(savedUser, joinRequest);
         savedInstance.updateProgress(Progress.ACTIVITY);
         instanceDetailService.quitChallenge(savedUser, savedInstance.getId());
-        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(savedUser.getId(),
+        Participant participant = participantProvider.findByJoinInfo(savedUser.getId(),
                 savedInstance.getId());
 
         //then
         assertThat(savedInstance.getParticipantCount()).isEqualTo(0);
-        assertThat(participantInfo.getJoinResult()).isEqualTo(JoinResult.FAIL);
-        assertThat(participantInfo.getJoinStatus()).isEqualTo(JoinStatus.NO);
+        assertThat(participant.getJoinResult()).isEqualTo(JoinResult.FAIL);
+        assertThat(participant.getJoinStatus()).isEqualTo(JoinStatus.NO);
     }
 
     @Test

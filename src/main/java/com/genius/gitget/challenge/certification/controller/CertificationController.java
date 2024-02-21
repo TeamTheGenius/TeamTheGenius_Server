@@ -9,8 +9,8 @@ import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceService;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.challenge.participantinfo.service.ParticipantInfoService;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
@@ -38,7 +38,7 @@ public class CertificationController {
     private final UserService userService;
     private final CertificationService certificationService;
     private final InstanceService instanceService;
-    private final ParticipantInfoService participantInfoService;
+    private final ParticipantProvider participantProvider;
 
 
     @GetMapping("/{instanceId}")
@@ -75,9 +75,9 @@ public class CertificationController {
             @RequestParam String identifier
     ) {
         User user = userService.findUserByIdentifier(identifier);
-        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(user.getId(), instanceId);
+        Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
         List<RenewResponse> weekCertification = certificationService.getWeekCertification(
-                participantInfo.getId(), LocalDate.now());
+                participant.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekCertification)
@@ -90,9 +90,9 @@ public class CertificationController {
             @RequestParam String identifier
     ) {
         User user = userService.findUserByIdentifier(identifier);
-        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(user.getId(), instanceId);
+        Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
         List<RenewResponse> totalCertification = certificationService.getTotalCertification(
-                participantInfo.getId(), LocalDate.now());
+                participant.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), totalCertification)
@@ -106,12 +106,12 @@ public class CertificationController {
     ) {
 
         Instance instance = instanceService.findInstanceById(instanceId);
-        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(
+        Participant participant = participantProvider.findByJoinInfo(
                 userPrincipal.getUser().getId(),
                 instanceId);
 
         CertificationInformation certificationInformation = certificationService.getCertificationInformation(
-                instance, participantInfo, LocalDate.now());
+                instance, participant, LocalDate.now());
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationInformation)

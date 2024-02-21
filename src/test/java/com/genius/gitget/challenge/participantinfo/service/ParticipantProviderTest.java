@@ -6,8 +6,8 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -20,15 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class ParticipantInfoServiceTest {
+class ParticipantProviderTest {
     @Autowired
-    ParticipantInfoService participantInfoService;
+    ParticipantProvider participantProvider;
     @Autowired
     UserRepository userRepository;
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    ParticipantInfoRepository participantInfoRepository;
+    ParticipantRepository participantRepository;
 
 
     @Test
@@ -40,12 +40,12 @@ class ParticipantInfoServiceTest {
         getSavedParticipantInfo(savedUser, savedInstance);
 
         //when
-        ParticipantInfo participantInfo = participantInfoService.findByJoinInfo(savedUser.getId(),
+        Participant participant = participantProvider.findByJoinInfo(savedUser.getId(),
                 savedInstance.getId());
 
         //then
-        assertThat(participantInfo.getUser().getId()).isEqualTo(savedUser.getId());
-        assertThat(participantInfo.getInstance().getId()).isEqualTo(savedInstance.getId());
+        assertThat(participant.getUser().getId()).isEqualTo(savedUser.getId());
+        assertThat(participant.getInstance().getId()).isEqualTo(savedInstance.getId());
     }
 
 
@@ -70,11 +70,11 @@ class ParticipantInfoServiceTest {
         );
     }
 
-    private ParticipantInfo getSavedParticipantInfo(User user, Instance instance) {
-        ParticipantInfo participantInfo = ParticipantInfo.builder()
+    private Participant getSavedParticipantInfo(User user, Instance instance) {
+        Participant participant = Participant.builder()
                 .joinStatus(JoinStatus.YES)
                 .build();
-        participantInfo.setUserAndInstance(user, instance);
-        return participantInfoRepository.save(participantInfo);
+        participant.setUserAndInstance(user, instance);
+        return participantRepository.save(participant);
     }
 }

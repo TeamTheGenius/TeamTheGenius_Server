@@ -2,7 +2,7 @@ package com.genius.gitget.challenge.instance.dto.detail;
 
 import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import lombok.Builder;
 
 @Builder
@@ -11,11 +11,11 @@ public record JoinResponse(
         JoinStatus joinStatus,
         JoinResult joinResult
 ) {
-    public static JoinResponse createJoinResponse(ParticipantInfo participantInfo) {
+    public static JoinResponse createJoinResponse(Participant participant) {
         return JoinResponse.builder()
-                .participantId(participantInfo.getId())
-                .joinStatus(participantInfo.getJoinStatus())
-                .joinResult(participantInfo.getJoinResult())
+                .participantId(participant.getId())
+                .joinStatus(participant.getJoinStatus())
+                .joinResult(participant.getJoinResult())
                 .build();
     }
 

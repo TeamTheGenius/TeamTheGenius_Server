@@ -3,9 +3,10 @@ package com.genius.gitget.challenge.participantinfo.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,28 +16,32 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ParticipantInfoService {
-    private final ParticipantInfoRepository participantInfoRepository;
+public class ParticipantProvider {
+    private final ParticipantRepository participantRepository;
 
 
-    public ParticipantInfo findByJoinInfo(Long userId, Long instanceId) {
-        return participantInfoRepository.findByJoinInfo(userId, instanceId)
+    public Participant findByJoinInfo(Long userId, Long instanceId) {
+        return participantRepository.findByJoinInfo(userId, instanceId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
     }
 
-    public ParticipantInfo findById(Long participantInfoId) {
-        return participantInfoRepository.findById(participantInfoId)
+    public Participant findById(Long participantInfoId) {
+        return participantRepository.findById(participantInfoId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
     }
 
     public Instance getInstanceById(Long participantId) {
-        return participantInfoRepository.findById(participantId)
+        return participantRepository.findById(participantId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND))
                 .getInstance();
     }
 
-    public boolean hasParticipantInfo(Long userId, Long instanceId) {
-        return participantInfoRepository.findByJoinInfo(userId, instanceId).isPresent();
+    public boolean hasParticipant(Long userId, Long instanceId) {
+        return participantRepository.findByJoinInfo(userId, instanceId).isPresent();
+    }
+
+    public LocalDate getInstanceStartDate(Long participantId) {
+        return getInstanceById(participantId).getStartedDate().toLocalDate();
     }
 
 }

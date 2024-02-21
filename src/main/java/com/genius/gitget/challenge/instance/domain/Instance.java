@@ -4,7 +4,7 @@ package com.genius.gitget.challenge.instance.domain;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.hits.domain.Hits;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -50,7 +50,7 @@ public class Instance {
     private List<Hits> hitsList = new ArrayList<>();
 
     @OneToMany(mappedBy = "instance")
-    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
+    private List<Participant> participantList = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id")
@@ -122,7 +122,7 @@ public class Instance {
     }
 
     public int getTotalAttempt() {
-        return DateUtil.getDiffBetweenDate(startedDate.toLocalDate(), completedDate.toLocalDate());
+        return DateUtil.getAttemptCount(startedDate.toLocalDate(), completedDate.toLocalDate());
     }
 
     //== 연관관계 편의 메서드 ==//

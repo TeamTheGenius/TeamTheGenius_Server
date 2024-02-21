@@ -17,8 +17,8 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -50,7 +50,7 @@ class CertificationServiceTest {
     @Autowired
     private InstanceRepository instanceRepository;
     @Autowired
-    private ParticipantInfoRepository participantInfoRepository;
+    private ParticipantRepository participantRepository;
     @Autowired
     private CertificationRepository certificationRepository;
 
@@ -79,6 +79,7 @@ class CertificationServiceTest {
                 .instanceId(instance.getId())
                 .targetDate(targetDate)
                 .build();
+        instance.updateProgress(Progress.ACTIVITY);
 
         //when
         RenewResponse renewResponse = certificationService.updateCertification(user,
@@ -108,6 +109,7 @@ class CertificationServiceTest {
                 .instanceId(instance.getId())
                 .targetDate(targetDate)
                 .build();
+        instance.updateProgress(Progress.ACTIVITY);
 
         //when
         RenewResponse renewResponse = certificationService.updateCertification(user,
@@ -156,16 +158,16 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 2, 3);
         LocalDate startDate = LocalDate.of(2024, 2, 1);
         LocalDate endDate = LocalDate.of(2024, 2, 4);
-        ParticipantInfo participantInfo = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+        Participant participant = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
 
         //when
-        getSavedCertification(NOT_YET, startDate, participantInfo);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participantInfo);
-        getSavedCertification(CERTIFICATED, endDate.minusDays(1), participantInfo);
-        getSavedCertification(CERTIFICATED, endDate, participantInfo);
+        getSavedCertification(NOT_YET, startDate, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, endDate.minusDays(1), participant);
+        getSavedCertification(CERTIFICATED, endDate, participant);
 
         List<RenewResponse> weekCertification = certificationService.getWeekCertification(
-                participantInfo.getId(), currentDate);
+                participant.getId(), currentDate);
 
         //then
         assertThat(weekCertification.size()).isEqualTo(3);
@@ -179,16 +181,16 @@ class CertificationServiceTest {
         LocalDate endDate = LocalDate.of(2024, 2, 29);
         LocalDate currentDate = LocalDate.of(2024, 2, 8);
 
-        ParticipantInfo participantInfo = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+        Participant participant = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
 
         //when
-        getSavedCertification(NOT_YET, startDate, participantInfo);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participantInfo);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participantInfo);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participantInfo);
+        getSavedCertification(NOT_YET, startDate, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
 
         List<RenewResponse> weekCertification = certificationService.getWeekCertification(
-                participantInfo.getId(), currentDate);
+                participant.getId(), currentDate);
 
         //then
         assertThat(weekCertification.size()).isEqualTo(4);
@@ -217,30 +219,30 @@ class CertificationServiceTest {
         );
     }
 
-    private ParticipantInfo getParticipantInfo(User user, Instance instance) {
-        ParticipantInfo participantInfo = participantInfoRepository.save(
-                ParticipantInfo.builder()
+    private Participant getParticipantInfo(User user, Instance instance) {
+        Participant participant = participantRepository.save(
+                Participant.builder()
                         .joinResult(JoinResult.PROCESSING)
                         .joinStatus(JoinStatus.YES)
                         .build()
         );
-        participantInfo.setUserAndInstance(user, instance);
-        participantInfo.updateRepository(targetRepo);
+        participant.setUserAndInstance(user, instance);
+        participant.updateRepository(targetRepo);
 
-        return participantInfo;
+        return participant;
     }
 
 
     private Certification getSavedCertification(CertificateStatus status, LocalDate certificatedAt,
-                                                ParticipantInfo participantInfo) {
-        int attempt = DateUtil.getDiffBetweenDate(participantInfo.getStartedDate(), certificatedAt);
+                                                Participant participant) {
+        int attempt = DateUtil.getAttemptCount(participant.getStartedDate(), certificatedAt);
         Certification certification = Certification.builder()
                 .certificationStatus(status)
                 .currentAttempt(attempt)
                 .certificatedAt(certificatedAt)
                 .certificationLinks("certificationLink")
                 .build();
-        certification.setParticipantInfo(participantInfo);
+        certification.setParticipant(participant);
         return certificationRepository.save(certification);
     }
 }

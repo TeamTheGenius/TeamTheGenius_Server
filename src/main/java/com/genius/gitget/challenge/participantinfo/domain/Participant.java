@@ -31,10 +31,10 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 @Table(name = "participantInfo")
-public class ParticipantInfo {
+public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "participantInfo_id")
+    @Column(name = "participant_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -45,7 +45,7 @@ public class ParticipantInfo {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "participantInfo")
+    @OneToMany(mappedBy = "participant")
     private List<Certification> certificationList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -61,14 +61,14 @@ public class ParticipantInfo {
     private String repositoryName;
 
     @Builder
-    private ParticipantInfo(JoinStatus joinStatus, JoinResult joinResult, String repositoryName) {
+    private Participant(JoinStatus joinStatus, JoinResult joinResult, String repositoryName) {
         this.joinStatus = joinStatus;
         this.joinResult = joinResult;
         this.repositoryName = repositoryName;
     }
 
-    public static ParticipantInfo createDefaultParticipantInfo(String repositoryName) {
-        return ParticipantInfo.builder()
+    public static Participant createDefaultParticipantInfo(String repositoryName) {
+        return Participant.builder()
                 .joinStatus(JoinStatus.YES)
                 .joinResult(JoinResult.PROCESSING)
                 .repositoryName(repositoryName)
@@ -98,15 +98,15 @@ public class ParticipantInfo {
 
     private void addParticipantInfoForUser(User user) {
         this.user = user;
-        if (!(user.getParticipantInfoList().contains(this))) {
-            user.getParticipantInfoList().add(this);
+        if (!(user.getParticipantList().contains(this))) {
+            user.getParticipantList().add(this);
         }
     }
 
     private void addParticipantInfoForInstance(Instance instance) {
         this.instance = instance;
-        if (!(instance.getParticipantInfoList().contains(this))) {
-            instance.getParticipantInfoList().add(this);
+        if (!(instance.getParticipantList().contains(this))) {
+            instance.getParticipantList().add(this);
         }
     }
 }

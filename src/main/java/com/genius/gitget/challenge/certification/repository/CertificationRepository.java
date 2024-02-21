@@ -11,16 +11,16 @@ import org.springframework.data.repository.query.Param;
 
 public interface CertificationRepository extends JpaRepository<Certification, Long> {
 
-    @Query("select c from Certification c where c.certificatedAt = :targetDate and c.participantInfo.id = :participantId")
+    @Query("select c from Certification c where c.certificatedAt = :targetDate and c.participant.id = :participantId")
     Optional<Certification> findByDate(@Param("targetDate") LocalDate targetDate,
                                        @Param("participantId") Long participantId);
 
-    @Query("select c from Certification c where c.participantInfo.id = :participantId and c.certificatedAt >= :startDate and c.certificatedAt <= :endDate order by c.currentAttempt desc")
+    @Query("select c from Certification c where c.participant.id = :participantId and c.certificatedAt >= :startDate and c.certificatedAt <= :endDate order by c.currentAttempt desc")
     List<Certification> findByDuration(@Param("startDate") LocalDate startDate,
                                        @Param("endDate") LocalDate endDate,
                                        @Param("participantId") Long participantId);
 
-    @Query("select c from Certification c where c.participantInfo.id = :participantId and c.certificationStatus = :status and c.certificatedAt <= :currentDate")
+    @Query("select c from Certification c where c.participant.id = :participantId and c.certificationStatus = :status and c.certificatedAt <= :currentDate")
     List<Certification> findByStatus(@Param("participantId") Long participantId,
                                      @Param("status") CertificateStatus status,
                                      @Param("currentDate") LocalDate currentDate);

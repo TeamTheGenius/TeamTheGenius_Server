@@ -18,7 +18,7 @@ class DateUtilTest {
         LocalDate endDate = LocalDate.of(2024, 3, 4);
 
         //when
-        int attempt = DateUtil.getDiffBetweenDate(startDate, endDate);
+        int attempt = DateUtil.getAttemptCount(startDate, endDate);
 
         //then
         assertThat(attempt).isEqualTo(33);

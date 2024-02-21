@@ -10,8 +10,8 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantInfoRepository;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -36,7 +36,7 @@ class CertificationRepositoryTest {
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    ParticipantInfoRepository participantInfoRepository;
+    ParticipantRepository participantRepository;
 
     @Test
     @DisplayName("Certification 객체를 만들어서 저장할 수 있다.")
@@ -44,7 +44,7 @@ class CertificationRepositoryTest {
         //given
         LocalDate certificatedDate = LocalDate.of(2024, 2, 1);
         String certificationLinks = "https://test.com";
-        ParticipantInfo savedParticipant = getSavedParticipant(getSavedUser(), getSavedInstance());
+        Participant savedParticipant = getSavedParticipant(getSavedUser(), getSavedInstance());
 
         //when
         Certification savedCertification = getSavedCertification(NOT_YET, certificatedDate, certificationLinks,
@@ -63,29 +63,29 @@ class CertificationRepositoryTest {
         String certificationLinks = "https://test.com";
         LocalDate startDate = LocalDate.of(2024, 2, 1);
         LocalDate endDate = LocalDate.of(2024, 2, 4);
-        ParticipantInfo participantInfo = getSavedParticipant(getSavedUser(), getSavedInstance());
+        Participant participant = getSavedParticipant(getSavedUser(), getSavedInstance());
 
         //when
-        getSavedCertification(NOT_YET, startDate, certificationLinks, participantInfo);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(1), certificationLinks, participantInfo);
-        getSavedCertification(CERTIFICATED, endDate.minusDays(1), certificationLinks, participantInfo);
-        getSavedCertification(CERTIFICATED, endDate, certificationLinks, participantInfo);
+        getSavedCertification(NOT_YET, startDate, certificationLinks, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), certificationLinks, participant);
+        getSavedCertification(CERTIFICATED, endDate.minusDays(1), certificationLinks, participant);
+        getSavedCertification(CERTIFICATED, endDate, certificationLinks, participant);
 
         List<Certification> certifications = certificationRepository.findByDuration(startDate, endDate,
-                participantInfo.getId());
+                participant.getId());
 
         //then
         assertThat(certifications.size()).isEqualTo(4);
     }
 
     private Certification getSavedCertification(CertificateStatus status, LocalDate certificatedAt,
-                                                String certificationLink, ParticipantInfo participantInfo) {
+                                                String certificationLink, Participant participant) {
         Certification certification = Certification.builder()
                 .certificationStatus(status)
                 .certificatedAt(certificatedAt)
                 .certificationLinks(certificationLink)
                 .build();
-        certification.setParticipantInfo(participantInfo);
+        certification.setParticipant(participant);
         return certificationRepository.save(certification);
     }
 
@@ -107,11 +107,11 @@ class CertificationRepositoryTest {
         );
     }
 
-    private ParticipantInfo getSavedParticipant(User user, Instance instance) {
-        ParticipantInfo participantInfo = ParticipantInfo.builder()
+    private Participant getSavedParticipant(User user, Instance instance) {
+        Participant participant = Participant.builder()
                 .joinStatus(JoinStatus.YES)
                 .build();
-        participantInfo.setUserAndInstance(user, instance);
-        return participantInfoRepository.save(participantInfo);
+        participant.setUserAndInstance(user, instance);
+        return participantRepository.save(participant);
     }
 }

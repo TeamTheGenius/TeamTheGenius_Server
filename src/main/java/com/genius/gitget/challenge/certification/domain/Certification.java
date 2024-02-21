@@ -1,6 +1,6 @@
 package com.genius.gitget.challenge.certification.domain;
 
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
+import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -32,8 +32,8 @@ public class Certification extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "participantInfo_id")
-    private ParticipantInfo participantInfo;
+    @JoinColumn(name = "participant_id")
+    private Participant participant;
 
     private int currentAttempt;
 
@@ -65,10 +65,10 @@ public class Certification extends BaseTimeEntity {
 
 
     //=== 연관관계 편의 메서드 ===//
-    public void setParticipantInfo(ParticipantInfo participantInfo) {
-        this.participantInfo = participantInfo;
-        if (!participantInfo.getCertificationList().contains(this)) {
-            participantInfo.getCertificationList().add(this);
+    public void setParticipant(Participant participant) {
+        this.participant = participant;
+        if (!participant.getCertificationList().contains(this)) {
+            participant.getCertificationList().add(this);
         }
     }
 }

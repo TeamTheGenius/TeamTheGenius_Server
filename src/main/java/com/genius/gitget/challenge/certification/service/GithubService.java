@@ -1,9 +1,12 @@
 package com.genius.gitget.challenge.certification.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_PR_NOT_FOUND;
+
 import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +50,14 @@ public class GithubService {
         return repositoryList.stream()
                 .map(GHRepository::getName)
                 .toList();
+    }
+
+    public List<PullRequestResponse> verifyPullRequest(User user, String repositoryName, LocalDate targetDate) {
+        List<PullRequestResponse> responses = getPullRequestListByDate(user, repositoryName, targetDate);
+        if (responses.isEmpty()) {
+            throw new BusinessException(GITHUB_PR_NOT_FOUND);
+        }
+        return responses;
     }
 
     public List<PullRequestResponse> getPullRequestListByDate(User user, String repositoryName, LocalDate targetDate) {

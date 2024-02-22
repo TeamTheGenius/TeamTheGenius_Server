@@ -1,13 +1,11 @@
 package com.genius.gitget.challenge.certification.controller;
 
-import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_PR_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.certification.dto.GithubTokenRequest;
 import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
 import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
-import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import java.time.LocalDate;
@@ -72,12 +70,9 @@ public class GithubController {
             @RequestParam String repo
     ) {
 
-        List<PullRequestResponse> pullRequestResponses = githubService.getPullRequestListByDate(
-                userPrincipal.getUser(), repo, LocalDate.now());
-
-        if (pullRequestResponses.isEmpty()) {
-            throw new BusinessException(GITHUB_PR_NOT_FOUND);
-        }
+        List<PullRequestResponse> pullRequestResponses = githubService.verifyPullRequest(
+                userPrincipal.getUser(), repo, LocalDate.now()
+        );
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), pullRequestResponses)

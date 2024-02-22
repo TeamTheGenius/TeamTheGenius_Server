@@ -59,10 +59,9 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody RenewRequest renewRequest
     ) {
-
         RenewResponse renewResponse = certificationService.updateCertification(
                 userPrincipal.getUser(),
-                renewRequest);
+                new RenewRequest(renewRequest.instanceId(), LocalDate.now()));
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), renewResponse)

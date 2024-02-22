@@ -102,7 +102,7 @@ public class CertificationService {
                 renewRequest.targetDate());
 
         Certification certification = certificationProvider.findByDate(renewRequest.targetDate(), participant.getId())
-                .orElse(certificationProvider.createCertification(participant, renewRequest.targetDate(),
+                .orElseGet(() -> certificationProvider.createCertification(participant, renewRequest.targetDate(),
                         pullRequests));
 
         return RenewResponse.createSuccess(certification);

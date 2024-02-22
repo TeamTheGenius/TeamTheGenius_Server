@@ -4,6 +4,7 @@ import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_JOIN_INS
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_QUIT_INSTANCE;
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
 
+import com.genius.gitget.challenge.certification.service.GithubProvider;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
@@ -18,6 +19,7 @@ import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ public class InstanceDetailService {
     private final UserService userService;
     private final InstanceRepository instanceRepository;
     private final ParticipantProvider participantProvider;
+    private final GithubProvider githubProvider;
 
 
     public InstanceResponse getInstanceDetailInformation(User user, Long instanceId) {
@@ -47,12 +50,14 @@ public class InstanceDetailService {
         Instance instance = instanceRepository.findById(joinRequest.instanceId())
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
-        if (canJoinChallenge(persistUser, instance)) {
+        String repository = joinRequest.repository();
+
+        if (verifyGithub(persistUser, repository) && canJoinChallenge(persistUser, instance)) {
             throw new BusinessException(CAN_NOT_JOIN_INSTANCE);
         }
 
         instance.updateParticipantCount(1);
-        Participant participant = Participant.createDefaultParticipantInfo(joinRequest.repository());
+        Participant participant = Participant.createDefaultParticipantInfo(repository);
         participant.setUserAndInstance(persistUser, instance);
         return JoinResponse.createJoinResponse(participantProvider.save(participant));
     }
@@ -60,6 +65,12 @@ public class InstanceDetailService {
     private boolean canJoinChallenge(User user, Instance instance) {
         return (instance.getProgress() != Progress.PREACTIVITY) ||
                 participantProvider.hasParticipant(user.getId(), instance.getId());
+    }
+
+    private boolean verifyGithub(User user, String repository) {
+        GitHub gitHub = githubProvider.getGithubConnection(user);
+        githubProvider.validateGithubRepository(gitHub, repository);
+        return true;
     }
 
     @Transactional

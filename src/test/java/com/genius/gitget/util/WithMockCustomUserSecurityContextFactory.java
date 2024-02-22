@@ -1,11 +1,11 @@
 package com.genius.gitget.util;
 
-import com.genius.gitget.global.security.service.CustomUserDetailsService;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.security.service.CustomUserDetailsService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +38,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 .information(customUser.information())
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
         Long signupId = userService.signup(signupRequest);
+        savedUser.updateRole(customUser.role());
 
         UserDetails principal = customUserDetailsService.loadUserByUsername(String.valueOf(signupId));
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, principal.getPassword(),

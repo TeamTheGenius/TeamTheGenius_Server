@@ -40,23 +40,23 @@ public class CertificationService {
 
 
     public List<RenewResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
+        LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
+        int curAttempt = DateUtil.getWeekAttempt(startDate, currentDate);
+
         List<Certification> certifications = certificationProvider.findByDuration(
                 DateUtil.getWeekStartDate(currentDate),
                 currentDate,
                 participantId);
-        Participant participant = participantProvider.findById(participantId);
-
-        int curAttempt = DateUtil.getWeekAttempt(participant.getStartedDate(), currentDate);
 
         return convertToRenewResponse(certifications, curAttempt);
     }
 
     public List<RenewResponse> getTotalCertification(Long participantId, LocalDate currentDate) {
         LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
+        int curAttempt = DateUtil.getAttemptCount(startDate, currentDate);
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
-        int curAttempt = DateUtil.getAttemptCount(startDate, currentDate);
 
         return convertToRenewResponse(certifications, curAttempt);
     }

@@ -40,7 +40,6 @@ public class CertificationProvider {
         return certificationRepository.save(certification);
     }
 
-    //TODO: 이름을 좀 더 직관적으로 만들 수 있지 않을까? 역할을 분리해야 하나?
     @Transactional
     public Certification createCertification(Participant participant,
                                              LocalDate targetDate,

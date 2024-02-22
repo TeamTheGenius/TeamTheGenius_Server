@@ -9,13 +9,14 @@ public class PaymentResponse {
     private Long pointAmount;
     private String orderName;
     private String orderId;
+    private String userEmail;
 
     @Builder
-    public PaymentResponse(Long amount, Long pointAmount, String orderName, String orderId) {
+    public PaymentResponse(Long amount, Long pointAmount, String orderName, String orderId, String userEmail) {
         this.amount = amount;
         this.pointAmount = pointAmount;
         this.orderName = orderName;
         this.orderId = orderId;
-
+        this.userEmail = userEmail;
     }
 }

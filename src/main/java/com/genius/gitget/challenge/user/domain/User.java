@@ -47,9 +47,8 @@ public class User extends BaseTimeEntity {
     @OneToMany(mappedBy = "user")
     private List<ParticipantInfo> participantInfoList = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_id")
-    private Payment payment;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payment = new ArrayList<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -95,4 +94,5 @@ public class User extends BaseTimeEntity {
     public void setFiles(Files files) {
         this.files = files;
     }
+
 }

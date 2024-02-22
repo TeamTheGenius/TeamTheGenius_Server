@@ -1,13 +1,16 @@
 package com.genius.gitget.payment.domain;
 
+import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import com.genius.gitget.payment.dto.PaymentResponse;
-import com.genius.gitget.payment.dto.PaymentSuccessResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -26,6 +29,10 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "payment_id")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private String orderId;
 
     private String paymentKey;
@@ -42,7 +49,7 @@ public class Payment extends BaseTimeEntity {
 
     @Builder
     public Payment(String orderId, String paymentKey, Long amount, Long pointAmount, String orderName,
-                   boolean isSuccess, String failReason) {
+                   boolean isSuccess, String failReason, User user) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
@@ -50,6 +57,7 @@ public class Payment extends BaseTimeEntity {
         this.orderName = orderName;
         this.isSuccess = isSuccess;
         this.failReason = failReason;
+        this.user = user;
     }
 
     public PaymentResponse paymentResponse() {
@@ -58,18 +66,7 @@ public class Payment extends BaseTimeEntity {
                 .pointAmount(pointAmount)
                 .orderName(orderName)
                 .orderId(orderId)
-                .build();
-    }
-
-    public PaymentSuccessResponse paymentSuccessResponse() {
-        return PaymentSuccessResponse.builder()
-                .orderId(orderId)
-                .paymentKey(paymentKey)
-                .amount(amount)
-                .pointAmount(pointAmount)
-                .orderName(orderName)
-                .isSuccess(isSuccess)
-                .failReason(failReason)
+                .userEmail(user.getIdentifier())
                 .build();
     }
 
@@ -81,5 +78,9 @@ public class Payment extends BaseTimeEntity {
     public void setPaymentFailStatus(String message, boolean isSuccess) {
         this.failReason = message;
         this.isSuccess = isSuccess;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

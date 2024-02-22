@@ -2,11 +2,14 @@ package com.genius.gitget.payment.service;
 
 import static java.lang.Long.valueOf;
 
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.payment.config.TossPaymentConfig;
 import com.genius.gitget.payment.domain.Payment;
 import com.genius.gitget.payment.dto.PaymentFailRequest;
+import com.genius.gitget.payment.dto.PaymentRequest;
 import com.genius.gitget.payment.dto.PaymentResponse;
 import com.genius.gitget.payment.dto.PaymentSuccessRequest;
 import com.genius.gitget.payment.dto.PaymentSuccessResponse;
@@ -20,6 +23,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -34,15 +38,35 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final UserRepository userRepository;
     private final TossPaymentConfig tossPaymentConfig;
 
     @Transactional
-    public PaymentResponse requestTossPayment(Payment payment) {
-        if (payment.getAmount() < 100) {
+    public PaymentResponse requestTossPayment(PaymentRequest paymentRequest) {
+
+        Payment paymentRequestToEntity = paymentRequestToEntity(paymentRequest);
+
+        if (paymentRequestToEntity.getAmount() < 100) {
             throw new BusinessException(ErrorCode.FAILED_POINT_PAYMENT);
         }
-        paymentRepository.save(payment);
-        return payment.paymentResponse();
+        paymentRepository.save(paymentRequestToEntity);
+        return paymentRequestToEntity.paymentResponse();
+    }
+
+    private Payment paymentRequestToEntity(PaymentRequest paymentRequest) {
+        User findByEmailUser = userRepository.findByIdentifier(paymentRequest.getUserEmail())
+                .orElseThrow(() -> new BusinessException(
+                        ErrorCode.MEMBER_NOT_FOUND));
+
+        return Payment.builder()
+                .orderId(UUID.randomUUID().toString())
+                .amount(paymentRequest.getAmount())
+                .orderName(paymentRequest.getOrderName())
+                .pointAmount(paymentRequest.getPointAmount())
+                .user(findByEmailUser)
+                .isSuccess(false)
+                .failReason("")
+                .build();
     }
 
     @Transactional
@@ -63,7 +87,7 @@ public class PaymentService {
 
         paymentKey = paymentSuccessRequest.getPaymentKey();
         orderId = paymentSuccessRequest.getOrderId();
-        amount = paymentSuccessRequest.getAmount();
+        amount = String.valueOf(paymentSuccessRequest.getAmount());
 
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("paymentKey", paymentKey);

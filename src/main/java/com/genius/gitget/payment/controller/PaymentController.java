@@ -32,7 +32,7 @@ public class PaymentController {
     @PostMapping("/toss")
     public ResponseEntity<SingleResponse<PaymentResponse>> requestTossPayment(
             @RequestBody PaymentRequest paymentRequest) {
-        PaymentResponse paymentResponse = paymentService.requestTossPayment(paymentRequest.toEntity());
+        PaymentResponse paymentResponse = paymentService.requestTossPayment(paymentRequest);
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), paymentResponse)
         );

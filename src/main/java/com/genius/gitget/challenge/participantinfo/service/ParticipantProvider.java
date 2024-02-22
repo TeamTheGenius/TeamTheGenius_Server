@@ -19,6 +19,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class ParticipantProvider {
     private final ParticipantRepository participantRepository;
 
+    @Transactional
+    public Participant save(Participant participant) {
+        return participantRepository.save(participant);
+    }
+
+    @Transactional
+    public void delete(Participant participant) {
+        participantRepository.delete(participant);
+    }
 
     public Participant findByJoinInfo(Long userId, Long instanceId) {
         return participantRepository.findByJoinInfo(userId, instanceId)

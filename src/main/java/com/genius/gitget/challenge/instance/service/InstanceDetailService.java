@@ -12,7 +12,6 @@ import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
@@ -30,8 +29,6 @@ public class InstanceDetailService {
     private final UserService userService;
     private final InstanceRepository instanceRepository;
     private final ParticipantProvider participantProvider;
-    //REFACTOR: ParticipantInfoService 에만 의존하도록 리팩토링할 것
-    private final ParticipantRepository participantRepository;
 
 
     public InstanceResponse getInstanceDetailInformation(User user, Long instanceId) {
@@ -57,7 +54,7 @@ public class InstanceDetailService {
         instance.updateParticipantCount(1);
         Participant participant = Participant.createDefaultParticipantInfo(joinRequest.repository());
         participant.setUserAndInstance(persistUser, instance);
-        return JoinResponse.createJoinResponse(participantRepository.save(participant));
+        return JoinResponse.createJoinResponse(participantProvider.save(participant));
     }
 
     private boolean canJoinChallenge(User user, Instance instance) {
@@ -77,7 +74,7 @@ public class InstanceDetailService {
 
         if (instance.getProgress() == Progress.PREACTIVITY) {
             instance.updateParticipantCount(-1);
-            participantRepository.delete(participant);
+            participantProvider.delete(participant);
             return JoinResponse.createQuitResponse();
         }
 

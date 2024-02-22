@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 public final class EncryptUtil {
     private final AesBytesEncryptor encryptor;
 
-    public String encryptPersonalToken(String personalToken) {
-        byte[] encrypt = encryptor.encrypt(personalToken.getBytes(StandardCharsets.UTF_8));
+    public String encrypt(String target) {
+        byte[] encrypt = encryptor.encrypt(target.getBytes(StandardCharsets.UTF_8));
         return byteArrayToString(encrypt);
     }
 
-    public String decryptPersonalToken(String encryptString) {
-        byte[] decryptBytes = stringToByteArray(encryptString);
+    public String decrypt(String encrypted) {
+        byte[] decryptBytes = stringToByteArray(encrypted);
         byte[] decrypt = encryptor.decrypt(decryptBytes);
         return new String(decrypt, StandardCharsets.UTF_8);
     }

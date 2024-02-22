@@ -22,8 +22,8 @@ class EncryptUtilTest {
         String target = "target token";
 
         //when
-        String encrypted = encryptUtil.encryptPersonalToken(target);
-        String decrypted = encryptUtil.decryptPersonalToken(encrypted);
+        String encrypted = encryptUtil.encrypt(target);
+        String decrypted = encryptUtil.decrypt(encrypted);
 
         //then
         Assertions.assertThat(decrypted).isEqualTo(target);

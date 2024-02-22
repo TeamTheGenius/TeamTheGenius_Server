@@ -63,7 +63,7 @@ class GithubServiceTest {
     public void should_updateTokenInfo_when_tokenValid() {
         //given
         User user = getSavedUser(githubId);
-        String encrypted = encryptUtil.encryptPersonalToken(personalKey);
+        String encrypted = encryptUtil.encrypt(personalKey);
 
         //when
         githubService.registerGithubPersonalToken(user, personalKey);
@@ -78,7 +78,7 @@ class GithubServiceTest {
     public void should_throwException_when_accountIncorrect() {
         //given
         User user = getSavedUser("incorrect Id");
-        encryptUtil.encryptPersonalToken(personalKey);
+        encryptUtil.encrypt(personalKey);
 
         //when & then
         assertThatThrownBy(() -> githubService.registerGithubPersonalToken(user, personalKey))

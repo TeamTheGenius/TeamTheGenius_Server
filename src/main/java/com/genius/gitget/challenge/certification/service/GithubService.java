@@ -28,7 +28,7 @@ public class GithubService {
         GitHub gitHub = githubProvider.getGithubConnection(githubToken);
         githubProvider.validateGithubConnection(gitHub, user.getIdentifier());
 
-        String encryptedToken = encryptUtil.encryptPersonalToken(githubToken);
+        String encryptedToken = encryptUtil.encrypt(githubToken);
         user.updateGithubPersonalToken(encryptedToken);
         userService.save(user);
     }

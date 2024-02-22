@@ -65,6 +65,6 @@ public class UserService {
         if (githubToken == null || githubToken.isEmpty() || githubToken.isBlank()) {
             throw new BusinessException(GITHUB_TOKEN_NOT_FOUND);
         }
-        return encryptUtil.decryptPersonalToken(githubToken);
+        return encryptUtil.decrypt(githubToken);
     }
 }

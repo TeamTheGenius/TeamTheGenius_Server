@@ -1,7 +1,6 @@
 package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
-import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
@@ -93,25 +92,42 @@ public class CertificationService {
         Participant participant = participantProvider.findByJoinInfo(user.getId(),
                 renewRequest.instanceId());
 
-        if (instance.getProgress() != Progress.ACTIVITY) {
+        if (!canCertificate(instance, renewRequest.targetDate())) {
             throw new BusinessException(CERTIFICATION_UNABLE);
         }
 
-        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(
-                        gitHub,
-                        participant.getRepositoryName(),
-                        renewRequest.targetDate())
-                .nextPage();
+        List<String> pullRequests = getPullRequestLink(
+                gitHub,
+                participant.getRepositoryName(),
+                renewRequest.targetDate());
 
-        Certification certification = certificationProvider.createCertification(
-                participant,
-                renewRequest,
-                ghPullRequests);
+        Certification certification = certificationProvider.findByDate(renewRequest.targetDate(), participant.getId())
+                .orElse(certificationProvider.createCertification(participant, renewRequest.targetDate(),
+                        pullRequests));
 
         return RenewResponse.createSuccess(certification);
     }
 
-    public CertificationResponse getCertificationInformation(User user, Long instanceId) {
+    private boolean canCertificate(Instance instance, LocalDate targetDate) {
+        boolean isValidPeriod = targetDate.isAfter(instance.getStartedDate().toLocalDate()) &&
+                targetDate.isBefore(instance.getCompletedDate().toLocalDate());
+
+        return ((instance.getProgress() == Progress.ACTIVITY) && isValidPeriod);
+    }
+
+    private List<String> getPullRequestLink(GitHub gitHub, String repositoryName, LocalDate targetDate) {
+        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(
+                        gitHub,
+                        repositoryName,
+                        targetDate)
+                .nextPage();
+
+        return ghPullRequests.stream()
+                .map(pr -> pr.getHtmlUrl().toString())
+                .toList();
+    }
+
+    public CertificationResponse getInstanceInformation(User user, Long instanceId) {
         Instance instance = instanceService.findInstanceById(instanceId);
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
 
@@ -124,8 +140,6 @@ public class CertificationService {
         //성공 인증 개수
         int successCount = certificationProvider.countCertificatedByStatus(participant.getId(), CERTIFICATED,
                 targetDate);
-        //실패 인증 개수
-        int failureCount = certificationProvider.countCertificatedByStatus(participant.getId(), NOT_YET, targetDate);
 
         //targetDate 기준 현재 진행 일차
         int currentAttempt = DateUtil.getAttemptCount(instance.getStartedDate().toLocalDate(), targetDate);
@@ -140,7 +154,7 @@ public class CertificationService {
                 .currentAttempt(currentAttempt)
                 .pointPerPerson(instance.getPointPerPerson())
                 .successCount(successCount)
-                .failureCount(failureCount)
+                .failureCount(currentAttempt - successCount)
                 .remainCount(remainAttempt)
                 .build();
     }

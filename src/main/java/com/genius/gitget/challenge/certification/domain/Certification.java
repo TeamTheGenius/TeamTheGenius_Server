@@ -55,14 +55,6 @@ public class Certification extends BaseTimeEntity {
         this.certificationStatus = certificationStatus;
     }
 
-    //=== 비지니스 로직 ===//
-    public void updateCertification(LocalDate certificatedAt, String certificationLinks,
-                                    CertificateStatus certificationStatus) {
-        this.certificatedAt = certificatedAt;
-        this.certificationLinks = certificationLinks;
-        this.certificationStatus = certificationStatus;
-    }
-
 
     //=== 연관관계 편의 메서드 ===//
     public void setParticipant(Participant participant) {

@@ -46,7 +46,7 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
-        CertificationResponse certificationResponse = certificationService.getCertificationInformation(
+        CertificationResponse certificationResponse = certificationService.getInstanceInformation(
                 userPrincipal.getUser(), instanceId);
 
         return ResponseEntity.ok().body(

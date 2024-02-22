@@ -2,12 +2,15 @@ package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
+import com.genius.gitget.challenge.certification.dto.CertificationInformation;
+import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.RenewRequest;
 import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
@@ -92,6 +95,29 @@ class CertificationServiceTest {
         assertThat(renewResponse.certificateStatus()).isEqualTo(CERTIFICATED);
         assertThat(renewResponse.certificatedAt()).isEqualTo(targetDate);
         assertThat(renewResponse.prCount()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("인증을 시도한 날짜가 챌린지의 진행 기간과 겹치지 않는다면 예외를 발생한다.")
+    public void should_throwException_when_progressIsNotActivity() {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        getParticipantInfo(user, instance);
+        githubService.registerGithubPersonalToken(user, personalKey);
+
+        LocalDate targetDate = LocalDate.of(2024, 3, 6);
+
+        RenewRequest renewRequest = RenewRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(targetDate)
+                .build();
+        instance.updateProgress(Progress.ACTIVITY);
+
+        //when && then
+        assertThatThrownBy(() -> certificationService.updateCertification(user, renewRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(CERTIFICATION_UNABLE.getMessage());
     }
 
     @Test
@@ -196,6 +222,74 @@ class CertificationServiceTest {
         assertThat(weekCertification.size()).isEqualTo(4);
     }
 
+    @Test
+    @DisplayName("현재 일자까지의 인증 현황들을 받아올 수 있다.")
+    public void should_returnList_when_passDate() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate endDate = LocalDate.of(2024, 2, 29);
+        LocalDate currentDate = LocalDate.of(2024, 2, 8);
+
+        Participant participant = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+
+        //when
+        getSavedCertification(NOT_YET, startDate, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
+
+        List<RenewResponse> certification = certificationService.getTotalCertification(participant.getId(),
+                currentDate);
+
+        //then
+        assertThat(certification.size()).isEqualTo(8);
+    }
+
+    @Test
+    @DisplayName("사용자가 참여한 챌린지에 대한 상세 정보를 받을 수 있다.")
+    public void should_returnDetailInfo_when_participate() {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+
+        //when
+        CertificationResponse certificationResponse = certificationService.getInstanceInformation(user,
+                instance.getId());
+
+        //then
+        assertThat(certificationResponse.instanceId()).isEqualTo(instance.getId());
+        assertThat(certificationResponse.repositoryName()).isEqualTo(targetRepo);
+    }
+
+    @Test
+    @DisplayName("사용자가 참여한 챌린지에 대해 전반적인 현황을 받을 수 있다.")
+    public void should_getInformation_when_participate() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate endDate = LocalDate.of(2024, 2, 29);
+        LocalDate targetDate = LocalDate.of(2024, 2, 8);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+
+        //when
+        getSavedCertification(NOT_YET, startDate, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
+        CertificationInformation information = certificationService.getCertificationInformation(instance,
+                participant, targetDate);
+
+        //then
+        assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(information.remainCount()).isEqualTo(information.totalAttempt() - information.currentAttempt());
+        assertThat(information.totalAttempt()).isEqualTo(29);
+        assertThat(information.currentAttempt()).isEqualTo(8);
+        assertThat(information.successCount()).isEqualTo(3);
+        assertThat(information.failureCount()).isEqualTo(information.currentAttempt() - information.successCount());
+    }
+
 
     private User getSavedUser(String githubId) {
         return userRepository.save(
@@ -215,6 +309,7 @@ class CertificationServiceTest {
                 Instance.builder()
                         .progress(Progress.PREACTIVITY)
                         .startedDate(LocalDateTime.of(2024, 2, 1, 11, 3))
+                        .completedDate(LocalDateTime.of(2024, 2, 29, 23, 59))
                         .build()
         );
     }

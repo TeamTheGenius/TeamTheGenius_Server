@@ -90,8 +90,8 @@ public class User extends BaseTimeEntity {
         this.role = role;
     }
 
-    public void updateGithubPersonalToken(String githubToken) {
-        this.githubToken = githubToken;
+    public void updateGithubPersonalToken(String encryptedToken) {
+        this.githubToken = encryptedToken;
     }
 
 

@@ -7,6 +7,7 @@ import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
@@ -44,12 +45,16 @@ class InstanceDetailServiceTest {
     @Autowired
     ParticipantProvider participantProvider;
     @Autowired
+    GithubService githubService;
+    @Autowired
     UserRepository userRepository;
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
     ParticipantRepository participantRepository;
 
+    @Value("${github.personalKey}")
+    private String githubToken;
     @Value("${github.githubId}")
     private String githubId;
     @Value("${github.repository}")
@@ -281,7 +286,7 @@ class InstanceDetailServiceTest {
     }
 
     private User getSavedUser(String githubId) {
-        return userRepository.save(
+        User user = userRepository.save(
                 User.builder()
                         .role(Role.USER)
                         .nickname("nickname")
@@ -291,6 +296,8 @@ class InstanceDetailServiceTest {
                         .tags("BE,FE")
                         .build()
         );
+        githubService.registerGithubPersonalToken(user, githubToken);
+        return user;
     }
 
     private Instance getSavedInstance(Progress progress) {

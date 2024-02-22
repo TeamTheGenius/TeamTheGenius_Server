@@ -69,7 +69,8 @@ public class InstanceDetailService {
 
     private boolean verifyGithub(User user, String repository) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
-        githubProvider.validateGithubRepository(gitHub, repository);
+        String repositoryFullName = githubProvider.getRepoFullName(gitHub, repository);
+        githubProvider.validateGithubRepository(gitHub, repositoryFullName);
         return true;
     }
 

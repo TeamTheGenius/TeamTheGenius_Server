@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.CertificationInformation;
-import com.genius.gitget.challenge.certification.dto.CertificationResponse;
+import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
 import com.genius.gitget.challenge.certification.dto.RenewRequest;
 import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
@@ -254,12 +254,10 @@ class CertificationServiceTest {
         Participant participant = getParticipantInfo(user, instance);
 
         //when
-        CertificationResponse certificationResponse = certificationService.getInstanceInformation(user,
-                instance.getId());
+        InstancePreviewResponse instancePreviewResponse = certificationService.getInstancePreview(instance.getId());
 
         //then
-        assertThat(certificationResponse.instanceId()).isEqualTo(instance.getId());
-        assertThat(certificationResponse.repositoryName()).isEqualTo(targetRepo);
+        assertThat(instancePreviewResponse.instanceId()).isEqualTo(instance.getId());
     }
 
     @Test

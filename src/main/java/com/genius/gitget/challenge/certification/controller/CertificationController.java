@@ -3,7 +3,7 @@ package com.genius.gitget.challenge.certification.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.certification.dto.CertificationInformation;
-import com.genius.gitget.challenge.certification.dto.CertificationResponse;
+import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
 import com.genius.gitget.challenge.certification.dto.RenewRequest;
 import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
@@ -42,15 +42,13 @@ public class CertificationController {
 
 
     @GetMapping("/{instanceId}")
-    public ResponseEntity<SingleResponse<CertificationResponse>> getInstanceInformation(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<SingleResponse<InstancePreviewResponse>> getInstanceInformation(
             @PathVariable Long instanceId
     ) {
-        CertificationResponse certificationResponse = certificationService.getInstanceInformation(
-                userPrincipal.getUser(), instanceId);
+        InstancePreviewResponse instancePreviewResponse = certificationService.getInstancePreview(instanceId);
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), instancePreviewResponse)
         );
     }
 

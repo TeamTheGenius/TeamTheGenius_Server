@@ -68,9 +68,9 @@ public class GithubProvider {
         }
     }
 
-    public void validateGithubRepository(GitHub gitHub, String repositoryName) {
+    public void validateGithubRepository(GitHub gitHub, String repositoryFullName) {
         try {
-            gitHub.getRepository(repositoryName);
+            gitHub.getRepository(repositoryFullName);
         } catch (GHFileNotFoundException e) {
             throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
         } catch (IllegalArgumentException | IOException e) {
@@ -93,7 +93,7 @@ public class GithubProvider {
     public PagedIterator<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName,
                                                              LocalDate createdAt) {
         try {
-            GHRepository repository = gitHub.getRepository(getRepoName(gitHub, repositoryName));
+            GHRepository repository = gitHub.getRepository(getRepoFullName(gitHub, repositoryName));
             GHPullRequestSearchBuilder builder = gitHub.searchPullRequests()
                     .repo(repository)
                     .author(getGHUser(gitHub))
@@ -113,7 +113,7 @@ public class GithubProvider {
         return gitHub.getUser(accountId);
     }
 
-    private String getRepoName(GitHub gitHub, String repositoryName) {
+    public String getRepoFullName(GitHub gitHub, String repositoryName) {
         try {
             return gitHub.getMyself().getLogin() + "/" + repositoryName;
         } catch (IOException e) {

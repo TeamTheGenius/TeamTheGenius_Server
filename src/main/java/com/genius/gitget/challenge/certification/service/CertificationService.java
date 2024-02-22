@@ -5,7 +5,7 @@ import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UN
 
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.CertificationInformation;
-import com.genius.gitget.challenge.certification.dto.CertificationResponse;
+import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
 import com.genius.gitget.challenge.certification.dto.RenewRequest;
 import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.util.DateUtil;
@@ -89,8 +89,7 @@ public class CertificationService {
     public RenewResponse updateCertification(User user, RenewRequest renewRequest) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
         Instance instance = instanceService.findInstanceById(renewRequest.instanceId());
-        Participant participant = participantProvider.findByJoinInfo(user.getId(),
-                renewRequest.instanceId());
+        Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
 
         if (!canCertificate(instance, renewRequest.targetDate())) {
             throw new BusinessException(CERTIFICATION_UNABLE);
@@ -127,11 +126,9 @@ public class CertificationService {
                 .toList();
     }
 
-    public CertificationResponse getInstanceInformation(User user, Long instanceId) {
+    public InstancePreviewResponse getInstancePreview(Long instanceId) {
         Instance instance = instanceService.findInstanceById(instanceId);
-        Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
-
-        return CertificationResponse.createByEntity(instance, participant.getRepositoryName());
+        return InstancePreviewResponse.createByEntity(instance);
     }
 
     @Transactional
@@ -149,6 +146,7 @@ public class CertificationService {
         int remainAttempt = totalAttempt - currentAttempt;
 
         return CertificationInformation.builder()
+                .repository(participant.getRepositoryName())
                 .successPercent(getSuccessPercent(successCount, currentAttempt))
                 .totalAttempt(totalAttempt)
                 .currentAttempt(currentAttempt)

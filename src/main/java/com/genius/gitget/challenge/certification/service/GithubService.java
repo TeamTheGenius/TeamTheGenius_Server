@@ -40,7 +40,7 @@ public class GithubService {
     public void verifyRepository(User user, String repository) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
 
-        String repositoryFullName = user.getIdentifier() + "/" + repository;
+        String repositoryFullName = githubProvider.getRepoFullName(gitHub, repository);
         githubProvider.validateGithubRepository(gitHub, repositoryFullName);
     }
 

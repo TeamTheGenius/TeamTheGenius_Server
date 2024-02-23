@@ -2,7 +2,6 @@ package com.genius.gitget.challenge.instance.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_JOIN_INSTANCE;
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_QUIT_INSTANCE;
-import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
 
 import com.genius.gitget.challenge.certification.service.GithubProvider;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -10,7 +9,6 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
-import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
@@ -29,14 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class InstanceDetailService {
     private final UserService userService;
-    private final InstanceRepository instanceRepository;
+    private final InstanceProvider instanceProvider;
     private final ParticipantProvider participantProvider;
     private final GithubProvider githubProvider;
 
 
     public InstanceResponse getInstanceDetailInformation(User user, Long instanceId) {
-        Instance instance = instanceRepository.findById(instanceId)
-                .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
+        Instance instance = instanceProvider.findById(instanceId);
         if (participantProvider.hasParticipant(user.getId(), instanceId)) {
             return InstanceResponse.createByEntity(instance, JoinStatus.YES);
         }
@@ -47,8 +44,7 @@ public class InstanceDetailService {
     @Transactional
     public JoinResponse joinNewChallenge(User user, JoinRequest joinRequest) {
         User persistUser = userService.findUserById(user.getId());
-        Instance instance = instanceRepository.findById(joinRequest.instanceId())
-                .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
+        Instance instance = instanceProvider.findById(joinRequest.instanceId());
 
         String repository = joinRequest.repository();
 
@@ -76,8 +72,7 @@ public class InstanceDetailService {
 
     @Transactional
     public JoinResponse quitChallenge(User user, Long instanceId) {
-        Instance instance = instanceRepository.findById(instanceId)
-                .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
+        Instance instance = instanceProvider.findById(instanceId);
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
 
         if (instance.getProgress() == Progress.DONE) {

@@ -11,7 +11,7 @@ import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.instance.service.InstanceService;
+import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
@@ -36,7 +36,7 @@ public class CertificationService {
     private final GithubProvider githubProvider;
     private final CertificationProvider certificationProvider;
     private final ParticipantProvider participantProvider;
-    private final InstanceService instanceService;
+    private final InstanceProvider instanceProvider;
 
 
     public List<RenewResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
@@ -88,7 +88,7 @@ public class CertificationService {
     @Transactional
     public RenewResponse updateCertification(User user, RenewRequest renewRequest) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
-        Instance instance = instanceService.findInstanceById(renewRequest.instanceId());
+        Instance instance = instanceProvider.findById(renewRequest.instanceId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
 
         if (!canCertificate(instance, renewRequest.targetDate())) {
@@ -127,7 +127,7 @@ public class CertificationService {
     }
 
     public InstancePreviewResponse getInstancePreview(Long instanceId) {
-        Instance instance = instanceService.findInstanceById(instanceId);
+        Instance instance = instanceProvider.findById(instanceId);
         return InstancePreviewResponse.createByEntity(instance);
     }
 

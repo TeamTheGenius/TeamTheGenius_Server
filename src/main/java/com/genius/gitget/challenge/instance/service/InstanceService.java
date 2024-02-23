@@ -114,9 +114,4 @@ public class InstanceService {
             throw new BusinessException(e);
         }
     }
-
-    public Instance findInstanceById(Long instanceId) {
-        return instanceRepository.findById(instanceId)
-                .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
-    }
 }

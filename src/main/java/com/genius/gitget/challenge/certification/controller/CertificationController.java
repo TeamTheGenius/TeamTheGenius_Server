@@ -8,7 +8,7 @@ import com.genius.gitget.challenge.certification.dto.RenewRequest;
 import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.instance.service.InstanceService;
+import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
@@ -37,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CertificationController {
     private final UserService userService;
     private final CertificationService certificationService;
-    private final InstanceService instanceService;
+    private final InstanceProvider instanceProvider;
     private final ParticipantProvider participantProvider;
 
 
@@ -102,7 +102,7 @@ public class CertificationController {
             @PathVariable Long instanceId
     ) {
 
-        Instance instance = instanceService.findInstanceById(instanceId);
+        Instance instance = instanceProvider.findById(instanceId);
         Participant participant = participantProvider.findByJoinInfo(
                 userPrincipal.getUser().getId(),
                 instanceId);

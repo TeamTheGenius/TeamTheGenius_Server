@@ -2,7 +2,6 @@ package com.genius.gitget.payment.domain;
 
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
-import com.genius.gitget.payment.dto.PaymentResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -58,16 +57,6 @@ public class Payment extends BaseTimeEntity {
         this.isSuccess = isSuccess;
         this.failReason = failReason;
         this.user = user;
-    }
-
-    public PaymentResponse paymentResponse() {
-        return PaymentResponse.builder()
-                .amount(amount)
-                .pointAmount(pointAmount)
-                .orderName(orderName)
-                .orderId(orderId)
-                .userEmail(user.getIdentifier())
-                .build();
     }
 
     public void setPaymentSuccessStatus(String paymentKey, boolean isSuccess) {

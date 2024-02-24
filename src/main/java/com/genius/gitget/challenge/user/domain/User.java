@@ -69,6 +69,8 @@ public class User extends BaseTimeEntity {
     @Column(length = 100)
     private String information;
 
+    private Long point;
+
     @Builder
     public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,
                 String tags) {
@@ -93,6 +95,10 @@ public class User extends BaseTimeEntity {
     //=== 연관관계 편의 메서드 ===//
     public void setFiles(Files files) {
         this.files = files;
+    }
+
+    public void setPoint(Long point) {
+        this.point += point;
     }
 
 }

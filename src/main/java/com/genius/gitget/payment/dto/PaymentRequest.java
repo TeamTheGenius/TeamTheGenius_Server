@@ -2,10 +2,8 @@ package com.genius.gitget.payment.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
 public class PaymentRequest {
     private Long amount;
     private String orderName;

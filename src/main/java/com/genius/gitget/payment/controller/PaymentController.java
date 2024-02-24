@@ -25,10 +25,6 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // 1. 프론트가 사용자가 입력한 정보를 [결제하기] 버튼을 통해 /toss 로 결제요청 api 호출
-    // 현재 컨트롤러에서 사용자 정보를 저장할 것
-    // Request : 사용자 정보
-    // Response : DB에 정보 저장 후 사용자 정보 반환
     @PostMapping("/toss")
     public ResponseEntity<SingleResponse<PaymentResponse>> requestTossPayment(
             @RequestBody PaymentRequest paymentRequest) {
@@ -37,7 +33,6 @@ public class PaymentController {
                 new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), paymentResponse)
         );
     }
-
 
     @PostMapping("/toss/success")
     public ResponseEntity<SingleResponse<PaymentSuccessResponse>> tossPaymentSuccess(

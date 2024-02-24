@@ -12,7 +12,7 @@ public class PaymentSuccessResponse {
     private Long amount;
     private Long pointAmount;
     private String orderName;
-    private boolean isSuccess;
+    private String isSuccess;
     private String failReason;
 
     @Builder
@@ -23,7 +23,7 @@ public class PaymentSuccessResponse {
         this.amount = amount;
         this.pointAmount = pointAmount;
         this.orderName = orderName;
-        this.isSuccess = isSuccess;
+        this.isSuccess = String.valueOf(isSuccess);
         this.failReason = failReason;
     }
 }

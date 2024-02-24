@@ -15,6 +15,7 @@ import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -66,12 +67,22 @@ public class InstanceService {
         return instances.map(this::mapToInstancePagingResponse);
     }
 
+
+    // 특정 토픽에 대한 리스트 조회
+    public Page<InstancePagingResponse> getAllInstancesOfSpecificTopic(Pageable pageable, Long id) {
+        Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        Page<Instance> instancesByTopicId = instanceRepository.findInstancesByTopicId(pageable, topic.getId());
+        return instancesByTopicId.map(this::mapToInstancePagingResponse);
+    }
+
+
     // 인스턴스 단건 조회
     public InstanceDetailResponse getInstanceById(Long id) {
         Instance instanceDetails = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
         return InstanceDetailResponse.createByEntity(instanceDetails, instanceDetails.getFiles());
     }
+
 
     // 인스턴스 삭제
     @Transactional
@@ -86,6 +97,7 @@ public class InstanceService {
         instance.setFiles(null);
         instanceRepository.delete(instance);
     }
+
 
     // 인스턴스 수정
     @Transactional

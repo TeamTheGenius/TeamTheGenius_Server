@@ -12,6 +12,7 @@ import lombok.Builder;
 @Builder
 public record InstanceResponse(
         Long instanceId,
+        String title,
         int remainDays,
         String period,
         int participantCount,
@@ -28,6 +29,7 @@ public record InstanceResponse(
         LocalDate startedLocalDate = instance.getStartedDate().toLocalDate();
         LocalDate completedLocalDate = instance.getCompletedDate().toLocalDate();
         return InstanceResponse.builder()
+                .title(instance.getTitle())
                 .instanceId(instance.getId())
                 .remainDays(getRemainDays(startedLocalDate))
                 .period(startedLocalDate + " ~ " + completedLocalDate)

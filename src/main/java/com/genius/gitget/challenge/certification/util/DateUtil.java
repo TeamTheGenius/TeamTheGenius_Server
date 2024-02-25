@@ -2,7 +2,9 @@ package com.genius.gitget.challenge.certification.util;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 
 public final class DateUtil {
     public static int getAttemptCount(LocalDate startDate, LocalDate targetDate) {
@@ -22,6 +24,13 @@ public final class DateUtil {
 
     public static LocalDate getWeekStartDate(LocalDate currentDate) {
         return currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
+    }
+
+    public static LocalDate convertToLocalDate(Date date) {
+        return LocalDate.ofInstant(
+                date.toInstant(),
+                ZoneId.of("Asia/Seoul")
+        );
     }
 }
 

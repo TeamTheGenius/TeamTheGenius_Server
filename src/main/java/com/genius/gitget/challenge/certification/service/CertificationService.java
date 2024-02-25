@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHPullRequest;
@@ -85,6 +86,7 @@ public class CertificationService {
         return certificationMap;
     }
 
+    //REFACTOR: 너무 길어서 보기 불편함. 흐름이 읽는데에 용이하지 않음
     @Transactional
     public RenewResponse updateCertification(User user, RenewRequest renewRequest) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
@@ -100,9 +102,18 @@ public class CertificationService {
                 participant.getRepositoryName(),
                 renewRequest.targetDate());
 
-        Certification certification = certificationProvider.findByDate(renewRequest.targetDate(), participant.getId())
-                .orElseGet(() -> certificationProvider.createCertification(participant, renewRequest.targetDate(),
-                        pullRequests));
+        Optional<Certification> optional = certificationProvider.findByDate(renewRequest.targetDate(),
+                participant.getId());
+
+        if (optional.isEmpty()) {
+            Certification certification = certificationProvider.createCertification(participant,
+                    renewRequest.targetDate(),
+                    pullRequests);
+            return RenewResponse.createSuccess(certification);
+        }
+
+        Certification certification = optional.get();
+        certificationProvider.update(certification, renewRequest.targetDate(), pullRequests);
 
         return RenewResponse.createSuccess(certification);
     }
@@ -115,11 +126,7 @@ public class CertificationService {
     }
 
     private List<String> getPullRequestLink(GitHub gitHub, String repositoryName, LocalDate targetDate) {
-        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(
-                        gitHub,
-                        repositoryName,
-                        targetDate)
-                .nextPage();
+        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate);
 
         return ghPullRequests.stream()
                 .map(pr -> pr.getHtmlUrl().toString())

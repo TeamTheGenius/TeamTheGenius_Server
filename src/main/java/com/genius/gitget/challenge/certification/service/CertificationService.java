@@ -15,6 +15,8 @@ import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CertificationService {
+    private final FilesService filesService;
     private final GithubProvider githubProvider;
     private final CertificationProvider certificationProvider;
     private final ParticipantProvider participantProvider;
@@ -132,7 +135,8 @@ public class CertificationService {
 
     public InstancePreviewResponse getInstancePreview(Long instanceId) {
         Instance instance = instanceProvider.findById(instanceId);
-        return InstancePreviewResponse.createByEntity(instance);
+        FileResponse fileResponse = filesService.getEncodedFile(instance.getFiles());
+        return InstancePreviewResponse.createByEntity(instance, fileResponse);
     }
 
     @Transactional

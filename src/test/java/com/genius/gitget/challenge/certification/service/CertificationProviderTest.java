@@ -135,7 +135,7 @@ class CertificationProviderTest {
 
     private Participant getSavedParticipant(User user, Instance instance) {
         Participant participant = participantRepository.save(
-                Participant.createDefaultParticipantInfo("repo")
+                Participant.createDefaultParticipant("repo")
         );
         participant.setUserAndInstance(user, instance);
         return participant;
@@ -143,7 +143,7 @@ class CertificationProviderTest {
 
     private Participant getSavedParticipant(Instance instance) {
         Participant participant = participantRepository.save(
-                Participant.createDefaultParticipantInfo("repo")
+                Participant.createDefaultParticipant("repo")
         );
         participant.setUserAndInstance(null, instance);
         return participant;

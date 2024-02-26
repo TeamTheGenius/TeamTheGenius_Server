@@ -53,8 +53,9 @@ public class InstanceDetailService {
         }
 
         instance.updateParticipantCount(1);
-        Participant participant = Participant.createDefaultParticipantInfo(repository);
+        Participant participant = Participant.createDefaultParticipant(repository);
         participant.setUserAndInstance(persistUser, instance);
+        participant.joinChallenge();
         return JoinResponse.createJoinResponse(participantProvider.save(participant));
     }
 

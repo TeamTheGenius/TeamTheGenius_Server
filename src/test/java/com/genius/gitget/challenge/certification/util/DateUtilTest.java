@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.certification.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,5 +51,18 @@ class DateUtilTest {
 
         //then
         assertThat(weekAttempt).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("Date를 전달했을 때 LocalDate로 변환할 수 있다.")
+    public void should_convertToLocalDate_when_passDate() {
+        //given
+        Date date = new Date(1725000000000L);
+
+        //when
+        LocalDate localDate = DateUtil.convertToLocalDate(date);
+
+        //then
+        assertThat(localDate).isEqualTo(LocalDate.of(2024, 8, 30));
     }
 }

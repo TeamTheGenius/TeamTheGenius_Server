@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +46,9 @@ public class Payment extends BaseTimeEntity {
     private boolean isSuccess;
 
     private String failReason;
+
+    @Column(name = "success_at", updatable = false)
+    private LocalDateTime successDate;
 
     @Builder
     public Payment(String orderId, String paymentKey, Long amount, Long pointAmount, String orderName,

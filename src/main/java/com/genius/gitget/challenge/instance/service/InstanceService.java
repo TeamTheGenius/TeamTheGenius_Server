@@ -50,6 +50,7 @@ public class InstanceService {
                 .notice(instanceCreateRequest.notice())
                 .startedDate(instanceCreateRequest.startedAt())
                 .completedDate(instanceCreateRequest.completedAt())
+                .certificationMethod(instanceCreateRequest.certificationMethod())
                 .progress(Progress.PREACTIVITY)
                 .build();
 
@@ -112,7 +113,8 @@ public class InstanceService {
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(),
                 instanceUpdateRequest.pointPerPerson(),
-                instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());
+                instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt(),
+                instanceUpdateRequest.certificationMethod());
 
         Instance savedInstance = instanceRepository.save(existingInstance);
 

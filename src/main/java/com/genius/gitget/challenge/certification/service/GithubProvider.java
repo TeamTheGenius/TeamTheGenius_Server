@@ -4,6 +4,7 @@ import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_CONNECTIO
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_ID_INCORRECT;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITORY_INCORRECT;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -21,7 +22,6 @@ import org.kohsuke.github.GHRepositorySearchBuilder.Sort;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.kohsuke.github.PagedIterator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,19 +90,30 @@ public class GithubProvider {
         }
     }
 
-    public PagedIterator<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName,
-                                                             LocalDate createdAt) {
+    public List<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName,
+                                                    LocalDate kstDate) {
         try {
             GHRepository repository = gitHub.getRepository(getRepoFullName(gitHub, repositoryName));
-            GHPullRequestSearchBuilder builder = gitHub.searchPullRequests()
+            GHPullRequestSearchBuilder prSearchBuilder = gitHub.searchPullRequests()
                     .repo(repository)
                     .author(getGHUser(gitHub))
-                    .created(createdAt);
+                    .created(kstDate.minusDays(1), kstDate);
 
-            return builder.list()._iterator(PAGE_SIZE);
+            return prSearchBuilder.list().iterator().nextPage().stream()
+                    .filter(pr -> isEqualToKST(pr, kstDate))
+                    .toList();
 
         } catch (GHFileNotFoundException e) {
             throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    private boolean isEqualToKST(GHPullRequest ghPullRequest, LocalDate targetDate) {
+        try {
+            LocalDate kst = DateUtil.convertToLocalDate(ghPullRequest.getCreatedAt());
+            return kst.isEqual(targetDate);
         } catch (IOException e) {
             throw new BusinessException(e);
         }

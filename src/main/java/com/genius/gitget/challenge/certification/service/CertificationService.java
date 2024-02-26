@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHPullRequest;
@@ -100,11 +101,18 @@ public class CertificationService {
                 participant.getRepositoryName(),
                 renewRequest.targetDate());
 
-        Certification certification = certificationProvider.findByDate(renewRequest.targetDate(), participant.getId())
-                .orElseGet(() -> certificationProvider.createCertification(participant, renewRequest.targetDate(),
-                        pullRequests));
+        Certification certification = createOrUpdate(participant, renewRequest.targetDate(), pullRequests);
 
         return RenewResponse.createSuccess(certification);
+    }
+
+    private Certification createOrUpdate(Participant participant, LocalDate targetDate, List<String> pullRequests) {
+        Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
+        if (optional.isPresent()) {
+            return certificationProvider.update(optional.get(), targetDate, pullRequests);
+        }
+
+        return certificationProvider.createCertification(participant, targetDate, pullRequests);
     }
 
     private boolean canCertificate(Instance instance, LocalDate targetDate) {
@@ -115,11 +123,7 @@ public class CertificationService {
     }
 
     private List<String> getPullRequestLink(GitHub gitHub, String repositoryName, LocalDate targetDate) {
-        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(
-                        gitHub,
-                        repositoryName,
-                        targetDate)
-                .nextPage();
+        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate);
 
         return ghPullRequests.stream()
                 .map(pr -> pr.getHtmlUrl().toString())

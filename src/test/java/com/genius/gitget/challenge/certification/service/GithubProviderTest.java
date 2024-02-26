@@ -99,8 +99,7 @@ class GithubProviderTest {
         LocalDate createdAt = LocalDate.of(2024, 2, 5);
 
         //when
-        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repository, createdAt)
-                .nextPage();
+        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repository, createdAt);
 
         //then
         assertThat(pullRequest.size()).isEqualTo(1);
@@ -131,6 +130,20 @@ class GithubProviderTest {
 
         //then
         assertThat(repositoryList.size()).isGreaterThan(0);
+    }
+
+    @Test
+    @DisplayName("Pr 인증을 시도 했을 때, KST 기준으로 생성된 PR 리스트를 불러올 수 있다.")
+    public void should_searchPR_when_tryToCertificate() {
+        //given
+        GitHub gitHub = getGitHub();
+        LocalDate kstDate = LocalDate.of(2024, 2, 25);
+
+        //when
+        List<GHPullRequest> pullRequests = githubProvider.getPullRequestByDate(gitHub, repository, kstDate);
+
+        //then
+        assertThat(pullRequests.size()).isEqualTo(2);
     }
 
     private GitHub getGitHub() {

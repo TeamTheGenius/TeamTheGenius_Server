@@ -41,6 +41,16 @@ public class CertificationProvider {
     }
 
     @Transactional
+    public Certification update(Certification certification,
+                                LocalDate targetDate,
+                                List<String> pullRequests) {
+        certification.update(
+                targetDate, getCertificateStatus(pullRequests), getPrLinks(pullRequests)
+        );
+        return certification;
+    }
+
+    @Transactional
     public Certification createCertification(Participant participant,
                                              LocalDate targetDate,
                                              List<String> pullRequests) {

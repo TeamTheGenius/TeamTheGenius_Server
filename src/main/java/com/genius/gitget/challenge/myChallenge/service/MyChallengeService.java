@@ -1,12 +1,14 @@
 package com.genius.gitget.challenge.myChallenge.service;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
+
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
+import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
@@ -23,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MyChallengeService {
-    private final InstanceProvider instanceProvider;
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
 
@@ -46,6 +47,35 @@ public class MyChallengeService {
         }
 
         return preActivity;
+    }
+
+    public List<DoneResponse> getDoneInstances(User user, LocalDate targetDate) {
+        List<DoneResponse> done = new ArrayList<>();
+        List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.DONE);
+
+        for (Participant participant : participants) {
+            Instance instance = participant.getInstance();
+
+            DoneResponse doneResponse = DoneResponse.builder()
+                    .instanceId(instance.getId())
+                    .pointPerPerson(instance.getPointPerPerson())
+                    .rewardPoints(instance.getPointPerPerson()) //TODO: 아이템 사용에 따른 적용 필요
+                    .joinResult(participant.getJoinResult())
+                    .achievementRate(getAchievementRate(instance, participant.getId(), targetDate))
+                    .build();
+            done.add(doneResponse);
+        }
+
+        return done;
+    }
+
+    private double getAchievementRate(Instance instance, Long participantId, LocalDate targetDate) {
+        int totalAttempt = instance.getTotalAttempt();
+        int successCount = certificationProvider.countCertificatedByStatus(participantId, CERTIFICATED,
+                targetDate);
+
+        double successPercent = (double) successCount / (double) totalAttempt * 100;
+        return Math.round(successPercent * 100 / 100.0);
     }
 
     public List<ActivatedResponse> getActivatedInstances(User user, LocalDate targetDate) {

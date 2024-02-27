@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.myChallenge.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
+import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
 import com.genius.gitget.challenge.myChallenge.service.MyChallengeService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
@@ -47,6 +48,19 @@ public class MyChallengeController {
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), activatedInstances)
+        );
+    }
+
+    @GetMapping("/done")
+    public ResponseEntity<ListResponse<DoneResponse>> getDoneChallenges(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<DoneResponse> doneInstances = myChallengeService.getDoneInstances(
+                userPrincipal.getUser(),
+                LocalDate.now());
+
+        return ResponseEntity.ok().body(
+                new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), doneInstances)
         );
     }
 }

@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.myChallenge.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
+import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
 import com.genius.gitget.challenge.myChallenge.service.MyChallengeService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
@@ -20,6 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class MyChallengeController {
     private final MyChallengeService myChallengeService;
+
+
+    @GetMapping("/pre-activity")
+    public ResponseEntity<ListResponse<PreActivityResponse>> getPreActivityChallenges(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        List<PreActivityResponse> preActivityInstances = myChallengeService.getPreActivityInstances(
+                userPrincipal.getUser(),
+                LocalDate.now());
+
+        return ResponseEntity.ok().body(
+                new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), preActivityInstances)
+        );
+    }
+
 
     @GetMapping("/activity")
     public ResponseEntity<ListResponse<ActivatedResponse>> getActivatedChallenges(

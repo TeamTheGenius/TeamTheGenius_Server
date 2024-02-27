@@ -7,10 +7,12 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
+import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,27 @@ public class MyChallengeService {
     private final InstanceProvider instanceProvider;
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
+
+
+    public List<PreActivityResponse> getPreActivityInstances(User user, LocalDate targetDate) {
+        List<PreActivityResponse> preActivity = new ArrayList<>();
+        List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.PREACTIVITY);
+
+        for (Participant participant : participants) {
+            Instance instance = participant.getInstance();
+
+            PreActivityResponse preActivityResponse = PreActivityResponse.builder()
+                    .instanceId(instance.getId())
+                    .title(instance.getTitle())
+                    .participantCount(instance.getParticipantCount())
+                    .pointPerPerson(instance.getPointPerPerson())
+                    .remainDays((int) ChronoUnit.DAYS.between(instance.getStartedDate(), targetDate))
+                    .build();
+            preActivity.add(preActivityResponse);
+        }
+
+        return preActivity;
+    }
 
     public List<ActivatedResponse> getActivatedInstances(User user, LocalDate targetDate) {
         List<ActivatedResponse> activated = new ArrayList<>();

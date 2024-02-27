@@ -3,10 +3,12 @@ package com.genius.gitget.challenge.participantinfo.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,10 @@ public class ParticipantProvider {
         return participantRepository.findById(participantId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND))
                 .getInstance();
+    }
+
+    public List<Participant> findJoinedByProgress(Long userId, Progress progress) {
+        return participantRepository.findAllJoinedByProgress(userId, progress);
     }
 
     public boolean hasParticipant(Long userId, Long instanceId) {

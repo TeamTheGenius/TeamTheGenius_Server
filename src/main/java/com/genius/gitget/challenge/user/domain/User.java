@@ -65,6 +65,8 @@ public class User extends BaseTimeEntity {
     @Column(length = 100)
     private String information;
 
+    private Long point;
+
     @Builder
     public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,
                 String tags) {
@@ -76,10 +78,13 @@ public class User extends BaseTimeEntity {
         this.information = information;
     }
 
-    public void updateUser(String nickname, String information, String interest) {
+    public void updateUserInformation(String nickname, String information) {
         this.nickname = nickname;
         this.information = information;
-        this.tags = interest;
+    }
+
+    public void updateUserTags(String tags) {
+        this.tags = tags;
     }
 
     public void updateRole(Role role) {

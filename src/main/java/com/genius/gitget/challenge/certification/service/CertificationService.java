@@ -8,6 +8,7 @@ import com.genius.gitget.challenge.certification.dto.CertificationInformation;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
 import com.genius.gitget.challenge.certification.dto.RenewRequest;
 import com.genius.gitget.challenge.certification.dto.RenewResponse;
+import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -28,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GitHub;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +56,29 @@ public class CertificationService {
                 participantId);
 
         return convertToRenewResponse(certifications, curAttempt);
+    }
+
+    public Slice<WeekResponse> getAllWeekCertification(Long instanceId, LocalDate currentDate,
+                                                       Pageable pageable) {
+        Slice<Participant> participants = participantProvider.findAllByInstanceId(instanceId, pageable);
+        return participants.map(
+                participant -> {
+                    LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
+                    List<Certification> certifications = certificationProvider.findByDuration(
+                            DateUtil.getWeekStartDate(currentDate),
+                            currentDate,
+                            participant.getId());
+                    List<RenewResponse> renewResponses = convertToRenewResponse(
+                            certifications,
+                            DateUtil.getWeekAttempt(startDate, currentDate));
+
+                    return WeekResponse.builder()
+                            .userId(participant.getUser().getId())
+                            .nickname(participant.getUser().getNickname())
+                            .renewResponses(renewResponses)
+                            .build();
+                }
+        );
     }
 
     public List<RenewResponse> getTotalCertification(Long participantId, LocalDate currentDate) {

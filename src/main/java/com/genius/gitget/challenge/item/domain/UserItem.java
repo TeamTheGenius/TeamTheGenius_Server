@@ -40,8 +40,8 @@ public class UserItem {
 
     public void setItem(Item item) {
         this.item = item;
-        if (!item.getUserItems().contains(this)) {
-            item.getUserItems().add(this);
+        if (!item.getUserItemList().contains(this)) {
+            item.getUserItemList().add(this);
         }
     }
 }

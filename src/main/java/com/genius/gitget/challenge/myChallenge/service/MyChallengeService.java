@@ -7,6 +7,8 @@ import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
+import com.genius.gitget.challenge.item.domain.ItemCategory;
+import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyChallengeService {
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
+    private final UserItemProvider userItemProvider;
 
 
     public List<PreActivityResponse> getPreActivityInstances(User user, LocalDate targetDate) {
@@ -86,6 +89,8 @@ public class MyChallengeService {
             Instance instance = participant.getInstance();
             Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
                     .orElse(getDummy());
+            int numOfPassItem = userItemProvider.countPossessItem(user, ItemCategory.CERTIFICATION_SKIPPER);
+            boolean canUseItem = checkItemCondition(certification.getCertificationStatus(), numOfPassItem);
 
             ActivatedResponse activatedResponse = ActivatedResponse.builder()
                     .instanceId(instance.getId())
@@ -93,16 +98,16 @@ public class MyChallengeService {
                     .pointPerPerson(instance.getPointPerPerson())
                     .repository(participant.getRepositoryName())
                     .certificateStatus(certification.getCertificationStatus())
-                    .canUsePassItem(checkItemCondition(certification.getCertificationStatus()))
+                    .canUsePassItem(canUseItem)
+                    .numOfPassItem(canUseItem ? numOfPassItem : null)
                     .build();
             activated.add(activatedResponse);
         }
         return activated;
     }
 
-    private boolean checkItemCondition(CertificateStatus certificateStatus) {
-        //TODO:사용자가 패스 아이템을 가지고 있는지 여부 추가 확인 필요
-        return certificateStatus == CertificateStatus.NOT_YET;
+    private boolean checkItemCondition(CertificateStatus certificateStatus, int numOfPassItem) {
+        return (certificateStatus == CertificateStatus.NOT_YET) && (numOfPassItem > 0);
     }
 
     private Certification getDummy() {

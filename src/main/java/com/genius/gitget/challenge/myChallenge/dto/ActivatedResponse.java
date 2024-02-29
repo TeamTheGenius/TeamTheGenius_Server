@@ -10,6 +10,7 @@ public record ActivatedResponse(
         int pointPerPerson,
         String repository,
         CertificateStatus certificateStatus,
+        int numOfPassItem,
         boolean canUsePassItem
 ) {
 }

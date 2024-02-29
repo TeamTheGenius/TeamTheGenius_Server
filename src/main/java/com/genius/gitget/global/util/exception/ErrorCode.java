@@ -45,7 +45,9 @@ public enum ErrorCode {
     CAN_NOT_JOIN_INSTANCE(HttpStatus.BAD_REQUEST, "해당 인스턴스에 참여할 수 없습니다."),
     CAN_NOT_QUIT_INSTANCE(HttpStatus.BAD_REQUEST, "해당 인스턴스의 참여를 취소할 수 없습니다."),
 
-    CERTIFICATION_UNABLE(HttpStatus.BAD_REQUEST, "해당 챌린지는 인증을 할 수 없는 상태입니다.");
+    CERTIFICATION_UNABLE(HttpStatus.BAD_REQUEST, "해당 챌린지는 인증을 할 수 없는 상태입니다."),
+
+    USER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다.");
 
 
     private final HttpStatus status;

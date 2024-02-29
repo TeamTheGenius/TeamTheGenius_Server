@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.user.domain;
 
 import com.genius.gitget.challenge.hits.domain.Hits;
+import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
@@ -45,6 +46,9 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user")
     private List<ParticipantInfo> participantInfoList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<UserItem> userItemList = new ArrayList<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)

@@ -2,8 +2,8 @@ package com.genius.gitget.challenge.certification.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.challenge.certification.dto.GithubTokenRequest;
-import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
+import com.genius.gitget.challenge.certification.dto.github.GithubTokenRequest;
+import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
 import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;

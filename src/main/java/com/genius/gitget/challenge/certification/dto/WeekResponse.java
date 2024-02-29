@@ -7,6 +7,6 @@ import lombok.Builder;
 public record WeekResponse(
         Long userId,
         String nickname,
-        List<RenewResponse> renewResponses
+        List<CertificationResponse> certificationResponses
 ) {
 }

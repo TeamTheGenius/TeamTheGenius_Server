@@ -5,9 +5,9 @@ import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UN
 
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.CertificationInformation;
+import com.genius.gitget.challenge.certification.dto.CertificationRequest;
+import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
-import com.genius.gitget.challenge.certification.dto.RenewRequest;
-import com.genius.gitget.challenge.certification.dto.RenewResponse;
 import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -46,7 +46,7 @@ public class CertificationService {
     private final InstanceProvider instanceProvider;
 
 
-    public List<RenewResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
+    public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
         LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
         int curAttempt = DateUtil.getWeekAttempt(startDate, currentDate);
 
@@ -68,20 +68,20 @@ public class CertificationService {
                             DateUtil.getWeekStartDate(currentDate),
                             currentDate,
                             participant.getId());
-                    List<RenewResponse> renewResponses = convertToRenewResponse(
+                    List<CertificationResponse> certificationResponses = convertToRenewResponse(
                             certifications,
                             DateUtil.getWeekAttempt(startDate, currentDate));
 
                     return WeekResponse.builder()
                             .userId(participant.getUser().getId())
                             .nickname(participant.getUser().getNickname())
-                            .renewResponses(renewResponses)
+                            .certificationResponses(certificationResponses)
                             .build();
                 }
         );
     }
 
-    public List<RenewResponse> getTotalCertification(Long participantId, LocalDate currentDate) {
+    public List<CertificationResponse> getTotalCertification(Long participantId, LocalDate currentDate) {
         LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
         int curAttempt = DateUtil.getAttemptCount(startDate, currentDate);
 
@@ -91,16 +91,16 @@ public class CertificationService {
         return convertToRenewResponse(certifications, curAttempt);
     }
 
-    private List<RenewResponse> convertToRenewResponse(List<Certification> certifications, int curAttempt) {
-        List<RenewResponse> result = new ArrayList<>();
+    private List<CertificationResponse> convertToRenewResponse(List<Certification> certifications, int curAttempt) {
+        List<CertificationResponse> result = new ArrayList<>();
         Map<Integer, Certification> certificationMap = convertToMap(certifications);
 
         for (int cur = 1; cur <= curAttempt; cur++) {
             if (certificationMap.containsKey(cur)) {
-                result.add(RenewResponse.createSuccess(certificationMap.get(cur)));
+                result.add(CertificationResponse.createSuccess(certificationMap.get(cur)));
                 continue;
             }
-            result.add(RenewResponse.createFail(cur));
+            result.add(CertificationResponse.createFail(cur));
         }
 
         return result;
@@ -116,23 +116,23 @@ public class CertificationService {
     }
 
     @Transactional
-    public RenewResponse updateCertification(User user, RenewRequest renewRequest) {
+    public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
-        Instance instance = instanceProvider.findById(renewRequest.instanceId());
+        Instance instance = instanceProvider.findById(certificationRequest.instanceId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
 
-        if (!canCertificate(instance, renewRequest.targetDate())) {
+        if (!canCertificate(instance, certificationRequest.targetDate())) {
             throw new BusinessException(CERTIFICATION_UNABLE);
         }
 
         List<String> pullRequests = getPullRequestLink(
                 gitHub,
                 participant.getRepositoryName(),
-                renewRequest.targetDate());
+                certificationRequest.targetDate());
 
-        Certification certification = createOrUpdate(participant, renewRequest.targetDate(), pullRequests);
+        Certification certification = createOrUpdate(participant, certificationRequest.targetDate(), pullRequests);
 
-        return RenewResponse.createSuccess(certification);
+        return CertificationResponse.createSuccess(certification);
     }
 
     private Certification createOrUpdate(Participant participant, LocalDate targetDate, List<String> pullRequests) {

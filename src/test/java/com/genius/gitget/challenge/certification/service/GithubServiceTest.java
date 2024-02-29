@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
-import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
+import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;

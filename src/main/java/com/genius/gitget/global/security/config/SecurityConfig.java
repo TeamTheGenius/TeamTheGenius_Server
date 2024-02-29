@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .httpBasic(HttpBasicConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable)
                 .authorizeHttpRequests(request -> request
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(PERMITTED_URI).permitAll()
                         .anyRequest().hasAnyRole(PERMITTED_ROLES))

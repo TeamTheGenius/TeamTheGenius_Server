@@ -48,8 +48,9 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 .information(customUser.information())
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
         Long signupId = userService.signup(signupRequest);
+        savedUser.updateRole(customUser.role());
 
         UserDetails principal = customUserDetailsService.loadUserByUsername(String.valueOf(signupId));
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, principal.getPassword(),

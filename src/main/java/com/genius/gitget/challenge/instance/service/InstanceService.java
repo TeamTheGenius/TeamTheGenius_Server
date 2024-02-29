@@ -15,6 +15,7 @@ import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,7 @@ public class InstanceService {
                 .notice(instanceCreateRequest.notice())
                 .startedDate(instanceCreateRequest.startedAt())
                 .completedDate(instanceCreateRequest.completedAt())
+                .certificationMethod(instanceCreateRequest.certificationMethod())
                 .progress(Progress.PREACTIVITY)
                 .build();
 
@@ -66,12 +68,22 @@ public class InstanceService {
         return instances.map(this::mapToInstancePagingResponse);
     }
 
+
+    // 특정 토픽에 대한 리스트 조회
+    public Page<InstancePagingResponse> getAllInstancesOfSpecificTopic(Pageable pageable, Long id) {
+        Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        Page<Instance> instancesByTopicId = instanceRepository.findInstancesByTopicId(pageable, topic.getId());
+        return instancesByTopicId.map(this::mapToInstancePagingResponse);
+    }
+
+
     // 인스턴스 단건 조회
     public InstanceDetailResponse getInstanceById(Long id) {
         Instance instanceDetails = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
         return InstanceDetailResponse.createByEntity(instanceDetails, instanceDetails.getFiles());
     }
+
 
     // 인스턴스 삭제
     @Transactional
@@ -87,6 +99,7 @@ public class InstanceService {
         instanceRepository.delete(instance);
     }
 
+
     // 인스턴스 수정
     @Transactional
     public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest,
@@ -100,7 +113,8 @@ public class InstanceService {
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(),
                 instanceUpdateRequest.pointPerPerson(),
-                instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt());
+                instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt(),
+                instanceUpdateRequest.certificationMethod());
 
         Instance savedInstance = instanceRepository.save(existingInstance);
 

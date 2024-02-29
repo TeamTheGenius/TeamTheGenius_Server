@@ -97,12 +97,13 @@ public class Instance {
 
     //== 비지니스 로직 ==//
     public void updateInstance(String description, String notice, int pointPerPerson, LocalDateTime startedDate,
-                               LocalDateTime completedDate) {
+                               LocalDateTime completedDate, String certificationMethod) {
         this.description = description;
         this.notice = notice;
         this.pointPerPerson = pointPerPerson;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
+        this.certificationMethod = certificationMethod;
     }
 
     public void updateParticipantCount(int amount) {

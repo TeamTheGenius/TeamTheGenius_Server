@@ -69,6 +69,8 @@ public class User extends BaseTimeEntity {
     @Column(length = 100)
     private String information;
 
+    private Long point;
+
     @Builder
     public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,
                 String tags) {

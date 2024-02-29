@@ -4,6 +4,7 @@ import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
+import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -11,6 +12,8 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,10 @@ public class ParticipantProvider {
     public Participant findById(Long participantInfoId) {
         return participantRepository.findById(participantInfoId)
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
+    }
+
+    public Slice<Participant> findAllByInstanceId(Long instanceId, Pageable pageable) {
+        return participantRepository.findAllByInstanceId(instanceId, JoinStatus.YES, pageable);
     }
 
     public Instance getInstanceById(Long participantId) {

@@ -3,9 +3,10 @@ package com.genius.gitget.challenge.certification.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.certification.dto.CertificationInformation;
+import com.genius.gitget.challenge.certification.dto.CertificationRequest;
+import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
-import com.genius.gitget.challenge.certification.dto.RenewRequest;
-import com.genius.gitget.challenge.certification.dto.RenewResponse;
+import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
@@ -16,10 +17,14 @@ import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
+import com.genius.gitget.global.util.response.dto.SlicingResponse;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,27 +58,27 @@ public class CertificationController {
     }
 
     @PostMapping("/today")
-    public ResponseEntity<SingleResponse<RenewResponse>> certificateByGithub(
+    public ResponseEntity<SingleResponse<CertificationResponse>> certificateByGithub(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @RequestBody RenewRequest renewRequest
+            @RequestBody CertificationRequest certificationRequest
     ) {
-        RenewResponse renewResponse = certificationService.updateCertification(
+        CertificationResponse certificationResponse = certificationService.updateCertification(
                 userPrincipal.getUser(),
-                new RenewRequest(renewRequest.instanceId(), LocalDate.now()));
+                new CertificationRequest(certificationRequest.instanceId(), LocalDate.now()));
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), renewResponse)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
         );
     }
 
     @GetMapping("/week/{instanceId}")
-    public ResponseEntity<ListResponse<RenewResponse>> getCertification(
-            @PathVariable Long instanceId,
-            @RequestParam String identifier
+    public ResponseEntity<ListResponse<CertificationResponse>> getWeekCertification(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long instanceId
     ) {
-        User user = userService.findUserByIdentifier(identifier);
+        User user = userPrincipal.getUser();
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
-        List<RenewResponse> weekCertification = certificationService.getWeekCertification(
+        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
                 participant.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(
@@ -81,14 +86,27 @@ public class CertificationController {
         );
     }
 
+    @GetMapping("/week/all/{instanceId}")
+    public ResponseEntity<SlicingResponse<WeekResponse>> getAllUserWeekCertification(
+            @PathVariable Long instanceId,
+            @PageableDefault Pageable pageable
+    ) {
+        Slice<WeekResponse> certifications = certificationService.getAllWeekCertification(instanceId,
+                LocalDate.now(), pageable);
+
+        return ResponseEntity.ok().body(
+                new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certifications)
+        );
+    }
+
     @GetMapping("/total/{instanceId}")
-    public ResponseEntity<ListResponse<RenewResponse>> getTotalCertifications(
+    public ResponseEntity<ListResponse<CertificationResponse>> getTotalCertifications(
             @PathVariable Long instanceId,
             @RequestParam String identifier
     ) {
         User user = userService.findUserByIdentifier(identifier);
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
-        List<RenewResponse> totalCertification = certificationService.getTotalCertification(
+        List<CertificationResponse> totalCertification = certificationService.getTotalCertification(
                 participant.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(

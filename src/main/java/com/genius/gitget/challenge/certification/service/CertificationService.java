@@ -55,30 +55,28 @@ public class CertificationService {
                 currentDate,
                 participantId);
 
-        return convertToRenewResponse(certifications, curAttempt);
+        return convertToCertificationResponse(certifications, curAttempt);
     }
 
     public Slice<WeekResponse> getAllWeekCertification(Long instanceId, LocalDate currentDate,
                                                        Pageable pageable) {
         Slice<Participant> participants = participantProvider.findAllByInstanceId(instanceId, pageable);
         return participants.map(
-                participant -> {
-                    LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
-                    List<Certification> certifications = certificationProvider.findByDuration(
-                            DateUtil.getWeekStartDate(currentDate),
-                            currentDate,
-                            participant.getId());
-                    List<CertificationResponse> certificationResponses = convertToRenewResponse(
-                            certifications,
-                            DateUtil.getWeekAttempt(startDate, currentDate));
-
-                    return WeekResponse.builder()
-                            .userId(participant.getUser().getId())
-                            .nickname(participant.getUser().getNickname())
-                            .certificationResponses(certificationResponses)
-                            .build();
-                }
+                participant -> convertToWeekResponse(participant, currentDate)
         );
+    }
+
+    private WeekResponse convertToWeekResponse(Participant participant, LocalDate currentDate) {
+        LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
+        List<Certification> certifications = certificationProvider.findByDuration(
+                DateUtil.getWeekStartDate(currentDate),
+                currentDate,
+                participant.getId());
+        List<CertificationResponse> certificationResponses = convertToCertificationResponse(
+                certifications,
+                DateUtil.getWeekAttempt(startDate, currentDate));
+
+        return WeekResponse.create(participant.getUser(), certificationResponses);
     }
 
     public List<CertificationResponse> getTotalCertification(Long participantId, LocalDate currentDate) {
@@ -88,10 +86,11 @@ public class CertificationService {
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
 
-        return convertToRenewResponse(certifications, curAttempt);
+        return convertToCertificationResponse(certifications, curAttempt);
     }
 
-    private List<CertificationResponse> convertToRenewResponse(List<Certification> certifications, int curAttempt) {
+    private List<CertificationResponse> convertToCertificationResponse(List<Certification> certifications,
+                                                                       int curAttempt) {
         List<CertificationResponse> result = new ArrayList<>();
         Map<Integer, Certification> certificationMap = convertToMap(certifications);
 

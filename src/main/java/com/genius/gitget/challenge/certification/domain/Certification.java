@@ -62,6 +62,12 @@ public class Certification extends BaseTimeEntity {
         this.certificationLinks = certificationLinks;
     }
 
+    public void updateToPass(LocalDate certificatedAt) {
+        this.certificatedAt = certificatedAt;
+        this.certificationStatus = CertificateStatus.PASSED;
+        this.certificationLinks = null;
+    }
+
 
     //=== 연관관계 편의 메서드 ===//
     public void setParticipant(Participant participant) {

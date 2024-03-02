@@ -7,6 +7,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum ItemCategory {
     PROFILE_FRAME,
-    CERTIFICATION_SKIPPER,
+    CERTIFICATION_PASSER,
     POINT_MULTIPLIER
 }

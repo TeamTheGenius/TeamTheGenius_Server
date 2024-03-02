@@ -71,6 +71,20 @@ public class CertificationController {
         );
     }
 
+    // 위의 컨트롤러와 합칠 수 있을 듯
+    @PostMapping("/pass")
+    public ResponseEntity<SingleResponse<CertificationResponse>> passCertification(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody CertificationRequest certificationRequest
+    ) {
+        CertificationResponse certificationResponse = certificationService.passCertification(userPrincipal.getUser(),
+                certificationRequest);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
+        );
+    }
+
     @GetMapping("/week/{instanceId}")
     public ResponseEntity<ListResponse<CertificationResponse>> getWeekCertification(
             @AuthenticationPrincipal UserPrincipal userPrincipal,

@@ -21,8 +21,4 @@ public class UserItemProvider {
         return userItemRepository.findUserItemByUser(user.getId(), itemCategory)
                 .orElseThrow(() -> new BusinessException(USER_ITEM_NOT_FOUND));
     }
-
-    public int countPossessItem(User user, ItemCategory itemCategory) {
-        return findUserItemByUser(user, itemCategory).getCount();
-    }
 }

@@ -47,7 +47,8 @@ public enum ErrorCode {
 
     CERTIFICATION_UNABLE(HttpStatus.BAD_REQUEST, "해당 챌린지는 인증을 할 수 없는 상태입니다."),
 
-    USER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다.");
+    USER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다."),
+    CAN_NOT_USE_PASS_ITEM(HttpStatus.BAD_REQUEST, "인증 패스 아이템을 사용할 수 없는 조건입니다.");
 
 
     private final HttpStatus status;

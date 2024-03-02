@@ -89,7 +89,7 @@ public class MyChallengeService {
             Instance instance = participant.getInstance();
             Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
                     .orElse(getDummy());
-            int numOfPassItem = userItemProvider.countPossessItem(user, ItemCategory.CERTIFICATION_SKIPPER);
+            int numOfPassItem = userItemProvider.findUserItemByUser(user, ItemCategory.CERTIFICATION_PASSER).getCount();
             boolean canUseItem = checkItemCondition(certification.getCertificationStatus(), numOfPassItem);
 
             ActivatedResponse activatedResponse = ActivatedResponse.builder()

@@ -30,6 +30,12 @@ public class UserItem {
     private int count;
 
 
+    //=== 비지니스 로직 ===//
+    public boolean hasItem() {
+        return this.count > 0;
+    }
+
+
     //=== 연관관계 편의 메서드 ===//
     public void setUser(User user) {
         this.user = user;

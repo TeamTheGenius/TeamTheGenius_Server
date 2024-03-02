@@ -1,6 +1,9 @@
 package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
+import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_USE_PASS_ITEM;
 import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
@@ -13,6 +16,9 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
+import com.genius.gitget.challenge.item.domain.ItemCategory;
+import com.genius.gitget.challenge.item.domain.UserItem;
+import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.participantinfo.domain.Participant;
 import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
@@ -44,6 +50,7 @@ public class CertificationService {
     private final CertificationProvider certificationProvider;
     private final ParticipantProvider participantProvider;
     private final InstanceProvider instanceProvider;
+    private final UserItemProvider userItemProvider;
 
 
     public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
@@ -112,6 +119,46 @@ public class CertificationService {
             certificationMap.put(certification.getCurrentAttempt(), certification);
         }
         return certificationMap;
+    }
+
+    @Transactional
+    public CertificationResponse passCertification(User user, CertificationRequest certificationRequest) {
+        Instance instance = instanceProvider.findById(certificationRequest.instanceId());
+        Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
+        LocalDate targetDate = certificationRequest.targetDate();
+
+        UserItem userItem = userItemProvider.findUserItemByUser(user, ItemCategory.CERTIFICATION_PASSER);
+        Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
+
+        if (!canPassCertificate(userItem, optional)) {
+            throw new BusinessException(CAN_NOT_USE_PASS_ITEM);
+        }
+
+        //TODO: 리팩토링 시급...
+        if (optional.isPresent()) {
+            optional.get().updateToPass(targetDate);
+            return CertificationResponse.createSuccess(optional.get());
+        }
+
+        Certification certification = Certification.builder()
+                .certificatedAt(targetDate)
+                .certificationStatus(PASSED)
+                .certificationLinks(null)
+                .build();
+        certification.setParticipant(participant);
+        certificationProvider.save(certification);
+
+        return CertificationResponse.createSuccess(certification);
+    }
+
+    private boolean canPassCertificate(UserItem userItem, Optional<Certification> optional) {
+        if (optional.isEmpty() && userItem.hasItem()) {
+            return true;
+        }
+        if (optional.isPresent() && optional.get().getCertificationStatus() == NOT_YET && userItem.hasItem()) {
+            return true;
+        }
+        return false;
     }
 
     @Transactional

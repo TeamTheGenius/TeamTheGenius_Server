@@ -15,6 +15,9 @@ public interface InstanceRepository extends JpaRepository<Instance, Long> {
     @Query("select i from Instance i ORDER BY i.id DESC ")
     Page<Instance> findAllById(Pageable pageable);
 
+    @Query("select i from Instance i where i.topic.id = :topicId")
+    Page<Instance> findInstancesByTopicId(Pageable pageable, Long topicId);
+
     @Query("select i from Instance i where i.progress = :progress and i.tags in :userTags")
     Slice<Instance> findRecommendations(@Param("userTags") List<String> userTags, Progress progress, Pageable pageable);
 

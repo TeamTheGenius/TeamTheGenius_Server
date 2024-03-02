@@ -75,6 +75,10 @@ public class FilesService {
         Files files = filesRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
+        if (file == null) {
+            return files;
+        }
+
         deleteFilesInStorage(files);
 
         UpdateDTO updateDTO = FileUtil.getUpdateInfo(file, files.getFileType(), UPLOAD_PATH);

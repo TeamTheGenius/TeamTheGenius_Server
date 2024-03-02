@@ -34,6 +34,14 @@ public class TopicService {
         return topics.map(this::mapToTopicPagingResponse);
     }
 
+    private TopicPagingResponse mapToTopicPagingResponse(Topic topic) {
+        try {
+            return TopicPagingResponse.createByEntity(topic, topic.getFiles());
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
     // 토픽 상세정보 요청
     public TopicDetailResponse getTopicById(Long id) throws IOException {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
@@ -60,6 +68,7 @@ public class TopicService {
         return savedTopic.getId();
     }
 
+    // 토픽 업데이트 요청
     @Transactional
     public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest, MultipartFile multipartFile, String type) {
         Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
@@ -86,13 +95,5 @@ public class TopicService {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
         topicRepository.delete(topic);
-    }
-
-    private TopicPagingResponse mapToTopicPagingResponse(Topic topic) {
-        try {
-            return TopicPagingResponse.createByEntity(topic, topic.getFiles());
-        } catch (IOException e) {
-            throw new BusinessException(e);
-        }
     }
 }

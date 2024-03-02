@@ -10,6 +10,7 @@ public record InstanceUpdateRequest(
         String notice,
         int pointPerPerson,
         LocalDateTime startedAt,
-        LocalDateTime completedAt
+        LocalDateTime completedAt,
+        String certificationMethod
 ) {
 }

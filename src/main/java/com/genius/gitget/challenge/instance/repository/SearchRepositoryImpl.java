@@ -1,5 +1,8 @@
 package com.genius.gitget.challenge.instance.repository;
 
+import static com.genius.gitget.challenge.instance.domain.QInstance.instance;
+import static com.genius.gitget.global.file.domain.QFiles.files;
+
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.dto.search.QInstanceSearchResponse;
@@ -7,14 +10,10 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
-
-import static com.genius.gitget.challenge.instance.domain.QInstance.instance;
-import static com.genius.gitget.global.file.domain.QFiles.files;
-
-import java.util.List;
 
 public class SearchRepositoryImpl implements SearchRepositoryCustom {
 
@@ -37,7 +36,8 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
 
         List<InstanceSearchResponse> content = queryFactory
                 .select(new QInstanceSearchResponse(
-                        instance.topic.id, instance.id, instance.title, instance.pointPerPerson, instance.participantCount,
+                        instance.topic.id, instance.id, instance.title, instance.pointPerPerson,
+                        instance.participantCount,
                         instance.files))
                 .from(instance)
                 .leftJoin(instance.files, files)

@@ -1,10 +1,16 @@
 package com.genius.gitget.challenge.user.domain;
 
+<<<<<<< HEAD
 import com.genius.gitget.challenge.hits.domain.Likes;
+=======
+import com.genius.gitget.challenge.hits.domain.Hits;
+import com.genius.gitget.challenge.item.domain.UserItem;
+>>>>>>> main
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
+import com.genius.gitget.payment.domain.Payment;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -45,6 +51,12 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user")
     private List<ParticipantInfo> participantInfoList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payment = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<UserItem> userItemList = new ArrayList<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -100,5 +112,8 @@ public class User extends BaseTimeEntity {
         this.nickname = nickname;
         this.information = information;
         this.tags = tags;
+    }
+    public void setPoint(Long point) {
+        this.point += point;
     }
 }

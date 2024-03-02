@@ -17,6 +17,7 @@ import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserPaymentDetailsResponse;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -110,12 +111,13 @@ public class ProfileService {
                 .success(success)
                 .processing(processing)
                 .beforeStart(participanTotalCount - fail - success - processing)
+                .progressBar(success - fail)
                 .build();
     }
 
     public void deleteUserInformation(String identifier) {
         User findUser = findUser(identifier);
-        // TODO : 회원 정보 삭제 시 고려해야 할 점 조사
+        userRepository.deleteById(findUser.getId());
     }
 
     private User findUser(String identifier) {
@@ -123,5 +125,7 @@ public class ProfileService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-
+    public UserPaymentDetailsResponse getUserPayment(String identifier) {
+        User findUser = findUser(identifier);
+    }
 }

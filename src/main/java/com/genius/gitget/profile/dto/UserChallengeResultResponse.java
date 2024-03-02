@@ -9,12 +9,15 @@ public class UserChallengeResultResponse {
     private Integer success;
     private Integer processing;
     private Integer beforeStart;
+    private Integer progressBar;
 
     @Builder
-    public UserChallengeResultResponse(Integer fail, Integer success, Integer processing, Integer beforeStart) {
+    public UserChallengeResultResponse(Integer fail, Integer success, Integer processing, Integer beforeStart,
+                                       Integer progressBar) {
         this.fail = fail;
         this.success = success;
         this.processing = processing;
         this.beforeStart = beforeStart;
+        this.progressBar = progressBar;
     }
 }

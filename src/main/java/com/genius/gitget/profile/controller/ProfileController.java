@@ -6,6 +6,7 @@ import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserPaymentDetailsResponse;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import com.genius.gitget.profile.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -77,5 +78,10 @@ public class ProfileController {
     }
 
     // TODO 마이페이지 - 결제 내역 조회
-    // @GetMapping("/payment")
+    @GetMapping("/payment/{identifier}")
+    public ResponseEntity<SingleResponse<UserPaymentDetailsResponse>> getUserPayment(
+            @PathVariable(value = "identifier") String identifier) {
+        profileService.getUserPayment(identifier);
+
+    }
 }

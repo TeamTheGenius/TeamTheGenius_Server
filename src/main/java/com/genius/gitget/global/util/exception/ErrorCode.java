@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
+    LIKES_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 좋아요 목록을 찾을 수 없습니다"),
+
     TOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 토픽을 찾을 수 없습니다."),
     TOPIC_HAVE_INSTANCE(HttpStatus.BAD_REQUEST, "해당 토픽은 인스턴스를 가지고 있으므로 삭제할 수 없습니다."),
 

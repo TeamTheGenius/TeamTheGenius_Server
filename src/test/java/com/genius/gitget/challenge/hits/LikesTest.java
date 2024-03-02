@@ -6,8 +6,8 @@ import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
 
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
-import com.genius.gitget.challenge.hits.domain.Hits;
-import com.genius.gitget.challenge.hits.repository.HitsRepository;
+import com.genius.gitget.challenge.hits.domain.Likes;
+import com.genius.gitget.challenge.hits.repository.LikesRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -24,14 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-public class HitsTest {
+public class LikesTest {
 
     @Autowired
     UserRepository userRepository;
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    HitsRepository hitsRepository;
+    LikesRepository likesRepository;
     @Autowired
     TopicRepository topicRepository;
 
@@ -84,10 +84,10 @@ public class HitsTest {
 
     @Test
     public void 사용자는_챌린지의_인스턴스를_관심목록에_저장한다() {
-        Hits like = new Hits(user1, instance1);
-        hitsRepository.save(like);
+        Likes like = new Likes(user1, instance1);
+        likesRepository.save(like);
 
-        int likeCount = instance1.getHitsList().size();
+        int likeCount = instance1.getLikesList().size();
         Assertions.assertEquals(1, likeCount);
 
     }

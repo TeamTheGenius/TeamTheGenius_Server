@@ -127,5 +127,6 @@ public class ProfileService {
 
     public UserPaymentDetailsResponse getUserPayment(String identifier) {
         User findUser = findUser(identifier);
+        return null;
     }
 }

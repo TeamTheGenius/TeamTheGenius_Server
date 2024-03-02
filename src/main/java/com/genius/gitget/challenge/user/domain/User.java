@@ -1,6 +1,6 @@
 package com.genius.gitget.challenge.user.domain;
 
-import com.genius.gitget.challenge.hits.domain.Hits;
+import com.genius.gitget.challenge.hits.domain.Likes;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
@@ -41,7 +41,7 @@ public class User extends BaseTimeEntity {
     private Files files;
 
     @OneToMany(mappedBy = "user")
-    private List<Hits> hitsList = new ArrayList<>();
+    private List<Likes> likesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<ParticipantInfo> participantInfoList = new ArrayList<>();
@@ -94,5 +94,11 @@ public class User extends BaseTimeEntity {
     //=== 연관관계 편의 메서드 ===//
     public void setFiles(Files files) {
         this.files = files;
+    }
+
+    public void updateUser(String nickname, String information, String tags) {
+        this.nickname = nickname;
+        this.information = information;
+        this.tags = tags;
     }
 }

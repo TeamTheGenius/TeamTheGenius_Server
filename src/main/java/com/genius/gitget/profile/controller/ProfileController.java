@@ -83,5 +83,6 @@ public class ProfileController {
             @PathVariable(value = "identifier") String identifier) {
         profileService.getUserPayment(identifier);
 
+        return null;
     }
 }

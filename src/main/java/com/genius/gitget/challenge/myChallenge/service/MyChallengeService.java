@@ -12,8 +12,10 @@ import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
-import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
+import com.genius.gitget.challenge.participant.domain.JoinResult;
+import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.RewardStatus;
+import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -59,17 +61,25 @@ public class MyChallengeService {
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
 
-            DoneResponse doneResponse = DoneResponse.builder()
-                    .instanceId(instance.getId())
-                    .pointPerPerson(instance.getPointPerPerson())
-                    .rewardPoints(instance.getPointPerPerson()) //TODO: 아이템 사용에 따른 적용 필요
-                    .joinResult(participant.getJoinResult())
-                    .achievementRate(getAchievementRate(instance, participant.getId(), targetDate))
-                    .build();
+            // 포인트를 아직 수령하지 않았을 때
+            if (participant.getRewardStatus() == RewardStatus.NO) {
+                DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant);
+                done.add(doneResponse);
+                continue;
+            }
+
+            // 포인트를 수령했을 때
+            double achievementRate = getAchievementRate(instance, participant.getId(), targetDate);
+            DoneResponse doneResponse = DoneResponse.createRewarded(instance, participant, achievementRate);
             done.add(doneResponse);
         }
 
         return done;
+    }
+
+    private boolean canGetReward(Participant participant) {
+        return (participant.getRewardStatus() == RewardStatus.NO) &&
+                (participant.getJoinResult() == JoinResult.SUCCESS);
     }
 
     private double getAchievementRate(Instance instance, Long participantId, LocalDate targetDate) {

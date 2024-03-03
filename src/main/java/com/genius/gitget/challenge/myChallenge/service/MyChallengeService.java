@@ -12,7 +12,6 @@ import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
-import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.domain.RewardStatus;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
@@ -63,7 +62,8 @@ public class MyChallengeService {
 
             // 포인트를 아직 수령하지 않았을 때
             if (participant.getRewardStatus() == RewardStatus.NO) {
-                DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant);
+                int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.POINT_MULTIPLIER);
+                DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant, numOfPassItem);
                 done.add(doneResponse);
                 continue;
             }
@@ -75,11 +75,6 @@ public class MyChallengeService {
         }
 
         return done;
-    }
-
-    private boolean canGetReward(Participant participant) {
-        return (participant.getRewardStatus() == RewardStatus.NO) &&
-                (participant.getJoinResult() == JoinResult.SUCCESS);
     }
 
     private double getAchievementRate(Instance instance, Long participantId, LocalDate targetDate) {
@@ -99,7 +94,7 @@ public class MyChallengeService {
             Instance instance = participant.getInstance();
             Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
                     .orElse(getDummy());
-            int numOfPassItem = userItemProvider.findUserItemByUser(user, ItemCategory.CERTIFICATION_PASSER).getCount();
+            int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.CERTIFICATION_PASSER);
             boolean canUseItem = checkItemCondition(certification.getCertificationStatus(), numOfPassItem);
 
             ActivatedResponse activatedResponse = ActivatedResponse.builder()

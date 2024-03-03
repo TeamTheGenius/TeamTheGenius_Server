@@ -60,7 +60,7 @@ public class InstanceDetailService {
     }
 
     private boolean canJoinChallenge(User user, Instance instance) {
-        return (instance.getProgress() == Progress.ACTIVITY) &&
+        return (instance.getProgress() == Progress.PREACTIVITY) &&
                 !participantProvider.hasParticipant(user.getId(), instance.getId());
     }
 

@@ -122,12 +122,12 @@ public class CertificationService {
     }
 
     @Transactional
-    public CertificationResponse passCertification(User user, CertificationRequest certificationRequest) {
+    public CertificationResponse passCertification(Long userId, CertificationRequest certificationRequest) {
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
-        Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
+        Participant participant = participantProvider.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
-        UserItem userItem = userItemProvider.findUserItemByUser(user, ItemCategory.CERTIFICATION_PASSER);
+        UserItem userItem = userItemProvider.findUserItemByUser(userId, ItemCategory.CERTIFICATION_PASSER);
         Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
 
         if (!canPassCertificate(userItem, optional)) {
@@ -152,6 +152,7 @@ public class CertificationService {
     }
 
     private boolean canPassCertificate(UserItem userItem, Optional<Certification> optional) {
+        //refactor: userItem.hasItem에서 예외가 발생할 수 있을 듯 함
         if (optional.isEmpty() && userItem.hasItem()) {
             return true;
         }

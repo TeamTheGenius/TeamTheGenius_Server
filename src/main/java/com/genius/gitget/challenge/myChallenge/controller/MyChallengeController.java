@@ -5,16 +5,20 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
+import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
 import com.genius.gitget.challenge.myChallenge.service.MyChallengeService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
+import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -61,6 +65,22 @@ public class MyChallengeController {
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), doneInstances)
+        );
+    }
+
+    // /api/challenges/reward/1?item=yes
+    @GetMapping("/reward/{instanceId}")
+    public ResponseEntity<SingleResponse<DoneResponse>> getRewards(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long instanceId,
+            @RequestParam("item") Boolean useItem
+    ) {
+
+        RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser(), instanceId, useItem, LocalDate.now());
+        DoneResponse doneResponse = myChallengeService.getRewards(rewardRequest);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), doneResponse)
         );
     }
 }

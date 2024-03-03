@@ -77,8 +77,9 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody CertificationRequest certificationRequest
     ) {
-        CertificationResponse certificationResponse = certificationService.passCertification(userPrincipal.getUser(),
-                certificationRequest);
+        User user = userPrincipal.getUser();
+        CertificationResponse certificationResponse = certificationService.passCertification(
+                user.getId(), certificationRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)

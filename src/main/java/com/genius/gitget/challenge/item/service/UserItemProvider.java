@@ -18,8 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserItemProvider {
     private final UserItemRepository userItemRepository;
 
-    public UserItem findUserItemByUser(User user, ItemCategory itemCategory) {
-        return userItemRepository.findUserItemByUser(user.getId(), itemCategory)
+    public UserItem findUserItemByUser(Long userId, ItemCategory itemCategory) {
+        return userItemRepository.findUserItemByUser(userId, itemCategory)
                 .orElseThrow(() -> new BusinessException(USER_ITEM_NOT_FOUND));
     }
 

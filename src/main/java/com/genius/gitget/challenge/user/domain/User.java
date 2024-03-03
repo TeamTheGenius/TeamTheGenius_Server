@@ -100,6 +100,10 @@ public class User extends BaseTimeEntity {
         this.githubToken = encryptedToken;
     }
 
+    public long updatePoints(int amount) {
+        this.point += amount;
+        return this.point;
+    }
 
     //=== 연관관계 편의 메서드 ===//
     public void setFiles(Files files) {

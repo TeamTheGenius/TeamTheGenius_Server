@@ -1,6 +1,8 @@
 package com.genius.gitget.challenge.item.domain;
 
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -35,6 +37,12 @@ public class UserItem {
         return this.count > 0;
     }
 
+    public void useItem() {
+        if (!hasItem()) {
+            throw new BusinessException(ErrorCode.HAS_NO_ITEM);
+        }
+        this.count -= 1;
+    }
 
     //=== 연관관계 편의 메서드 ===//
     public void setUser(User user) {

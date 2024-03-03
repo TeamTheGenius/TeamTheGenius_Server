@@ -8,14 +8,20 @@ import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
+import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
+import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
+import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.domain.RewardStatus;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -28,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MyChallengeService {
+    private final UserService userService;
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
     private final UserItemProvider userItemProvider;
@@ -93,7 +100,7 @@ public class MyChallengeService {
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
             Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
-                    .orElse(getDummy());
+                    .orElse(getDummyCertification());
             int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.CERTIFICATION_PASSER);
             boolean canUseItem = checkItemCondition(certification.getCertificationStatus(), numOfPassItem);
 
@@ -115,7 +122,7 @@ public class MyChallengeService {
         return (certificateStatus == CertificateStatus.NOT_YET) && (numOfPassItem > 0);
     }
 
-    private Certification getDummy() {
+    private Certification getDummyCertification() {
         return Certification.builder()
                 .currentAttempt(0)
                 .certificationStatus(CertificateStatus.NOT_YET)
@@ -123,9 +130,32 @@ public class MyChallengeService {
                 .certificationLinks(null)
                 .build();
     }
+
+    @Transactional
+    public DoneResponse getRewards(RewardRequest rewardRequest) {
+        User user = userService.findUserById(rewardRequest.user().getId());
+        Participant participant = participantProvider.findByJoinInfo(user.getId(), rewardRequest.instanceId());
+        Instance instance = participant.getInstance();
+        if (!canGetReward(participant)) {
+            throw new BusinessException(ErrorCode.CAN_NOT_GET_REWARDS);
+        }
+
+        int pointPerPerson = instance.getPointPerPerson();
+        int rewardPoints = pointPerPerson;
+
+        if (rewardRequest.useItem()) {
+            UserItem userItem = userItemProvider.findUserItemByUser(user.getId(), ItemCategory.POINT_MULTIPLIER);
+            userItem.useItem();
+            rewardPoints = pointPerPerson * 2;
+        }
+
+        user.updatePoints(rewardPoints);
+        double achievementRate = getAchievementRate(instance, participant.getId(), rewardRequest.targetDate());
+        return DoneResponse.createRewarded(instance, participant, achievementRate);
+    }
+
+    private boolean canGetReward(Participant participant) {
+        return (participant.getRewardStatus() == RewardStatus.NO) &&
+                (participant.getJoinResult() == JoinResult.SUCCESS);
+    }
 }
-
-
-
-
-

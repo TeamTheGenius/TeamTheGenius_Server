@@ -68,7 +68,7 @@ public class MyChallengeController {
         );
     }
 
-    // /api/challenges/reward/1?item=yes
+    // /api/challenges/reward/1?item=true
     @GetMapping("/reward/{instanceId}")
     public ResponseEntity<SingleResponse<DoneResponse>> getRewards(
             @AuthenticationPrincipal UserPrincipal userPrincipal,

@@ -5,6 +5,7 @@ import static com.genius.gitget.challenge.certification.domain.CertificateStatus
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.service.CertificationProvider;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
@@ -23,7 +24,6 @@ import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +52,7 @@ public class MyChallengeService {
                     .title(instance.getTitle())
                     .participantCount(instance.getParticipantCount())
                     .pointPerPerson(instance.getPointPerPerson())
-                    .remainDays((int) ChronoUnit.DAYS.between(instance.getStartedDate(), targetDate))
+                    .remainDays(DateUtil.getRemainDaysToStart(participant.getStartedDate(), targetDate))
                     .build();
             preActivity.add(preActivityResponse);
         }

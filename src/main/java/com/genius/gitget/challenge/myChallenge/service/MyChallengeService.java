@@ -111,7 +111,7 @@ public class MyChallengeService {
                     .title(instance.getTitle())
                     .pointPerPerson(instance.getPointPerPerson())
                     .repository(participant.getRepositoryName())
-                    .certificateStatus(certification.getCertificationStatus())
+                    .certificateStatus(certification.getCertificationStatus().getTag())
                     .canUsePassItem(canUseItem)
                     .numOfPassItem(canUseItem ? numOfPassItem : 0)
                     .build();
@@ -132,7 +132,7 @@ public class MyChallengeService {
                 .certificationLinks(null)
                 .build();
     }
-    
+
     @Transactional
     public DoneResponse getRewards(RewardRequest rewardRequest) {
         User user = userService.findUserById(rewardRequest.user().getId());

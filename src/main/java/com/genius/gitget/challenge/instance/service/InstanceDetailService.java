@@ -48,7 +48,7 @@ public class InstanceDetailService {
 
         String repository = joinRequest.repository();
 
-        if (verifyGithub(persistUser, repository) && !canJoinChallenge(persistUser, instance)) {
+        if (!verifyGithub(persistUser, repository) || !canJoinChallenge(persistUser, instance)) {
             throw new BusinessException(CAN_NOT_JOIN_INSTANCE);
         }
 
@@ -60,6 +60,7 @@ public class InstanceDetailService {
     }
 
     private boolean canJoinChallenge(User user, Instance instance) {
+        boolean b = !participantProvider.hasParticipant(user.getId(), instance.getId());
         return (instance.getProgress() == Progress.PREACTIVITY) &&
                 !participantProvider.hasParticipant(user.getId(), instance.getId());
     }

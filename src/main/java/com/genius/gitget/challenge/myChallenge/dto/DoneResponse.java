@@ -39,7 +39,6 @@ public record DoneResponse(
                 .build();
     }
 
-    //TODO: MyChallengeService와 코드가 중복됨
     private static boolean canGetReward(Participant participant) {
         return (participant.getRewardStatus() == RewardStatus.NO) &&
                 (participant.getJoinResult() == JoinResult.SUCCESS);

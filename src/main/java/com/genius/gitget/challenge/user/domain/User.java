@@ -26,6 +26,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -72,6 +73,7 @@ public class User extends BaseTimeEntity {
     @Column(columnDefinition = "TEXT")
     private String githubToken;
 
+    @ColumnDefault(value = "0")
     private Long point;
 
     @Builder

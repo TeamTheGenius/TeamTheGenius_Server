@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/challenges/my")
+@RequestMapping("/api/challenges")
 @RequiredArgsConstructor
 public class MyChallengeController {
     private final MyChallengeService myChallengeService;
 
 
-    @GetMapping("/pre-activity")
+    @GetMapping("/my/pre-activity")
     public ResponseEntity<ListResponse<PreActivityResponse>> getPreActivityChallenges(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
@@ -42,7 +42,7 @@ public class MyChallengeController {
     }
 
 
-    @GetMapping("/activity")
+    @GetMapping("/my/activity")
     public ResponseEntity<ListResponse<ActivatedResponse>> getActivatedChallenges(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
@@ -55,7 +55,7 @@ public class MyChallengeController {
         );
     }
 
-    @GetMapping("/done")
+    @GetMapping("/my/done")
     public ResponseEntity<ListResponse<DoneResponse>> getDoneChallenges(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
@@ -73,7 +73,7 @@ public class MyChallengeController {
     public ResponseEntity<SingleResponse<DoneResponse>> getRewards(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId,
-            @RequestParam("item") Boolean useItem
+            @RequestParam(value = "item") boolean useItem
     ) {
 
         RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser(), instanceId, useItem, LocalDate.now());

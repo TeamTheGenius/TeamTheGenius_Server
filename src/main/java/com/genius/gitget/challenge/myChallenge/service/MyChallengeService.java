@@ -1,6 +1,9 @@
 package com.genius.gitget.challenge.myChallenge.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
+import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
+import static com.genius.gitget.challenge.participant.domain.RewardStatus.NO;
+import static com.genius.gitget.challenge.participant.domain.RewardStatus.YES;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
@@ -15,9 +18,7 @@ import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
 import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
-import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
-import com.genius.gitget.challenge.participant.domain.RewardStatus;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
@@ -60,6 +61,7 @@ public class MyChallengeService {
         return preActivity;
     }
 
+    //TODO: 사용자의 달성률이 85%가 되지 않았을 때에는 joinResult가 Fail이어야 함
     public List<DoneResponse> getDoneInstances(User user, LocalDate targetDate) {
         List<DoneResponse> done = new ArrayList<>();
         List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.DONE);
@@ -68,7 +70,7 @@ public class MyChallengeService {
             Instance instance = participant.getInstance();
 
             // 포인트를 아직 수령하지 않았을 때
-            if (participant.getRewardStatus() == RewardStatus.NO) {
+            if (participant.getRewardStatus() == NO) {
                 int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.POINT_MULTIPLIER);
                 DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant, numOfPassItem);
                 done.add(doneResponse);
@@ -111,7 +113,7 @@ public class MyChallengeService {
                     .repository(participant.getRepositoryName())
                     .certificateStatus(certification.getCertificationStatus())
                     .canUsePassItem(canUseItem)
-                    .numOfPassItem(canUseItem ? numOfPassItem : null)
+                    .numOfPassItem(canUseItem ? numOfPassItem : 0)
                     .build();
             activated.add(activatedResponse);
         }
@@ -130,15 +132,14 @@ public class MyChallengeService {
                 .certificationLinks(null)
                 .build();
     }
-
+    
     @Transactional
     public DoneResponse getRewards(RewardRequest rewardRequest) {
         User user = userService.findUserById(rewardRequest.user().getId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), rewardRequest.instanceId());
         Instance instance = participant.getInstance();
-        if (!canGetReward(participant)) {
-            throw new BusinessException(ErrorCode.CAN_NOT_GET_REWARDS);
-        }
+
+        validRewardCondition(participant);
 
         int pointPerPerson = instance.getPointPerPerson();
         int rewardPoints = pointPerPerson;
@@ -151,11 +152,17 @@ public class MyChallengeService {
 
         user.updatePoints(rewardPoints);
         double achievementRate = getAchievementRate(instance, participant.getId(), rewardRequest.targetDate());
+
+        participant.getRewards(rewardPoints);
         return DoneResponse.createRewarded(instance, participant, achievementRate);
     }
 
-    private boolean canGetReward(Participant participant) {
-        return (participant.getRewardStatus() == RewardStatus.NO) &&
-                (participant.getJoinResult() == JoinResult.SUCCESS);
+    private void validRewardCondition(Participant participant) {
+        if (participant.getJoinResult() != SUCCESS) {
+            throw new BusinessException(ErrorCode.CAN_NOT_GET_REWARDS);
+        }
+        if (participant.getRewardStatus() == YES) {
+            throw new BusinessException(ErrorCode.ALREADY_REWARDED);
+        }
     }
 }

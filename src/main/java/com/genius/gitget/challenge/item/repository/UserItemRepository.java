@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserItemRepository extends JpaRepository<UserItem, Long> {
 
-    @Query("select u from UserItem u where u.user = :userId and u.item.itemCategory = :itemCategory")
+    @Query("select u from UserItem u where u.user.id = :userId and u.item.itemCategory = :itemCategory")
     Optional<UserItem> findUserItemByUser(@Param("userId") Long userId,
                                           @Param("itemCategory") ItemCategory itemCategory);
 }

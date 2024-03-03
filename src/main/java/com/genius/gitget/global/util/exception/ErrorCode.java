@@ -51,7 +51,8 @@ public enum ErrorCode {
     HAS_NO_ITEM(HttpStatus.NOT_FOUND, "해당 아이템을 보유하고 있지 않습니다."),
     CAN_NOT_USE_PASS_ITEM(HttpStatus.BAD_REQUEST, "인증 패스 아이템을 사용할 수 없는 조건입니다."),
 
-    CAN_NOT_GET_REWARDS(HttpStatus.BAD_REQUEST, "챌린지 보상을 받을 수 있는 조건이 아닙니다.");
+    CAN_NOT_GET_REWARDS(HttpStatus.BAD_REQUEST, "챌린지 보상을 받을 수 있는 조건이 아닙니다."),
+    ALREADY_REWARDED(HttpStatus.BAD_REQUEST, "해당 챌린지 보상은 이미 지급되었습니다.");
 
 
     private final HttpStatus status;

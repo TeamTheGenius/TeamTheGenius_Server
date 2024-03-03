@@ -4,7 +4,7 @@ package com.genius.gitget.challenge.instance.domain;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.hits.domain.Hits;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

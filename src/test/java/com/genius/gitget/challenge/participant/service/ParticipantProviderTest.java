@@ -1,13 +1,13 @@
-package com.genius.gitget.challenge.participantinfo.service;
+package com.genius.gitget.challenge.participant.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
+import com.genius.gitget.challenge.participant.domain.JoinStatus;
+import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;

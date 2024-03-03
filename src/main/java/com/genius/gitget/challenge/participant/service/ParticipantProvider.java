@@ -1,12 +1,12 @@
-package com.genius.gitget.challenge.participantinfo.service;
+package com.genius.gitget.challenge.participant.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
+import com.genius.gitget.challenge.participant.domain.JoinStatus;
+import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
 import java.util.List;

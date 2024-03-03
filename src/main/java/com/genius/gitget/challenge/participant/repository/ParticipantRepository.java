@@ -1,8 +1,8 @@
-package com.genius.gitget.challenge.participantinfo.repository;
+package com.genius.gitget.challenge.participant.repository;
 
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.JoinStatus;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;

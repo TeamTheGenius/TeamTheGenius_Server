@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.participantinfo.domain;
+package com.genius.gitget.challenge.participant.domain;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -49,16 +49,20 @@ public class Participant {
     private List<Certification> certificationList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "join_status")
     @NotNull
     @ColumnDefault("'YES'")
     private JoinStatus joinStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "join_result")
     private JoinResult joinResult;
 
     private String repositoryName;
+
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'NO'")
+    private RewardStatus rewardStatus;
+
+    private int rewardPoints;
 
     @Builder
     private Participant(JoinStatus joinStatus, JoinResult joinResult, String repositoryName) {
@@ -84,6 +88,11 @@ public class Participant {
     public void quitChallenge() {
         this.joinStatus = JoinStatus.NO;
         this.joinResult = JoinResult.FAIL;
+    }
+
+    public void getRewards(int rewardPoints) {
+        this.rewardStatus = RewardStatus.YES;
+        this.rewardPoints = rewardPoints;
     }
 
     public void updateRepository(String repository) {

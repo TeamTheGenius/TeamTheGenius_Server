@@ -1,6 +1,6 @@
 package com.genius.gitget.challenge.certification.domain;
 
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

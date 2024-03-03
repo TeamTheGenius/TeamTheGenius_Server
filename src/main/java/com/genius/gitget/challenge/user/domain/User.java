@@ -2,7 +2,7 @@ package com.genius.gitget.challenge.user.domain;
 
 import com.genius.gitget.challenge.hits.domain.Hits;
 import com.genius.gitget.challenge.item.domain.UserItem;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;

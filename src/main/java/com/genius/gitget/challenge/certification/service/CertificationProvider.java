@@ -7,7 +7,7 @@ import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;

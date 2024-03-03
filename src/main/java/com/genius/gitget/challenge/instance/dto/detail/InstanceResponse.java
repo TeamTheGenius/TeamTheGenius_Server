@@ -1,7 +1,7 @@
 package com.genius.gitget.challenge.instance.dto.detail;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
+import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import java.time.LocalDate;

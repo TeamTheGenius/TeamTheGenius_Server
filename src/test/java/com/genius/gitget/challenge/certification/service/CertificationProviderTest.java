@@ -120,6 +120,27 @@ class CertificationProviderTest {
         assertThat(certification.getCertificatedAt()).isEqualTo(targetDate);
     }
 
+    @Test
+    @DisplayName("인증과 관련된 정보를 전달했을 때, 객체의 정보를 업데이트할 수 있다.")
+    public void should_update_when_passInfo() {
+        //given
+        User user = getSavedUser();
+        Instance instance = getSavedInstance();
+        Participant participant = getSavedParticipant(user, instance);
+        LocalDate targetDate = LocalDate.of(2024, 2, 1);
+        Certification certification = getSavedCertification(targetDate, NOT_YET, "", participant);
+        List<String> pullRequests = List.of("pr link1", "pr link2");
+
+        //when
+        Certification updatedCertification = certificationProvider.update(certification, targetDate, pullRequests);
+
+        //then
+        assertThat(updatedCertification.getId()).isEqualTo(certification.getId());
+        assertThat(updatedCertification.getCertificatedAt()).isEqualTo(targetDate);
+        assertThat(updatedCertification.getCertificationStatus()).isEqualTo(CERTIFICATED);
+        assertThat(updatedCertification.getCertificationLinks()).isEqualTo("pr link1,pr link2,");
+    }
+
     private Certification getSavedCertification(LocalDate certificatedAt, CertificateStatus status,
                                                 String link, Participant participant) {
         Certification certification = certificationProvider.save(

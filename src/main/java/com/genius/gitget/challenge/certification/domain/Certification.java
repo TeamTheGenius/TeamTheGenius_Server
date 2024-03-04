@@ -1,5 +1,7 @@
 package com.genius.gitget.challenge.certification.domain;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
+
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
@@ -55,6 +57,14 @@ public class Certification extends BaseTimeEntity {
         this.certificationStatus = certificationStatus;
     }
 
+    public static Certification createPassed(LocalDate certificatedAt) {
+        return Certification.builder()
+                .certificatedAt(certificatedAt)
+                .certificationStatus(PASSED)
+                .certificationLinks("")
+                .build();
+    }
+
     //=== 비지니스 로직 ===//
     public void update(LocalDate certificatedAt, CertificateStatus status, String certificationLinks) {
         this.certificatedAt = certificatedAt;
@@ -65,7 +75,7 @@ public class Certification extends BaseTimeEntity {
     public void updateToPass(LocalDate certificatedAt) {
         this.certificatedAt = certificatedAt;
         this.certificationStatus = CertificateStatus.PASSED;
-        this.certificationLinks = null;
+        this.certificationLinks = "";
     }
 
 

@@ -2,8 +2,6 @@ package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
-import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
-import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_USE_PASS_ITEM;
 import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
@@ -25,6 +23,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,9 +129,7 @@ public class CertificationService {
         UserItem userItem = userItemProvider.findUserItemByUser(userId, ItemCategory.CERTIFICATION_PASSER);
         Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
 
-        if (!canPassCertificate(userItem, optional)) {
-            throw new BusinessException(CAN_NOT_USE_PASS_ITEM);
-        }
+        validatePassCondition(userItem, optional);
 
         //TODO: 리팩토링 시급...
         if (optional.isPresent()) {
@@ -140,26 +137,21 @@ public class CertificationService {
             return CertificationResponse.createSuccess(optional.get());
         }
 
-        Certification certification = Certification.builder()
-                .certificatedAt(targetDate)
-                .certificationStatus(PASSED)
-                .certificationLinks(null)
-                .build();
+        Certification certification = Certification.createPassed(targetDate);
         certification.setParticipant(participant);
         certificationProvider.save(certification);
 
         return CertificationResponse.createSuccess(certification);
     }
 
-    private boolean canPassCertificate(UserItem userItem, Optional<Certification> optional) {
-        //refactor: userItem.hasItem에서 예외가 발생할 수 있을 듯 함
-        if (optional.isEmpty() && userItem.hasItem()) {
-            return true;
+    private void validatePassCondition(UserItem userItem, Optional<Certification> optional) {
+        if (!userItem.hasItem()) {
+            throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
         }
-        if (optional.isPresent() && optional.get().getCertificationStatus() == NOT_YET && userItem.hasItem()) {
-            return true;
+        if (optional.isEmpty() || optional.get().getCertificationStatus() == NOT_YET) {
+            return;
         }
-        return false;
+        throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
     }
 
     @Transactional

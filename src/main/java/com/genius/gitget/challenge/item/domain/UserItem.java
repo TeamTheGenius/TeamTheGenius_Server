@@ -3,9 +3,11 @@ package com.genius.gitget.challenge.item.domain;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -18,8 +20,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserItem {
     @Id
-    @GeneratedValue
-    Long userItemId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_item_id")
+    Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
@@ -31,6 +34,9 @@ public class UserItem {
 
     private int count;
 
+    public UserItem(int count) {
+        this.count = count;
+    }
 
     //=== 비지니스 로직 ===//
     public boolean hasItem() {

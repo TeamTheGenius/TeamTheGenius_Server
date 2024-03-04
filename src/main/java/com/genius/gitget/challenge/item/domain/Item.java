@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -35,4 +36,12 @@ public class Item extends BaseTimeEntity {
     private ItemCategory itemCategory;
 
     private String details;
+
+    @Builder
+    public Item(String name, int cost, ItemCategory itemCategory, String details) {
+        this.name = name;
+        this.cost = cost;
+        this.itemCategory = itemCategory;
+        this.details = details;
+    }
 }

@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.hits;
+package com.genius.gitget.challenge.likes;
 
 import static com.genius.gitget.challenge.user.domain.Role.ADMIN;
 import static com.genius.gitget.challenge.user.domain.Role.USER;
@@ -6,11 +6,11 @@ import static com.genius.gitget.global.security.constants.ProviderInfo.GOOGLE;
 
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
-import com.genius.gitget.challenge.hits.domain.Likes;
-import com.genius.gitget.challenge.hits.repository.LikesRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
+import com.genius.gitget.challenge.likes.domain.Likes;
+import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;

@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.hits.domain;
+package com.genius.gitget.challenge.likes.domain;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.user.domain.User;
@@ -66,20 +66,5 @@ public class Likes {
             instance.getLikesList().add(this);
         }
         this.instance = instance;
-    }
-
-    public void deleteUserAndLikes(User user, Instance instance) {
-        deleteLikesForUser(user);
-        deleteLikesForInstance(instance);
-    }
-
-    private void deleteLikesForUser(User user) {
-        user.getLikesList().remove(this);
-        this.user = null;
-    }
-
-    private void deleteLikesForInstance(Instance instance) {
-        instance.getLikesList().remove(this);
-        this.instance = null;
     }
 }

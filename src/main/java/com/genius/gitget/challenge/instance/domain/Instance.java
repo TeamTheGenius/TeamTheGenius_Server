@@ -2,7 +2,7 @@ package com.genius.gitget.challenge.instance.domain;
 
 
 import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.challenge.hits.domain.Likes;
+import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.global.file.domain.Files;
 import jakarta.persistence.CascadeType;

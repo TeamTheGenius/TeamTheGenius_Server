@@ -1,14 +1,15 @@
-package com.genius.gitget.challenge.hits.controller;
+package com.genius.gitget.challenge.likes.controller;
 
-import com.genius.gitget.challenge.hits.dto.UserLikesAddRequest;
-import com.genius.gitget.challenge.hits.dto.UserLikesResponse;
-import com.genius.gitget.challenge.hits.service.LikesService;
+import com.genius.gitget.challenge.likes.dto.UserLikesAddRequest;
+import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
+import com.genius.gitget.challenge.likes.service.LikesService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
-import com.genius.gitget.global.util.response.dto.SlicingResponse;
+import com.genius.gitget.global.util.response.dto.PagingResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -30,13 +31,15 @@ public class LikesController {
 
     // 좋아요 목록 조회
     @GetMapping("/likes")
-    public ResponseEntity<SlicingResponse<UserLikesResponse>> getLikesListOfUser(Pageable pageable,
-                                                                                 @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<PagingResponse<UserLikesResponse>> getLikesListOfUser(Pageable pageable,
+                                                                                @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-        likesService.getLikesList(userPrincipal.getUser(), pageRequest);
+        Page<UserLikesResponse> likesResponses = likesService.getLikesList(userPrincipal.getUser(), pageRequest);
 
-        return null;
+        return ResponseEntity.ok().body(
+                new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), likesResponses)
+        );
     }
 
     // 좋아요 목록 추가

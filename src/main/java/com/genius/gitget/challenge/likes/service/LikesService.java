@@ -1,10 +1,11 @@
-package com.genius.gitget.challenge.hits.service;
+package com.genius.gitget.challenge.likes.service;
 
-import com.genius.gitget.challenge.hits.domain.Likes;
-import com.genius.gitget.challenge.hits.dto.UserLikesResponse;
-import com.genius.gitget.challenge.hits.repository.LikesRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
+import com.genius.gitget.challenge.likes.domain.Likes;
+import com.genius.gitget.challenge.likes.dto.LikesDTO;
+import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
+import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -13,41 +14,37 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
+@Service
 public class LikesService {
     private final UserRepository userRepository;
     private final InstanceRepository instanceRepository;
     private final LikesRepository likesRepository;
 
-    public Slice<UserLikesResponse> getLikesList(User user, Pageable pageable) {
+    public Page<UserLikesResponse> getLikesList(User user, Pageable pageable) {
         User verifiedUser = verifyUser(user);
-        List<Likes> likesList = verifiedUser.getLikesList();
-        ArrayList<Long> instanceArrayList = new ArrayList<>();
-        for (Likes likes : likesList) {
-            instanceArrayList.add(likes.getInstance().getId());
+        List<Likes> likes = verifiedUser.getLikesList();
+        List<Long> likesList = new ArrayList<>();
+
+        for (Likes like : likes) {
+            Instance findLikedInstance = instanceRepository.findById(like.getInstance().getId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.INSTANCE_NOT_FOUND));
+            likesList.add(findLikedInstance.getId());
         }
-        findInstanceList(instanceArrayList);
-
-        //return likes.map(this::mapToUserLikesResponse);
-        return null;
+        Page<LikesDTO> likesDTOS = instanceRepository.findLikes(likesList, pageable);
+        return likesDTOS.map(this::mapToUserLikesResponse);
     }
 
-    private void findInstanceList(ArrayList<Long> instanceArrayList) {
-
-    }
-
-    private UserLikesResponse mapToUserLikesResponse(Likes likes) {
+    private UserLikesResponse mapToUserLikesResponse(LikesDTO likesDTO) {
         try {
-            //return UserLikesResponse.createByEntity(likes);
-            return null;
+            return UserLikesResponse.createByEntity(likesDTO);
         } catch (Exception e) {
             throw new BusinessException();
         }
@@ -67,10 +64,9 @@ public class LikesService {
     public void deleteLikes(User user, Long likesId) {
         Likes findLikes = getLikes(likesId);
         User findUser = getUser(findLikes.getUser().getIdentifier());
-        Instance findInstance = getInstance(findLikes.getInstance().getId());
-        User verifiedUser = verifyUser(user, findUser.getIdentifier());
+        verifyUser(user, findUser.getIdentifier());
+        getInstance(findLikes.getInstance().getId());
 
-        findLikes.deleteUserAndLikes(verifiedUser, findInstance);
         likesRepository.deleteById(findLikes.getId());
     }
 

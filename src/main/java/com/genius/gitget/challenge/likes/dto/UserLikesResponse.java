@@ -1,14 +1,15 @@
-package com.genius.gitget.challenge.hits.dto;
+package com.genius.gitget.challenge.likes.dto;
 
-import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import java.io.IOException;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Data
+@RequiredArgsConstructor
 public class UserLikesResponse {
     private Long instanceId;
     private String title;
@@ -23,19 +24,20 @@ public class UserLikesResponse {
         this.fileResponse = fileResponse;
     }
 
-    public static UserLikesResponse createByEntity(Instance instance, Files files) throws IOException {
+    public static UserLikesResponse createByEntity(LikesDTO likesDTO) throws IOException {
         return UserLikesResponse.builder()
-                .instanceId(instance.getId())
-                .title(instance.getTitle())
-                .pointPerPerson(instance.getPointPerPerson())
-                .fileResponse(convertToFileResponse(Optional.ofNullable(files)))
+                .instanceId(likesDTO.getInstanceId())
+                .title(likesDTO.getTitle())
+                .pointPerPerson(likesDTO.getPointPerPerson())
+                .fileResponse(convertToFileResponse(Optional.ofNullable(likesDTO.getFiles())))
                 .build();
     }
 
-    private static FileResponse convertToFileResponse(Optional<Files> files) throws IOException {
+    private static FileResponse convertToFileResponse(Optional<Files> files) {
         if (files.isEmpty()) {
             return FileResponse.createNotExistFile();
         }
         return FileResponse.createExistFile(files.get());
     }
+
 }

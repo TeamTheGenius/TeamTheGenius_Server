@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.hits.dto;
+package com.genius.gitget.challenge.likes.dto;
 
 import lombok.Data;
 

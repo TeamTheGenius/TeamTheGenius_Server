@@ -13,7 +13,7 @@ public record DoneResponse(
         JoinResult joinResult,
         boolean canGetReward,
         int numOfPointItem,
-        int rewardPoints,
+        int rewardedPoints,
         double achievementRate
 ) {
     public static DoneResponse createNotRewarded(Instance instance, Participant participant,
@@ -34,7 +34,7 @@ public record DoneResponse(
                 .pointPerPerson(instance.getPointPerPerson())
                 .joinResult(participant.getJoinResult())
                 .canGetReward(false)
-                .rewardPoints(participant.getRewardPoints())
+                .rewardedPoints(participant.getRewardPoints())
                 .achievementRate(achievementRate)
                 .build();
     }

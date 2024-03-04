@@ -69,6 +69,8 @@ public class Participant {
         this.joinStatus = joinStatus;
         this.joinResult = joinResult;
         this.repositoryName = repositoryName;
+        this.rewardStatus = RewardStatus.NO;
+        this.rewardPoints = 0;
     }
 
     public static Participant createDefaultParticipant(String repositoryName) {

@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class UserInformationUpdateRequest {
-    private String identifier;
     private String nickname;
     private String information;
 }

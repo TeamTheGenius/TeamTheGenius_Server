@@ -17,7 +17,6 @@ import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
-import com.genius.gitget.profile.dto.UserPaymentDetailsResponse;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,9 +36,11 @@ public class ProfileService {
     private final FilesRepository filesRepository;
     private final FilesService filesService;
 
+    // TODO 결제 내역 조회
+
     // 마이페이지 - 사용자 정보 조회
-    public UserInformationResponse getUserInformation(String identifier) {
-        User findUser = findUser(identifier);
+    public UserInformationResponse getUserInformation(User user) {
+        User findUser = findUser(user.getIdentifier());
         Files findFile = filesRepository.findById(findUser.getId())
                 .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST));
 
@@ -48,9 +49,9 @@ public class ProfileService {
 
     // 마이페이지 - 사용자 정보 수정
     @Transactional
-    public void updateUserInformation(UserInformationUpdateRequest userInformationUpdateRequest,
+    public void updateUserInformation(User user, UserInformationUpdateRequest userInformationUpdateRequest,
                                       MultipartFile multipartFile) {
-        User findUser = findUser(userInformationUpdateRequest.getIdentifier());
+        User findUser = findUser(user.getIdentifier());
         findUser.updateUserInformation(
                 userInformationUpdateRequest.getNickname(),
                 userInformationUpdateRequest.getInformation());
@@ -60,17 +61,23 @@ public class ProfileService {
         userRepository.save(findUser);
     }
 
+    // 마이페이지 - 회원 탈퇴
+    public void deleteUserInformation(User user) {
+        User findUser = findUser(user.getIdentifier());
+        userRepository.deleteById(findUser.getId());
+    }
+
     // 마이페이지 - 관심사 수정
     @Transactional
-    public void updateUserTags(UserTagsUpdateRequest userTagsUpdateRequest) {
-        User findUser = findUser(userTagsUpdateRequest.getIdentifier());
+    public void updateUserTags(User user, UserTagsUpdateRequest userTagsUpdateRequest) {
+        User findUser = findUser(user.getIdentifier());
         findUser.updateUserTags(userTagsUpdateRequest.getTags());
         userRepository.save(findUser);
     }
 
     // 마이페이지 - 챌린지 현황
-    public UserChallengeResultResponse getUserChallengeResult(String identifier) {
-        User findUser = findUser(identifier);
+    public UserChallengeResultResponse getUserChallengeResult(User user) {
+        User findUser = findUser(user.getIdentifier());
         HashMap<JoinResult, List<Long>> participantHashMap = new HashMap<>() {
             {
                 put(FAIL, new ArrayList<>());
@@ -115,18 +122,9 @@ public class ProfileService {
                 .build();
     }
 
-    public void deleteUserInformation(String identifier) {
-        User findUser = findUser(identifier);
-        userRepository.deleteById(findUser.getId());
-    }
 
     private User findUser(String identifier) {
         return userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    public UserPaymentDetailsResponse getUserPayment(String identifier) {
-        User findUser = findUser(identifier);
-        return null;
     }
 }

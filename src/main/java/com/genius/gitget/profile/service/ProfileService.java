@@ -41,10 +41,14 @@ public class ProfileService {
     // 마이페이지 - 사용자 정보 조회
     public UserInformationResponse getUserInformation(User user) {
         User findUser = findUser(user.getIdentifier());
-        Files findFile = filesRepository.findById(findUser.getId())
-                .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST));
-
-        return UserInformationResponse.entityToDto(findUser, findFile);
+        
+        try {
+            Files files = filesRepository.findById(findUser.getId())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST));
+            return UserInformationResponse.entityToDto(findUser, files);
+        } catch (Exception e) {
+            return UserInformationResponse.entityToDto(findUser, null);
+        }
     }
 
     // 마이페이지 - 사용자 정보 수정

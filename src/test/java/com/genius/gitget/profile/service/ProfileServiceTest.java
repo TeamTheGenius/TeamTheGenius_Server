@@ -1,7 +1,6 @@
-package com.genius.gitget.challenge.likes.service;
+package com.genius.gitget.profile.service;
 
 import static com.genius.gitget.global.security.constants.ProviderInfo.GITHUB;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
@@ -9,26 +8,24 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.likes.domain.Likes;
-import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
 import com.genius.gitget.challenge.likes.repository.LikesRepository;
+import com.genius.gitget.challenge.likes.service.LikesService;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.profile.dto.UserInformationResponse;
 import java.time.LocalDateTime;
-import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class LikesServiceTest {
+public class ProfileServiceTest {
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -39,6 +36,8 @@ class LikesServiceTest {
     LikesRepository likesRepository;
     @Autowired
     LikesService likesService;
+    @Autowired
+    ProfileService profileService;
 
     static User user1;
     static Topic topic1;
@@ -68,34 +67,14 @@ class LikesServiceTest {
     }
 
     @Test
-    void 유저는_좋아요목록을_조회할_수_있다1() {
-        List<Likes> all = likesRepository.findAll();
-
-        for (int i = 0; i < all.size(); i++) {
-            if (i <= 1) {
-                assertThat(all.get(i).getInstance().getTitle()).isEqualTo("1일 1커밋");
-            } else {
-                assertThat(all.get(i).getInstance().getTitle()).isEqualTo("1일 1알고리즘");
-            }
-        }
-        assertThat(all.size()).isEqualTo(3);
+    void 유저_조회() {
+        UserInformationResponse userInformation = profileService.getUserInformation(user1);
+        Assertions.assertThat(userInformation.getIdentifier()).isEqualTo("neo5188@gmail.com");
     }
 
     @Test
-    @Rollback(value = false)
-    void 유저는_좋아요목록을_조회할_수_있다2() {
-        PageRequest pageRequest = PageRequest.of(0, 5);
-        Page<UserLikesResponse> likesResponses = likesService.getLikesList(user1, pageRequest);
+    void 유저_정보_수정() {
 
-        assertThat(likesResponses.getContent().size()).isEqualTo(3);
-        assertThat(likesResponses.getContent().get(0).getTitle()).isEqualTo("1일 1커밋");
-        assertThat(likesResponses.getContent().get(0).getPointPerPerson()).isEqualTo(50);
-
-        assertThat(likesResponses.getContent().get(1).getTitle()).isEqualTo("1일 1커밋");
-        assertThat(likesResponses.getContent().get(1).getPointPerPerson()).isEqualTo(100);
-
-        assertThat(likesResponses.getContent().get(2).getTitle()).isEqualTo("1일 1알고리즘");
-        assertThat(likesResponses.getContent().get(2).getPointPerPerson()).isEqualTo(500);
     }
 
 

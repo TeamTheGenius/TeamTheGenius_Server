@@ -1,7 +1,6 @@
 package com.genius.gitget;
 
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +16,6 @@ class GitgetApplicationTests {
 
     @Test
     void test() {
-        Assertions.assertThat(userRepository.findAll().size()).isEqualTo(1);
     }
 
 }

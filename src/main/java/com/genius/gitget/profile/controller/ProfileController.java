@@ -28,6 +28,7 @@ public class ProfileController {
     private final ProfileService profileService;
 
     // TODO 마이페이지 - 결제 내역 조회
+
     // 마이페이지 - 사용자 정보
     @GetMapping
     public ResponseEntity<SingleResponse<UserInformationResponse>> getUserInformation(@AuthenticationPrincipal

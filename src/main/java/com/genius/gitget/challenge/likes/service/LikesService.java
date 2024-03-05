@@ -33,12 +33,19 @@ public class LikesService {
         List<Likes> likes = verifiedUser.getLikesList();
         List<Long> likesList = new ArrayList<>();
 
+        log.info("given test");
+        log.info(verifiedUser.getIdentifier());
+
         for (Likes like : likes) {
+            log.info("like @@@@ : " + like.getId());
             Instance findLikedInstance = instanceRepository.findById(like.getInstance().getId())
                     .orElseThrow(() -> new BusinessException(ErrorCode.INSTANCE_NOT_FOUND));
             likesList.add(findLikedInstance.getId());
         }
         Page<LikesDTO> likesDTOS = instanceRepository.findLikes(likesList, pageable);
+
+        log.info("before return test");
+
         return likesDTOS.map(this::mapToUserLikesResponse);
     }
 

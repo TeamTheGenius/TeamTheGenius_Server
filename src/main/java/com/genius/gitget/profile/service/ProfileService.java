@@ -41,13 +41,22 @@ public class ProfileService {
     // 마이페이지 - 사용자 정보 조회
     public UserInformationResponse getUserInformation(User user) {
         User findUser = findUser(user.getIdentifier());
+        int participantCount = 0;
+        List<ParticipantInfo> participantInfoList = findUser.getParticipantInfoList();
+
+        for (int i = 0; i < participantInfoList.size(); i++) {
+            if (participantInfoList.get(i).getJoinStatus() == YES) {
+                JoinResult joinResult = participantInfoList.get(i).getJoinResult();
+                participantCount = (joinResult == SUCCESS) ? participantCount + 1 : participantCount - 1;
+            }
+        }
 
         try {
             Files files = filesRepository.findById(findUser.getId())
                     .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST));
-            return UserInformationResponse.entityToDto(findUser, files);
+            return UserInformationResponse.entityToDto(findUser, files, participantCount);
         } catch (Exception e) {
-            return UserInformationResponse.entityToDto(findUser, null);
+            return UserInformationResponse.entityToDto(findUser, null, participantCount);
         }
     }
 
@@ -103,26 +112,16 @@ public class ProfileService {
                 put(SUCCESS, new ArrayList<>());
             }
         };
-        // hashmap에 JoinResult : [1,2,3] 형식으로 저장할 예정 -> 1,2,3은 유저가 참여한 participantInfo.
-        // 다시 말해서, key는 JoinResult가 되고, values 에는 유저가 참여한 참여 정보의 PK인 id가 저장될 것 이다.
-
-        // 유저의 참여 정보를 담고 있는 리스트
-        List<ParticipantInfo> participantInfoList = findUser.getParticipantInfoList();
+        List<ParticipantInfo> participantInfoList = findUser.getParticipantInfoList(); // 유저의 참여 정보를 담고 있는 리스트
         int participanTotalCount = participantInfoList.size();
 
-        for (int i = 0; i < participantInfoList.size(); i++) {
-            // 각 참여 정보를 받아옴.
+        for (int i = 0; i < participantInfoList.size(); i++) { // 각 참여 정보를 받아옴.
             if (participantInfoList.get(i).getJoinStatus() == YES) {
                 JoinResult joinResult = participantInfoList.get(i).getJoinResult();
-
-                // hashmap에 저장된 key와 일치 여부 확인
-                if (participantHashMap.containsKey(joinResult)) {
-                    // 일치한다면, 해당 key의 value인 list에 id 저장
+                if (participantHashMap.containsKey(joinResult)) { // hashmap에 저장된 key와 일치 여부 확인
                     List<Long> participantIdList = participantHashMap.get(joinResult);
-                    participantIdList.add(participantInfoList.get(i).getId());
-
-                    // 최종적으로 hashmap에 저장
-                    participantHashMap.put(joinResult, participantIdList);
+                    participantIdList.add(participantInfoList.get(i).getId()); // 일치한다면, 해당 key의 value인 list에 id 저장
+                    participantHashMap.put(joinResult, participantIdList); // 최종적으로 hashmap에 저장
                 }
             }
         }
@@ -136,7 +135,6 @@ public class ProfileService {
                 .success(success)
                 .processing(processing)
                 .beforeStart(participanTotalCount - fail - success - processing)
-                .progressBar(success - fail)
                 .build();
     }
 

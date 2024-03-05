@@ -51,8 +51,19 @@ public class GithubController {
         );
     }
 
+    @GetMapping("/verify/token")
+    public ResponseEntity<CommonResponse> verifyGithubToken(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        githubService.verifyGithubToken(userPrincipal.getUser());
+        
+        return ResponseEntity.ok().body(
+                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
+        );
+    }
+
     @GetMapping("/verify/repository")
-    public ResponseEntity<CommonResponse> registerRepository(
+    public ResponseEntity<CommonResponse> verifyRepository(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String repo
     ) {
@@ -65,7 +76,7 @@ public class GithubController {
     }
 
     @GetMapping("/verify/pull-request")
-    public ResponseEntity<ListResponse<PullRequestResponse>> verify(
+    public ResponseEntity<ListResponse<PullRequestResponse>> verifyPullRequest(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String repo
     ) {

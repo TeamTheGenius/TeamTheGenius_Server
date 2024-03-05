@@ -36,6 +36,13 @@ public class GithubService {
         userService.save(user);
     }
 
+    public void verifyGithubToken(User user) {
+        String githubToken = encryptUtil.decrypt(user.getGithubToken());
+
+        GitHub gitHub = githubProvider.getGithubConnection(githubToken);
+        githubProvider.validateGithubConnection(gitHub, user.getIdentifier());
+    }
+
     @Transactional
     public void verifyRepository(User user, String repository) {
         GitHub gitHub = githubProvider.getGithubConnection(user);

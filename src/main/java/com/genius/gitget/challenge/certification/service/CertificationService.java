@@ -9,6 +9,7 @@ import com.genius.gitget.challenge.certification.dto.CertificationInformation;
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
+import com.genius.gitget.challenge.certification.dto.TotalResponse;
 import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -89,14 +90,23 @@ public class CertificationService {
         return WeekResponse.create(user, fileResponse, certificationResponses);
     }
 
-    public List<CertificationResponse> getTotalCertification(Long participantId, LocalDate currentDate) {
-        LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
+    public TotalResponse getTotalCertification(Long participantId, LocalDate currentDate) {
+        Instance instance = participantProvider.getInstanceById(participantId);
+        LocalDate startDate = instance.getStartedDate().toLocalDate();
+        int totalAttempts = instance.getTotalAttempt();
+
         int curAttempt = DateUtil.getAttemptCount(startDate, currentDate);
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
 
-        return convertToCertificationResponse(certifications, curAttempt, currentDate);
+        List<CertificationResponse> certificationResponses = convertToCertificationResponse(certifications, curAttempt,
+                currentDate);
+
+        return TotalResponse.builder()
+                .totalAttempts(totalAttempts)
+                .certifications(certificationResponses)
+                .build();
     }
 
     private List<CertificationResponse> convertToCertificationResponse(List<Certification> certifications,

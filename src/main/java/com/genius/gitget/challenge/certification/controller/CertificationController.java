@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.certification.dto.CertificationInformation;
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
+import com.genius.gitget.challenge.certification.dto.TotalResponse;
 import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -16,7 +17,6 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.security.domain.UserPrincipal;
-import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.global.util.response.dto.SlicingResponse;
 import java.time.LocalDate;
@@ -119,17 +119,17 @@ public class CertificationController {
     }
 
     @GetMapping("/total/{instanceId}")
-    public ResponseEntity<ListResponse<CertificationResponse>> getTotalCertifications(
+    public ResponseEntity<SingleResponse<TotalResponse>> getTotalCertifications(
             @PathVariable Long instanceId,
             @RequestParam String identifier
     ) {
         User user = userService.findUserByIdentifier(identifier);
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
-        List<CertificationResponse> totalCertification = certificationService.getTotalCertification(
+        TotalResponse totalResponse = certificationService.getTotalCertification(
                 participant.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(
-                new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), totalCertification)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), totalResponse)
         );
     }
 

@@ -14,6 +14,7 @@ import com.genius.gitget.challenge.certification.dto.CertificationInformation;
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
+import com.genius.gitget.challenge.certification.dto.TotalResponse;
 import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
@@ -251,7 +252,8 @@ class CertificationServiceTest {
         LocalDate endDate = LocalDate.of(2024, 2, 29);
         LocalDate currentDate = LocalDate.of(2024, 2, 8);
 
-        Participant participant = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(getSavedUser(githubId), instance);
 
         //when
         getSavedCertification(NOT_YET, startDate, participant);
@@ -259,11 +261,12 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
 
-        List<CertificationResponse> certification = certificationService.getTotalCertification(participant.getId(),
+        TotalResponse totalResponse = certificationService.getTotalCertification(participant.getId(),
                 currentDate);
 
         //then
-        assertThat(certification.size()).isEqualTo(8);
+        assertThat(totalResponse.certifications().size()).isEqualTo(8);
+        assertThat(totalResponse.totalAttempts()).isEqualTo(instance.getTotalAttempt());
     }
 
     @Test

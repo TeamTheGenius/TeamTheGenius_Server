@@ -327,7 +327,7 @@ class CertificationServiceTest {
 
         //then
         assertThat(certification.getContent().size()).isEqualTo(1);
-        assertThat(certification.getContent().get(0).certificationResponses().size()).isEqualTo(3);
+        assertThat(certification.getContent().get(0).certifications().size()).isEqualTo(3);
     }
 
     @Test

@@ -14,6 +14,7 @@ import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -71,7 +72,6 @@ public class CertificationController {
         );
     }
 
-    // 위의 컨트롤러와 합칠 수 있을 듯
     @PostMapping("/pass")
     public ResponseEntity<SingleResponse<CertificationResponse>> passCertification(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -95,10 +95,11 @@ public class CertificationController {
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
         List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
                 participant.getId(), LocalDate.now());
+        FileResponse fileResponse = FileResponse.create(user.getFiles());
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
-                        WeekResponse.create(user, weekCertification))
+                        WeekResponse.create(user, fileResponse, weekCertification))
         );
     }
 
@@ -110,8 +111,7 @@ public class CertificationController {
     ) {
         User user = userPrincipal.getUser();
         Slice<WeekResponse> certifications = certificationService.getAllWeekCertification(
-                user.getId(), instanceId,
-                LocalDate.now(), pageable);
+                user.getId(), instanceId, LocalDate.now(), pageable);
 
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certifications)

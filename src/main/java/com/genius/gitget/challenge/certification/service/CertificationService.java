@@ -73,7 +73,9 @@ public class CertificationService {
     }
 
     private WeekResponse convertToWeekResponse(Participant participant, LocalDate currentDate) {
+        User user = participant.getUser();
         LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
+
         List<Certification> certifications = certificationProvider.findByDuration(
                 DateUtil.getWeekStartDate(currentDate),
                 currentDate,
@@ -82,8 +84,9 @@ public class CertificationService {
                 certifications,
                 DateUtil.getWeekAttempt(startDate, currentDate),
                 currentDate);
+        FileResponse fileResponse = FileResponse.create(user.getFiles());
 
-        return WeekResponse.create(participant.getUser(), certificationResponses);
+        return WeekResponse.create(user, fileResponse, certificationResponses);
     }
 
     public List<CertificationResponse> getTotalCertification(Long participantId, LocalDate currentDate) {

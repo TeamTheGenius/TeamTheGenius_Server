@@ -22,6 +22,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -105,6 +106,10 @@ public class User extends BaseTimeEntity {
     public long updatePoints(int amount) {
         this.point += amount;
         return this.point;
+    }
+
+    public Optional<Files> getFiles() {
+        return Optional.ofNullable(this.files);
     }
 
     //=== 연관관계 편의 메서드 ===//

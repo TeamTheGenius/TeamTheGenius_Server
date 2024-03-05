@@ -38,8 +38,7 @@ public class LikesService {
 
         for (Likes like : likes) {
             log.info("like @@@@ : " + like.getId());
-            Instance findLikedInstance = instanceRepository.findById(like.getInstance().getId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.INSTANCE_NOT_FOUND));
+            Instance findLikedInstance = verifyInstance(like.getInstance().getId());
             likesList.add(findLikedInstance.getId());
         }
         Page<LikesDTO> likesDTOS = instanceRepository.findLikes(likesList, pageable);
@@ -59,9 +58,9 @@ public class LikesService {
 
     @Transactional
     public void addLikes(User user, String identifier, Long instanceId) {
-        User verifiedUser = verifyUser(user, identifier);
-        User findUser = getUser(verifiedUser.getIdentifier());
-        Instance findInstance = getInstance(instanceId);
+        User comparedUser = compareToUserIdentifier(user, identifier);
+        User findUser = verifyUser(comparedUser);
+        Instance findInstance = verifyInstance(instanceId);
 
         Likes likes = new Likes(findUser, findInstance);
         likesRepository.save(likes);
@@ -70,16 +69,9 @@ public class LikesService {
     @Transactional
     public void deleteLikes(User user, Long likesId) {
         Likes findLikes = getLikes(likesId);
-        User findUser = getUser(findLikes.getUser().getIdentifier());
-        verifyUser(user, findUser.getIdentifier());
-        getInstance(findLikes.getInstance().getId());
-
-        likesRepository.deleteById(findLikes.getId());
-    }
-
-    private Likes getLikes(Long likesId) {
-        return likesRepository.findById(likesId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.LIKES_NOT_FOUND));
+        User findUser = verifyUser(findLikes.getUser());
+        compareToUserIdentifier(user, findUser.getIdentifier());
+        likesRepository.deleteById(likesId);
     }
 
     private User verifyUser(User user) {
@@ -87,20 +79,20 @@ public class LikesService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 
-    private User verifyUser(User AuthenticatedUser, String identifier) {
+    private Instance verifyInstance(Long instanceId) {
+        return instanceRepository.findById(instanceId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INSTANCE_NOT_FOUND));
+    }
+
+    private User compareToUserIdentifier(User AuthenticatedUser, String identifier) {
         if (!(AuthenticatedUser.getIdentifier().equals(identifier))) {
             throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
         }
         return AuthenticatedUser;
     }
 
-    private Instance getInstance(Long instanceId) {
-        return instanceRepository.findById(instanceId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.INSTANCE_NOT_FOUND));
-    }
-
-    private User getUser(String user) {
-        return userRepository.findByIdentifier(user)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+    private Likes getLikes(Long likesId) {
+        return likesRepository.findById(likesId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.LIKES_NOT_FOUND));
     }
 }

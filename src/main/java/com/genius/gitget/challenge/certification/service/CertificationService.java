@@ -17,6 +17,7 @@ import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.item.service.UserItemProvider;
+import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
@@ -121,7 +122,7 @@ public class CertificationService {
     }
 
     @Transactional
-    public CertificationResponse passCertification(Long userId, CertificationRequest certificationRequest) {
+    public ActivatedResponse passCertification(Long userId, CertificationRequest certificationRequest) {
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
         Participant participant = participantProvider.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
@@ -133,15 +134,18 @@ public class CertificationService {
 
         //TODO: 리팩토링 시급...
         if (optional.isPresent()) {
-            optional.get().updateToPass(targetDate);
-            return CertificationResponse.createSuccess(optional.get());
+            Certification certification = optional.get();
+            certification.updateToPass(targetDate);
+            return ActivatedResponse.create(instance, certification.getCertificationStatus(),
+                    0, participant.getRepositoryName());
         }
 
         Certification certification = Certification.createPassed(targetDate);
         certification.setParticipant(participant);
         certificationProvider.save(certification);
 
-        return CertificationResponse.createSuccess(certification);
+        return ActivatedResponse.create(instance, certification.getCertificationStatus(),
+                0, participant.getRepositoryName());
     }
 
     private void validatePassCondition(UserItem userItem, Optional<Certification> optional) {

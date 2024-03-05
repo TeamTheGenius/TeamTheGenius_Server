@@ -121,9 +121,9 @@ public class CertificationController {
     @GetMapping("/total/{instanceId}")
     public ResponseEntity<SingleResponse<TotalResponse>> getTotalCertifications(
             @PathVariable Long instanceId,
-            @RequestParam String identifier
+            @RequestParam Long userId
     ) {
-        User user = userService.findUserByIdentifier(identifier);
+        User user = userService.findUserById(userId);
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
         TotalResponse totalResponse = certificationService.getTotalCertification(
                 participant.getId(), LocalDate.now());

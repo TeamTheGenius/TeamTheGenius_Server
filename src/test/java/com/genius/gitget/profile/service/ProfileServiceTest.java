@@ -14,7 +14,10 @@ import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserInformationResponse;
+import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,6 +77,16 @@ public class ProfileServiceTest {
 
     @Test
     void 유저_정보_수정() {
+        profileService.updateUserInformation(user1,
+                UserInformationUpdateRequest.builder()
+                        .nickname("수정된 nickname")
+                        .information("수정된 information")
+                        .build(), null, "profile");
+
+        User user = userRepository.findByIdentifier(user1.getIdentifier())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        Assertions.assertThat(user.getNickname()).isEqualTo("수정된 nickname");
 
     }
 

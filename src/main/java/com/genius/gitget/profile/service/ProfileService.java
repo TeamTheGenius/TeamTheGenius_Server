@@ -41,7 +41,7 @@ public class ProfileService {
     // 마이페이지 - 사용자 정보 조회
     public UserInformationResponse getUserInformation(User user) {
         User findUser = findUser(user.getIdentifier());
-        
+
         try {
             Files files = filesRepository.findById(findUser.getId())
                     .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST));
@@ -60,11 +60,13 @@ public class ProfileService {
                 userInformationUpdateRequest.getNickname(),
                 userInformationUpdateRequest.getInformation());
 
-        if (findUser.getFiles() == null) {
-            Files uploadedFile = filesService.uploadFile(multipartFile, type);
-            findUser.setFiles(uploadedFile);
-        } else {
-            filesService.updateFile(findUser.getFiles().getId(), multipartFile);
+        if (multipartFile != null) {
+            if (findUser.getFiles() == null) {
+                Files uploadedFile = filesService.uploadFile(multipartFile, type);
+                findUser.setFiles(uploadedFile);
+            } else {
+                filesService.updateFile(findUser.getFiles().getId(), multipartFile);
+            }
         }
         userRepository.save(findUser);
     }

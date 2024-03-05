@@ -113,4 +113,8 @@ public class User extends BaseTimeEntity {
     public void setPoint(Long point) {
         this.point += point;
     }
+
+    public void deleteLikesList() {
+        this.likesList.clear();
+    }
 }

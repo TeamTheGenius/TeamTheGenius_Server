@@ -1,6 +1,7 @@
 package com.genius.gitget.profile.service;
 
 import static com.genius.gitget.global.security.constants.ProviderInfo.GITHUB;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
@@ -18,6 +19,7 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 public class ProfileServiceTest {
+    static User user1;
+    static Topic topic1;
+    static Instance instance1, instance2, instance3;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -42,13 +47,9 @@ public class ProfileServiceTest {
     @Autowired
     ProfileService profileService;
 
-    static User user1;
-    static Topic topic1;
-    static Instance instance1, instance2, instance3;
-
     @BeforeEach
     void setup() {
-        user1 = getSavedUser("neo5188@gmail.com", GITHUB, "kimdozzi");
+        user1 = getSavedUser("neo5188@gmail.com", GITHUB, "alias");
 
         topic1 = getSavedTopic("1일 1커밋", "BE");
 
@@ -69,6 +70,8 @@ public class ProfileServiceTest {
         likesRepository.save(likes3);
     }
 
+    // TODO 챌린지 현황 조회 -> 코드 병합 후 테스트할 것
+
     @Test
     void 유저_조회() {
         UserInformationResponse userInformation = profileService.getUserInformation(user1);
@@ -87,7 +90,26 @@ public class ProfileServiceTest {
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
         Assertions.assertThat(user.getNickname()).isEqualTo("수정된 nickname");
+    }
 
+    @Test
+    void 유저_관심사_수정() {
+        profileService.updateUserTags(user1, UserTagsUpdateRequest.builder().tags("수정 테스트 관심사").build());
+        User user = userRepository.findByIdentifier(user1.getIdentifier())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        Assertions.assertThat(user.getTags()).isEqualTo("수정 테스트 관심사");
+    }
+
+
+    @Test
+    void 회원_탈퇴() {
+        User user = userRepository.findByIdentifier(user1.getIdentifier())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        profileService.deleteUserInformation(user);
+
+        assertThrows(BusinessException.class,
+                () -> userRepository.findById(user.getId())
+                        .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND)));
     }
 
 

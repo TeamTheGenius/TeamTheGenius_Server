@@ -75,6 +75,8 @@ public class ProfileService {
     @Transactional
     public void deleteUserInformation(User user) {
         User findUser = findUser(user.getIdentifier());
+        findUser.setFiles(null);
+        findUser.deleteLikesList();
         userRepository.deleteById(findUser.getId());
     }
 

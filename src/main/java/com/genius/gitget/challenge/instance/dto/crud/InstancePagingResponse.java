@@ -18,14 +18,7 @@ public record InstancePagingResponse(Long topicId, Long instanceId, String title
                 .title(instance.getTitle())
                 .startedAt(instance.getStartedDate())
                 .completedAt(instance.getCompletedDate())
-                .fileResponse(convertToFileResponse(files))
+                .fileResponse(FileResponse.create(files))
                 .build();
-    }
-
-    private static FileResponse convertToFileResponse(Optional<Files> files) {
-        if (files.isEmpty()) {
-            return FileResponse.createNotExistFile();
-        }
-        return FileResponse.createExistFile(files.get());
     }
 }

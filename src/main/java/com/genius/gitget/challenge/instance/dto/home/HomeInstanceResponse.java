@@ -21,14 +21,7 @@ public record HomeInstanceResponse(
                 .title(instance.getTitle())
                 .participantCnt(instance.getParticipantCount())
                 .pointPerPerson(instance.getPointPerPerson())
-                .fileResponse(convertToFileResponse(files))
+                .fileResponse(FileResponse.create(files))
                 .build();
-    }
-
-    private static FileResponse convertToFileResponse(Optional<Files> files) throws IOException {
-        if (files.isEmpty()) {
-            return FileResponse.createNotExistFile();
-        }
-        return FileResponse.createExistFile(files.get());
     }
 }

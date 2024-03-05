@@ -78,8 +78,11 @@ class MyChallengeServiceTest {
         //then
         assertThat(instances.size()).isEqualTo(3);
         assertThat(instances.get(0).instanceId()).isEqualTo(instance1.getId());
+        assertThat(instances.get(0).fileResponse()).isNotNull();
         assertThat(instances.get(1).instanceId()).isEqualTo(instance2.getId());
+        assertThat(instances.get(1).fileResponse()).isNotNull();
         assertThat(instances.get(2).instanceId()).isEqualTo(instance3.getId());
+        assertThat(instances.get(2).fileResponse()).isNotNull();
     }
 
     @Test

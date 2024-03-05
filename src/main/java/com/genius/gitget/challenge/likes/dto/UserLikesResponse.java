@@ -6,10 +6,8 @@ import java.io.IOException;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
 public class UserLikesResponse {
     private Long instanceId;
     private String title;

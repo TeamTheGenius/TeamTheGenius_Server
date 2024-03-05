@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +28,6 @@ public class ProfileController {
     private final ProfileService profileService;
 
     // TODO 마이페이지 - 결제 내역 조회
-
     // 마이페이지 - 사용자 정보
     @GetMapping
     public ResponseEntity<SingleResponse<UserInformationResponse>> getUserInformation(@AuthenticationPrincipal
@@ -43,17 +43,19 @@ public class ProfileController {
     @PostMapping("/information")
     public ResponseEntity<CommonResponse> updateUserInformation(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                                 @RequestPart(value = "data") UserInformationUpdateRequest userInformationUpdateRequest,
-                                                                @RequestPart(value = "files", required = false) MultipartFile multipartFile) {
-        profileService.updateUserInformation(userPrincipal.getUser(), userInformationUpdateRequest, multipartFile);
+                                                                @RequestPart(value = "files", required = false) MultipartFile multipartFile,
+                                                                @RequestPart(value = "type") String type) {
+        profileService.updateUserInformation(userPrincipal.getUser(), userInformationUpdateRequest, multipartFile,
+                type);
 
         return ResponseEntity.ok()
                 .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
     }
 
     // 마이페이지 - 관심사 수정
-    @PostMapping("/tags")
+    @PostMapping("/interest")
     public ResponseEntity<CommonResponse> updateUserTags(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                         UserTagsUpdateRequest userTagsUpdateRequest) {
+                                                         @RequestBody UserTagsUpdateRequest userTagsUpdateRequest) {
         profileService.updateUserTags(userPrincipal.getUser(), userTagsUpdateRequest);
 
         return ResponseEntity.ok()

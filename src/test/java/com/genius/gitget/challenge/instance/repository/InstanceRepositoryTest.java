@@ -62,7 +62,7 @@ class InstanceRepositoryTest {
         //when
         Instance savedInstance = instanceRepository.save(instance);
         savedInstance.updateInstance("수정되었습니다.", "수정된 유의사항", 10000, LocalDateTime.now(),
-                LocalDateTime.now().plusDays(5));
+                LocalDateTime.now().plusDays(5), "인증방법");
 
         //then
         Assertions.assertThat(instance.getDescription()).isEqualTo(savedInstance.getDescription());

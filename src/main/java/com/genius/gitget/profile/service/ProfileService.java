@@ -50,18 +50,23 @@ public class ProfileService {
     // 마이페이지 - 사용자 정보 수정
     @Transactional
     public void updateUserInformation(User user, UserInformationUpdateRequest userInformationUpdateRequest,
-                                      MultipartFile multipartFile) {
+                                      MultipartFile multipartFile, String type) {
         User findUser = findUser(user.getIdentifier());
         findUser.updateUserInformation(
                 userInformationUpdateRequest.getNickname(),
                 userInformationUpdateRequest.getInformation());
 
-        Long findFileId = findUser.getFiles().getId();
-        filesService.updateFile(findFileId, multipartFile);
+        if (findUser.getFiles() == null) {
+            Files uploadedFile = filesService.uploadFile(multipartFile, type);
+            findUser.setFiles(uploadedFile);
+        } else {
+            filesService.updateFile(findUser.getFiles().getId(), multipartFile);
+        }
         userRepository.save(findUser);
     }
 
     // 마이페이지 - 회원 탈퇴
+    @Transactional
     public void deleteUserInformation(User user) {
         User findUser = findUser(user.getIdentifier());
         userRepository.deleteById(findUser.getId());
@@ -70,7 +75,12 @@ public class ProfileService {
     // 마이페이지 - 관심사 수정
     @Transactional
     public void updateUserTags(User user, UserTagsUpdateRequest userTagsUpdateRequest) {
-        User findUser = findUser(user.getIdentifier());
+        if (userTagsUpdateRequest.getTags() == null) {
+            throw new BusinessException();
+        }
+        User findUser = userRepository.findByIdentifier(user.getIdentifier())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
         findUser.updateUserTags(userTagsUpdateRequest.getTags());
         userRepository.save(findUser);
     }

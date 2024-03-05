@@ -49,7 +49,7 @@ public class LikesController {
         likesService.addLikes(userPrincipal.getUser(), userLikesAddRequest.getIdentifier(),
                 userLikesAddRequest.getInstanceId());
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
+                new CommonResponse(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage())
         );
     }
 
@@ -59,7 +59,7 @@ public class LikesController {
                                                       @PathVariable(value = "likesId") Long likesId) {
         likesService.deleteLikes(userPrincipal.getUser(), likesId);
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.CREATED.getMessage())
+                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
         );
     }
 }

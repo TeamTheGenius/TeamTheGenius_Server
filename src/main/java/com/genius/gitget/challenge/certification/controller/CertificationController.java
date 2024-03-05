@@ -103,10 +103,13 @@ public class CertificationController {
 
     @GetMapping("/week/all/{instanceId}")
     public ResponseEntity<SlicingResponse<WeekResponse>> getAllUserWeekCertification(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId,
             @PageableDefault Pageable pageable
     ) {
-        Slice<WeekResponse> certifications = certificationService.getAllWeekCertification(instanceId,
+        User user = userPrincipal.getUser();
+        Slice<WeekResponse> certifications = certificationService.getAllWeekCertification(
+                user.getId(), instanceId,
                 LocalDate.now(), pageable);
 
         return ResponseEntity.ok().body(

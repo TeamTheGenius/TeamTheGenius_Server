@@ -81,7 +81,7 @@ class DateUtilTest {
     }
 
     @Test
-    @DisplayName("현재일자가 시작일자보다 더 이후의 날짜일 때, 남은 일수를 -로 반환한다.")
+    @DisplayName("현재일자가 시작일자보다 더 이후의 날짜일 때, 남은 일수를 0으로 반환한다.")
     public void should_returnMinus_when_startDateBeforeThenTargetDate() {
         //given
         LocalDate targetDate = LocalDate.of(2024, 3, 10);
@@ -91,6 +91,6 @@ class DateUtilTest {
         int remainDays = DateUtil.getRemainDaysToStart(startDate, targetDate);
 
         //then
-        assertThat(remainDays).isEqualTo(-9);
+        assertThat(remainDays).isEqualTo(0);
     }
 }

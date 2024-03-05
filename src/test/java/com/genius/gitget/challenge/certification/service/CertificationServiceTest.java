@@ -310,7 +310,7 @@ class CertificationServiceTest {
     }
 
     @Test
-    @DisplayName("챌린지에 참여한 모든 사용자들의 일주일 간 인증 현황을 받아올 수 있다.")
+    @DisplayName("챌린지에 참여한 모든 사용자들의 일주일 간 인증 현황을 받아올 수 있다. 단, 본인의 값을 제외한다.")
     public void should_getWeekCertification_aboutAllParticipants() {
         //given
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -322,13 +322,12 @@ class CertificationServiceTest {
         Participant participant2 = getParticipantInfo(user2, instance);
 
         //when
-        Slice<WeekResponse> certification = certificationService.getAllWeekCertification(instance.getId(), currentDate,
-                pageRequest);
+        Slice<WeekResponse> certification = certificationService.getAllWeekCertification(
+                user1.getId(), instance.getId(), currentDate, pageRequest);
 
         //then
-        assertThat(certification.getContent().size()).isEqualTo(2);
+        assertThat(certification.getContent().size()).isEqualTo(1);
         assertThat(certification.getContent().get(0).certificationResponses().size()).isEqualTo(3);
-        assertThat(certification.getContent().get(1).certificationResponses().size()).isEqualTo(3);
     }
 
     @Test

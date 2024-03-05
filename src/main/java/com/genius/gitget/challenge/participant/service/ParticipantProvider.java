@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +45,14 @@ public class ParticipantProvider {
                 .orElseThrow(() -> new BusinessException(PARTICIPANT_INFO_NOT_FOUND));
     }
 
-    public Slice<Participant> findAllByInstanceId(Long instanceId, Pageable pageable) {
-        return participantRepository.findAllByInstanceId(instanceId, JoinStatus.YES, pageable);
+    public Slice<Participant> findAllByInstanceId(Long userId, Long instanceId, Pageable pageable) {
+        Slice<Participant> participants = participantRepository.findAllByInstanceId(instanceId, JoinStatus.YES,
+                pageable);
+        List<Participant> filtered = participants.stream()
+                .filter(participant -> participant.getUser().getId() != userId)
+                .toList();
+
+        return new SliceImpl<>(filtered, pageable, participants.hasNext());
     }
 
     public Instance getInstanceById(Long participantId) {

@@ -64,9 +64,9 @@ public class CertificationService {
         return convertToCertificationResponse(certifications, curAttempt);
     }
 
-    public Slice<WeekResponse> getAllWeekCertification(Long instanceId, LocalDate currentDate,
-                                                       Pageable pageable) {
-        Slice<Participant> participants = participantProvider.findAllByInstanceId(instanceId, pageable);
+    public Slice<WeekResponse> getAllWeekCertification(Long userId, Long instanceId,
+                                                       LocalDate currentDate, Pageable pageable) {
+        Slice<Participant> participants = participantProvider.findAllByInstanceId(userId, instanceId, pageable);
         return participants.map(
                 participant -> convertToWeekResponse(participant, currentDate)
         );

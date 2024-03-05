@@ -19,12 +19,12 @@ public record CertificationResponse(
         List<String> prLinks
 ) {
 
-    public static CertificationResponse createFail(int currentAttempt) {
+    public static CertificationResponse createFail(int currentAttempt, LocalDate certificatedAt) {
         return CertificationResponse.builder()
                 .certificationId(0L)
                 .certificationAttempt(currentAttempt)
-                .dayOfWeek(null)
-                .certificatedAt(null)
+                .dayOfWeek(certificatedAt.getDayOfWeek())
+                .certificatedAt(certificatedAt)
                 .certificateStatus(null)
                 .prLinks(null)
                 .prCount(0)

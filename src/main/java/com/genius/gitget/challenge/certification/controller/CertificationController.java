@@ -87,7 +87,7 @@ public class CertificationController {
     }
 
     @GetMapping("/week/{instanceId}")
-    public ResponseEntity<ListResponse<CertificationResponse>> getWeekCertification(
+    public ResponseEntity<SingleResponse<WeekResponse>> getWeekCertification(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
@@ -97,7 +97,8 @@ public class CertificationController {
                 participant.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(
-                new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekCertification)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
+                        WeekResponse.create(user, weekCertification))
         );
     }
 

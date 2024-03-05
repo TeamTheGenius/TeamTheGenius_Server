@@ -61,7 +61,7 @@ public class CertificationService {
                 currentDate,
                 participantId);
 
-        return convertToCertificationResponse(certifications, curAttempt);
+        return convertToCertificationResponse(certifications, curAttempt, currentDate);
     }
 
     public Slice<WeekResponse> getAllWeekCertification(Long userId, Long instanceId,
@@ -80,7 +80,8 @@ public class CertificationService {
                 participant.getId());
         List<CertificationResponse> certificationResponses = convertToCertificationResponse(
                 certifications,
-                DateUtil.getWeekAttempt(startDate, currentDate));
+                DateUtil.getWeekAttempt(startDate, currentDate),
+                currentDate);
 
         return WeekResponse.create(participant.getUser(), certificationResponses);
     }
@@ -92,20 +93,22 @@ public class CertificationService {
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
 
-        return convertToCertificationResponse(certifications, curAttempt);
+        return convertToCertificationResponse(certifications, curAttempt, currentDate);
     }
 
     private List<CertificationResponse> convertToCertificationResponse(List<Certification> certifications,
-                                                                       int curAttempt) {
+                                                                       int curAttempt, LocalDate currentDate) {
         List<CertificationResponse> result = new ArrayList<>();
         Map<Integer, Certification> certificationMap = convertToMap(certifications);
+        currentDate = DateUtil.getWeekStartDate(currentDate).minusDays(1);
 
         for (int cur = 1; cur <= curAttempt; cur++) {
+            currentDate = currentDate.plusDays(1);
             if (certificationMap.containsKey(cur)) {
                 result.add(CertificationResponse.createSuccess(certificationMap.get(cur)));
                 continue;
             }
-            result.add(CertificationResponse.createFail(cur));
+            result.add(CertificationResponse.createFail(cur, currentDate));
         }
 
         return result;

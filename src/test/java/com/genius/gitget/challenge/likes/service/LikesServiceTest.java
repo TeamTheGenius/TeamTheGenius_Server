@@ -15,20 +15,25 @@ import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
 class LikesServiceTest {
+    static User user1;
+    static Topic topic1;
+    static Instance instance1, instance2, instance3;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -39,10 +44,6 @@ class LikesServiceTest {
     LikesRepository likesRepository;
     @Autowired
     LikesService likesService;
-
-    static User user1;
-    static Topic topic1;
-    static Instance instance1, instance2, instance3;
 
     @BeforeEach
     void setup() {
@@ -68,6 +69,30 @@ class LikesServiceTest {
     }
 
     @Test
+    void 유저_좋아요_목록_추가() {
+        List<Likes> all = likesRepository.findAll();
+        int cnt = 0;
+        for (Likes likes : all) {
+            if (likes.getUser().getIdentifier().equals("neo5188@gmail.com") && likes.getInstance().getTitle()
+                    .equals("1일 1커밋")) {
+                cnt++;
+            }
+        }
+        Assertions.assertThat(all.size() - 1).isEqualTo(cnt);
+    }
+
+    @Test
+    void 유저_좋아요_목록_삭제() {
+        likesService.deleteLikes(user1, 1L);
+        List<Likes> all = likesRepository.findAll();
+
+        org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class,
+                () -> likesRepository.findById(1L).orElseThrow(() -> new BusinessException(ErrorCode.LIKES_NOT_FOUND)));
+
+        Assertions.assertThat(all.size()).isEqualTo(2);
+    }
+
+    @Test
     void 유저는_좋아요목록을_조회할_수_있다1() {
         List<Likes> all = likesRepository.findAll();
 
@@ -82,7 +107,6 @@ class LikesServiceTest {
     }
 
     @Test
-    @Rollback(value = false)
     void 유저는_좋아요목록을_조회할_수_있다2() {
         PageRequest pageRequest = PageRequest.of(0, 5);
         Page<UserLikesResponse> likesResponses = likesService.getLikesList(user1, pageRequest);

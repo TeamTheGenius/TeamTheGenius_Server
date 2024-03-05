@@ -1,12 +1,10 @@
 package com.genius.gitget.challenge.instance.dto.detail;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import lombok.Builder;
 
 @Builder
@@ -14,7 +12,8 @@ public record InstanceResponse(
         Long instanceId,
         String title,
         int remainDays,
-        String period,
+        LocalDate startedDate,
+        LocalDate completedDate,
         int participantCount,
         int pointPerPerson,
         String description,
@@ -31,8 +30,9 @@ public record InstanceResponse(
         return InstanceResponse.builder()
                 .title(instance.getTitle())
                 .instanceId(instance.getId())
-                .remainDays(getRemainDays(startedLocalDate))
-                .period(startedLocalDate + " ~ " + completedLocalDate)
+                .remainDays(DateUtil.getRemainDaysToStart(startedLocalDate, LocalDate.now()))
+                .startedDate(startedLocalDate)
+                .completedDate(completedLocalDate)
                 .participantCount(instance.getParticipantCount())
                 .pointPerPerson(instance.getPointPerPerson())
                 .description(instance.getDescription())
@@ -40,22 +40,7 @@ public record InstanceResponse(
                 .certificationMethod(instance.getCertificationMethod())
                 .joinStatus(joinStatus)
                 .hitCount(instance.getHitsList().size())
-                .fileResponse(convertToFileResponse(instance.getFiles()))
+                .fileResponse(FileResponse.create(instance.getFiles()))
                 .build();
-    }
-
-    private static int getRemainDays(LocalDate startedDate) {
-        LocalDate now = LocalDate.now();
-        if (now.isBefore(startedDate)) {
-            return (int) ChronoUnit.DAYS.between(now, startedDate);
-        }
-        return 0;
-    }
-
-    private static FileResponse convertToFileResponse(Optional<Files> optionalFiles) {
-        if (optionalFiles.isEmpty()) {
-            return FileResponse.createNotExistFile();
-        }
-        return FileResponse.createExistFile(optionalFiles.get());
     }
 }

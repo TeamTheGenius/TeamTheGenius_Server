@@ -35,7 +35,7 @@ public class InstanceHomeService {
 
     public Slice<HomeInstanceResponse> getInstancesByCondition(Pageable pageable) {
 
-        Slice<Instance> instances = instanceRepository.findInstanceByCondition(PREACTIVITY, pageable);
+        Slice<Instance> instances = instanceRepository.findPagesByProgress(PREACTIVITY, pageable);
         return instances.map(this::mapToHomeInstanceResponse);
     }
 

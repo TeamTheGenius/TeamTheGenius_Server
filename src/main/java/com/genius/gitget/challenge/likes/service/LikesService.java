@@ -3,16 +3,18 @@ package com.genius.gitget.challenge.likes.service;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.likes.domain.Likes;
-import com.genius.gitget.challenge.likes.dto.LikesDTO;
 import com.genius.gitget.challenge.likes.dto.UserLikesAddResponse;
 import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
 import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,29 +34,31 @@ public class LikesService {
     public Page<UserLikesResponse> getLikesList(User user, Pageable pageable) {
         User verifiedUser = verifyUser(user);
         List<Likes> likes = verifiedUser.getLikesList();
-        List<Long> likesList = new ArrayList<>();
-
-        log.info("given test");
-        log.info(verifiedUser.getIdentifier());
+        List<Long> likesInstanceList = new ArrayList<>();
+        List<Long> likesFileList = new ArrayList<>();
 
         for (Likes like : likes) {
-            log.info("like @@@@ : " + like.getId());
             Instance findLikedInstance = verifyInstance(like.getInstance().getId());
-            likesList.add(findLikedInstance.getId());
+            Long findLikedFileId = findLikedInstance.getFiles()
+                    .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST)).getId();
+
+            likesInstanceList.add(findLikedInstance.getId());
+            likesFileList.add(findLikedFileId);
         }
-        Page<LikesDTO> likesDTOS = instanceRepository.findLikes(likesList, pageable);
-
-        log.info("before return test");
-
-        return likesDTOS.map(this::mapToUserLikesResponse);
-    }
-
-    private UserLikesResponse mapToUserLikesResponse(LikesDTO likesDTO) {
-        try {
-            return UserLikesResponse.createByEntity(likesDTO);
-        } catch (Exception e) {
-            throw new BusinessException();
-        }
+        return instanceRepository.findLikes(likesInstanceList, pageable).map(
+                new Function<Instance, UserLikesResponse>() {
+                    @Override
+                    public UserLikesResponse apply(Instance instance) {
+                        Files files = instance.getFiles()
+                                .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST));
+                        return UserLikesResponse.builder()
+                                .instanceId(instance.getId())
+                                .title(instance.getTitle())
+                                .pointPerPerson(instance.getPointPerPerson())
+                                .fileResponse(FileResponse.createExistFile(files))
+                                .build();
+                    }
+                });
     }
 
     @Transactional

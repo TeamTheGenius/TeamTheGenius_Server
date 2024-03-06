@@ -14,6 +14,8 @@ import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.domain.FileType;
+import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
@@ -26,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -107,10 +110,41 @@ class LikesServiceTest {
     }
 
     @Test
+    @Rollback(value = false)
     void 유저는_좋아요목록을_조회할_수_있다2() {
+        Files files1 = Files.builder()
+                .fileType(FileType.INSTANCE)
+                .originalFilename("originalFilenameA")
+                .savedFilename("savedFilenameA")
+                .fileURI("fileURI")
+                .build();
+
+        Files files2 = Files.builder()
+                .fileType(FileType.INSTANCE)
+                .originalFilename("originalFilenameB")
+                .savedFilename("savedFilenameB")
+                .fileURI("fileURI")
+                .build();
+
+        Files files3 = Files.builder()
+                .fileType(FileType.PROFILE)
+                .originalFilename("originalFilename")
+                .savedFilename("savedFilename")
+                .fileURI("fileURI")
+                .build();
+
+        instance1.setFiles(files1);
+        instance2.setFiles(files2);
+        user1.setFiles(files3);
+        userRepository.save(user1);
+
         PageRequest pageRequest = PageRequest.of(0, 5);
         Page<UserLikesResponse> likesResponses = likesService.getLikesList(user1, pageRequest);
-
+        for (UserLikesResponse likesRespons : likesResponses) {
+            System.out.println(likesRespons.getInstanceId() + " " + likesRespons.getTitle() + " "
+                    + likesRespons.getPointPerPerson());
+            System.out.println(likesRespons.getFileResponse());
+        }
         assertThat(likesResponses.getContent().size()).isEqualTo(3);
         assertThat(likesResponses.getContent().get(0).getTitle()).isEqualTo("1일 1커밋");
         assertThat(likesResponses.getContent().get(0).getPointPerPerson()).isEqualTo(50);

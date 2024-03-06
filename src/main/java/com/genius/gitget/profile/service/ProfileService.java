@@ -101,7 +101,8 @@ public class ProfileService {
         User findUser = userRepository.findByIdentifier(user.getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-        findUser.updateUserTags(userTagsUpdateRequest.getTags());
+        String interest = String.join(",", userTagsUpdateRequest.getTags());
+        findUser.updateUserTags(interest);
         userRepository.save(findUser);
     }
 

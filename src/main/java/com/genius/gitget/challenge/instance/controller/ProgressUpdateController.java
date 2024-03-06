@@ -19,7 +19,9 @@ public class ProgressUpdateController {
 
     @GetMapping("/challenges/update")
     public ResponseEntity<CommonResponse> updateProgress() {
-        progressUpdater.updateToActivity(LocalDate.now());
+        LocalDate currentDate = LocalDate.now();
+        progressUpdater.updateToActivity(currentDate);
+        progressUpdater.updateToDone(currentDate);
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())

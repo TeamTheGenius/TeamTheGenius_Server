@@ -97,6 +97,10 @@ public class Participant {
         this.rewardPoints = rewardPoints;
     }
 
+    public void updateJoinResult(JoinResult joinResult) {
+        this.joinResult = joinResult;
+    }
+
     public void updateRepository(String repository) {
         this.repositoryName = repository;
     }

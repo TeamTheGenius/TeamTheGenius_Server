@@ -285,31 +285,84 @@ class CertificationServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 참여한 챌린지에 대해 전반적인 현황을 받을 수 있다.")
-    public void should_getInformation_when_participate() {
+    @DisplayName("사용자가 참여한 챌린지가 아직 시작 전이라면, 성공/실패의 값이 모두 0이어야한다.")
+    public void should_getInformation_when_progressIsPreActivity() {
         //given
-        LocalDate startDate = LocalDate.of(2024, 2, 1);
-        LocalDate endDate = LocalDate.of(2024, 2, 29);
         LocalDate targetDate = LocalDate.of(2024, 2, 8);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         Participant participant = getParticipantInfo(user, instance);
 
         //when
-        getSavedCertification(NOT_YET, startDate, participant);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
         CertificationInformation information = certificationService.getCertificationInformation(instance,
                 participant, targetDate);
 
         //then
         assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
-        assertThat(information.remainCount()).isEqualTo(information.totalAttempt() - information.currentAttempt());
-        assertThat(information.totalAttempt()).isEqualTo(58);
+        assertThat(information.remainCount()).isEqualTo(information.totalAttempt());
+        assertThat(information.totalAttempt()).isEqualTo(instance.getTotalAttempt());
+        assertThat(information.currentAttempt()).isEqualTo(0);
+        assertThat(information.successCount()).isEqualTo(0);
+        assertThat(information.failureCount()).isEqualTo(0);
+        assertThat(information.remainCount()).isEqualTo(instance.getTotalAttempt());
+    }
+
+    @Test
+    @DisplayName("사용자가 참여한 챌린지가 진행 중이라면, 성공/실패/남은 일자의 값의 제대로 나와야 한다.")
+    public void should_getInformation_when_progressIsActivity() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate targetDate = LocalDate.of(2024, 2, 8);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+
+        //when
+        instance.updateProgress(Progress.ACTIVITY);
+        getSavedCertification(NOT_YET, startDate, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
+        getSavedCertification(PASSED, startDate.plusDays(6), participant);
+        CertificationInformation information = certificationService.getCertificationInformation(instance,
+                participant, targetDate);
+
+        //then
+        assertThat(information.repository()).isEqualTo(participant.getRepositoryName());
+        assertThat(information.totalAttempt()).isEqualTo(instance.getTotalAttempt());
         assertThat(information.currentAttempt()).isEqualTo(8);
+        assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
         assertThat(information.successCount()).isEqualTo(3);
-        assertThat(information.failureCount()).isEqualTo(information.currentAttempt() - information.successCount());
+        assertThat(information.failureCount()).isEqualTo(information.currentAttempt() - 3);
+        assertThat(information.remainCount()).isEqualTo(instance.getTotalAttempt() - 8);
+    }
+
+    @Test
+    @DisplayName("사용자가 참여한 챌린지가 완료이라면, 성공/실패/남은 일자의 값의 제대로 나와야 한다.")
+    public void should_getInformation_when_progressIsDone() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate targetDate = LocalDate.of(2024, 2, 8);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+
+        //when
+        instance.updateProgress(Progress.DONE);
+        getSavedCertification(NOT_YET, startDate, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
+        getSavedCertification(PASSED, startDate.plusDays(6), participant);
+        CertificationInformation information = certificationService.getCertificationInformation(instance,
+                participant, targetDate);
+
+        //then
+        assertThat(information.repository()).isEqualTo(participant.getRepositoryName());
+        assertThat(information.totalAttempt()).isEqualTo(instance.getTotalAttempt());
+        assertThat(information.currentAttempt()).isEqualTo(instance.getTotalAttempt());
+        assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(information.successCount()).isEqualTo(3);
+        assertThat(information.failureCount()).isEqualTo(information.totalAttempt() - 3);
+        assertThat(information.remainCount()).isEqualTo(0);
     }
 
     @Test
@@ -515,8 +568,8 @@ class CertificationServiceTest {
         return instanceRepository.save(
                 Instance.builder()
                         .progress(Progress.PREACTIVITY)
-                        .startedDate(LocalDateTime.of(2024, 2, 1, 11, 3))
-                        .completedDate(LocalDateTime.of(2024, 3, 29, 23, 59))
+                        .startedDate(LocalDateTime.of(2024, 2, 1, 0, 0))
+                        .completedDate(LocalDateTime.of(2024, 3, 29, 0, 0))
                         .build()
         );
     }

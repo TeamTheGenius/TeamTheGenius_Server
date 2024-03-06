@@ -88,7 +88,7 @@ public class MyChallengeService {
 
     private double getAchievementRate(Instance instance, Long participantId, LocalDate targetDate) {
         int totalAttempt = instance.getTotalAttempt();
-        int successCount = certificationProvider.countCertificatedByStatus(participantId, CERTIFICATED,
+        int successCount = certificationProvider.countByStatus(participantId, CERTIFICATED,
                 targetDate);
 
         double successPercent = (double) successCount / (double) totalAttempt * 100;

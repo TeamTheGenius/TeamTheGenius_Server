@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
 import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
@@ -222,17 +223,31 @@ public class CertificationService {
 
     @Transactional
     public CertificationInformation getCertificationInformation(Instance instance, Participant participant,
-                                                                LocalDate targetDate) {
-        //성공 인증 개수
-        int successCount = certificationProvider.countCertificatedByStatus(participant.getId(), CERTIFICATED,
-                targetDate);
+                                                                LocalDate currentDate) {
+        int successCount = 0;
+        int failureCount = 0;
+        int remainCount = 0;
 
-        //targetDate 기준 현재 진행 일차
-        int currentAttempt = DateUtil.getAttemptCount(instance.getStartedDate().toLocalDate(), targetDate);
-
-        //남은 인증 개수 = 전체 일차 - 오늘 회차
         int totalAttempt = instance.getTotalAttempt();
-        int remainAttempt = totalAttempt - currentAttempt;
+        int currentAttempt = 0;
+
+        switch (instance.getProgress()) {
+            case PREACTIVITY -> {
+                remainCount = instance.getTotalAttempt();
+            }
+            case ACTIVITY -> {
+                currentAttempt = DateUtil.getAttemptCount(instance.getStartedDate().toLocalDate(), currentDate);
+                successCount = calculateSuccess(participant.getId(), currentDate);
+                failureCount = currentAttempt - successCount;
+                remainCount = totalAttempt - currentAttempt;
+
+            }
+            case DONE -> {
+                currentAttempt = totalAttempt;
+                successCount = calculateSuccess(participant.getId(), instance.getCompletedDate().toLocalDate());
+                failureCount = totalAttempt - successCount;
+            }
+        }
 
         return CertificationInformation.builder()
                 .repository(participant.getRepositoryName())
@@ -241,9 +256,15 @@ public class CertificationService {
                 .currentAttempt(currentAttempt)
                 .pointPerPerson(instance.getPointPerPerson())
                 .successCount(successCount)
-                .failureCount(currentAttempt - successCount)
-                .remainCount(remainAttempt)
+                .failureCount(failureCount)
+                .remainCount(remainCount)
                 .build();
+    }
+
+    private int calculateSuccess(Long participantId, LocalDate currentDate) {
+        int certificated = certificationProvider.countByStatus(participantId, CERTIFICATED, currentDate);
+        int passed = certificationProvider.countByStatus(participantId, PASSED, currentDate);
+        return certificated + passed;
     }
 
     private double getSuccessPercent(int successCount, int currentAttempt) {

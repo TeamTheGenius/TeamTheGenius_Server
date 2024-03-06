@@ -30,8 +30,8 @@ public class CertificationProvider {
         return certificationRepository.findByDate(targetDate, participantId);
     }
 
-    public int countCertificatedByStatus(Long participantId, CertificateStatus certificateStatus,
-                                         LocalDate targetDate) {
+    public int countByStatus(Long participantId, CertificateStatus certificateStatus,
+                             LocalDate targetDate) {
         return certificationRepository.findByStatus(participantId, certificateStatus, targetDate).size();
     }
 

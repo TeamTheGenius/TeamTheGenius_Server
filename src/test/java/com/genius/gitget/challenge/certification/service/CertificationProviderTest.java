@@ -95,7 +95,7 @@ class CertificationProviderTest {
         getSavedCertification(endDate.minusDays(2), CERTIFICATED, "link1", participant);
 
         //when
-        int certificated = certificationProvider.countCertificatedByStatus(participant.getId(), CERTIFICATED,
+        int certificated = certificationProvider.countByStatus(participant.getId(), CERTIFICATED,
                 endDate);
 
         //then

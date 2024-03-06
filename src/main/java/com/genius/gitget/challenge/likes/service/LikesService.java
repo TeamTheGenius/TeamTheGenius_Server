@@ -4,6 +4,7 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.likes.dto.LikesDTO;
+import com.genius.gitget.challenge.likes.dto.UserLikesAddResponse;
 import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
 import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.user.domain.User;
@@ -57,13 +58,15 @@ public class LikesService {
     }
 
     @Transactional
-    public void addLikes(User user, String identifier, Long instanceId) {
+    public UserLikesAddResponse addLikes(User user, String identifier, Long instanceId) {
         User comparedUser = compareToUserIdentifier(user, identifier);
         User findUser = verifyUser(comparedUser);
         Instance findInstance = verifyInstance(instanceId);
 
         Likes likes = new Likes(findUser, findInstance);
-        likesRepository.save(likes);
+        Long id = likesRepository.save(likes).getId();
+        return UserLikesAddResponse.builder()
+                .likesId(id).build();
     }
 
     @Transactional

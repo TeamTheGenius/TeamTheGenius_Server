@@ -2,7 +2,6 @@ package com.genius.gitget.challenge.likes.domain;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.user.domain.User;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -33,7 +32,7 @@ public class Likes {
     @Column(name = "likes_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "instance_id")
     private Instance instance;
 

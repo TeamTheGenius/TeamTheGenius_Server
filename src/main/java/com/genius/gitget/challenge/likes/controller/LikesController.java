@@ -1,12 +1,14 @@
 package com.genius.gitget.challenge.likes.controller;
 
 import com.genius.gitget.challenge.likes.dto.UserLikesAddRequest;
+import com.genius.gitget.challenge.likes.dto.UserLikesAddResponse;
 import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
 import com.genius.gitget.challenge.likes.service.LikesService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
+import com.genius.gitget.global.util.response.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -44,12 +46,15 @@ public class LikesController {
 
     // 좋아요 목록 추가
     @PostMapping("/likes")
-    public ResponseEntity<CommonResponse> addLikes(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                   @RequestBody UserLikesAddRequest userLikesAddRequest) {
-        likesService.addLikes(userPrincipal.getUser(), userLikesAddRequest.getIdentifier(),
+    public ResponseEntity<SingleResponse<UserLikesAddResponse>> addLikes(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody UserLikesAddRequest userLikesAddRequest) {
+        UserLikesAddResponse userLikesAddResponse = likesService.addLikes(userPrincipal.getUser(),
+                userLikesAddRequest.getIdentifier(),
                 userLikesAddRequest.getInstanceId());
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage())
+                new SingleResponse<>(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage(),
+                        userLikesAddResponse)
         );
     }
 

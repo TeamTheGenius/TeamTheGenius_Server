@@ -9,6 +9,7 @@ import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.file.service.FilesService;
@@ -54,10 +55,12 @@ public class ProfileService {
         try {
             Files files = filesRepository.findById(findUser.getId())
                     .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST));
-            return UserInformationResponse.entityToDto(findUser, files, participantCount);
+            if (files.getFileType() == FileType.PROFILE) {
+                return UserInformationResponse.entityToDto(findUser, files, participantCount);
+            }
         } catch (Exception e) {
-            return UserInformationResponse.entityToDto(findUser, null, participantCount);
         }
+        return UserInformationResponse.entityToDto(findUser, null, participantCount);
     }
 
     // 마이페이지 - 사용자 정보 수정

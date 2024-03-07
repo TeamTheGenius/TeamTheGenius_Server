@@ -244,6 +244,7 @@ class InstanceDetailServiceTest {
 
         //then
         assertThat(instanceResponse.instanceId()).isEqualTo(savedInstance.getId());
+        assertThat(instanceResponse.progress()).isEqualTo(Progress.PREACTIVITY);
         assertThat(instanceResponse.remainDays()).isEqualTo(2);
         assertThat(instanceResponse.participantCount()).isEqualTo(1);
         assertThat(instanceResponse.pointPerPerson()).isEqualTo(100);

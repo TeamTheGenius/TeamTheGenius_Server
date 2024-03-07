@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProgressUpdater {
     private final InstanceProvider instanceProvider;
     private final CertificationProvider certificationProvider;
-    private final double SUCCESS_THRESHOLD = 85.5;
+    private final double SUCCESS_THRESHOLD = 85;
 
     @Transactional
     public void updateToActivity(LocalDate currentDate) {
@@ -46,23 +46,24 @@ public class ProgressUpdater {
             LocalDate startedDate = instance.getStartedDate().toLocalDate();
             LocalDate completedDate = instance.getCompletedDate().toLocalDate();
 
-            if (startedDate.isAfter(currentDate) && completedDate.isAfter(currentDate)) {
+            if (currentDate.isAfter(startedDate) && currentDate.isAfter(completedDate)) {
                 updateParticipants(instance, currentDate);
             }
         }
     }
 
-    public void updateParticipants(Instance instance, LocalDate currentDate) {
+    private void updateParticipants(Instance instance, LocalDate currentDate) {
         instance.updateProgress(Progress.DONE);
         for (Participant participant : instance.getParticipantList()) {
             int totalAttempt = instance.getTotalAttempt();
-            int successAttempt = calculateSuccess(participant.getId(), currentDate);
+            int successAttempt = getSuccessAttempt(participant.getId(), currentDate);
 
-            participant.updateJoinResult(calculateJoinResult(totalAttempt, successAttempt));
+            JoinResult joinResult = getJoinResult(totalAttempt, successAttempt);
+            participant.updateJoinResult(joinResult);
         }
     }
 
-    private JoinResult calculateJoinResult(int totalAttempt, int successAttempt) {
+    private JoinResult getJoinResult(int totalAttempt, int successAttempt) {
         double successPercent = getSuccessPercent(successAttempt, totalAttempt);
         if (successPercent >= SUCCESS_THRESHOLD) {
             return JoinResult.SUCCESS;
@@ -70,7 +71,7 @@ public class ProgressUpdater {
         return JoinResult.FAIL;
     }
 
-    private int calculateSuccess(Long participantId, LocalDate currentDate) {
+    private int getSuccessAttempt(Long participantId, LocalDate currentDate) {
         int certificated = certificationProvider.countByStatus(participantId, CERTIFICATED, currentDate);
         int passed = certificationProvider.countByStatus(participantId, PASSED, currentDate);
         return certificated + passed;

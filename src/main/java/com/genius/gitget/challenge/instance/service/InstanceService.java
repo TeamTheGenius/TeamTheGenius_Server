@@ -1,12 +1,12 @@
 package com.genius.gitget.challenge.instance.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_INSTANCE_DATE;
 import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
 
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
@@ -17,6 +17,7 @@ import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,30 +37,30 @@ public class InstanceService {
     // 인스턴스 생성
     @Transactional
     public Long createInstance(InstanceCreateRequest instanceCreateRequest,
-                               MultipartFile multipartFile, String type) {
+                               MultipartFile multipartFile, String type, LocalDate currentDate) {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
         Files uploadedFile = filesService.uploadFile(topic.getFiles(), multipartFile, type);
 
-        Instance instance = Instance.builder()
-                .title(instanceCreateRequest.title())
-                .tags(instanceCreateRequest.tags())
-                .description(instanceCreateRequest.description())
-                .pointPerPerson(instanceCreateRequest.pointPerPerson())
-                .notice(instanceCreateRequest.notice())
-                .startedDate(instanceCreateRequest.startedAt())
-                .completedDate(instanceCreateRequest.completedAt())
-                .certificationMethod(instanceCreateRequest.certificationMethod())
-                .progress(Progress.PREACTIVITY)
-                .build();
+        validatePeriod(instanceCreateRequest, currentDate);
 
+        Instance instance = Instance.createByRequest(instanceCreateRequest);
         instance.setTopic(topic);
         instance.setFiles(uploadedFile);
 
         Instance savedInstance = instanceRepository.save(instance);
 
         return savedInstance.getId();
+    }
+
+    private void validatePeriod(InstanceCreateRequest instanceCreateRequest, LocalDate currentDate) {
+        LocalDate startedDate = instanceCreateRequest.startedAt().toLocalDate();
+        LocalDate completedDate = instanceCreateRequest.completedAt().toLocalDate();
+
+        if (currentDate.isAfter(startedDate) || currentDate.isAfter(completedDate)) {
+            throw new BusinessException(INVALID_INSTANCE_DATE);
+        }
     }
 
     // 인스턴스 리스트 조회

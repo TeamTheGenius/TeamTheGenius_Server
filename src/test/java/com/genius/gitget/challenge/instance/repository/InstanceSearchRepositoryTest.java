@@ -1,12 +1,12 @@
 package com.genius.gitget.challenge.instance.repository;
 
+import static com.genius.gitget.challenge.instance.domain.Progress.ACTIVITY;
+import static com.genius.gitget.challenge.instance.domain.Progress.DONE;
+import static com.genius.gitget.challenge.instance.domain.Progress.PREACTIVITY;
+
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
-
-import java.io.IOException;
-import java.time.LocalDateTime;
-
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;
@@ -15,6 +15,8 @@ import com.genius.gitget.util.file.FileTestUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.io.IOException;
+import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,8 +26,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.genius.gitget.challenge.instance.domain.Progress.*;
 
 @SpringBootTest
 @Transactional
@@ -51,7 +51,7 @@ public class InstanceSearchRepositoryTest {
     JPAQueryFactory queryFactory;
 
     // @BeforeEach
-    public void setup() throws IOException{
+    public void setup() throws IOException {
 
         queryFactory = new JPAQueryFactory(em);
 
@@ -73,7 +73,6 @@ public class InstanceSearchRepositoryTest {
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
 
-
         Topic savedTopic = topicRepository.save(topic);
 
         createInstance(savedTopic, instance, instance.getTitle());
@@ -85,13 +84,13 @@ public class InstanceSearchRepositoryTest {
 
     @Test
     public void 검색_조건_없이_테스트() throws Exception {
-        for (int i = 0; i<5; i++) {
+        for (int i = 0; i < 5; i++) {
             PageRequest pageRequest = PageRequest.of(i, 2);
             Page<InstanceSearchResponse> result = searchRepository.search(null, null, pageRequest);
             for (InstanceSearchResponse instanceSearchResponse : result) {
                 System.out.println("instanceSearchResponse = " + instanceSearchResponse.getInstanceId());
             }
-            System.out.println("========== " + i+1 + " 번째 끝 =========");
+            System.out.println("========== " + i + 1 + " 번째 끝 =========");
         }
     }
 
@@ -101,7 +100,9 @@ public class InstanceSearchRepositoryTest {
         Page<InstanceSearchResponse> result = searchRepository.search(null, "리", pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) cnt++;
+            if (instanceSearchResponse != null) {
+                cnt++;
+            }
         }
         Assertions.assertThat(cnt).isEqualTo(2);
     }
@@ -112,7 +113,9 @@ public class InstanceSearchRepositoryTest {
         Page<InstanceSearchResponse> result = searchRepository.search(PREACTIVITY, null, pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) cnt++;
+            if (instanceSearchResponse != null) {
+                cnt++;
+            }
         }
         Assertions.assertThat(cnt).isEqualTo(4);
     }
@@ -123,7 +126,9 @@ public class InstanceSearchRepositoryTest {
         Page<InstanceSearchResponse> result = searchRepository.search(DONE, null, pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) cnt++;
+            if (instanceSearchResponse != null) {
+                cnt++;
+            }
         }
         Assertions.assertThat(cnt).isEqualTo(1);
     }
@@ -134,7 +139,9 @@ public class InstanceSearchRepositoryTest {
         Page<InstanceSearchResponse> result = searchRepository.search(ACTIVITY, null, pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) cnt++;
+            if (instanceSearchResponse != null) {
+                cnt++;
+            }
         }
         Assertions.assertThat(cnt).isEqualTo(0);
     }
@@ -145,7 +152,9 @@ public class InstanceSearchRepositoryTest {
         Page<InstanceSearchResponse> result = searchRepository.search(PREACTIVITY, "1", pageRequest);
         int cnt = 0;
         for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) cnt++;
+            if (instanceSearchResponse != null) {
+                cnt++;
+            }
         }
         Assertions.assertThat(cnt).isEqualTo(3);
     }
@@ -162,6 +171,7 @@ public class InstanceSearchRepositoryTest {
                         .pointPerPerson(instance.getPointPerPerson())
                         .startedAt(instance.getStartedDate())
                         .completedAt(instance.getCompletedDate()).build(),
-                FileTestUtil.getMultipartFile("name"), "instance");
+                FileTestUtil.getMultipartFile("name"), "instance",
+                instance.getCompletedDate().plusDays(3).toLocalDate());
     }
 }

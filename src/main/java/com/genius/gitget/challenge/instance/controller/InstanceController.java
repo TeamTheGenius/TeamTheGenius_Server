@@ -9,6 +9,7 @@ import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -74,7 +75,7 @@ public class InstanceController {
             @RequestPart(value = "data") InstanceCreateRequest instanceCreateRequest,
             @RequestPart(value = "files", required = false) MultipartFile multipartFile,
             @RequestPart(value = "type", required = false) String type) {
-        instanceService.createInstance(instanceCreateRequest, multipartFile, type);
+        instanceService.createInstance(instanceCreateRequest, multipartFile, type, LocalDate.now());
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage())
         );

@@ -4,6 +4,7 @@ package com.genius.gitget.challenge.instance.domain;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.hits.domain.Hits;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
 import jakarta.persistence.CascadeType;
@@ -93,6 +94,20 @@ public class Instance {
         this.progress = progress;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
+    }
+
+    public static Instance createByRequest(InstanceCreateRequest instanceCreateRequest) {
+        return Instance.builder()
+                .title(instanceCreateRequest.title())
+                .tags(instanceCreateRequest.tags())
+                .description(instanceCreateRequest.description())
+                .pointPerPerson(instanceCreateRequest.pointPerPerson())
+                .notice(instanceCreateRequest.notice())
+                .startedDate(instanceCreateRequest.startedAt())
+                .completedDate(instanceCreateRequest.completedAt())
+                .certificationMethod(instanceCreateRequest.certificationMethod())
+                .progress(Progress.PREACTIVITY)
+                .build();
     }
 
     //== 비지니스 로직 ==//

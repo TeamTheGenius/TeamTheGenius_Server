@@ -42,7 +42,7 @@ public class Likes {
     private User user;
 
     @CreatedDate
-    @Column(name = "liked_at", unique = false)
+    @Column(name = "liked_at")
     private LocalDateTime likedAt; // 찜하기 누른 시각
 
     public Likes(User user, Instance instance) {

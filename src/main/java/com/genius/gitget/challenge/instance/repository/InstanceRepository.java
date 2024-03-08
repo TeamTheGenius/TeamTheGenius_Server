@@ -23,7 +23,4 @@ public interface InstanceRepository extends JpaRepository<Instance, Long> {
 
     @Query("select i from Instance i where i.progress = :progress")
     Slice<Instance> findInstanceByCondition(@Param("progress") Progress progress, Pageable pageable);
-
-    @Query("select i from Instance i where i.id in :instanceId")
-    Page<Instance> findLikes(@Param("instanceId") List<Long> instanceId, Pageable pageable);
 }

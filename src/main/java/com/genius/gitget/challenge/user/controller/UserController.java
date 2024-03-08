@@ -3,9 +3,9 @@ package com.genius.gitget.challenge.user.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.global.security.dto.TokenDTO;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.security.dto.TokenDTO;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
@@ -40,4 +40,5 @@ public class UserController {
                 new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), new TokenDTO(identifier))
         );
     }
+
 }

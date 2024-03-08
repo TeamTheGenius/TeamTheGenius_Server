@@ -65,9 +65,6 @@ public class LikesService {
 
     @Transactional
     public void deleteLikes(User user, Long likesId) {
-        Likes findLikes = getLikes(likesId);
-        User findUser = verifyUser(findLikes.getUser());
-        compareToUserIdentifier(user, findUser.getIdentifier());
         likesRepository.deleteById(likesId);
     }
 

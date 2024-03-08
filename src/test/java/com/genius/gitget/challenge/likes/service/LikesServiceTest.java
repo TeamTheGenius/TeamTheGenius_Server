@@ -16,6 +16,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
@@ -28,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -37,6 +37,7 @@ class LikesServiceTest {
     static User user1;
     static Topic topic1;
     static Instance instance1, instance2, instance3;
+    static Files files1, files2, files3, files4;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -47,9 +48,14 @@ class LikesServiceTest {
     LikesRepository likesRepository;
     @Autowired
     LikesService likesService;
+    @Autowired
+    FilesRepository filesRepository;
 
     @BeforeEach
     void setup() {
+        files1 = getSavedFiles("originalFileName", "savedFileName", "fileURL", FileType.INSTANCE);
+        files2 = getSavedFiles("originalFileName", "savedFileName", "fileURL", FileType.TOPIC);
+
         user1 = getSavedUser("neo5188@gmail.com", GITHUB, "kimdozzi");
 
         topic1 = getSavedTopic("1일 1커밋", "BE");
@@ -63,13 +69,26 @@ class LikesServiceTest {
         instance2.setTopic(topic1);
         instance3.setTopic(topic1);
 
+//        topic1.setFiles(files1);
+//        topicRepository.save(topic1);
+//
+//        instance1.setFiles(files2);
+//        instanceRepository.save(instance1);
+//        instance2.setFiles(files4);
+//        instanceRepository.save(instance2);
+//
+//        user1.setFiles(files3);
+//        userRepository.save(user1);
+
         Likes likes1 = new Likes(user1, instance1);
         Likes likes2 = new Likes(user1, instance2);
         Likes likes3 = new Likes(user1, instance3);
         likesRepository.save(likes1);
         likesRepository.save(likes2);
         likesRepository.save(likes3);
+
     }
+
 
     @Test
     void 유저_좋아요_목록_추가() {
@@ -110,40 +129,13 @@ class LikesServiceTest {
     }
 
     @Test
-    @Rollback(value = false)
     void 유저는_좋아요목록을_조회할_수_있다2() {
-        Files files1 = Files.builder()
-                .fileType(FileType.INSTANCE)
-                .originalFilename("originalFilenameA")
-                .savedFilename("savedFilenameA")
-                .fileURI("fileURI")
-                .build();
-
-        Files files2 = Files.builder()
-                .fileType(FileType.INSTANCE)
-                .originalFilename("originalFilenameB")
-                .savedFilename("savedFilenameB")
-                .fileURI("fileURI")
-                .build();
-
-        Files files3 = Files.builder()
-                .fileType(FileType.PROFILE)
-                .originalFilename("originalFilename")
-                .savedFilename("savedFilename")
-                .fileURI("fileURI")
-                .build();
-
-        instance1.setFiles(files1);
-        instance2.setFiles(files2);
-        user1.setFiles(files3);
-        userRepository.save(user1);
 
         PageRequest pageRequest = PageRequest.of(0, 5);
         Page<UserLikesResponse> likesResponses = likesService.getLikesList(user1, pageRequest);
-        for (UserLikesResponse likesRespons : likesResponses) {
-            System.out.println(likesRespons.getInstanceId() + " " + likesRespons.getTitle() + " "
-                    + likesRespons.getPointPerPerson());
-            System.out.println(likesRespons.getFileResponse());
+        for (UserLikesResponse likesResponse : likesResponses) {
+            System.out.println(likesResponse.getInstanceId() + " " + likesResponse.getTitle() + " "
+                    + likesResponse.getPointPerPerson());
         }
         assertThat(likesResponses.getContent().size()).isEqualTo(3);
         assertThat(likesResponses.getContent().get(0).getTitle()).isEqualTo("1일 1커밋");
@@ -158,7 +150,7 @@ class LikesServiceTest {
 
 
     private User getSavedUser(String identifier, ProviderInfo providerInfo, String nickname) {
-        User user = userRepository.save(
+        return userRepository.save(
                 User.builder()
                         .identifier(identifier)
                         .providerInfo(providerInfo)
@@ -166,11 +158,10 @@ class LikesServiceTest {
                         .nickname(nickname)
                         .build()
         );
-        return user;
     }
 
     private Topic getSavedTopic(String title, String tags) {
-        Topic topic = topicRepository.save(
+        return topicRepository.save(
                 Topic.builder()
                         .title(title)
                         .tags(tags)
@@ -178,7 +169,6 @@ class LikesServiceTest {
                         .pointPerPerson(100)
                         .build()
         );
-        return topic;
     }
 
     private Instance getSavedInstance(String title, String tags, int participantCnt) {
@@ -197,5 +187,16 @@ class LikesServiceTest {
         );
         instance.updateParticipantCount(participantCnt);
         return instance;
+    }
+
+    private Files getSavedFiles(String originalFilename, String savedFilename, String fileURL, FileType fileType) {
+        return filesRepository.save(
+                Files.builder()
+                        .originalFilename(originalFilename)
+                        .savedFilename(savedFilename)
+                        .fileURI(fileURL)
+                        .fileType(fileType)
+                        .build()
+        );
     }
 }

@@ -7,6 +7,7 @@ import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserPointResponse;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import com.genius.gitget.profile.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -81,5 +82,16 @@ public class ProfileController {
 
         return ResponseEntity.ok()
                 .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
+    }
+
+    // 포인트 조회
+    @GetMapping("/point")
+    public ResponseEntity<SingleResponse<UserPointResponse>> getUserPoint(
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        UserPointResponse userPoint = profileService.getUserPoint(userPrincipal.getUser());
+
+        return ResponseEntity.ok()
+                .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                        userPoint));
     }
 }

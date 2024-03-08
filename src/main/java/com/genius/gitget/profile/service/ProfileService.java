@@ -18,6 +18,7 @@ import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserPointResponse;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,14 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final FilesRepository filesRepository;
     private final FilesService filesService;
+
+    // 포인트 조회
+    public UserPointResponse getUserPoint(User user) {
+        return UserPointResponse.builder()
+                .identifier(user.getIdentifier())
+                .point(user.getPoint())
+                .build();
+    }
 
     // TODO 결제 내역 조회
 

@@ -19,8 +19,11 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserPointResponse;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -96,10 +99,11 @@ public class ProfileServiceTest {
 
     @Test
     void 유저_관심사_수정() {
-        profileService.updateUserTags(user1, UserTagsUpdateRequest.builder().tags("수정 테스트 관심사").build());
+        profileService.updateUserTags(user1,
+                UserTagsUpdateRequest.builder().tags(new ArrayList<>(Arrays.asList("FE", "BE"))).build());
         User user = userRepository.findByIdentifier(user1.getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        Assertions.assertThat(user.getTags()).isEqualTo("수정 테스트 관심사");
+        Assertions.assertThat(user.getTags()).isEqualTo("FE,BE");
     }
 
 
@@ -112,6 +116,16 @@ public class ProfileServiceTest {
         assertThrows(BusinessException.class,
                 () -> userRepository.findById(user.getId())
                         .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND)));
+    }
+
+    @Test
+    void 유저_포인트_조회() {
+        User user = userRepository.findByIdentifier(user1.getIdentifier())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        user.setPoint(1500L);
+        userRepository.save(user);
+        UserPointResponse userPoint = profileService.getUserPoint(user1);
+        Assertions.assertThat(userPoint.getPoint()).isEqualTo(1500);
     }
 
 

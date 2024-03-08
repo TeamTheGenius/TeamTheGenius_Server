@@ -65,8 +65,21 @@ public class LikesService {
 
     @Transactional
     public void deleteLikes(User user, Long likesId) {
-        likesRepository.deleteById(likesId);
+        Likes findLikes = likesRepository.findById(likesId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.LIKES_NOT_FOUND));
+
+        likesRepository.deleteById(findLikes.getId());
     }
+
+    @Transactional
+    public void deleteLikesLazy(User user, Long likesId) {
+        try {
+            likesRepository.deleteById(likesId);
+        } catch (Exception e) {
+            e.getStackTrace();
+        }
+    }
+
 
     private User verifyUser(User user) {
         return userRepository.findByIdentifier(user.getIdentifier())

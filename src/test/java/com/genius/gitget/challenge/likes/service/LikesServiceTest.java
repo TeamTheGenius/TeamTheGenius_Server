@@ -29,10 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
+@Rollback
 class LikesServiceTest {
     static User user1;
     static Topic topic1;
@@ -60,9 +62,9 @@ class LikesServiceTest {
 
         topic1 = getSavedTopic("1일 1커밋", "BE");
 
-        instance1 = getSavedInstance("1일 1커밋", "BE", 50);
-        instance2 = getSavedInstance("1일 1커밋", "BE", 100);
-        instance3 = getSavedInstance("1일 1알고리즘", "CS,BE,FE", 500);
+        instance1 = getSavedInstance("1일 1커밋", "BE", 50, 100);
+        instance2 = getSavedInstance("1일 1커밋", "BE", 50, 150);
+        instance3 = getSavedInstance("1일 1알고리즘", "CS,BE,FE", 50, 200);
 
         //== 연관관계 ==//
         instance1.setTopic(topic1);
@@ -105,11 +107,15 @@ class LikesServiceTest {
 
     @Test
     void 유저_좋아요_목록_삭제() {
-        likesService.deleteLikes(user1, 1L);
-        List<Likes> all = likesRepository.findAll();
+        List<Likes> likes = likesRepository.findAll();
+        Long likesId = likes.get(0).getId();
 
+        likesService.deleteLikes(user1, likesId);
         org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class,
-                () -> likesRepository.findById(1L).orElseThrow(() -> new BusinessException(ErrorCode.LIKES_NOT_FOUND)));
+                () -> likesRepository.findById(likesId)
+                        .orElseThrow(() -> new BusinessException(ErrorCode.LIKES_NOT_FOUND)));
+
+        List<Likes> all = likesRepository.findAll();
 
         Assertions.assertThat(all.size()).isEqualTo(2);
     }
@@ -139,13 +145,13 @@ class LikesServiceTest {
         }
         assertThat(likesResponses.getContent().size()).isEqualTo(3);
         assertThat(likesResponses.getContent().get(0).getTitle()).isEqualTo("1일 1커밋");
-        assertThat(likesResponses.getContent().get(0).getPointPerPerson()).isEqualTo(50);
+        assertThat(likesResponses.getContent().get(0).getPointPerPerson()).isEqualTo(100);
 
         assertThat(likesResponses.getContent().get(1).getTitle()).isEqualTo("1일 1커밋");
-        assertThat(likesResponses.getContent().get(1).getPointPerPerson()).isEqualTo(100);
+        assertThat(likesResponses.getContent().get(1).getPointPerPerson()).isEqualTo(150);
 
         assertThat(likesResponses.getContent().get(2).getTitle()).isEqualTo("1일 1알고리즘");
-        assertThat(likesResponses.getContent().get(2).getPointPerPerson()).isEqualTo(500);
+        assertThat(likesResponses.getContent().get(2).getPointPerPerson()).isEqualTo(200);
     }
 
 
@@ -171,7 +177,7 @@ class LikesServiceTest {
         );
     }
 
-    private Instance getSavedInstance(String title, String tags, int participantCnt) {
+    private Instance getSavedInstance(String title, String tags, int participantCnt, int pointPerPerson) {
         LocalDateTime now = LocalDateTime.now();
         Instance instance = instanceRepository.save(
                 Instance.builder()
@@ -179,7 +185,7 @@ class LikesServiceTest {
                         .title(title)
                         .description("description")
                         .progress(Progress.PREACTIVITY)
-                        .pointPerPerson(100)
+                        .pointPerPerson(pointPerPerson)
                         .certificationMethod("인증 방법")
                         .startedDate(now)
                         .completedDate(now.plusDays(1))

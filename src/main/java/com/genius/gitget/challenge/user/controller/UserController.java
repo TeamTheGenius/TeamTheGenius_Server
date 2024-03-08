@@ -40,5 +40,4 @@ public class UserController {
                 new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), new TokenDTO(identifier))
         );
     }
-
 }

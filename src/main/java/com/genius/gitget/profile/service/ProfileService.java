@@ -5,6 +5,8 @@ import static com.genius.gitget.challenge.participantinfo.domain.JoinResult.PROC
 import static com.genius.gitget.challenge.participantinfo.domain.JoinResult.SUCCESS;
 import static com.genius.gitget.challenge.participantinfo.domain.JoinStatus.YES;
 
+import com.genius.gitget.admin.signout.Signout;
+import com.genius.gitget.admin.signout.SignoutRepository;
 import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
 import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
 import com.genius.gitget.challenge.user.domain.User;
@@ -37,6 +39,7 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final FilesRepository filesRepository;
     private final FilesService filesService;
+    private final SignoutRepository signoutRepository;
 
     // 포인트 조회
     public UserPointResponse getUserPoint(User user) {
@@ -94,11 +97,17 @@ public class ProfileService {
 
     // 마이페이지 - 회원 탈퇴
     @Transactional
-    public void deleteUserInformation(User user) {
-        User findUser = findUser(user.getIdentifier());
+    public void deleteUserInformation(String identifier, String reason) {
+        User findUser = findUser(identifier);
         findUser.setFiles(null);
         findUser.deleteLikesList();
         userRepository.deleteById(findUser.getId());
+        signoutRepository.save(
+                Signout.builder()
+                        .identifier(identifier)
+                        .reason(reason)
+                        .build()
+        );
     }
 
     // 마이페이지 - 관심사 수정

@@ -3,6 +3,8 @@ package com.genius.gitget.profile.service;
 import static com.genius.gitget.global.security.constants.ProviderInfo.GITHUB;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.genius.gitget.admin.signout.Signout;
+import com.genius.gitget.admin.signout.SignoutRepository;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -51,6 +53,8 @@ public class ProfileServiceTest {
     LikesService likesService;
     @Autowired
     ProfileService profileService;
+    @Autowired
+    SignoutRepository signoutRepository;
 
     @BeforeEach
     void setup() {
@@ -111,11 +115,16 @@ public class ProfileServiceTest {
     void 회원_탈퇴() {
         User user = userRepository.findByIdentifier(user1.getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        profileService.deleteUserInformation(user);
+        String userIdentifier = user.getIdentifier();
+        profileService.deleteUserInformation(userIdentifier, "서비스 이용 불편");
 
         assertThrows(BusinessException.class,
-                () -> userRepository.findById(user.getId())
+                () -> userRepository.findByIdentifier(userIdentifier)
                         .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND)));
+
+        Signout byIdentifier = signoutRepository.findByIdentifier(userIdentifier);
+
+        Assertions.assertThat(byIdentifier.getReason()).isEqualTo("서비스 이용 불편");
     }
 
     @Test

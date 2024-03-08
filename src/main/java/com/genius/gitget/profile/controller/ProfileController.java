@@ -8,6 +8,7 @@ import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
+import com.genius.gitget.profile.dto.UserSignoutRequest;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import com.genius.gitget.profile.service.ProfileService;
 import lombok.RequiredArgsConstructor;
@@ -77,8 +78,9 @@ public class ProfileController {
 
     // 마이페이지 - 탈퇴하기
     @DeleteMapping
-    public ResponseEntity<CommonResponse> deleteUserInformation(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        profileService.deleteUserInformation(userPrincipal.getUser());
+    public ResponseEntity<CommonResponse> deleteUserInformation(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                                @RequestBody UserSignoutRequest userSignoutRequest) {
+        profileService.deleteUserInformation(userPrincipal.getUser().getIdentifier(), userSignoutRequest.getReason());
 
         return ResponseEntity.ok()
                 .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));

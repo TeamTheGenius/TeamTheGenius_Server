@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,9 +42,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponse> logout(HttpServletResponse response) {
-        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
-                .getPrincipal();
+    public ResponseEntity<CommonResponse> logout(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            HttpServletResponse response) {
         jwtService.logout(userPrincipal.getUser(), response);
 
         return ResponseEntity.ok().body(

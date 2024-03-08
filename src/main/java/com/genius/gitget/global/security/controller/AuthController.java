@@ -41,7 +41,7 @@ public class AuthController {
         );
     }
 
-    @PostMapping("/auth/logout")
+    @PostMapping("/logout")
     public ResponseEntity<CommonResponse> logout(HttpServletResponse response) {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();

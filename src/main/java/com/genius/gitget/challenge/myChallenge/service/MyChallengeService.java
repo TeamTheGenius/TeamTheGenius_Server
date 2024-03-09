@@ -22,6 +22,7 @@ import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
@@ -54,6 +55,7 @@ public class MyChallengeService {
                     .participantCount(instance.getParticipantCount())
                     .pointPerPerson(instance.getPointPerPerson())
                     .remainDays(DateUtil.getRemainDaysToStart(participant.getStartedDate(), targetDate))
+                    .fileResponse(FileResponse.create(instance.getFiles()))
                     .build();
             preActivity.add(preActivityResponse);
         }
@@ -104,24 +106,14 @@ public class MyChallengeService {
             Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
                     .orElse(getDummyCertification());
             int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.CERTIFICATION_PASSER);
-            boolean canUseItem = checkItemCondition(certification.getCertificationStatus(), numOfPassItem);
 
-            ActivatedResponse activatedResponse = ActivatedResponse.builder()
-                    .instanceId(instance.getId())
-                    .title(instance.getTitle())
-                    .pointPerPerson(instance.getPointPerPerson())
-                    .repository(participant.getRepositoryName())
-                    .certificateStatus(certification.getCertificationStatus().getTag())
-                    .canUsePassItem(canUseItem)
-                    .numOfPassItem(canUseItem ? numOfPassItem : 0)
-                    .build();
+            ActivatedResponse activatedResponse = ActivatedResponse.create(
+                    instance, certification.getCertificationStatus(),
+                    numOfPassItem, participant.getRepositoryName()
+            );
             activated.add(activatedResponse);
         }
         return activated;
-    }
-
-    private boolean checkItemCondition(CertificateStatus certificateStatus, int numOfPassItem) {
-        return (certificateStatus == CertificateStatus.NOT_YET) && (numOfPassItem > 0);
     }
 
     private Certification getDummyCertification() {

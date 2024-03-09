@@ -28,13 +28,5 @@ public class InstanceSearchResponse {
         this.pointPerPerson = pointPerPerson;
         this.participantCount = participantCount;
         this.fileResponse = FileResponse.create(Optional.of(files));
-        this.fileResponse = convertToFileResponse(Optional.ofNullable(files));
-    }
-
-    private static FileResponse convertToFileResponse(Optional<Files> files) {
-        if (files.isEmpty()) {
-            return FileResponse.createNotExistFile();
-        }
-        return FileResponse.createExistFile(files.get());
     }
 }

@@ -11,6 +11,7 @@ import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
+import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
@@ -73,16 +74,17 @@ public class CertificationController {
     }
 
     @PostMapping("/pass")
-    public ResponseEntity<SingleResponse<CertificationResponse>> passCertification(
+    public ResponseEntity<SingleResponse<ActivatedResponse>> passCertification(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody CertificationRequest certificationRequest
     ) {
         User user = userPrincipal.getUser();
-        CertificationResponse certificationResponse = certificationService.passCertification(
-                user.getId(), certificationRequest);
+        ActivatedResponse activatedResponse = certificationService.passCertification(
+                user.getId(),
+                new CertificationRequest(certificationRequest.instanceId(), LocalDate.now()));
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), activatedResponse)
         );
     }
 

@@ -167,7 +167,7 @@ class InstanceRepositoryTest {
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "BE", 3);
         getSavedInstance("title3", "BE", 20);
-        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PREACTIVITY, pageRequest);
+        Slice<Instance> instances = instanceRepository.findPagesByProgress(Progress.PREACTIVITY, pageRequest);
 
         //then
         assertThat(instances.getContent().size()).isEqualTo(3);
@@ -194,7 +194,7 @@ class InstanceRepositoryTest {
         getSavedInstance("title1", "BE", 10);
         getSavedInstance("title2", "BE", 3);
         getSavedInstance("title3", "BE", 20);
-        Slice<Instance> instances = instanceRepository.findInstanceByCondition(Progress.PREACTIVITY, pageRequest);
+        Slice<Instance> instances = instanceRepository.findPagesByProgress(Progress.PREACTIVITY, pageRequest);
 
         //then
         assertThat(instances.getContent().size()).isEqualTo(3);

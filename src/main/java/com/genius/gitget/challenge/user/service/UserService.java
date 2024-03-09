@@ -69,7 +69,7 @@ public class UserService {
         }
         return encryptUtil.decrypt(githubToken);
     }
-    
+
     public void isAlreadyRegistered(User user) {
         if (user.getRole() != Role.NOT_REGISTERED) {
             throw new BusinessException(ALREADY_REGISTERED);

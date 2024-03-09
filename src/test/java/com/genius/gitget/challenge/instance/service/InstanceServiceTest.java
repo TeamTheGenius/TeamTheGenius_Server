@@ -10,6 +10,7 @@ import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.util.file.FileTestUtil;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -60,12 +61,13 @@ public class InstanceServiceTest {
     @Test
     public void 인스턴스_생성() throws Exception {
         //given
+        LocalDate currentDate = instance.getCompletedDate().minusDays(3).toLocalDate();
         Topic savedTopic = topicRepository.save(topic);
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
 
         //when
         Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType);
+                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
 
         //then
         Optional<Instance> byId = instanceRepository.findById(savedInstanceId);
@@ -75,11 +77,12 @@ public class InstanceServiceTest {
     @Test
     public void 인스턴스_수정() throws Exception {
         //given
+        LocalDate currentDate = instance.getCompletedDate().minusDays(3).toLocalDate();
         Topic savedTopic = topicRepository.save(topic);
 
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
         Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType);
+                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
 
         InstanceUpdateRequest instanceUpdateRequest = InstanceUpdateRequest.builder()
                 .topicId(savedTopic.getId())
@@ -101,11 +104,12 @@ public class InstanceServiceTest {
     @Test
     public void 인스턴스_단건_조회() throws Exception {
         //given
+        LocalDate currentDate = instance.getCompletedDate().minusDays(3).toLocalDate();
         Topic savedTopic = topicRepository.save(topic);
 
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
         Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType);
+                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
 
         //when
         InstanceDetailResponse instanceById = instanceService.getInstanceById(savedInstanceId);

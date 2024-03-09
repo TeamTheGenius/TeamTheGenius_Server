@@ -21,6 +21,7 @@ public record CertificationResponse(
         List<String> prLinks
 ) {
 
+
     public static CertificationResponse createNonExist(int currentAttempt, LocalDate certificatedAt) {
         return CertificationResponse.builder()
                 .certificationId(0L)

@@ -36,5 +36,4 @@ public record ActivatedResponse(
     private static boolean checkItemCondition(CertificateStatus certificateStatus, int numOfPassItem) {
         return (certificateStatus == CertificateStatus.NOT_YET) && (numOfPassItem > 0);
     }
-
 }

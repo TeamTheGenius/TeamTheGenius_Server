@@ -29,5 +29,4 @@ public class InstanceSearchResponse {
         this.participantCount = participantCount;
         this.fileResponse = FileResponse.create(Optional.of(files));
     }
-
 }

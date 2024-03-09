@@ -26,6 +26,7 @@ import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.item.repository.ItemRepository;
 import com.genius.gitget.challenge.item.repository.UserItemRepository;
+import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -406,16 +407,19 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, currentDate.plusDays(4), participant);
         getSavedCertification(CERTIFICATED, currentDate.plusDays(6), participant);
 
-        CertificationResponse certificationResponse = certificationService.passCertification(
+        ActivatedResponse activatedResponse = certificationService.passCertification(
                 user.getId(),
                 certificationRequest);
 
         //then
-        assertThat(certificationResponse.certificationId()).isNotNull();
-        assertThat(certificationResponse.certificateStatus()).isEqualTo(CertificateStatus.PASSED);
-        assertThat(certificationResponse.certificatedAt()).isEqualTo(currentDate);
-        assertThat(certificationResponse.prCount()).isEqualTo(0);
-        assertThat(certificationResponse.prLinks()).isEmpty();
+        assertThat(activatedResponse.instanceId()).isEqualTo(instance.getId());
+        assertThat(activatedResponse.title()).isEqualTo(instance.getTitle());
+        assertThat(activatedResponse.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(activatedResponse.repository()).isEqualTo(participant.getRepositoryName());
+        assertThat(activatedResponse.certificateStatus()).isEqualTo(PASSED.getTag());
+        assertThat(activatedResponse.numOfPassItem()).isEqualTo(0);
+        assertThat(activatedResponse.canUsePassItem()).isFalse();
+        assertThat(activatedResponse.fileResponse()).isNotNull();
     }
 
     @Test
@@ -500,15 +504,18 @@ class CertificationServiceTest {
 
         //when
         getSavedCertification(NOT_YET, currentDate, participant);
-        CertificationResponse certificationResponse = certificationService.passCertification(user.getId(),
+        ActivatedResponse activatedResponse = certificationService.passCertification(user.getId(),
                 certificationRequest);
 
         //then
-        assertThat(certificationResponse.certificateStatus()).isEqualTo(PASSED);
-        assertThat(certificationResponse.certificationId()).isNotZero();
-        assertThat(certificationResponse.prCount()).isZero();
-        assertThat(certificationResponse.prLinks().size()).isZero();
-        assertThat(certificationResponse.certificatedAt()).isEqualTo(currentDate);
+        assertThat(activatedResponse.instanceId()).isEqualTo(instance.getId());
+        assertThat(activatedResponse.title()).isEqualTo(instance.getTitle());
+        assertThat(activatedResponse.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(activatedResponse.repository()).isEqualTo(participant.getRepositoryName());
+        assertThat(activatedResponse.certificateStatus()).isEqualTo(PASSED.getTag());
+        assertThat(activatedResponse.numOfPassItem()).isEqualTo(0);
+        assertThat(activatedResponse.canUsePassItem()).isFalse();
+        assertThat(activatedResponse.fileResponse()).isNotNull();
     }
 
     @Test
@@ -526,15 +533,18 @@ class CertificationServiceTest {
                 .build();
 
         //when
-        CertificationResponse certificationResponse = certificationService.passCertification(user.getId(),
+        ActivatedResponse activatedResponse = certificationService.passCertification(user.getId(),
                 certificationRequest);
 
         //then
-        assertThat(certificationResponse.certificateStatus()).isEqualTo(PASSED);
-        assertThat(certificationResponse.certificationId()).isNotZero();
-        assertThat(certificationResponse.prCount()).isZero();
-        assertThat(certificationResponse.prLinks().size()).isZero();
-        assertThat(certificationResponse.certificatedAt()).isEqualTo(currentDate);
+        assertThat(activatedResponse.instanceId()).isEqualTo(instance.getId());
+        assertThat(activatedResponse.title()).isEqualTo(instance.getTitle());
+        assertThat(activatedResponse.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(activatedResponse.repository()).isEqualTo(participant.getRepositoryName());
+        assertThat(activatedResponse.certificateStatus()).isEqualTo(PASSED.getTag());
+        assertThat(activatedResponse.numOfPassItem()).isEqualTo(0);
+        assertThat(activatedResponse.canUsePassItem()).isFalse();
+        assertThat(activatedResponse.fileResponse()).isNotNull();
     }
 
 

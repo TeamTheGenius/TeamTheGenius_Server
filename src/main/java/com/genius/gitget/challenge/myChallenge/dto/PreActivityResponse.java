@@ -1,5 +1,6 @@
 package com.genius.gitget.challenge.myChallenge.dto;
 
+import com.genius.gitget.global.file.dto.FileResponse;
 import lombok.Builder;
 
 @Builder
@@ -8,6 +9,7 @@ public record PreActivityResponse(
         String title,
         int participantCount,
         int pointPerPerson,
-        int remainDays
+        int remainDays,
+        FileResponse fileResponse
 ) {
 }

@@ -20,7 +20,7 @@ public record InstanceResponse(
         String notice,
         String certificationMethod,
         JoinStatus joinStatus,
-        int hitCount,
+        int likesCount,
         FileResponse fileResponse
 ) {
 
@@ -39,7 +39,7 @@ public record InstanceResponse(
                 .notice(instance.getNotice())
                 .certificationMethod(instance.getCertificationMethod())
                 .joinStatus(joinStatus)
-                .hitCount(instance.getLikesList().size())
+                .likesCount(instance.getLikesList().size())
                 .fileResponse(FileResponse.create(instance.getFiles()))
                 .build();
     }

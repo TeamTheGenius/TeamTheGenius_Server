@@ -78,8 +78,11 @@ class MyChallengeServiceTest {
         //then
         assertThat(instances.size()).isEqualTo(3);
         assertThat(instances.get(0).instanceId()).isEqualTo(instance1.getId());
+        assertThat(instances.get(0).fileResponse()).isNotNull();
         assertThat(instances.get(1).instanceId()).isEqualTo(instance2.getId());
+        assertThat(instances.get(1).fileResponse()).isNotNull();
         assertThat(instances.get(2).instanceId()).isEqualTo(instance3.getId());
+        assertThat(instances.get(2).fileResponse()).isNotNull();
     }
 
     @Test
@@ -135,17 +138,23 @@ class MyChallengeServiceTest {
         //given
         LocalDate targetDate = LocalDate.of(2024, 2, 14);
         User user = getSavedUser();
-        Instance instance1 = getSavedInstance(Progress.DONE);
-        Participant participant1 = getSavedParticipant(user, instance1, SUCCESS);
+        Instance instance = getSavedInstance(Progress.DONE);
+        Participant participant = getSavedParticipant(user, instance, SUCCESS);
         getSavedUserItem(user, ItemCategory.POINT_MULTIPLIER, 3);
 
         //when
         List<DoneResponse> doneResponses = myChallengeService.getDoneInstances(user, targetDate);
 
         //then
+        DoneResponse doneResponse = doneResponses.get(0);
         assertThat(doneResponses.size()).isEqualTo(1);
-        assertThat(doneResponses.get(0).canGetReward()).isTrue();
-        assertThat(doneResponses.get(0).numOfPointItem()).isEqualTo(3);
+        assertThat(doneResponse.title()).isEqualTo(instance.getTitle());
+        assertThat(doneResponse.instanceId()).isEqualTo(instance.getId());
+        assertThat(doneResponse.rewardedPoints()).isZero();
+        assertThat(doneResponse.joinResult()).isEqualTo(SUCCESS);
+        assertThat(doneResponse.fileResponse()).isNotNull();
+        assertThat(doneResponse.canGetReward()).isTrue();
+        assertThat(doneResponse.numOfPointItem()).isEqualTo(3);
     }
 
     @Test

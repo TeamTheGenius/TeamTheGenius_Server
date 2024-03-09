@@ -1,5 +1,6 @@
 package com.genius.gitget.payment.dto;
 
+import com.genius.gitget.payment.domain.Payment;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,5 +19,16 @@ public class PaymentResponse {
         this.orderName = orderName;
         this.orderId = orderId;
         this.userEmail = userEmail;
+    }
+
+    public static PaymentResponse createByEntity(Payment payment) {
+
+        return PaymentResponse.builder()
+                .amount(payment.getAmount())
+                .pointAmount(payment.getPointAmount())
+                .orderName(payment.getOrderName())
+                .orderId(payment.getOrderId())
+                .userEmail(payment.getUser().getIdentifier())
+                .build();
     }
 }

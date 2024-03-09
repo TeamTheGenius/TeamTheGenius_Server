@@ -28,9 +28,8 @@ public class InstanceSearchResponse {
         this.keyword = keyword;
         this.pointPerPerson = pointPerPerson;
         this.participantCount = participantCount;
-        this.fileResponse = convertToFileResponse(Optional.of(files));
+        this.fileResponse = convertToFileResponse(Optional.ofNullable(files));
     }
-
 
     private static FileResponse convertToFileResponse(Optional<Files> files) throws IOException {
         if (files.isEmpty()) {

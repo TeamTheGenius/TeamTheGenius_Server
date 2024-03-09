@@ -23,7 +23,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -41,63 +40,24 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final TossPaymentConfig tossPaymentConfig;
 
-    private static Payment getPayment(PaymentRequest paymentRequest, User findByEmailUser) {
-        return Payment.builder()
-                .orderId(UUID.randomUUID().toString())
-                .amount(paymentRequest.getAmount())
-                .orderName(paymentRequest.getOrderName())
-                .pointAmount(paymentRequest.getPointAmount())
-                .user(findByEmailUser)
-                .isSuccess(false)
-                .failReason("")
-                .build();
-    }
-
-    private static PaymentSuccessResponse getPaymentSuccessResponse(Payment payment) {
-        return PaymentSuccessResponse.builder()
-                .paymentKey(payment.getPaymentKey())
-                .amount(payment.getAmount())
-                .orderName(payment.getOrderName())
-                .pointAmount(payment.getPointAmount())
-                .orderId(payment.getOrderId())
-                .isSuccess(payment.isSuccess())
-                .build();
-    }
-
-    public static PaymentResponse getPaymentResponse(Payment payment) {
-        return PaymentResponse.builder()
-                .amount(payment.getAmount())
-                .pointAmount(payment.getPointAmount())
-                .orderName(payment.getOrderName())
-                .orderId(payment.getOrderId())
-                .userEmail(payment.getUser().getIdentifier())
-                .build();
-    }
-
     @Transactional
-    public PaymentResponse requestTossPayment(PaymentRequest paymentRequest) {
+    public PaymentResponse requestTossPayment(User user, PaymentRequest paymentRequest) {
+        User findUser = userRepository.findByIdentifier(user.getIdentifier())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
 
-        Payment paymentRequestToEntity = paymentRequestToEntity(paymentRequest);
-
-        if (paymentRequestToEntity.getAmount() < 100L) {
+        if (!findUser.getIdentifier().equals(paymentRequest.getUserEmail())) {
+            throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        if (paymentRequest.getAmount() < 100L) {
             throw new BusinessException(ErrorCode.FAILED_POINT_PAYMENT);
         }
         if (!(paymentRequest.getAmount() == 1000L || paymentRequest.getAmount() == 3000L
                 || paymentRequest.getAmount() == 5000L || paymentRequest.getAmount() == 7000L)) {
             throw new BusinessException(ErrorCode.FAILED_POINT_PAYMENT);
         }
-
-        Payment savedPayment = paymentRepository.save(paymentRequestToEntity);
-
-        return getPaymentResponse(savedPayment);
-    }
-
-    private Payment paymentRequestToEntity(PaymentRequest paymentRequest) {
-        User findByEmailUser = userRepository.findByIdentifier(paymentRequest.getUserEmail())
-                .orElseThrow(() -> new BusinessException(
-                        ErrorCode.MEMBER_NOT_FOUND));
-
-        return getPayment(paymentRequest, findByEmailUser);
+        Payment requestToEntity = paymentRequest.paymentRequestToEntity(user, paymentRequest);
+        Payment savedPayment = paymentRepository.save(requestToEntity);
+        return PaymentResponse.createByEntity(savedPayment);
     }
 
     @Transactional
@@ -165,17 +125,15 @@ public class PaymentService {
             throw new BusinessException(ErrorCode.FAILED_FINAL_PAYMENT);
         }
 
-        return getPaymentSuccessResponse(payment);
+        return PaymentSuccessResponse.createByEntity(payment);
     }
 
     public Payment verifyPayment(String orderId, Long amount) {
         Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new BusinessException(
                 ErrorCode.MEMBER_NOT_FOUND));
-
         if (amount < 100L) {
             throw new BusinessException(ErrorCode.FAILED_POINT_PAYMENT);
         }
-
         if (payment.getAmount().equals(amount)) {
             Long pointAmount = payment.getPointAmount();
             if (pointAmount == (amount / 10L) && (pointAmount * 10L) == amount) {

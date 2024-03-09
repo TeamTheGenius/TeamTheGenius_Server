@@ -1,5 +1,8 @@
 package com.genius.gitget.payment.dto;
 
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.payment.domain.Payment;
+import java.util.UUID;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,5 +19,17 @@ public class PaymentRequest {
         this.orderName = orderName;
         this.pointAmount = pointAmount;
         this.userEmail = userEmail;
+    }
+
+    public Payment paymentRequestToEntity(User user, PaymentRequest paymentRequest) {
+        return Payment.builder()
+                .orderId(UUID.randomUUID().toString())
+                .amount(paymentRequest.getAmount())
+                .orderName(paymentRequest.getOrderName())
+                .pointAmount(paymentRequest.getPointAmount())
+                .user(user)
+                .isSuccess(false)
+                .failReason("")
+                .build();
     }
 }

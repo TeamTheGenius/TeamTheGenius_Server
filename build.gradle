@@ -28,6 +28,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
+    // json
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
     // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
@@ -49,7 +52,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 
     // H2
-    runtimeOnly 'com.h2database:h2:1.4.200'
+    runtimeOnly 'com.h2database:h2:2.2.222'
 
     // Github API for Java
     implementation 'org.kohsuke:github-api:1.318'
@@ -66,4 +69,9 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }

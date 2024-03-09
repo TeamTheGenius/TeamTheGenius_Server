@@ -250,7 +250,7 @@ class InstanceDetailServiceTest {
         assertThat(instanceResponse.pointPerPerson()).isEqualTo(100);
         assertThat(instanceResponse.description()).isEqualTo(savedInstance.getDescription());
         assertThat(instanceResponse.joinStatus()).isEqualTo(JoinStatus.YES);
-        assertThat(instanceResponse.hitCount()).isEqualTo(0);
+        assertThat(instanceResponse.likesCount()).isEqualTo(0);
     }
 
     @Test
@@ -271,7 +271,7 @@ class InstanceDetailServiceTest {
         assertThat(instanceResponse.pointPerPerson()).isEqualTo(100);
         assertThat(instanceResponse.description()).isEqualTo(savedInstance.getDescription());
         assertThat(instanceResponse.joinStatus()).isEqualTo(JoinStatus.NO);
-        assertThat(instanceResponse.hitCount()).isEqualTo(0);
+        assertThat(instanceResponse.likesCount()).isEqualTo(0);
     }
 
     @Test

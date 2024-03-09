@@ -92,22 +92,14 @@ public class TopicServiceTest {
                 fileType);
 
         //when
-        Assertions.assertThatThrownBy(() -> topicService.deleteTopic(savedTopicId))
-                .isInstanceOf(BusinessException.class);
+        topicService.deleteTopic(savedTopicId);
 
         //then
-//        org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class, () -> {
-//            topicService.getTopicById(1L);
-//        });
-//
-//        Assertions.assertThatThrownBy(()-> topicService.getTopicById(1L))
-//                .isInstanceOf(BusinessException.class);
-//
-//        try {
-//            topicService.getTopicById(savedTopicId);
-//        } catch (BusinessException e) {
-//            org.junit.jupiter.api.Assertions.assertEquals("해당 토픽을 찾을 수 없습니다.", e.getMessage());
-//        }
+        try {
+            topicService.getTopicById(savedTopicId);
+        } catch (BusinessException e) {
+            org.junit.jupiter.api.Assertions.assertEquals("해당 토픽을 찾을 수 없습니다.", e.getMessage());
+        }
     }
 
     private TopicCreateRequest getTopicCreateRequest() {

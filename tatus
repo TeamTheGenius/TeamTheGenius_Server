@@ -1,0 +1,1426 @@
+[33mcommit 0bf88386d2c54e1514492811010360948868e0fd[m[33m ([m[1;36mHEAD -> [m[1;32mfeat/52-payment[m[33m)[m
+Merge: f7e3001 50a4997
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Thu Feb 15 01:30:27 2024 +0900
+
+    chore: from main to feat/52-payment merge 완료
+
+[33mcommit 50a499732c9cf560c7113d1d0e40d41eefe97dcb[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Feb 15 01:16:33 2024 +0900
+
+    chore: package 구조 변경
+    
+    - home 패키지 내의 controller, service, dto를 instance 패키지로 이동
+
+[33mcommit c964d56d0e586ee958ae0492a58b954c6ea9eff3[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Feb 15 01:13:50 2024 +0900
+
+    chore: Querydsl 관련 build.gradle 수정
+
+[33mcommit 8b15712bfe48dca94d64d8020e1adf5f6d7bef63[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Feb 15 00:33:39 2024 +0900
+
+    chore: gitignore 추가 설정
+
+[33mcommit 30449befceef678627c20cce1dfd96b30c829865[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Feb 14 14:29:31 2024 +0900
+
+    hotfix: instance 생성 시, 경로가 없어 예외를 던지는 버그 픽스
+
+[33mcommit 40159008d3b81bfa8f9d855fd2caac87dcd79995[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Feb 14 10:04:10 2024 +0900
+
+    [BUG] Topic 삭제 요청 시, 삭제가 되지 않는 버그 (#67)
+    
+    * fix: topic 삭제 시 예외가 발생하던 버그 픽스
+    
+    - topic 삭제 가능 조건에서 삭제 요청을 했을 때, 삭제가 되지 않고 예외가 발생하던 버그 픽스
+    - 영속성 전이(cascade) 추가로 인해 발생하던 문제임을 인지 후 수정
+    
+    * refactor: File 로직 예외 추가 처리
+    
+    - File 시스템과 관련된 로직에서 따로 처리하지 않았던 부분에 대해 try-catch문을 통해 명시적으로 처리
+    
+    * feat: instance 생성 로직 보강
+    
+    - Topic에 등록된 이미지를 사용하기 위해, instance 생성 시 이미지를 별도로 전달하지 않은 경우에 대해 처리 로직 추가
+    - FileUtil에 복사 관련 로직 추가 구현
+
+[33mcommit 89a82600dcb6ac0c764607dc22482dc5db985e5c[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Tue Feb 13 22:44:16 2024 +0900
+
+    [FEAT] 동적쿼리를 적용한 검색 기능 개발  (#65)
+    
+    * chore: testBaseUtil 개발 중 패키지 구조 변경으로 인한 커밋
+    
+    * feat: Home 검색 기능 개발
+    
+    * refactor: search dto 네임 변경
+    
+    * test: 단위 테스트 수행
+    
+    - controller test 중 mongodb 이슈 발생 -> 해결요망
+    - 검색 기능 postman test 완료
+    
+    * test: 검색 기능 단위 테스트
+    
+    * feat: 검색 조건에 따른 키워드 검색 기능 개발
+    
+    - stringToEnum converter 재정의
+    - 스프링 빈으로 등록하여 생성한 컨버터 사용 적용
+    - 검색 조건에 따른 각 계층별 코드 작성
+    
+    * refactor: 불필요한 코드 제거
+    
+    * refactor: 코드 리펙토링
+    
+    * test: topicController mongodb issue test
+    
+    * chore: Querydsl dependency 추가
+    
+    * test: querydsl test
+    
+    * test: querydsl 적용 테스트
+    
+    * feat: querydsl dto 생성
+    
+    - querydsl로 작성한 프로젝션을 받아오기 위한 dto
+    
+    * test: querydsl 별도의 dto를 사용한 instance와 files join table 테스트
+    
+    * test: 프로젝션 결과반환 - 생성자 방식 사용
+    
+    * test: 동적쿼리 - booleanBuilder 테스트
+    
+    * test: 동적쿼리 - 다중 where
+    
+    - composition 가능한 장점이 있음
+    
+    * test: 수정, 삭제 배치쿼리
+    
+    - bulkUpdate
+    - bulkAdd
+    - bulkDelete
+    
+    * feat: 동적 쿼리 적용 및 querydsl 페이징 연동
+    
+    * feat: 검색 조건과 챌린지 진행 현황에 따른 검색 기능 개발
+    
+    - querydsl 적용
+    - 사용자 정의 리포지토리 적용
+    - BooleamBuilder 적용으로 성능 최적화
+    - instanceSearchService 코드 수정 및 개선
+    - progress entity ALL 제거
+    - 검색 기능 repository 테스트 코드 작성
+    
+    * feat: 동적쿼리를 위한 instanceSearchService 로직 개발
+    
+    - instanceSearchService 코드 개선
+    - ErrorCode 추가
+    - postmand api 테스트 완료
+    
+    * refactor: 코드 리펙토링
+
+[33mcommit f7e3001fae9604e4c5f3a5343d14472ff8b601a6[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Mon Feb 12 19:12:06 2024 +0900
+
+    test: 결제 검증을 위한 테스트 환경 구축
+
+[33mcommit e5418de60708f437ff1e01db7685f03aaed43261[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Mon Feb 12 15:27:01 2024 +0900
+
+    test: 사용자 access_token 정보 취득 테스트
+
+[33mcommit 6cd7dcf0329fa5f516fd5cf7892fbf4a104d665e[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Mon Feb 12 15:26:37 2024 +0900
+
+    chore: iamport dependency 추가
+
+[33mcommit 6d4f561fdd7ffba2e10bac1e1d133eee40d583ce[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Feb 9 23:27:07 2024 +0900
+
+    hotfix: 홈화면 API에서 인스턴스 식별자를 반환하지 않는 버그 픽스
+
+[33mcommit e0791f510aaa7b0b2690259447be981a7e35e030[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Feb 7 01:50:51 2024 +0900
+
+    feat: 엔티티 영속성 전이 설정 (#64)
+
+[33mcommit 15c36249e54e62c35bc19715f6acf3c9d03a397e[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sat Feb 3 15:23:09 2024 +0900
+
+    test: 로직 변경으로 인해 돌아가지 않던 테스트 코드 수정
+    
+    - FileTestUtil 클래스 작성: MultiFile을 반환하는 정적 메서드 추가
+    - Topic, Instance 로직 변경으로 인해 돌아가지 않던 테스트 코드 추가
+    - DTO에 빌더패턴 적용
+
+[33mcommit 2fe76bd70d15585f99b4d43572df6c41107f543b[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Sat Feb 3 15:22:41 2024 +0900
+
+    feat: 테스트 중 이슈 발견 및 해결 (#62)
+    
+    - 토픽이 인스턴스를 가질 때 해당 토픽을 삭제하려 할 때의 예외처리
+    - ErrorCode 추가
+
+[33mcommit 63e2e807f9bf0cf0c4b4c03738ccae7e5c8ceebd[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Sat Feb 3 10:27:23 2024 +0900
+
+    [HOTFIX] JWT Filter에서 예외 발생 시 처리하지 못하는 로직 수정 (#60)
+    
+    * feat: OAuth 로그인 성공 시 리다이렉트 주소 변경
+    
+    - OAuth 로그인 성공 시, 토큰 발급 URL로 리다이렉트하도록 변경
+    
+    * feat: JwtAuthenticationFilter 예외를 처리할 필터 추가 구현
+
+[33mcommit fa331c20c7f43a9d29a1ecc992bb4ebeac838bc2[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Fri Feb 2 23:28:34 2024 +0900
+
+    [FEAT] 어드민 페이지 파일 api 적용 (#61)
+    
+    * chore: enum converter global 패키지로 이동
+    
+    * feat: 어드민 페이지 topic - file 적용
+    
+    * feat: 어드민 페이지 instance - file 적용
+    
+    * feat: admin file api 적용 완료
+
+[33mcommit 4b96a350677d1dfdbf8ef6803bb75016e5050241[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Feb 2 14:54:10 2024 +0900
+
+    [REFACTOR] FileType Enum 예외처리 로직 보강 (#59)
+    
+    * refactor: 프로덕션 코드 변경으로 인한 테스트 코드 수정
+    
+    * refactor: FileType 정적 팩토리 메서드 예외 추가 처리
+    
+    - 소문자 외에 대문자로 왔을 때에도 처리가 가능하도록 수정
+    - 메서드명 오타 수정
+    
+    * fix: Files 삭제 시, DB의 값을 삭제되지 않는 버그 픽스
+    
+    * chore: 프로덕션 패키지 구조에 맞게 테스트 코드 패키지 구조 변경
+
+[33mcommit 872120be8d6d0bd96ba1d21251426cc5123dc6f6[m[33m ([m[1;31morigin/refactor/42-constructor[m[33m)[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Thu Feb 1 23:13:49 2024 +0900
+
+    hotfix: Instance entity 이름 변경 (#56)
+
+[33mcommit df2feaacf6c61dfd6129a9388b9efdee76da64d5[m
+Merge: 2cf298f 5d0aef2
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Thu Feb 1 23:04:39 2024 +0900
+
+    Merge branch 'main' of https://github.com/TeamTheGenius/TeamTheGenius_Server
+
+[33mcommit 2cf298f23f6f5b53c9caa29f1be938646d957a79[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Thu Feb 1 23:04:12 2024 +0900
+
+    hotfix: 충돌 코드 삭제
+
+[33mcommit 5d0aef2b68a3ae2399eb505da6c1dfdc48b8c90b[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Feb 1 14:50:31 2024 +0900
+
+    !HOTFIX: logout API endpoint 변경
+    
+    - /api/logout 에서 /api/auth/logout으로 변경
+
+[33mcommit 7ac23d50981c81aa4f79827002b13f73f1e1a51c[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Wed Jan 31 19:11:55 2024 +0900
+
+    test: 불필요한 test class 제거
+
+[33mcommit e93afa4a88f4147b727879359c47f32cdadfe570[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Wed Jan 31 19:08:36 2024 +0900
+
+    refactor: instanceService 누락된 코드 추가
+
+[33mcommit 4e84a310c1b34830d035cdb3b971ab5f60e69836[m
+Merge: ad32382 a957fb5
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Wed Jan 31 19:07:23 2024 +0900
+
+    Merge branch 'main' of https://github.com/TeamTheGenius/TeamTheGenius_Server
+
+[33mcommit ad3238240a9898c28f6c444f54e95f2633d6a134[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Wed Jan 31 19:07:15 2024 +0900
+
+    refactor: 불필요한 주석 제거
+
+[33mcommit a957fb5c92de8d0db9d1f62946beff33bb30398a[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Jan 31 18:39:16 2024 +0900
+
+    !HOTFIX: 컴파일 에러 해결
+
+[33mcommit 64b18a0b23796ab4448844f03f4e9877074002b4[m[33m ([m[1;31morigin/feat/52-payment[m[33m)[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 30 23:01:18 2024 +0900
+
+    [FEAT] 홈 화면 - 추천/인기/신규 기능 개발 (#50)
+    
+    * Squashed commit of the following:
+    
+    commit 77f54caa2f77b9ce040738b2a2f642b03a84d1d8
+    Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+    Date:   Fri Jan 26 16:33:27 2024 +0900
+    
+        chore: 패키지 구조 변경
+    
+        - admin 패키지: 관리자 관련 기능과 밀접한 기능들
+        - challenge 패키지: 사용자 관련 기능과 밀접한 기능들
+        - global 패키지: file, security, util 같은 서비스 전체에 영향을 줄 수 있는 기능들
+    
+    commit 8929e06e2cbb61717b00f76ae08af526d09a2fee
+    Author: HEY <50323157+SSung023@users.noreply.github.com>
+    Date:   Fri Jan 26 16:21:42 2024 +0900
+    
+        [TEST] JWT, 회원가입 로직 테스트 코드 추가 (#47)
+    
+        * Squashed commit of the following:
+    
+        commit 025fd0c5faf4a2d6ab159f4b0a95c8c7cde751a3
+        Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+        Date:   Thu Jan 25 23:15:25 2024 +0900
+    
+            !HOTFIX: conflict resolve 해결
+    
+        commit d2f1db695856489b13de47accb700c9432051ff3
+        Author: HEY <50323157+SSung023@users.noreply.github.com>
+        Date:   Thu Jan 25 23:14:14 2024 +0900
+    
+            [FIX] JWT 재발급 관련 버그 픽스 (#45)
+    
+            * fix: access-token 재발급 안되는 버그 수정
+    
+            * fix: 예외 처리 로직 추가 및 무한 리다이렉션 버그 픽스
+    
+            - Cookie로부터 토큰을 얻을 때, cookie가 비어있을 때 예외 처리 로직 추가
+            - JWT 토큰 요청 시, 사용자의 권한이 NOT_REGISTERED(가입 이전)이라면 JWT 토큰 발급 거부 로직 추가
+            - refresh-token이 비어있는 경우 예외 처리
+    
+            * chore: test 코드 정리
+    
+        commit 42f6e36ae95189025342ee0730485d7c6e37cd20
+        Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+        Date:   Thu Jan 25 21:43:28 2024 +0900
+    
+            !HOTFIX: 회원가입 기능 핫픽스
+    
+            - 회원가입 완료 후 반환하는 Response 객체의 구조 변경
+    
+        commit f9a0e3320212a76c1fc33f291c4146b93d81963a
+        Author: HEY <50323157+SSung023@users.noreply.github.com>
+        Date:   Thu Jan 25 18:09:04 2024 +0900
+    
+            Update issue templates
+    
+        * test: JwtService에 대한 테스트 코드 추가
+    
+        * test: JWT 테스트 코드 추가
+    
+        * test: 회원가입 관련 테스트 코드 추가
+    
+    * feat: InstanceRepository에 추천 인스턴스들을 받는 메서드 추가
+    
+    - Instance 엔티티의 '참여자 수' 필드 추가 및 업데이트 메서드 추가
+    - InstanceRepository에 조건에 맞는 추천 인스턴스들을 받아오는 메서드 추가
+    - 추천 인스턴스를 받아오는 Repository 테스트 코드 추가
+    
+    * chore: User의 관심사 필드의 이름 변경
+    
+    User의 관심사 필드의 이름을 interest에서 tags로 변경하여, 다른 엔티티들과 통일
+    
+    * refactor: 추천 인스턴스의 대상을 진행 중인 인스턴스로 변경
+    
+    * feat: 추천 인스턴스를 반환하는 서비스 로직 구현 및 테스트 코드 추가
+    
+    - 추천 인스턴스 페이징용 DTO인 RecommendPagingResponse 작성
+    - 추천 인스턴스 결과를 페이징 형식으로 반환
+    
+    * feat: 홈 화면의 추천 챌린지 추천 컨트롤러 개발
+    
+    - 컨트롤러 개발 및 테스트 코드 작성
+    
+    * refactor: 추천 챌린지의 대상을 '시작 전'으로 변경
+    
+    * chore: DTO 이름 및 테스트 코드 수정
+    
+    * feat: 신규 & 인기 인스턴스 레포지토리 구현 및 테스트 코드 추가
+    
+    * refactor: 파일 시스템 예외 상황 처리
+    
+    - 인스턴스의 경우 파일이 존재하지 않을 수 있으므로, Optional을 반환하도록 변경
+    - FileResponse에서 파일이 존재하지 않는 경우에 호출할 팩토리 메서드 추가
+    
+    * feat: 홈 화면의 인기/신규 기능 개발
+    
+    * refactor: 파일 시스템 구조 변경
+    
+    - FilesController: 파일 업로드 시, DTO와 이미지를 같이 받을 수 있는 예시로 변경
+    - FileUtil: 메서드들을 모두 static으로 변경
+    - FilesService: UPLOAD_PATH 관리 위치 변경
+    - FileResponse: 팩토리 메서드를 통해 생성할 수 있도록 추가
+    
+    * refactor: 불필요한 메서드에 대해 리팩토링 진행
+    
+    * feat: 파일(이미지) 갱신 기능 구현
+    
+    - FileId(PK)와 변경하고싶은 파일(MultipartFile)을 받아 기존에 존재했던 파일(이미지)는 삭제하고, 전달받은 파일로 갱신하는 기능 구현
+    - 파일 갱신 테스트용 API 구현
+    
+    * feat: 파일(이미지) 삭제 로직 추가
+    
+    - 삭제하고자하는 Files 엔티티의 PK를 전달했을 때, 삭제하는 기능 구현
+    - 저장소에 저장되어 있던 파일(이미지) 삭제
+    - Files 엔티티 삭제
+
+[33mcommit 89c31c56149fec830bd6b1bccdb7eb9b3873f684[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Tue Jan 30 22:32:12 2024 +0900
+
+    [FEAT] 홈 화면 - 챌린지 검색 기능 개발 (#51)
+    
+    * chore: testBaseUtil 개발 중 패키지 구조 변경으로 인한 커밋
+    
+    * feat: Home 검색 기능 개발
+    
+    * refactor: search dto 네임 변경
+    
+    * test: 단위 테스트 수행
+    
+    - controller test 중 mongodb 이슈 발생 -> 해결요망
+    - 검색 기능 postman test 완료
+    
+    * test: 검색 기능 단위 테스트
+    
+    * feat: 검색 조건에 따른 키워드 검색 기능 개발
+    
+    - stringToEnum converter 재정의
+    - 스프링 빈으로 등록하여 생성한 컨버터 사용 적용
+    - 검색 조건에 따른 각 계층별 코드 작성
+    
+    * refactor: 불필요한 코드 제거
+    
+    * refactor: 코드 리펙토링
+
+[33mcommit 27bd71465d8e6c43a4e64dcfb571ffd6a885f8a2[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Sat Jan 27 23:27:38 2024 +0900
+
+    [REFACTOR] 이미지/파일 요청과 응답 시 base64 인코딩하여 전달하도록 변경 (#49)
+    
+    * refactor: 파일과 관련된 응답 객체 전달 시, base64로 인코딩하여 전달
+    
+    - 파일/이미지 저장 요청 & 파일/이미지 정보 요청에 대한 응답 시, base64로 인코딩하여 전달하도록 리팩토링
+    
+    * refactor: base64로 인코딩한 값을 전달하도록 변경
+
+[33mcommit 77f54caa2f77b9ce040738b2a2f642b03a84d1d8[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Jan 26 16:33:27 2024 +0900
+
+    chore: 패키지 구조 변경
+    
+    - admin 패키지: 관리자 관련 기능과 밀접한 기능들
+    - challenge 패키지: 사용자 관련 기능과 밀접한 기능들
+    - global 패키지: file, security, util 같은 서비스 전체에 영향을 줄 수 있는 기능들
+
+[33mcommit 8929e06e2cbb61717b00f76ae08af526d09a2fee[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Jan 26 16:21:42 2024 +0900
+
+    [TEST] JWT, 회원가입 로직 테스트 코드 추가 (#47)
+    
+    * Squashed commit of the following:
+    
+    commit 025fd0c5faf4a2d6ab159f4b0a95c8c7cde751a3
+    Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+    Date:   Thu Jan 25 23:15:25 2024 +0900
+    
+        !HOTFIX: conflict resolve 해결
+    
+    commit d2f1db695856489b13de47accb700c9432051ff3
+    Author: HEY <50323157+SSung023@users.noreply.github.com>
+    Date:   Thu Jan 25 23:14:14 2024 +0900
+    
+        [FIX] JWT 재발급 관련 버그 픽스 (#45)
+    
+        * fix: access-token 재발급 안되는 버그 수정
+    
+        * fix: 예외 처리 로직 추가 및 무한 리다이렉션 버그 픽스
+    
+        - Cookie로부터 토큰을 얻을 때, cookie가 비어있을 때 예외 처리 로직 추가
+        - JWT 토큰 요청 시, 사용자의 권한이 NOT_REGISTERED(가입 이전)이라면 JWT 토큰 발급 거부 로직 추가
+        - refresh-token이 비어있는 경우 예외 처리
+    
+        * chore: test 코드 정리
+    
+    commit 42f6e36ae95189025342ee0730485d7c6e37cd20
+    Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+    Date:   Thu Jan 25 21:43:28 2024 +0900
+    
+        !HOTFIX: 회원가입 기능 핫픽스
+    
+        - 회원가입 완료 후 반환하는 Response 객체의 구조 변경
+    
+    commit f9a0e3320212a76c1fc33f291c4146b93d81963a
+    Author: HEY <50323157+SSung023@users.noreply.github.com>
+    Date:   Thu Jan 25 18:09:04 2024 +0900
+    
+        Update issue templates
+    
+    * test: JwtService에 대한 테스트 코드 추가
+    
+    * test: JWT 테스트 코드 추가
+    
+    * test: 회원가입 관련 테스트 코드 추가
+
+[33mcommit 025fd0c5faf4a2d6ab159f4b0a95c8c7cde751a3[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Jan 25 23:15:25 2024 +0900
+
+    !HOTFIX: conflict resolve 해결
+
+[33mcommit d2f1db695856489b13de47accb700c9432051ff3[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Jan 25 23:14:14 2024 +0900
+
+    [FIX] JWT 재발급 관련 버그 픽스 (#45)
+    
+    * fix: access-token 재발급 안되는 버그 수정
+    
+    * fix: 예외 처리 로직 추가 및 무한 리다이렉션 버그 픽스
+    
+    - Cookie로부터 토큰을 얻을 때, cookie가 비어있을 때 예외 처리 로직 추가
+    - JWT 토큰 요청 시, 사용자의 권한이 NOT_REGISTERED(가입 이전)이라면 JWT 토큰 발급 거부 로직 추가
+    - refresh-token이 비어있는 경우 예외 처리
+    
+    * chore: test 코드 정리
+
+[33mcommit 42f6e36ae95189025342ee0730485d7c6e37cd20[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Jan 25 21:43:28 2024 +0900
+
+    !HOTFIX: 회원가입 기능 핫픽스
+    
+    - 회원가입 완료 후 반환하는 Response 객체의 구조 변경
+
+[33mcommit f9a0e3320212a76c1fc33f291c4146b93d81963a[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Jan 25 18:09:04 2024 +0900
+
+    Update issue templates
+
+[33mcommit 8bbc369a49f124b039e6d8c8f483d82abc399053[m
+Merge: a120e65 caa3f58
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Jan 24 21:05:09 2024 +0900
+
+    Merge pull request #39 from TeamTheGenius/feat/21-image-util
+    
+    [FEAT] 이미지/파일 업로드 유틸 클래스 개발
+
+[33mcommit caa3f58041fa48216e8fa7fa98a57711a6fc00c0[m
+Merge: 32ca58a a120e65
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Jan 24 21:04:10 2024 +0900
+
+    Merge branch 'main' into feat/21-image-util
+
+[33mcommit a120e651f47371ee7d809823a6e8fd3c1ecd01a6[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Wed Jan 24 20:48:02 2024 +0900
+
+    24 feat admin topic api (#41)
+    
+    * feat: Topic Controller 개발
+    
+    * feat: Topic Domain 비즈니스 로직 개발
+    
+    * feat: Topic Service 개발
+    
+    * test: topic rest api 테스트 코드 작성
+    
+    - jwt 관련 오류로 인해 테스트 불가 -> 해결 방안 모색 중
+    
+    * feat: 전체 Topic 조회 페이징과 정렬
+    
+    * feat: Instance API 개발
+    
+    - DTO 활용
+    - BusinessException 활용
+    
+    * refactor: topic controller & service DTO 도입
+    
+    * refactor: topic, instance paging 리팩토링
+    
+    * refactor: 리펙토링
+    
+    - participant_count entity 제거 -> participantInfo list size로 해결 가능
+    - 테스트 코드 작성
+    - 코드 리펙토링 등
+    
+    * refactor: admin page refactoring
+    
+    - 연관관계 편의 메서드 수정
+    - DTO 수정
+    - API Response 재정의
+    - util의 ErrorCode Enum 추가
+    - PagingResponse 추가
+    
+    * test: postman api test
+    
+    - test 수행 중 발견한 수정사항 해결
+    
+    * test: test 완료
+
+[33mcommit 32ca58aa9da64d644921bbdd2eb515214ab8cc7c[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Jan 24 01:22:25 2024 +0900
+
+    feat: Files 엔티티 연관관계 설정
+
+[33mcommit cf3b20ef842ac2d925e590fc1188639074e6f63f[m
+Merge: a1014bc 061171e
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Jan 24 00:39:39 2024 +0900
+
+    Merge branch 'main' into feat/21-image-util
+
+[33mcommit 061171e13bf48328f6f5bc94b3a9dc5899cab431[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Wed Jan 24 00:37:56 2024 +0900
+
+    [FEAT] 어드민 페이지 개발 (#38)
+    
+    * [FEAT] Admin 페이지 Instance , Topic API 개발  (#33)
+    
+    * feat: Topic Controller 개발
+    
+    * feat: Topic Domain 비즈니스 로직 개발
+    
+    * feat: Topic Service 개발
+    
+    * test: topic rest api 테스트 코드 작성
+    
+    - jwt 관련 오류로 인해 테스트 불가 -> 해결 방안 모색 중
+    
+    * feat: 전체 Topic 조회 페이징과 정렬
+    
+    * feat: Instance API 개발
+    
+    - DTO 활용
+    - BusinessException 활용
+    
+    * refactor: topic controller & service DTO 도입
+    
+    * refactor: topic, instance paging 리팩토링
+    
+    * refactor: 리펙토링
+    
+    - participant_count entity 제거 -> participantInfo list size로 해결 가능
+    - 테스트 코드 작성
+    - 코드 리펙토링 등
+    
+    * refactor: admin page refactoring
+    
+    - 연관관계 편의 메서드 수정
+    - DTO 수정
+    - API Response 재정의
+    - util의 ErrorCode Enum 추가
+    - PagingResponse 추가
+    
+    * [REFACTOR] 어드민 페이지 리펙토링  (#36)
+    
+    * feat: Topic Controller 개발
+    
+    * feat: Topic Domain 비즈니스 로직 개발
+    
+    * feat: Topic Service 개발
+    
+    * test: topic rest api 테스트 코드 작성
+    
+    - jwt 관련 오류로 인해 테스트 불가 -> 해결 방안 모색 중
+    
+    * feat: 전체 Topic 조회 페이징과 정렬
+    
+    * feat: Instance API 개발
+    
+    - DTO 활용
+    - BusinessException 활용
+    
+    * refactor: topic controller & service DTO 도입
+    
+    * refactor: topic, instance paging 리팩토링
+    
+    * refactor: 리펙토링
+    
+    - participant_count entity 제거 -> participantInfo list size로 해결 가능
+    - 테스트 코드 작성
+    - 코드 리펙토링 등
+    
+    * refactor: admin page refactoring
+    
+    - 연관관계 편의 메서드 수정
+    - DTO 수정
+    - API Response 재정의
+    - util의 ErrorCode Enum 추가
+    - PagingResponse 추가
+    
+    * [FEAT] 어드민 페이지 postman API 테스트  (#37)
+    
+    * feat: Topic Controller 개발
+    
+    * feat: Topic Domain 비즈니스 로직 개발
+    
+    * feat: Topic Service 개발
+    
+    * test: topic rest api 테스트 코드 작성
+    
+    - jwt 관련 오류로 인해 테스트 불가 -> 해결 방안 모색 중
+    
+    * feat: 전체 Topic 조회 페이징과 정렬
+    
+    * feat: Instance API 개발
+    
+    - DTO 활용
+    - BusinessException 활용
+    
+    * refactor: topic controller & service DTO 도입
+    
+    * refactor: topic, instance paging 리팩토링
+    
+    * refactor: 리펙토링
+    
+    - participant_count entity 제거 -> participantInfo list size로 해결 가능
+    - 테스트 코드 작성
+    - 코드 리펙토링 등
+    
+    * refactor: admin page refactoring
+    
+    - 연관관계 편의 메서드 수정
+    - DTO 수정
+    - API Response 재정의
+    - util의 ErrorCode Enum 추가
+    - PagingResponse 추가
+    
+    * test: postman api test
+    
+    - test 수행 중 발견한 수정사항 해결
+    
+    ---------
+    
+    Co-authored-by: HEY <50323157+SSung023@users.noreply.github.com>
+
+[33mcommit a1014bc447c985f10cf9014cf07623c1c4896d3c[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 23 21:30:13 2024 +0900
+
+    feat: 파일(이미지) 전송 기능 개발
+
+[33mcommit 077a466c9fe52d1459f622eeb115d5460e8069d8[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 23 20:58:05 2024 +0900
+
+    feat: 이미지 업로드 API 추가
+
+[33mcommit 8a235d40eb5364ad4992108f6d3225e9ce3b4394[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 23 19:35:26 2024 +0900
+
+    feat: 파일 업로드를 테스트하는 임시 API 추가
+
+[33mcommit d04d40df208c56d70d7540b06a86060c1b7ae94c[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 23 19:34:52 2024 +0900
+
+    feat: 저장소, DB에 이미지를 저장하는 로직 개발
+
+[33mcommit 4ca9006aeaf03af28867c5bb60db0b37e3abb368[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 23 18:33:56 2024 +0900
+
+    feat: 유효성 검사, 저장할 File 생성하는 FileUtil 클래스 구현
+    
+    - 전달받은 파일의 유효성 검사, 저장할 File을 생성하는 로직을 FileUtil 클래스에 구현
+    - FileUtil 관련 서비스 코드 작성
+    - Files 클래스에 BaseTimeEntity 상속
+
+[33mcommit c513a3ee39ac6b4aea10a3783e7fb4c813ad2694[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 23 16:06:12 2024 +0900
+
+    feat: 이미지/파일 레포지토리 생성 및 테스트 코드 추가
+
+[33mcommit beccdca33dbbe36b9aa060817b72920f0b26b465[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 23 16:05:27 2024 +0900
+
+    feat: 이미지/파일을 저장할 엔티티 작성
+    
+    - 이미지/파일을 저장할 엔티티 및 enum 클래스 작성
+
+[33mcommit 6f17d9f078e024f323320cf65d19ebab1f9d73a9[m
+Merge: da4a86f 5b1c149
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 22 23:13:53 2024 +0900
+
+    Merge pull request #35 from TeamTheGenius/feat/34-auth-anotation
+    
+    [FEAT] Controller(API) 테스트 코드 작성에 필요한 유틸 개발
+
+[33mcommit 5b1c149da4e82c4c81e873199a10611d23a13030[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 22 09:57:47 2024 +0900
+
+    feat: 테스트에 이용할 JWT 토큰 생성 유틸 클래스 구현
+
+[33mcommit 70fda414ec1e8da9e68e703b28eb5c0d85d8fc5e[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 22 02:46:16 2024 +0900
+
+    feat: 커스텀 어노테이션 통해 인증 객체를 반환받는 기능 추가
+
+[33mcommit da4a86f539863d3a99abffb721b36a2a185093eb[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Fri Jan 19 17:55:28 2024 +0900
+
+    refactor: 엔티티 리펙토링
+
+[33mcommit da5bf8b7d93d19647c882a13c8ee2e2ec4c9deaa[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Fri Jan 19 15:01:39 2024 +0900
+
+    [REFACTOR] DB entity 리펙토링 (#32)
+    
+    * refactor: 소셜 로그인 facebook 관련 파일 제거
+    
+    * feat: DB Entity 개발
+    
+    - User Entity 수정
+    - Hits, Topic, Instance, ParticipantInfo Entity 개발
+    
+    * feat: challenge domain 및 repository 개발
+    
+    - entity 수정 및 애노테이션 추가
+    - DB Table 별 repository 추가
+    - User entity : email -> identifier 로 변경
+    
+    * refactor: 엔티티와 파일 리펙토링
+    
+    - entity refactoring
+    - 프로젝트 구조 변경
+    
+    * chore: P6Spy query logging 의존성 추가
+    
+    * test: 기능별 도메인 생성 테스트 코드 추가
+    
+    * test: User 회원 추가/조회/수정/삭제 테스트 코드 작성 완료
+    
+    * feat: User와 Instance 다대다 연관관계 편의 메서드 작성
+    
+    - 테스트 코드 작성 완료
+    
+    * feat: User와 Instance 다대다 연관관계 편의 메서드 작성 - 2
+    
+    - 관심목록, 인스턴스에 참여한 유저 정보 - 테스트 완료
+    - 하나의 인스턴스가 가지는 Hits 테이블의 컬럼 갯수를 조회함으로서 Instance 테이블의 like_count 컬럼을 제거해도 됨. -> 리펙토링 예정
+    
+    * refactor: 불필요한 entity 제거
+    
+    * feat: 토픽과 인스턴스 연관관계 편의 메서드 작성
+    
+    * test: 기존에 작성한 불필요한 코드 제거 및 테스트
+
+[33mcommit 204b043da7ea421155219f71d07ce43b4a72a638[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 16 20:36:46 2024 +0900
+
+    chore: 프로젝트 이름을 GitGet로 변경
+
+[33mcommit fd5ebec58e04486882552f8e79c37c635c9450af[m
+Merge: c93b35e 8c0ff0f
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 16 20:20:28 2024 +0900
+
+    Merge pull request #29 from TeamTheGenius/feat/17-jwt
+    
+    [FEAT] 회원가입&JWT(로그인, 로그아웃) 기능 개발
+
+[33mcommit 8c0ff0f3c4416ad7ec6e12d9a23c602a09319b6b[m
+Merge: 0101d4a c93b35e
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 16 20:20:02 2024 +0900
+
+    Merge branch 'main' into feat/17-jwt
+
+[33mcommit 0101d4a87f3262feae0b0fa2518bd773702d8026[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 16 20:03:41 2024 +0900
+
+    test: JwtService 관련 테스트 코드 추가
+
+[33mcommit c93b35e4a4c0156e05de48cb302d8d78072742ae[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Tue Jan 16 20:03:32 2024 +0900
+
+    [FEAT] DB Entity 개발 (#28)
+    
+    * refactor: 소셜 로그인 facebook 관련 파일 제거
+    
+    * feat: DB Entity 개발
+    
+    - User Entity 수정
+    - Hits, Topic, Instance, ParticipantInfo Entity 개발
+    
+    * feat: challenge domain 및 repository 개발
+    
+    - entity 수정 및 애노테이션 추가
+    - DB Table 별 repository 추가
+    - User entity : email -> identifier 로 변경
+
+[33mcommit ef0e5a065a9ad1e6ad782e3b6439d453cc3722c5[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 16 16:09:16 2024 +0900
+
+    feat: refresh token 탈취 감지 로직 구현
+    
+    1. 요청받은 Refresh-token과 DB에 저장된 토큰이 불일치 시 토큰 탈취됨을 감지하는 로직 구현
+    2. 토큰 탈취 감지 시, 강제 로그아웃 실행
+    3. 관련 테스트코드 추가
+
+[33mcommit 061b7d472c85732abdb21e07446e989adbee7363[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 16 10:25:30 2024 +0900
+
+    Update pull_request_template.md
+
+[33mcommit 69f008dab7d216ee2ce8f9c6eedf4c676da242a2[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 15 14:30:10 2024 +0900
+
+    refactor: JWT 관련 코드 내 리팩토링
+    
+    1. 변수명 적절하게 수정
+    2. TokenStatus enum 도입 및 적용
+    3. 메서드 추출
+
+[33mcommit 48eb1aca2ee19c2aec82bdf56560357bcad07dce[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 15 13:01:41 2024 +0900
+
+    feat: 회원가입 시 닉네임 중복 확인 API 구현
+
+[33mcommit cfba09dbb126867bf49471dfcebda89d8d027dd0[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 15 02:31:15 2024 +0900
+
+    feat: logout API 구현
+
+[33mcommit a3f87848bee19b15caf3dfe040c453137fcc6b66[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 15 01:46:08 2024 +0900
+
+    refactor: JwtUtil 클래스 분리를 통한 리팩터링
+
+[33mcommit 64094f3848cc380f03370e0483d699b1dde88b55[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Jan 14 23:39:51 2024 +0900
+
+    feat: JWT 검증 필터 로직 및 재발급 로직 구현
+    
+    - RTR 로직 구현
+    - 전반적인 리팩토링 필요
+
+[33mcommit f96fd8b8e7e05149611e5a32b7be9bfbaaada32a[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Jan 14 19:47:24 2024 +0900
+
+    refactor: JWT에 사용될 enum 클래스 선언 및 적용
+
+[33mcommit 4ad0ea05a841b901864ef20ab1e03db9c9f20028[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Jan 14 16:13:45 2024 +0900
+
+    feat: refresh-token 저장하는 로직 구현
+    
+    - MongoDB에 refresh token을 저장하는 로직 구현
+
+[33mcommit b684f925c84e38bd50cc33bfd59d575badfc9704[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Jan 14 15:19:22 2024 +0900
+
+    feat: Token 정보를 담을 클래스/리포지토리 설정
+
+[33mcommit bd259b4fd9e5d439c9e383575e549723bbaa4d42[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Jan 14 15:18:08 2024 +0900
+
+    feat: MongoDB 의존성 추가
+
+[33mcommit 921e387c72c436980afe372ef4dbdc924aadf839[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Jan 14 14:37:28 2024 +0900
+
+    refactor: JWT 요청 시, 전달하는 사용자 정보 변경
+    
+    - 사용자의 PK를 보내는 방법에서 Identifier 정보 전달로 변경
+
+[33mcommit bb2852482ff076106c27187a3dd6d1a006e21df8[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Jan 14 14:30:32 2024 +0900
+
+    chore: mongoDB 의존성 추가
+
+[33mcommit 9398af7f9304eff4587fa099d140cead98652580[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Jan 12 10:54:37 2024 +0900
+
+    fix: 회원가입 요청 DTO 버그 수정
+
+[33mcommit ebec72d9cae6dc93c79bbf3afdfcff94c084fc3a[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Jan 12 09:56:35 2024 +0900
+
+    fix: OAuthRule enum 클래스 수정으로 인한 버그 수정
+
+[33mcommit 1f6dddf88be7aab31b948da4da939b72f70e0cf9[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Jan 11 11:48:33 2024 +0900
+
+    refactor: OAuth2와 관련된 상수를 하나의 enum 클래스에 모음
+
+[33mcommit f42e400b1e49713dc062f6df8682ffe188f36447[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Jan 11 01:25:55 2024 +0900
+
+    refactor: filterChain을 Security 6에 맞게 람다로 변경
+
+[33mcommit 8be9964397d99e5054019c5068074248d11d83ed[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Jan 11 01:11:58 2024 +0900
+
+    refactor: CorsConfigurationSource 클래스 분리
+
+[33mcommit 2b93f74ed713bb4142925d1da07b817fcb49186f[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Thu Jan 11 00:53:31 2024 +0900
+
+    feat: JWT 발급 API 요청 시, access & refresh token 발급 로직 개발
+    
+    - JwtAuthorizationFilter 세부 구현 필요
+    - JwtService 내의 매직 넘버 처리 필요
+
+[33mcommit edb1c2f2048014ab5cda2bb9c690140bdafe0216[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 9 14:40:43 2024 +0900
+
+    feat: Github 소셜로그인 추가 및 구조 변경
+    
+    - Github 소셜로그인 추가
+    - Github 소셜로그인 추가에 따라, Spring security에서 Authentication을 찾는데에 사용하는 값 변경
+
+[33mcommit 6de4dbfc9dbd764729afea474ddd659636e5d955[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Jan 3 14:50:44 2024 +0900
+
+    feat: refresh token 생성 로직 구현
+
+[33mcommit d71bfe4970ac3df816e4b4774edee3c87095f588[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Jan 3 12:19:15 2024 +0900
+
+    chore: 코드 최적화
+
+[33mcommit 9dfc46d82297b3bbfc9c57098b57b1f7d0d81d03[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Wed Jan 3 12:17:29 2024 +0900
+
+    feat: Security Context에 사용자의 정보를 담는 클래스 구현
+    
+    - UserPrincipal가 DefaultOAuth2User 상속 -> OAuth2User 인터페이스 상속으로 변경
+    - UserPrincipal 클래스에 UserDetails 인터페이스 상속
+    - 인터페이스 상속으로 인한 메서드 구현
+    - OAuth2User의 getName(): email 반환
+    - UserDetails의 getUsername(): User PK를 String 형으로 반환
+
+[33mcommit 7f1fdd0d98afbd9c87845532fc4e1e766af3d5d2[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 2 11:55:45 2024 +0900
+
+    chore: jwt 관련 의존성 추가
+
+[33mcommit b7848d77953aa7c7549cf35c9a09e54a9955cb4e[m
+Merge: f03d1f7 61d873c
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 2 10:16:42 2024 +0900
+
+    Merge pull request #16 from TeamTheGenius/feat/social-login
+    
+    Feat: 회원가입 API 개발
+
+[33mcommit f03d1f7742cc4dd13a756903a1446188752b90b2[m
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 2 01:06:37 2024 +0900
+
+    Update issue templates
+
+[33mcommit 61d873c68b7441a487732328f2e34a7c778c9fd6[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Tue Jan 2 00:57:13 2024 +0900
+
+    refactor: 공통 응답 객체에 값 추가
+
+[33mcommit 6cea0ac9e1170ca19ea6277ddc78a22f8cd392a6[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 1 14:15:19 2024 +0900
+
+    refactor: BusinessExceptionHandler의 반환타입 변경
+
+[33mcommit 09330b408572662244ddfe08b75661e9d42cd470[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 1 13:45:06 2024 +0900
+
+    chore: final 상수 이름을 네이밍 컨벤션에 맞게 변경
+
+[33mcommit 76b6c8f5aec2090e1b54b3512bfd1cfdf8c107ac[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 1 02:22:58 2024 +0900
+
+    feat: 회원가입 로직 개발
+    
+    - 소셜로그인 성공 이후 회원가입 이전 사용자를 대상으로, 회원가입을 진행하는 로직 개발
+    - FE로부터 배열 형태로 받은 관심사를 처리하는 Converter 클래스 구현 필요
+
+[33mcommit 8f0137fd9f749d09eeba6e9cb632240a7267b250[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Mon Jan 1 01:51:23 2024 +0900
+
+    chore: build.gradle에서 lombok 의존성 추가
+    
+    - test 코드에서도 사용할 수 있도록 의존성 추가
+
+[33mcommit 748cda29f95d3557139fe694309856462f8d3e78[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 17:17:55 2023 +0900
+
+    chore: 패키지명 변경
+
+[33mcommit d074cc947e66bcefe7b671b6ac7e9ea4ebe86d69[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 15:54:08 2023 +0900
+
+    chore: 어플리케이션 baseURL 수정
+
+[33mcommit 17db90d6c66f971665979df363e13d4861ffb84c[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 14:56:02 2023 +0900
+
+    chore: swagger 관련 URI 수정
+
+[33mcommit baf94401d73f809e5b1f7c6d352aabb8b7b49f79[m
+Merge: 33c4234 3cb3358
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 14:37:45 2023 +0900
+
+    Merge pull request #15 from TeamTheGenius/feat/7-add-utils
+    
+    Feat: Utils 파일 추가
+
+[33mcommit 3cb335899010df60b07385d26d51c4a0b2b04b04[m
+Merge: af5971f 33c4234
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 14:37:23 2023 +0900
+
+    Merge branch 'feat/social-login' into feat/7-add-utils
+
+[33mcommit af5971f3cd09e23180c41eaeeaa9a8af3c48350e[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 14:09:03 2023 +0900
+
+    feat: swagger 설정 파일 추가
+
+[33mcommit 33c42342a038ac0b613ccfa79a79770ee5522b6b[m
+Merge: c24f5bd ea5d3b2
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 12:39:58 2023 +0900
+
+    Merge pull request #14 from TeamTheGenius/feat/social-login
+    
+    Feat: 소셜로그인에 필요한 DTO 개발, 클래스 커스터마이징 및 로직 구현
+
+[33mcommit ea5d3b225e0ac9a5f0b18acdd5ad2b4ec40f50a1[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 12:37:03 2023 +0900
+
+    chore: 사용하지 않는 클래스 삭제 및 magic number 상수로 변환
+
+[33mcommit a103100304b1ba94c7094e40e86d29c7f6bdb398[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 12:05:54 2023 +0900
+
+    fix: 인증 클래스 생성자에 사용자의 역할을 전달하도록 수정
+    
+    - 기존에 무조건 ROLE_USER를 전달하던 로직에서, 생성자에 사용자의 역할을 전달하도록 수정
+
+[33mcommit ec2a0acf3248181747e9b04dc952a1c043c3ce65[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 03:26:46 2023 +0900
+
+    refactor: 인증 객체 상속관계 변경
+    
+    - 기존에 OAuth2User 인터페이스 상속에서 DefaultOAuth2User 상속으로 변경
+    - getName() 메서드 오버라이드: 사용자의 이메일을 반환하도록 설정
+
+[33mcommit 25ca958b019ba9c96fb8234b19dccf77f5f05aba[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 03:17:50 2023 +0900
+
+    refactor: 소셜 별 UserInfo 클래스 리팩토링 진행
+    
+    - 매직 넘버(magic number)에 대해 상수로 변경
+    - 인증 객체에 필요한 메서드 추가
+
+[33mcommit 20580d9478afba19c63391a905f6dc334482099c[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 02:05:50 2023 +0900
+
+    feat: 소셜로그인 관련 Handler 로직 구현
+    
+    - 소셜로그인을 통한 인증 성공 후, 실행되는 OAuth2SuccessHandler 클래스 로직 구현
+    - 소셜로그인 도중 모종의 이유로 인해 실패했을 경우, 실행되는 OAuth2FailureHandler 클래스 로직 구현
+
+[33mcommit 52dbed24f9c1c4f837ada471d423c1c23f0d82e1[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sun Dec 31 01:34:24 2023 +0900
+
+    feat: 소셜로그인 성공 시 실행되는 서비스 클래스 개발
+    
+    - 서드파티로부터 access-token 받은 이후 실행되는 custom 서비스 클래스 로직 구현
+    - 사용자 정보(email)을 받아온 후 -> DB에 저장 여부 확인 -> 없다면 DB에 저장
+
+[33mcommit 431013464b7112a4ed472982f39c4f3c0d532def[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sat Dec 30 23:06:06 2023 +0900
+
+    refactor: 소셜로그인 관련 파일들 구조 변경
+
+[33mcommit bd1572b8eabee22e5cff10bb31f5a0c76d21bb89[m
+Merge: 7e6f06a 3d17f1e
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Sat Dec 30 17:06:46 2023 +0900
+
+    Merge remote-tracking branch 'upstream/feat/social-login' into feat/social-login
+
+[33mcommit 7e6f06a8007ff56881ecea6ec58eeccdd8f17342[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Sat Dec 30 16:58:37 2023 +0900
+
+    Feat: 폴더 구조 변경
+
+[33mcommit 368c804680dac110069481cd4f7b56a17efcd857[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Sat Dec 30 16:58:09 2023 +0900
+
+    Feat: 소셜로그인 테스트를 위한 의존성 추가 및 수정
+
+[33mcommit db87b1a7287d7bf9535b80d59062214603e62285[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Sat Dec 30 16:54:32 2023 +0900
+
+    Feat: 소셜별 UserInfo DTO 개발
+
+[33mcommit 5005b951fa755cc17b3c4fe1165a861027d2cd6b[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Sat Dec 30 16:53:24 2023 +0900
+
+    Feat: 소셜로그인에 필요한 클래스 커스터마이징 및 개발
+
+[33mcommit 6c828bbe32b96749e2da988304f5a6b6e97465d4[m
+Author: kimdozzi <neo5188@gmail.com>
+Date:   Sat Dec 30 16:51:44 2023 +0900
+
+    Feat: Config 수정 및 entity 수정
+
+[33mcommit 264c5e2b37ecb781fdcd2714a6560f114ac7bfe2[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sat Dec 30 02:19:56 2023 +0900
+
+    feat: CORS 처리 필터 추가
+
+[33mcommit 27f54dbc88c2b8b23c9326e9a381b8ec05c087b3[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sat Dec 30 02:16:50 2023 +0900
+
+    feat: Time formatting 파일 추가
+
+[33mcommit 7534ca1d2e3f2b1309058832c58e9fd8bb14b542[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sat Dec 30 02:16:25 2023 +0900
+
+    feat: Response 형식에 따른 타입 통일
+    
+    - 반환하는 값의 형식에 따른 Response DTO 타입 지정
+
+[33mcommit c3fe05f2ffe9888fce0d9d9d93ecf1b8b9c56c55[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Sat Dec 30 02:14:48 2023 +0900
+
+    feat: Exception 클래스 및 ExceptionHandler 클래스 생성
+    
+    - BusinessException: 비지니스 로직에서 발생한 예외를 처리할 때 해당 예외 클래스를 throw
+    - BusinessExceptionHandler : 사용자가 처리한 예외(BusinessException)을 어떻게 처리할 것인지 구현
+    - GlobalExceptionHandler: 개발자가 처리하지 않은 예외가 던져졌을 때 처리되는 부분 -> 추가 처리 필요함을 날리는 곳
+    - ErrorCode: 예외 메시지를 저장하는 Enum 클래스
+
+[33mcommit 3d17f1e8b3c619c49612e6f14489ecb7dc200a35[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 23:59:03 2023 +0900
+
+    hotfix: security 패키지 위치 변경
+
+[33mcommit 86c029e7edddf644018f6b7afc5ebcb7b568a688[m
+Merge: 31a7b79 c24f5bd
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 23:44:15 2023 +0900
+
+    Merge branch 'main' into feat/social-login
+
+[33mcommit 31a7b790c06827303da27af54df70cf141dee8be[m
+Merge: 8ae3e86 8ec6058
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 13:35:45 2023 +0900
+
+    Merge pull request #12 from TeamTheGenius/setting
+    
+    Feat: Spring Security, OAuth 2.0에서 필요한 설정 진행
+
+[33mcommit c24f5bddf9f746e98c2cb88c5468806dbcee984c[m
+Merge: 8ae3e86 29e6938
+Author: HEY <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 13:35:35 2023 +0900
+
+    Merge pull request #13 from TeamTheGenius/common
+    
+    Feat: 소셜로그인에 필요한 User Entity 및 Repository 개발
+
+[33mcommit 29e6938f3642fe13d9884d1b175bfc08023a870b[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 02:21:47 2023 +0900
+
+    feat: 사용자를 이메일, provider를 통해 찾는 기능 개발
+    
+    - JpaRepository 인터페이스를 상속하여 구현
+    - 이메일 / 이메일+provider 를 통해 DB에서 사용자를 찾는 기능 구현
+    - 두 메서드에 대해 단위 테스트 코드 작성
+
+[33mcommit 6bf4468a966d026e7b56c54a2fca0a142ea534eb[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 02:20:07 2023 +0900
+
+    feat: User Entity 추가
+    
+    - JPA를 활용하여 User 엔티티 클래스 작성
+    - BaseTimeEntity 상속
+    - 사용자의 회원가입 여부/ 권한에 대한 정보를 담고 있는 Enum class 작성
+
+[33mcommit 844cedddb9ea95f5cffc7073e62777cb2e9da227[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 02:10:30 2023 +0900
+
+    feat: 공통 필드를 가지고 있는 Entity 추가
+    
+    - 생성시간, 수정시간, 삭제시간 필드를 가지고 있는 공통 Entity 추가
+    - createdDate, modifiedDate 자동 기록을 위해
+    @EnableJpaAuditing 어노테이션 추가
+
+[33mcommit 8ec6058776a0ed0beaa87062b3d9471c1246b7f3[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 01:24:55 2023 +0900
+
+    feat: 서비스에 적용되는 Provider Enum 클래스 생성
+    
+    - 정적 팩토리 메서드를 통해 provider에 맞는 AuthProvider를 반환
+
+[33mcommit 9f887ff18e8e5642c268a60143700eeeb3ca6988[m
+Author: SSung023 <50323157+SSung023@users.noreply.github.com>
+Date:   Fri Dec 29 01:23:23 2023 +0900
+
+    feat: SecurityConfig에서 소셜로그인에 필요한 설정 추가
+    
+    - OAuth2.0을 이용한 소셜로그인에 필요한 설정 추가 (filterChain을 통해 구현)
+    - 실제 객체가 생성되어있지 않아 작성할 수 없는 부분은 주석 처리 (추후 주석 해제  필요)
+    - application-oauth.yml 파일에 소셜로그인에 대한 설정 후, 테스트 시 정상작동 확인
+
+[33mcommit 8ae3e86e7916db6951020743d1ed28c54430cbfa[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Mon Dec 25 21:23:18 2023 +0900
+
+    Update issue templates
+
+[33mcommit 4ca2ccf2d8bdb7d767987cbd53969fae228f3a40[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Mon Dec 25 21:21:38 2023 +0900
+
+    Update issue templates
+
+[33mcommit ed9ef2799075a0ee06beeac6130e1cfd607899cd[m
+Author: DoHyung Kim <neo5188@gmail.com>
+Date:   Mon Dec 25 21:15:11 2023 +0900
+
+    Create pull_request_template.md
+
+[33mcommit 03de9128b78939781f1ba83d4b31b33dcae96474[m[33m ([m[1;31morigin/production[m[33m, [m[1;31morigin/pre-production[m[33m)[m
+Author: SSung023 <hat7206@naver.com>
+Date:   Mon Dec 25 20:48:00 2023 +0900
+
+    init: 프로젝트 초기 세팅
+    
+    - .yml 파일에 DB 추가 세팅 필요
+
+[33mcommit e1c602ff455e6d6cf6eca31f69bf2b03311cc90a[m
+Author: SSung023 <hat7206@naver.com>
+Date:   Mon Dec 25 20:42:34 2023 +0900
+
+    init: 초기 세팅 revert
+
+[33mcommit f033f9991c5722d2ba7f2fd2c65704c243e3e87c[m
+Author: SSung023 <hat7206@naver.com>
+Date:   Mon Dec 25 20:41:23 2023 +0900
+
+    Revert "init: 프로젝트 초기 세팅"
+    
+    This reverts commit ac57c42d0c3241a46bf24c6757518d26b8f822e7.
+
+[33mcommit ac57c42d0c3241a46bf24c6757518d26b8f822e7[m
+Author: SSung023 <hat7206@naver.com>
+Date:   Mon Dec 25 20:40:08 2023 +0900
+
+    init: 프로젝트 초기 세팅
+    
+    - .yml 파일에 DB 추가 세팅 필요

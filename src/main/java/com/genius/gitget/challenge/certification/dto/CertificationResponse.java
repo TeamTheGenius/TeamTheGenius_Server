@@ -1,5 +1,7 @@
 package com.genius.gitget.challenge.certification.dto;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import java.time.DayOfWeek;
@@ -19,19 +21,20 @@ public record CertificationResponse(
         List<String> prLinks
 ) {
 
-    public static CertificationResponse createFail(int currentAttempt, LocalDate certificatedAt) {
+
+    public static CertificationResponse createNonExist(int currentAttempt, LocalDate certificatedAt) {
         return CertificationResponse.builder()
                 .certificationId(0L)
                 .certificationAttempt(currentAttempt)
                 .dayOfWeek(certificatedAt.getDayOfWeek())
                 .certificatedAt(certificatedAt)
-                .certificateStatus(null)
+                .certificateStatus(NOT_YET)
                 .prLinks(null)
                 .prCount(0)
                 .build();
     }
 
-    public static CertificationResponse createSuccess(Certification certification) {
+    public static CertificationResponse createExist(Certification certification) {
         List<String> prLinks = getPrList(certification.getCertificationLinks());
 
         return CertificationResponse.builder()

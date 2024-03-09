@@ -8,6 +8,13 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
+    MEMBER_NOT_UPDATED(HttpStatus.BAD_REQUEST, "유저 정보가 업데이트되지 않았습니다."),
+    LIKES_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 좋아요 목록을 찾을 수 없습니다"),
+    FAILED_POINT_PAYMENT(HttpStatus.BAD_REQUEST, "최소 충전 금액은 100원 이상입니다."),
+    INVALID_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "최초 결제 요청 금액과 일치하지 않습니다."),
+    FAILED_FINAL_PAYMENT(HttpStatus.BAD_REQUEST, "최종 결제가 승인되지 않았습니다"),
+    INVALID_ORDERID(HttpStatus.NOT_FOUND, "해당 주문번호가 존재하지 않습니다."),
+
     TOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 토픽을 찾을 수 없습니다."),
     TOPIC_HAVE_INSTANCE(HttpStatus.BAD_REQUEST, "해당 토픽은 인스턴스를 가지고 있으므로 삭제할 수 없습니다."),
 
@@ -16,6 +23,7 @@ public enum ErrorCode {
     PARTICIPANT_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 참여 정보를 찾을 수 없습니다."),
     CERTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 인증 정보를 찾을 수 없습니다."),
 
+    ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 회원가입이 완료된 사용자입니다."),
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
     DUPLICATED_NICKNAME(HttpStatus.BAD_REQUEST, "이미 존재하는 닉네임입니다."),
     NOT_AUTHENTICATED_USER(HttpStatus.BAD_REQUEST, "인증 가능한 사용자가 아닙니다."),

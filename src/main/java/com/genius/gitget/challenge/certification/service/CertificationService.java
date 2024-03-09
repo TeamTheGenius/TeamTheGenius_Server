@@ -119,10 +119,10 @@ public class CertificationService {
         for (int cur = 1; cur <= curAttempt; cur++) {
             currentDate = currentDate.plusDays(1);
             if (certificationMap.containsKey(cur)) {
-                result.add(CertificationResponse.createSuccess(certificationMap.get(cur)));
+                result.add(CertificationResponse.createExist(certificationMap.get(cur)));
                 continue;
             }
-            result.add(CertificationResponse.createFail(cur, currentDate));
+            result.add(CertificationResponse.createNonExist(cur, currentDate));
         }
 
         return result;
@@ -151,14 +151,14 @@ public class CertificationService {
         //TODO: 리팩토링 시급...
         if (optional.isPresent()) {
             optional.get().updateToPass(targetDate);
-            return CertificationResponse.createSuccess(optional.get());
+            return CertificationResponse.createExist(optional.get());
         }
 
         Certification certification = Certification.createPassed(targetDate);
         certification.setParticipant(participant);
         certificationProvider.save(certification);
 
-        return CertificationResponse.createSuccess(certification);
+        return CertificationResponse.createExist(certification);
     }
 
     private void validatePassCondition(UserItem userItem, Optional<Certification> optional) {
@@ -188,7 +188,7 @@ public class CertificationService {
 
         Certification certification = createOrUpdate(participant, certificationRequest.targetDate(), pullRequests);
 
-        return CertificationResponse.createSuccess(certification);
+        return CertificationResponse.createExist(certification);
     }
 
     private Certification createOrUpdate(Participant participant, LocalDate targetDate, List<String> pullRequests) {

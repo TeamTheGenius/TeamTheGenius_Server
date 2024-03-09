@@ -8,23 +8,34 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class UserInformationResponse {
+public class UserDetailsInformationResponse {
     private String identifier;
     private String nickname;
+    private String information;
+    private Long point;
+    private int progressBar;
     private FileResponse fileResponse;
 
     @Builder
-    public UserInformationResponse(String identifier, String nickname, Files files) {
+    public UserDetailsInformationResponse(String identifier, String nickname, String information, Long point,
+                                          Files files,
+                                          int progressBar) {
         this.identifier = identifier;
         this.nickname = nickname;
+        this.information = information;
+        this.point = point;
         this.fileResponse = convertToFileResponse(Optional.ofNullable(files));
+        this.progressBar = progressBar;
     }
 
-    public static UserInformationResponse createByEntity(User findUser, Files files) {
-        return UserInformationResponse.builder()
+    public static UserDetailsInformationResponse createByEntity(User findUser, Files files, int participantCount) {
+        return UserDetailsInformationResponse.builder()
                 .identifier(findUser.getIdentifier())
                 .nickname(findUser.getNickname())
+                .information(findUser.getInformation())
+                .point(findUser.getPoint())
                 .files(files)
+                .progressBar(participantCount)
                 .build();
     }
 

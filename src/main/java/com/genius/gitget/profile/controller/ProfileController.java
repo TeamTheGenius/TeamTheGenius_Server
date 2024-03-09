@@ -5,8 +5,11 @@ import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
+import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
+import com.genius.gitget.profile.dto.UserInformationRequest;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserInterestResponse;
 import com.genius.gitget.profile.dto.UserPointResponse;
 import com.genius.gitget.profile.dto.UserSignoutRequest;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
@@ -31,11 +34,24 @@ public class ProfileController {
 
     // TODO 마이페이지 - 결제 내역 조회
 
-    // 마이페이지 - 사용자 정보
+    // 마이페이지 - 사용자 상세 정보 조회
     @GetMapping
-    public ResponseEntity<SingleResponse<UserInformationResponse>> getUserInformation(@AuthenticationPrincipal
-                                                                                      UserPrincipal userPrincipal) {
-        UserInformationResponse userInformation = profileService.getUserInformation(userPrincipal.getUser());
+    public ResponseEntity<SingleResponse<UserDetailsInformationResponse>> getUserDetailsInformation(
+            @AuthenticationPrincipal
+            UserPrincipal userPrincipal) {
+        UserDetailsInformationResponse userInformation = profileService.getUserDetailsInformation(
+                userPrincipal.getUser());
+        return ResponseEntity.ok()
+                .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                        userInformation)
+                );
+    }
+
+    // 사용자 정보 조회
+    @PostMapping
+    public ResponseEntity<SingleResponse<UserInformationResponse>> getUserInformation(
+            @RequestBody UserInformationRequest userInformationRequest) {
+        UserInformationResponse userInformation = profileService.getUserInformation(userInformationRequest.getUserId());
         return ResponseEntity.ok()
                 .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
                         userInformation)
@@ -54,6 +70,18 @@ public class ProfileController {
         return ResponseEntity.ok()
                 .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
     }
+
+    // 마이페이지 - 관심사 조회
+    @GetMapping("/interest")
+    public ResponseEntity<SingleResponse<UserInterestResponse>> getUserInterest(
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        UserInterestResponse userInterest = profileService.getUserInterest(userPrincipal.getUser());
+
+        return ResponseEntity.ok()
+                .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                        userInterest));
+    }
+
 
     // 마이페이지 - 관심사 수정
     @PostMapping("/interest")
@@ -80,7 +108,7 @@ public class ProfileController {
     @DeleteMapping
     public ResponseEntity<CommonResponse> deleteUserInformation(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                                 @RequestBody UserSignoutRequest userSignoutRequest) {
-        profileService.deleteUserInformation(userPrincipal.getUser().getIdentifier(), userSignoutRequest.getReason());
+        profileService.deleteUserInformation(userPrincipal.getUser(), userSignoutRequest.getReason());
 
         return ResponseEntity.ok()
                 .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));

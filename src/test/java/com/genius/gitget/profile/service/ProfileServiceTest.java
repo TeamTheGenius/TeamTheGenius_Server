@@ -19,13 +19,16 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserInterestResponse;
 import com.genius.gitget.profile.dto.UserPointResponse;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Rollback
 public class ProfileServiceTest {
-    static User user1;
+    static User user1, user2;
     static Topic topic1;
     static Instance instance1, instance2, instance3;
     @Autowired
@@ -58,7 +61,8 @@ public class ProfileServiceTest {
 
     @BeforeEach
     void setup() {
-        user1 = getSavedUser("neo5188@gmail.com", GITHUB, "alias");
+        user1 = getSavedUser("neo5188@gmail.com", GITHUB, "alias1");
+        user2 = getSavedUser("neo7269@naver.com", GITHUB, "alias2");
 
         topic1 = getSavedTopic("1일 1커밋", "BE");
 
@@ -82,9 +86,24 @@ public class ProfileServiceTest {
     // TODO 챌린지 현황 조회 -> 코드 병합 후 테스트할 것
 
     @Test
+    void 유저_상세_조회() {
+        UserDetailsInformationResponse userDetailsInformation = profileService.getUserDetailsInformation(user1);
+        Assertions.assertThat(userDetailsInformation.getIdentifier()).isEqualTo("neo5188@gmail.com");
+    }
+
+    @Test
     void 유저_조회() {
-        UserInformationResponse userInformation = profileService.getUserInformation(user1);
-        Assertions.assertThat(userInformation.getIdentifier()).isEqualTo("neo5188@gmail.com");
+        List<Long> userIdList = new ArrayList<>();
+        List<User> all = userRepository.findAll();
+        for (User user : all) {
+            Long id = user.getId();
+            userIdList.add(id);
+        }
+
+        for (int i = userIdList.size() - 1; i >= 0; i--) {
+            UserInformationResponse userInformation = profileService.getUserInformation(userIdList.get(i));
+            Assertions.assertThat(userInformation.getNickname()).isEqualTo("alias" + (i + 1));
+        }
     }
 
     @Test
@@ -102,6 +121,14 @@ public class ProfileServiceTest {
     }
 
     @Test
+    void 유저_관심사_조회() {
+        UserInterestResponse userInterest = profileService.getUserInterest(user1);
+        List<String> tags = userInterest.getTags();
+        String join = String.join(",", tags);
+        Assertions.assertThat(join).isEqualTo("BE,FE");
+    }
+
+    @Test
     void 유저_관심사_수정() {
         profileService.updateUserTags(user1,
                 UserTagsUpdateRequest.builder().tags(new ArrayList<>(Arrays.asList("FE", "BE"))).build());
@@ -116,7 +143,7 @@ public class ProfileServiceTest {
         User user = userRepository.findByIdentifier(user1.getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         String userIdentifier = user.getIdentifier();
-        profileService.deleteUserInformation(userIdentifier, "서비스 이용 불편");
+        profileService.deleteUserInformation(user, "서비스 이용 불편");
 
         assertThrows(BusinessException.class,
                 () -> userRepository.findByIdentifier(userIdentifier)
@@ -144,6 +171,7 @@ public class ProfileServiceTest {
                         .identifier(identifier)
                         .providerInfo(providerInfo)
                         .role(Role.ADMIN)
+                        .tags("BE,FE")
                         .nickname(nickname)
                         .build()
         );

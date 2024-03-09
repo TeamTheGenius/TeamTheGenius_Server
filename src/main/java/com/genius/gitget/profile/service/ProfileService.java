@@ -18,11 +18,14 @@ import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
+import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
+import com.genius.gitget.profile.dto.UserInterestResponse;
 import com.genius.gitget.profile.dto.UserPointResponse;
 import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -49,11 +52,20 @@ public class ProfileService {
                 .build();
     }
 
-    // TODO 결제 내역 조회
+    // 사용자 정보 조회
+    public UserInformationResponse getUserInformation(Long userId) {
+        User findUser = getUserById(userId);
+        Files files = getFiles(findUser);
+        if (isProfileFileType(files)) {
+            return UserInformationResponse.createByEntity(findUser, files);
+        } else {
+            return UserInformationResponse.createByEntity(findUser, null);
+        }
+    }
 
-    // 마이페이지 - 사용자 정보 조회
-    public UserInformationResponse getUserInformation(User user) {
-        User findUser = findUser(user.getIdentifier());
+    // 마이페이지 - 사용자 정보 상세 조회
+    public UserDetailsInformationResponse getUserDetailsInformation(User user) {
+        User findUser = getUserByIdentifier(user.getIdentifier());
         int participantCount = 0;
         List<ParticipantInfo> participantInfoList = findUser.getParticipantInfoList();
 
@@ -63,23 +75,19 @@ public class ProfileService {
                 participantCount = (joinResult == SUCCESS) ? participantCount + 1 : participantCount - 1;
             }
         }
-
-        try {
-            Files files = filesRepository.findById(findUser.getId())
-                    .orElseThrow(() -> new BusinessException(ErrorCode.FILE_NOT_EXIST));
-            if (files.getFileType() == FileType.PROFILE) {
-                return UserInformationResponse.entityToDto(findUser, files, participantCount);
-            }
-        } catch (Exception e) {
+        Files files = getFiles(findUser);
+        if (isProfileFileType(files)) {
+            return UserDetailsInformationResponse.createByEntity(findUser, files, participantCount);
+        } else {
+            return UserDetailsInformationResponse.createByEntity(findUser, null, participantCount);
         }
-        return UserInformationResponse.entityToDto(findUser, null, participantCount);
     }
 
     // 마이페이지 - 사용자 정보 수정
     @Transactional
     public void updateUserInformation(User user, UserInformationUpdateRequest userInformationUpdateRequest,
                                       MultipartFile multipartFile, String type) {
-        User findUser = findUser(user.getIdentifier());
+        User findUser = getUserByIdentifier(user.getIdentifier());
         findUser.updateUserInformation(
                 userInformationUpdateRequest.getNickname(),
                 userInformationUpdateRequest.getInformation());
@@ -97,14 +105,14 @@ public class ProfileService {
 
     // 마이페이지 - 회원 탈퇴
     @Transactional
-    public void deleteUserInformation(String identifier, String reason) {
-        User findUser = findUser(identifier);
+    public void deleteUserInformation(User user, String reason) {
+        User findUser = getUserByIdentifier(user.getIdentifier());
         findUser.setFiles(null);
         findUser.deleteLikesList();
         userRepository.deleteById(findUser.getId());
         signoutRepository.save(
                 Signout.builder()
-                        .identifier(identifier)
+                        .identifier(user.getIdentifier())
                         .reason(reason)
                         .build()
         );
@@ -116,17 +124,28 @@ public class ProfileService {
         if (userTagsUpdateRequest.getTags() == null) {
             throw new BusinessException();
         }
-        User findUser = userRepository.findByIdentifier(user.getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-
+        User findUser = getUserByIdentifier(user.getIdentifier());
         String interest = String.join(",", userTagsUpdateRequest.getTags());
         findUser.updateUserTags(interest);
         userRepository.save(findUser);
     }
 
+    // 관심사 조회
+    public UserInterestResponse getUserInterest(User user) {
+        String tags = user.getTags();
+        String[] tagsList = tags.split(",");
+        for (int i = 0; i < tagsList.length; i++) {
+            tagsList[i] = tagsList[i].trim();
+        }
+        List<String> interestList = new ArrayList<>(Arrays.asList(tagsList));
+        return UserInterestResponse.builder()
+                .tags(interestList)
+                .build();
+    }
+
     // 마이페이지 - 챌린지 현황
     public UserChallengeResultResponse getUserChallengeResult(User user) {
-        User findUser = findUser(user.getIdentifier());
+        User findUser = getUserByIdentifier(user.getIdentifier());
         HashMap<JoinResult, List<Long>> participantHashMap = new HashMap<>() {
             {
                 put(FAIL, new ArrayList<>());
@@ -160,9 +179,25 @@ public class ProfileService {
                 .build();
     }
 
-
-    private User findUser(String identifier) {
+    private User getUserByIdentifier(String identifier) {
         return userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    private Files getFiles(User findUser) {
+        if (findUser.getFiles() != null) {
+            return filesRepository.findById(findUser.getFiles().getId()).orElse(null);
+        } else {
+            return null;
+        }
+    }
+
+    private User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+    }
+
+    private static boolean isProfileFileType(Files files) {
+        return files != null && files.getFileType().equals(FileType.PROFILE);
     }
 }

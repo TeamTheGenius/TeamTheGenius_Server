@@ -3,7 +3,6 @@ package com.genius.gitget.challenge.instance.dto.search;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.querydsl.core.annotations.QueryProjection;
-import java.io.IOException;
 import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
@@ -22,16 +21,17 @@ public class InstanceSearchResponse {
     @Builder
     @QueryProjection
     public InstanceSearchResponse(Long topicId, Long instanceId, String keyword, int pointPerPerson,
-                                  int participantCount, Files files) throws IOException {
+                                  int participantCount, Files files) {
         this.topicId = topicId;
         this.instanceId = instanceId;
         this.keyword = keyword;
         this.pointPerPerson = pointPerPerson;
         this.participantCount = participantCount;
+        this.fileResponse = FileResponse.create(Optional.of(files));
         this.fileResponse = convertToFileResponse(Optional.ofNullable(files));
     }
 
-    private static FileResponse convertToFileResponse(Optional<Files> files) throws IOException {
+    private static FileResponse convertToFileResponse(Optional<Files> files) {
         if (files.isEmpty()) {
             return FileResponse.createNotExistFile();
         }

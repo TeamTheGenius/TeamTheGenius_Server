@@ -111,10 +111,15 @@ public class FilesService {
 
     public FileResponse getEncodedFile(Long fileId) {
         Optional<Files> optionalFiles = filesRepository.findById(fileId);
-        if (optionalFiles.isEmpty()) {
-            return FileResponse.createNotExistFile();
-        }
+        return optionalFiles
+                .map(FileResponse::createExistFile)
+                .orElseGet(FileResponse::createNotExistFile);
 
-        return FileResponse.createExistFile(optionalFiles.get());
+    }
+
+    public FileResponse getEncodedFile(Optional<Files> optionalFiles) {
+        return optionalFiles
+                .map(FileResponse::createExistFile)
+                .orElseGet(FileResponse::createNotExistFile);
     }
 }

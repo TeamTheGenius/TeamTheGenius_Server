@@ -61,7 +61,7 @@ class UserControllerTest {
     public void should_return2XX_when_nicknameNotDuplicated() throws Exception {
         mockMvc.perform(get("/api/auth/check-nickname?nickname=" + "nickname"))
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.code").value(SUCCESS.getKey()))
+                .andExpect(jsonPath("$.code").value("OK"))
                 .andExpect(jsonPath("$.resultCode").value(SUCCESS.getStatus().value()))
                 .andExpect(jsonPath("$.message").value(SUCCESS.getMessage()));
     }

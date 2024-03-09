@@ -3,8 +3,8 @@ package com.genius.gitget.global.security.service;
 import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_JWT;
+import static com.genius.gitget.global.util.exception.ErrorCode.JWT_TOKEN_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
-import static com.genius.gitget.global.util.exception.ErrorCode.TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -171,7 +171,7 @@ class JwtServiceTest {
         //then
         assertThatThrownBy(() -> jwtService.resolveTokenFromCookie(request, refreshTokenPrefix))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(TOKEN_NOT_FOUND.getMessage());
+                .hasMessageContaining(JWT_TOKEN_NOT_FOUND.getMessage());
     }
 
     @Test

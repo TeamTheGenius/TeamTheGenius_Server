@@ -1,14 +1,14 @@
 package com.genius.gitget.profile.service;
 
-import static com.genius.gitget.challenge.participantinfo.domain.JoinResult.FAIL;
-import static com.genius.gitget.challenge.participantinfo.domain.JoinResult.PROCESSING;
-import static com.genius.gitget.challenge.participantinfo.domain.JoinResult.SUCCESS;
-import static com.genius.gitget.challenge.participantinfo.domain.JoinStatus.YES;
+import static com.genius.gitget.challenge.participant.domain.JoinResult.FAIL;
+import static com.genius.gitget.challenge.participant.domain.JoinResult.PROCESSING;
+import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
+import static com.genius.gitget.challenge.participant.domain.JoinStatus.YES;
 
 import com.genius.gitget.admin.signout.Signout;
 import com.genius.gitget.admin.signout.SignoutRepository;
-import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
+import com.genius.gitget.challenge.participant.domain.JoinResult;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.domain.FileType;
@@ -44,6 +44,10 @@ public class ProfileService {
     private final FilesService filesService;
     private final SignoutRepository signoutRepository;
 
+    private static boolean isProfileFileType(Files files) {
+        return files != null && files.getFileType().equals(FileType.PROFILE);
+    }
+
     // 포인트 조회
     public UserPointResponse getUserPoint(User user) {
         return UserPointResponse.builder()
@@ -67,7 +71,7 @@ public class ProfileService {
     public UserDetailsInformationResponse getUserDetailsInformation(User user) {
         User findUser = getUserByIdentifier(user.getIdentifier());
         int participantCount = 0;
-        List<ParticipantInfo> participantInfoList = findUser.getParticipantInfoList();
+        List<Participant> participantInfoList = findUser.getParticipantList();
 
         for (int i = 0; i < participantInfoList.size(); i++) {
             if (participantInfoList.get(i).getJoinStatus() == YES) {
@@ -93,11 +97,11 @@ public class ProfileService {
                 userInformationUpdateRequest.getInformation());
 
         if (multipartFile != null) {
-            if (findUser.getFiles() == null) {
+            if (findUser.getFiles().isEmpty()) {
                 Files uploadedFile = filesService.uploadFile(multipartFile, type);
                 findUser.setFiles(uploadedFile);
             } else {
-                filesService.updateFile(findUser.getFiles().getId(), multipartFile);
+                filesService.updateFile(findUser.getFiles().get().getId(), multipartFile);
             }
         }
         userRepository.save(findUser);
@@ -153,7 +157,7 @@ public class ProfileService {
                 put(SUCCESS, new ArrayList<>());
             }
         };
-        List<ParticipantInfo> participantInfoList = findUser.getParticipantInfoList(); // 유저의 참여 정보를 담고 있는 리스트
+        List<Participant> participantInfoList = findUser.getParticipantList(); // 유저의 참여 정보를 담고 있는 리스트
         int participanTotalCount = participantInfoList.size();
 
         for (int i = 0; i < participantInfoList.size(); i++) { // 각 참여 정보를 받아옴.
@@ -185,8 +189,8 @@ public class ProfileService {
     }
 
     private Files getFiles(User findUser) {
-        if (findUser.getFiles() != null) {
-            return filesRepository.findById(findUser.getFiles().getId()).orElse(null);
+        if (findUser.getFiles().isPresent()) {
+            return filesRepository.findById(findUser.getFiles().get().getId()).orElse(null);
         } else {
             return null;
         }
@@ -195,9 +199,5 @@ public class ProfileService {
     private User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    private static boolean isProfileFileType(Files files) {
-        return files != null && files.getFileType().equals(FileType.PROFILE);
     }
 }

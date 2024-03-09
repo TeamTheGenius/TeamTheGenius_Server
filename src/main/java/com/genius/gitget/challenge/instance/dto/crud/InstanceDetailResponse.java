@@ -25,14 +25,7 @@ public record InstanceDetailResponse(Long topicId, Long instanceId, String title
                 .startedAt(instance.getStartedDate())
                 .completedAt(instance.getCompletedDate())
                 .certificationMethod(instance.getCertificationMethod())
-                .fileResponse(convertToFileResponse(files))
+                .fileResponse(FileResponse.create(files))
                 .build();
-    }
-
-    private static FileResponse convertToFileResponse(Optional<Files> files) {
-        if (files.isEmpty()) {
-            return FileResponse.createNotExistFile();
-        }
-        return FileResponse.createExistFile(files.get());
     }
 }

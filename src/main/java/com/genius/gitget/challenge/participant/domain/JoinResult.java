@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.participantinfo.domain;
+package com.genius.gitget.challenge.participant.domain;
 
 import lombok.Getter;
 

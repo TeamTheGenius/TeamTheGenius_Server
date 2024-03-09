@@ -8,11 +8,11 @@ public record FileResponse(
         Long fileId,
         String encodedFile) {
 
-    public static FileResponse create(Optional<Files> files) {
-        if (files.isEmpty()) {
-            return createNotExistFile();
+    public static FileResponse create(Optional<Files> optionalFiles) {
+        if (optionalFiles.isEmpty()) {
+            return FileResponse.createNotExistFile();
         }
-        return createExistFile(files.get());
+        return FileResponse.createExistFile(optionalFiles.get());
     }
 
     public static FileResponse createExistFile(Files files) {

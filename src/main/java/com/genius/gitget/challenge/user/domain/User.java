@@ -2,7 +2,7 @@ package com.genius.gitget.challenge.user.domain;
 
 import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.likes.domain.Likes;
-import com.genius.gitget.challenge.participantinfo.domain.ParticipantInfo;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
@@ -23,10 +23,12 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -46,7 +48,7 @@ public class User extends BaseTimeEntity {
     private List<Likes> likesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<ParticipantInfo> participantInfoList = new ArrayList<>();
+    private List<Participant> participantList = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payment = new ArrayList<>();
@@ -73,6 +75,10 @@ public class User extends BaseTimeEntity {
     @Column(length = 100)
     private String information;
 
+    @Column(columnDefinition = "TEXT")
+    private String githubToken;
+
+    @ColumnDefault(value = "0")
     private Long point = 0L;
 
     @Builder
@@ -86,6 +92,7 @@ public class User extends BaseTimeEntity {
         this.information = information;
     }
 
+    //=== 비지니스 로직 ===//
     public void updateUserInformation(String nickname, String information) {
         this.nickname = nickname;
         this.information = information;
@@ -97,6 +104,19 @@ public class User extends BaseTimeEntity {
 
     public void updateRole(Role role) {
         this.role = role;
+    }
+
+    public void updateGithubPersonalToken(String encryptedToken) {
+        this.githubToken = encryptedToken;
+    }
+
+    public long updatePoints(Long amount) {
+        this.point += amount;
+        return this.point;
+    }
+
+    public Optional<Files> getFiles() {
+        return Optional.ofNullable(this.files);
     }
 
     //=== 연관관계 편의 메서드 ===//

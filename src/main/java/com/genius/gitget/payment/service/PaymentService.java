@@ -69,7 +69,7 @@ public class PaymentService {
 
         User user = userRepository.findByIdentifier(payment.getUser().getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        user.setPoint(payment.getPointAmount());
+        user.updatePoints(payment.getPointAmount());
 
         return result;
     }

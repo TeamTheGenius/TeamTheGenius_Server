@@ -2,8 +2,10 @@ package com.genius.gitget.challenge.user.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.ALREADY_REGISTERED;
 import static com.genius.gitget.global.util.exception.ErrorCode.DUPLICATED_NICKNAME;
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.MEMBER_NOT_FOUND;
 
+import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final EncryptUtil encryptUtil;
 
 
     public User findUserById(Long id) {
@@ -30,6 +33,11 @@ public class UserService {
     public User findUserByIdentifier(String identifier) {
         return userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
+    }
+
+    @Transactional
+    public Long save(User user) {
+        return userRepository.saveAndFlush(user).getId();
     }
 
     @Transactional
@@ -54,6 +62,14 @@ public class UserService {
         }
     }
 
+    public String getGithubToken(User user) {
+        String githubToken = user.getGithubToken();
+        if (githubToken == null || githubToken.isEmpty() || githubToken.isBlank()) {
+            throw new BusinessException(GITHUB_TOKEN_NOT_FOUND);
+        }
+        return encryptUtil.decrypt(githubToken);
+    }
+    
     public void isAlreadyRegistered(User user) {
         if (user.getRole() != Role.NOT_REGISTERED) {
             throw new BusinessException(ALREADY_REGISTERED);

@@ -3,7 +3,7 @@ package com.genius.gitget.challenge.instance.domain;
 
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.certification.util.DateUtil;
-import com.genius.gitget.challenge.hits.domain.Hits;
+import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
 import jakarta.persistence.CascadeType;
@@ -47,7 +47,7 @@ public class Instance {
     private Files files;
 
     @OneToMany(mappedBy = "instance")
-    private List<Hits> hitsList = new ArrayList<>();
+    private List<Likes> likesList = new ArrayList<>();
 
     @OneToMany(mappedBy = "instance")
     private List<Participant> participantList = new ArrayList<>();

@@ -39,7 +39,7 @@ public record InstanceResponse(
                 .notice(instance.getNotice())
                 .certificationMethod(instance.getCertificationMethod())
                 .joinStatus(joinStatus)
-                .hitCount(instance.getHitsList().size())
+                .hitCount(instance.getLikesList().size())
                 .fileResponse(FileResponse.create(instance.getFiles()))
                 .build();
     }

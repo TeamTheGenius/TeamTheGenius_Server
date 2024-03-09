@@ -27,4 +27,5 @@ public class BaseTimeEntity {
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedDate;
+
 }

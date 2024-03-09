@@ -13,21 +13,27 @@ import com.genius.gitget.global.file.dto.CopyDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.util.file.FileTestUtil;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @SpringBootTest
 @Transactional
 @ActiveProfiles({"file"})
 class FileUtilTest {
+    @Autowired
+    private FilesService filesService;
     @Value("${file.upload.path}")
     private String UPLOAD_PATH;
 
@@ -114,6 +120,20 @@ class FileUtilTest {
         //then
         assertThat(copyDTO.fileType()).isEqualTo(INSTANCE);
         assertThat(copyDTO.fileURI()).contains(UPLOAD_PATH);
+    }
+
+    @Test
+    @DisplayName("FileTestUtil을 통해 받은 MultipartFile을 통해 인코딩 파일을 받을 수 있다")
+    public void should_getEncodedFiles() {
+        //given
+        MultipartFile multipartFile = FileTestUtil.getMultipartFile("filename");
+        Files files = filesService.uploadFile(multipartFile, "topic");
+
+        //when
+        String encoded = FileUtil.encodedImage(files);
+
+        //then
+        log.info(encoded);
     }
 
 

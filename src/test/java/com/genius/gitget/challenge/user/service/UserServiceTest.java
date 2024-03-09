@@ -58,6 +58,29 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("사용자가 한 차례 회원가입을 진행한 후, 한 번 더 회원가입을 요청하면 예외가 발생해야 한다.")
+    public void should_throwException_when_requestRegisterAgain() {
+        //given
+        String email = "test@naver.com";
+        saveUnsignedUser();
+        SignupRequest signupRequest = SignupRequest.builder()
+                .identifier(email)
+                .nickname("nickname")
+                .information("information")
+                .interest(List.of("관심사1", "관심사2"))
+                .build();
+
+        //when
+        User user = userService.findUserByIdentifier(email);
+        Long signupUserId = userService.signup(signupRequest);
+
+        //then
+        assertThatThrownBy(() -> userService.signup(signupRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.ALREADY_REGISTERED.getMessage());
+    }
+
+    @Test
     @DisplayName("저장되어 있는 사용자를 PK를 통해 찾을 수 있다.")
     public void should_returnUser_when_passPK() {
         //given

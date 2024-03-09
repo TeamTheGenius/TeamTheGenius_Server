@@ -1,5 +1,6 @@
 package com.genius.gitget.challenge.user.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.ALREADY_REGISTERED;
 import static com.genius.gitget.global.util.exception.ErrorCode.DUPLICATED_NICKNAME;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.MEMBER_NOT_FOUND;
@@ -41,17 +42,18 @@ public class UserService {
 
     @Transactional
     public Long signup(SignupRequest requestUser) {
-        User targetUser = findUserByIdentifier(requestUser.identifier());
+        User user = findUserByIdentifier(requestUser.identifier());
+        isAlreadyRegistered(user);
 
         //TODO: Converter 클래스 만들어서 적용하기
         String interest = String.join(",", requestUser.interest());
 
-        targetUser.updateUser(requestUser.nickname(),
+        user.updateUser(requestUser.nickname(),
                 requestUser.information(),
                 interest);
-        targetUser.updateRole(Role.USER);
+        user.updateRole(Role.USER);
 
-        return targetUser.getId();
+        return user.getId();
     }
 
     public void isNicknameDuplicate(String nickname) {
@@ -66,5 +68,11 @@ public class UserService {
             throw new BusinessException(GITHUB_TOKEN_NOT_FOUND);
         }
         return encryptUtil.decrypt(githubToken);
+    }
+    
+    public void isAlreadyRegistered(User user) {
+        if (user.getRole() != Role.NOT_REGISTERED) {
+            throw new BusinessException(ALREADY_REGISTERED);
+        }
     }
 }

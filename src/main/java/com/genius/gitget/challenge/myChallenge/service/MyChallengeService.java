@@ -150,7 +150,7 @@ public class MyChallengeService {
             rewardPoints = pointPerPerson * 2;
         }
 
-        user.updatePoints(rewardPoints);
+        user.updatePoints((long) rewardPoints);
         double achievementRate = getAchievementRate(instance, participant.getId(), rewardRequest.targetDate());
 
         participant.getRewards(rewardPoints);

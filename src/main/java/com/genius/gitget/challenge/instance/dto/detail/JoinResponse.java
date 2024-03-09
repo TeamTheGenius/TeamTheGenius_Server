@@ -1,8 +1,8 @@
 package com.genius.gitget.challenge.instance.dto.detail;
 
-import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
-import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.JoinResult;
+import com.genius.gitget.challenge.participant.domain.JoinStatus;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import lombok.Builder;
 
 @Builder

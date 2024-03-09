@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.certification.dto;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.dto.FileResponse;
+import java.time.LocalDate;
 import lombok.Builder;
 
 @Builder
@@ -9,7 +10,8 @@ public record InstancePreviewResponse(
         Long instanceId,
         String title,
         int participantCount,
-        String period,
+        LocalDate startDate,
+        LocalDate completedDate,
         int pointPerPerson,
         String certificationMethod,
         FileResponse fileResponse
@@ -20,7 +22,8 @@ public record InstancePreviewResponse(
                 .instanceId(instance.getId())
                 .title(instance.getTitle())
                 .participantCount(instance.getParticipantCount())
-                .period(instance.getStartedDate().toLocalDate() + " ~ " + instance.getCompletedDate().toLocalDate())
+                .startDate(instance.getStartedDate().toLocalDate())
+                .completedDate(instance.getCompletedDate().toLocalDate())
                 .pointPerPerson(instance.getPointPerPerson())
                 .certificationMethod(instance.getCertificationMethod())
                 .fileResponse(fileResponse)

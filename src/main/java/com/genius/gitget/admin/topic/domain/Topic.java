@@ -2,6 +2,7 @@ package com.genius.gitget.admin.topic.domain;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -26,7 +27,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "topic")
 
-public class Topic {
+public class Topic extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "topic_id")

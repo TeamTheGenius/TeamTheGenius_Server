@@ -7,6 +7,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 public final class DateUtil {
+
+    public static int getRemainDaysToStart(LocalDate startDate, LocalDate targetDate) {
+        if (targetDate.isBefore(startDate)) {
+            return (int) ChronoUnit.DAYS.between(targetDate, startDate);
+        }
+        return 0;
+    }
+
     public static int getAttemptCount(LocalDate startDate, LocalDate targetDate) {
         return Math.toIntExact(ChronoUnit.DAYS.between(startDate, targetDate)) + 1;
     }

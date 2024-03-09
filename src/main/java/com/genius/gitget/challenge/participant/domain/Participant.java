@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.participantinfo.domain;
+package com.genius.gitget.challenge.participant.domain;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -30,7 +30,7 @@ import org.hibernate.annotations.DynamicInsert;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
-@Table(name = "participantInfo")
+@Table(name = "participant")
 public class Participant {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,25 +49,31 @@ public class Participant {
     private List<Certification> certificationList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "join_status")
     @NotNull
     @ColumnDefault("'YES'")
     private JoinStatus joinStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "join_result")
     private JoinResult joinResult;
 
     private String repositoryName;
+
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'NO'")
+    private RewardStatus rewardStatus;
+
+    private int rewardPoints;
 
     @Builder
     private Participant(JoinStatus joinStatus, JoinResult joinResult, String repositoryName) {
         this.joinStatus = joinStatus;
         this.joinResult = joinResult;
         this.repositoryName = repositoryName;
+        this.rewardStatus = RewardStatus.NO;
+        this.rewardPoints = 0;
     }
 
-    public static Participant createDefaultParticipantInfo(String repositoryName) {
+    public static Participant createDefaultParticipant(String repositoryName) {
         return Participant.builder()
                 .joinStatus(JoinStatus.YES)
                 .joinResult(JoinResult.PROCESSING)
@@ -76,9 +82,19 @@ public class Participant {
     }
 
     //=== 비지니스 로직 ===//
+    public void joinChallenge() {
+        this.joinStatus = JoinStatus.YES;
+        this.joinResult = JoinResult.PROCESSING;
+    }
+
     public void quitChallenge() {
         this.joinStatus = JoinStatus.NO;
         this.joinResult = JoinResult.FAIL;
+    }
+
+    public void getRewards(int rewardPoints) {
+        this.rewardStatus = RewardStatus.YES;
+        this.rewardPoints = rewardPoints;
     }
 
     public void updateRepository(String repository) {

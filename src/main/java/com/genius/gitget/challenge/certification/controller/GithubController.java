@@ -2,8 +2,8 @@ package com.genius.gitget.challenge.certification.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.challenge.certification.dto.GithubTokenRequest;
-import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
+import com.genius.gitget.challenge.certification.dto.github.GithubTokenRequest;
+import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
 import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
@@ -51,8 +51,19 @@ public class GithubController {
         );
     }
 
+    @GetMapping("/verify/token")
+    public ResponseEntity<CommonResponse> verifyGithubToken(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        githubService.verifyGithubToken(userPrincipal.getUser());
+        
+        return ResponseEntity.ok().body(
+                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
+        );
+    }
+
     @GetMapping("/verify/repository")
-    public ResponseEntity<CommonResponse> registerRepository(
+    public ResponseEntity<CommonResponse> verifyRepository(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String repo
     ) {
@@ -65,7 +76,7 @@ public class GithubController {
     }
 
     @GetMapping("/verify/pull-request")
-    public ResponseEntity<ListResponse<PullRequestResponse>> verify(
+    public ResponseEntity<ListResponse<PullRequestResponse>> verifyPullRequest(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String repo
     ) {

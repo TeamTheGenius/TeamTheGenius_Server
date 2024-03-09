@@ -65,4 +65,32 @@ class DateUtilTest {
         //then
         assertThat(localDate).isEqualTo(LocalDate.of(2024, 8, 30));
     }
+
+    @Test
+    @DisplayName("시작일자과 현재일자를 전달했을 때, 챌린지 시작까지 몇 일 남았는지 구할 수 있다.")
+    public void should_getRemainDays_when_passStartDate() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 3, 10);
+        LocalDate targetDate = LocalDate.of(2024, 3, 1);
+
+        //when
+        int remainDays = DateUtil.getRemainDaysToStart(startDate, targetDate);
+
+        //then
+        assertThat(remainDays).isEqualTo(9);
+    }
+
+    @Test
+    @DisplayName("현재일자가 시작일자보다 더 이후의 날짜일 때, 남은 일수를 0으로 반환한다.")
+    public void should_returnMinus_when_startDateBeforeThenTargetDate() {
+        //given
+        LocalDate targetDate = LocalDate.of(2024, 3, 10);
+        LocalDate startDate = LocalDate.of(2024, 3, 1);
+
+        //when
+        int remainDays = DateUtil.getRemainDaysToStart(startDate, targetDate);
+
+        //then
+        assertThat(remainDays).isEqualTo(0);
+    }
 }

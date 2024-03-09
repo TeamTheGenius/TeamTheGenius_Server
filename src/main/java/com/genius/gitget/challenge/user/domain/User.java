@@ -1,7 +1,8 @@
 package com.genius.gitget.challenge.user.domain;
 
 import com.genius.gitget.challenge.hits.domain.Hits;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.item.domain.UserItem;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
@@ -21,10 +22,12 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -45,6 +48,9 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user")
     private List<Participant> participantList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<UserItem> userItemList = new ArrayList<>();
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -67,6 +73,9 @@ public class User extends BaseTimeEntity {
 
     @Column(columnDefinition = "TEXT")
     private String githubToken;
+
+    @ColumnDefault(value = "0")
+    private Long point;
 
     @Builder
     public User(ProviderInfo providerInfo, String identifier, Role role, String nickname, String information,
@@ -94,6 +103,14 @@ public class User extends BaseTimeEntity {
         this.githubToken = encryptedToken;
     }
 
+    public long updatePoints(int amount) {
+        this.point += amount;
+        return this.point;
+    }
+
+    public Optional<Files> getFiles() {
+        return Optional.ofNullable(this.files);
+    }
 
     //=== 연관관계 편의 메서드 ===//
     public void setFiles(Files files) {

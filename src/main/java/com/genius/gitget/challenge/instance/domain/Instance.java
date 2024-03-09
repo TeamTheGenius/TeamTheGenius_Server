@@ -4,7 +4,7 @@ package com.genius.gitget.challenge.instance.domain;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.hits.domain.Hits;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -97,12 +97,13 @@ public class Instance {
 
     //== 비지니스 로직 ==//
     public void updateInstance(String description, String notice, int pointPerPerson, LocalDateTime startedDate,
-                               LocalDateTime completedDate) {
+                               LocalDateTime completedDate, String certificationMethod) {
         this.description = description;
         this.notice = notice;
         this.pointPerPerson = pointPerPerson;
         this.startedDate = startedDate;
         this.completedDate = completedDate;
+        this.certificationMethod = certificationMethod;
     }
 
     public void updateParticipantCount(int amount) {

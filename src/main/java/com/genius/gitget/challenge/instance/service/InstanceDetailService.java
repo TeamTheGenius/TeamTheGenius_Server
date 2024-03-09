@@ -9,9 +9,9 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
-import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
-import com.genius.gitget.challenge.participantinfo.service.ParticipantProvider;
+import com.genius.gitget.challenge.participant.domain.JoinStatus;
+import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -48,19 +48,21 @@ public class InstanceDetailService {
 
         String repository = joinRequest.repository();
 
-        if (verifyGithub(persistUser, repository) && canJoinChallenge(persistUser, instance)) {
+        if (!verifyGithub(persistUser, repository) || !canJoinChallenge(persistUser, instance)) {
             throw new BusinessException(CAN_NOT_JOIN_INSTANCE);
         }
 
         instance.updateParticipantCount(1);
-        Participant participant = Participant.createDefaultParticipantInfo(repository);
+        Participant participant = Participant.createDefaultParticipant(repository);
         participant.setUserAndInstance(persistUser, instance);
+        participant.joinChallenge();
         return JoinResponse.createJoinResponse(participantProvider.save(participant));
     }
 
     private boolean canJoinChallenge(User user, Instance instance) {
-        return (instance.getProgress() != Progress.PREACTIVITY) ||
-                participantProvider.hasParticipant(user.getId(), instance.getId());
+        boolean b = !participantProvider.hasParticipant(user.getId(), instance.getId());
+        return (instance.getProgress() == Progress.PREACTIVITY) &&
+                !participantProvider.hasParticipant(user.getId(), instance.getId());
     }
 
     private boolean verifyGithub(User user, String repository) {

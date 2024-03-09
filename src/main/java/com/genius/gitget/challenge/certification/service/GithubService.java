@@ -2,7 +2,7 @@ package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_PR_NOT_FOUND;
 
-import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
+import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
@@ -34,6 +34,13 @@ public class GithubService {
         String encryptedToken = encryptUtil.encrypt(githubToken);
         user.updateGithubPersonalToken(encryptedToken);
         userService.save(user);
+    }
+
+    public void verifyGithubToken(User user) {
+        String githubToken = encryptUtil.decrypt(user.getGithubToken());
+
+        GitHub gitHub = githubProvider.getGithubConnection(githubToken);
+        githubProvider.validateGithubConnection(gitHub, user.getIdentifier());
     }
 
     @Transactional

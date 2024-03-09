@@ -2,12 +2,19 @@ package com.genius.gitget.global.file.dto;
 
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FileUtil;
+import java.util.Optional;
 
 public record FileResponse(
         Long fileId,
         String encodedFile) {
-    
-    //REFACTOR: 두 메서드를 하나로 합칠 수 있음
+
+    public static FileResponse create(Optional<Files> optionalFiles) {
+        if (optionalFiles.isEmpty()) {
+            return FileResponse.createNotExistFile();
+        }
+        return FileResponse.createExistFile(optionalFiles.get());
+    }
+
     public static FileResponse createExistFile(Files files) {
         return new FileResponse(files.getId(), FileUtil.encodedImage(files));
     }

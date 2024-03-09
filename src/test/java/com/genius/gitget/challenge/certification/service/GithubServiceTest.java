@@ -7,16 +7,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
-import com.genius.gitget.challenge.certification.dto.PullRequestResponse;
+import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
-import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
+import com.genius.gitget.challenge.participant.domain.JoinResult;
+import com.genius.gitget.challenge.participant.domain.JoinStatus;
+import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -175,7 +175,7 @@ class GithubServiceTest {
 
     @Test
     @DisplayName("특정 레포지토리에 특정 날짜에 생성된 PR 목록을 불러올 수 있다.")
-    public void should_loadPRList_when_tryJoin() throws IOException {
+    public void should_loadPRList_when_tryJoin() {
         //given
         User user = getSavedUser(githubId);
         githubService.registerGithubPersonalToken(user, personalKey);
@@ -189,6 +189,37 @@ class GithubServiceTest {
         //then
         assertThat(pullRequestResponses.size()).isEqualTo(1);
         log.info(pullRequestResponses.get(0).toString());
+    }
+
+    @Test
+    @DisplayName("특정 일자에 특정 브랜치에 PR이 있는지 확인할 수 있다.")
+    public void should_checkPR_when_tryToVerify() {
+        //given
+        User user = getSavedUser(githubId);
+        githubService.registerGithubPersonalToken(user, personalKey);
+
+        LocalDate targetDate = LocalDate.of(2024, 2, 5);
+
+        //when
+        List<PullRequestResponse> pullRequestResponses = githubService.verifyPullRequest(user, targetRepo, targetDate);
+
+        //then
+        assertThat(pullRequestResponses.size()).isNotZero();
+    }
+
+    @Test
+    @DisplayName("PR 검증을 요청했을 때, PR이 해당 브랜치에 존재하지 않는다면 예외를 발생한다.")
+    public void should_throwException_when_PRNotExist() {
+        //given
+        User user = getSavedUser(githubId);
+        githubService.registerGithubPersonalToken(user, personalKey);
+
+        LocalDate targetDate = LocalDate.of(2024, 3, 5);
+
+        //when & then
+        assertThatThrownBy(() -> githubService.verifyPullRequest(user, targetRepo, targetDate))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.GITHUB_PR_NOT_FOUND.getMessage());
     }
 
 

@@ -11,6 +11,7 @@ import lombok.Builder;
 public record InstanceDetailResponse(Long topicId, Long instanceId, String title, String description,
                                      int pointPerPerson,
                                      String tags, String notice, LocalDateTime startedAt, LocalDateTime completedAt,
+                                     String certificationMethod,
                                      FileResponse fileResponse) {
     public static InstanceDetailResponse createByEntity(Instance instance, Optional<Files> files) {
         return InstanceDetailResponse.builder()
@@ -23,14 +24,8 @@ public record InstanceDetailResponse(Long topicId, Long instanceId, String title
                 .notice(instance.getNotice())
                 .startedAt(instance.getStartedDate())
                 .completedAt(instance.getCompletedDate())
-                .fileResponse(convertToFileResponse(files))
+                .certificationMethod(instance.getCertificationMethod())
+                .fileResponse(FileResponse.create(files))
                 .build();
-    }
-
-    private static FileResponse convertToFileResponse(Optional<Files> files) {
-        if (files.isEmpty()) {
-            return FileResponse.createNotExistFile();
-        }
-        return FileResponse.createExistFile(files.get());
     }
 }

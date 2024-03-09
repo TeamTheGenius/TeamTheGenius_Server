@@ -1,5 +1,7 @@
 package com.genius.gitget.challenge.certification.dto;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import java.time.DayOfWeek;
@@ -9,7 +11,7 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record RenewResponse(
+public record CertificationResponse(
         Long certificationId,
         int certificationAttempt,
         DayOfWeek dayOfWeek,
@@ -19,22 +21,22 @@ public record RenewResponse(
         List<String> prLinks
 ) {
 
-    public static RenewResponse createFail(int currentAttempt) {
-        return RenewResponse.builder()
+    public static CertificationResponse createNonExist(int currentAttempt, LocalDate certificatedAt) {
+        return CertificationResponse.builder()
                 .certificationId(0L)
                 .certificationAttempt(currentAttempt)
-                .dayOfWeek(null)
-                .certificatedAt(null)
-                .certificateStatus(null)
+                .dayOfWeek(certificatedAt.getDayOfWeek())
+                .certificatedAt(certificatedAt)
+                .certificateStatus(NOT_YET)
                 .prLinks(null)
                 .prCount(0)
                 .build();
     }
 
-    public static RenewResponse createSuccess(Certification certification) {
+    public static CertificationResponse createExist(Certification certification) {
         List<String> prLinks = getPrList(certification.getCertificationLinks());
 
-        return RenewResponse.builder()
+        return CertificationResponse.builder()
                 .certificationId(certification.getId())
                 .certificationAttempt(certification.getCurrentAttempt())
                 .dayOfWeek(certification.getCertificatedAt().getDayOfWeek())

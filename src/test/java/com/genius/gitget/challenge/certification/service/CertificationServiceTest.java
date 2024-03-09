@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.certification.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
 import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,32 +11,45 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.CertificationInformation;
+import com.genius.gitget.challenge.certification.dto.CertificationRequest;
+import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
-import com.genius.gitget.challenge.certification.dto.RenewRequest;
-import com.genius.gitget.challenge.certification.dto.RenewResponse;
+import com.genius.gitget.challenge.certification.dto.TotalResponse;
+import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.challenge.participantinfo.domain.JoinResult;
-import com.genius.gitget.challenge.participantinfo.domain.JoinStatus;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
+import com.genius.gitget.challenge.item.domain.Item;
+import com.genius.gitget.challenge.item.domain.ItemCategory;
+import com.genius.gitget.challenge.item.domain.UserItem;
+import com.genius.gitget.challenge.item.repository.ItemRepository;
+import com.genius.gitget.challenge.item.repository.UserItemRepository;
+import com.genius.gitget.challenge.participant.domain.JoinResult;
+import com.genius.gitget.challenge.participant.domain.JoinStatus;
+import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.EnumSource.Mode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +70,10 @@ class CertificationServiceTest {
     private ParticipantRepository participantRepository;
     @Autowired
     private CertificationRepository certificationRepository;
+    @Autowired
+    private ItemRepository itemRepository;
+    @Autowired
+    private UserItemRepository userItemRepository;
 
     @Value("${github.personalKey}")
     private String personalKey;
@@ -78,23 +96,23 @@ class CertificationServiceTest {
 
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
 
-        RenewRequest renewRequest = RenewRequest.builder()
+        CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(targetDate)
                 .build();
         instance.updateProgress(Progress.ACTIVITY);
 
         //when
-        RenewResponse renewResponse = certificationService.updateCertification(user,
-                renewRequest);
-        Certification certification = certificationRepository.findById(renewResponse.certificationId())
+        CertificationResponse certificationResponse = certificationService.updateCertification(user,
+                certificationRequest);
+        Certification certification = certificationRepository.findById(certificationResponse.certificationId())
                 .get();
 
         //then
-        assertThat(certification.getId()).isEqualTo(renewResponse.certificationId());
-        assertThat(renewResponse.certificateStatus()).isEqualTo(CERTIFICATED);
-        assertThat(renewResponse.certificatedAt()).isEqualTo(targetDate);
-        assertThat(renewResponse.prCount()).isEqualTo(1);
+        assertThat(certification.getId()).isEqualTo(certificationResponse.certificationId());
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(CERTIFICATED);
+        assertThat(certificationResponse.certificatedAt()).isEqualTo(targetDate);
+        assertThat(certificationResponse.prCount()).isEqualTo(1);
     }
 
     @Test
@@ -106,16 +124,16 @@ class CertificationServiceTest {
         getParticipantInfo(user, instance);
         githubService.registerGithubPersonalToken(user, personalKey);
 
-        LocalDate targetDate = LocalDate.of(2024, 3, 6);
+        LocalDate targetDate = LocalDate.of(2024, 12, 6);
 
-        RenewRequest renewRequest = RenewRequest.builder()
+        CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(targetDate)
                 .build();
         instance.updateProgress(Progress.ACTIVITY);
 
         //when && then
-        assertThatThrownBy(() -> certificationService.updateCertification(user, renewRequest))
+        assertThatThrownBy(() -> certificationService.updateCertification(user, certificationRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(CERTIFICATION_UNABLE.getMessage());
     }
@@ -131,23 +149,23 @@ class CertificationServiceTest {
 
         LocalDate targetDate = LocalDate.of(2024, 2, 6);
 
-        RenewRequest renewRequest = RenewRequest.builder()
+        CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(targetDate)
                 .build();
         instance.updateProgress(Progress.ACTIVITY);
 
         //when
-        RenewResponse renewResponse = certificationService.updateCertification(user,
-                renewRequest);
-        Certification certification = certificationRepository.findById(renewResponse.certificationId())
+        CertificationResponse certificationResponse = certificationService.updateCertification(user,
+                certificationRequest);
+        Certification certification = certificationRepository.findById(certificationResponse.certificationId())
                 .get();
 
         //then
-        assertThat(certification.getId()).isEqualTo(renewResponse.certificationId());
-        assertThat(renewResponse.certificateStatus()).isEqualTo(CertificateStatus.NOT_YET);
-        assertThat(renewResponse.certificatedAt()).isEqualTo(targetDate);
-        assertThat(renewResponse.prCount()).isEqualTo(0);
+        assertThat(certification.getId()).isEqualTo(certificationResponse.certificationId());
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(CertificateStatus.NOT_YET);
+        assertThat(certificationResponse.certificatedAt()).isEqualTo(targetDate);
+        assertThat(certificationResponse.prCount()).isEqualTo(0);
     }
 
     @Test
@@ -192,7 +210,7 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, endDate.minusDays(1), participant);
         getSavedCertification(CERTIFICATED, endDate, participant);
 
-        List<RenewResponse> weekCertification = certificationService.getWeekCertification(
+        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
                 participant.getId(), currentDate);
 
         //then
@@ -215,11 +233,15 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
 
-        List<RenewResponse> weekCertification = certificationService.getWeekCertification(
+        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
                 participant.getId(), currentDate);
 
         //then
         assertThat(weekCertification.size()).isEqualTo(4);
+        assertThat(weekCertification.get(0).certificationAttempt()).isEqualTo(1);
+        assertThat(weekCertification.get(1).certificationAttempt()).isEqualTo(2);
+        assertThat(weekCertification.get(2).certificationAttempt()).isEqualTo(3);
+        assertThat(weekCertification.get(3).certificationAttempt()).isEqualTo(4);
     }
 
     @Test
@@ -230,7 +252,8 @@ class CertificationServiceTest {
         LocalDate endDate = LocalDate.of(2024, 2, 29);
         LocalDate currentDate = LocalDate.of(2024, 2, 8);
 
-        Participant participant = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(getSavedUser(githubId), instance);
 
         //when
         getSavedCertification(NOT_YET, startDate, participant);
@@ -238,11 +261,12 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
 
-        List<RenewResponse> certification = certificationService.getTotalCertification(participant.getId(),
+        TotalResponse totalResponse = certificationService.getTotalCertification(participant.getId(),
                 currentDate);
 
         //then
-        assertThat(certification.size()).isEqualTo(8);
+        assertThat(totalResponse.certifications().size()).isEqualTo(8);
+        assertThat(totalResponse.totalAttempts()).isEqualTo(instance.getTotalAttempt());
     }
 
     @Test
@@ -261,31 +285,256 @@ class CertificationServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 참여한 챌린지에 대해 전반적인 현황을 받을 수 있다.")
-    public void should_getInformation_when_participate() {
+    @DisplayName("사용자가 참여한 챌린지가 아직 시작 전이라면, 성공/실패의 값이 모두 0이어야한다.")
+    public void should_getInformation_when_progressIsPreActivity() {
         //given
-        LocalDate startDate = LocalDate.of(2024, 2, 1);
-        LocalDate endDate = LocalDate.of(2024, 2, 29);
         LocalDate targetDate = LocalDate.of(2024, 2, 8);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         Participant participant = getParticipantInfo(user, instance);
 
         //when
-        getSavedCertification(NOT_YET, startDate, participant);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
         CertificationInformation information = certificationService.getCertificationInformation(instance,
                 participant, targetDate);
 
         //then
         assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
-        assertThat(information.remainCount()).isEqualTo(information.totalAttempt() - information.currentAttempt());
-        assertThat(information.totalAttempt()).isEqualTo(29);
+        assertThat(information.remainCount()).isEqualTo(information.totalAttempt());
+        assertThat(information.totalAttempt()).isEqualTo(instance.getTotalAttempt());
+        assertThat(information.currentAttempt()).isEqualTo(0);
+        assertThat(information.successCount()).isEqualTo(0);
+        assertThat(information.failureCount()).isEqualTo(0);
+        assertThat(information.remainCount()).isEqualTo(instance.getTotalAttempt());
+    }
+
+    @Test
+    @DisplayName("사용자가 참여한 챌린지가 진행 중이라면, 성공/실패/남은 일자의 값의 제대로 나와야 한다.")
+    public void should_getInformation_when_progressIsActivity() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate targetDate = LocalDate.of(2024, 2, 8);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+
+        //when
+        instance.updateProgress(Progress.ACTIVITY);
+        getSavedCertification(NOT_YET, startDate, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
+        getSavedCertification(PASSED, startDate.plusDays(6), participant);
+        CertificationInformation information = certificationService.getCertificationInformation(instance,
+                participant, targetDate);
+
+        //then
+        assertThat(information.repository()).isEqualTo(participant.getRepositoryName());
+        assertThat(information.totalAttempt()).isEqualTo(instance.getTotalAttempt());
         assertThat(information.currentAttempt()).isEqualTo(8);
+        assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
         assertThat(information.successCount()).isEqualTo(3);
-        assertThat(information.failureCount()).isEqualTo(information.currentAttempt() - information.successCount());
+        assertThat(information.failureCount()).isEqualTo(information.currentAttempt() - 3);
+        assertThat(information.remainCount()).isEqualTo(instance.getTotalAttempt() - 8);
+    }
+
+    @Test
+    @DisplayName("사용자가 참여한 챌린지가 완료이라면, 성공/실패/남은 일자의 값의 제대로 나와야 한다.")
+    public void should_getInformation_when_progressIsDone() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 2, 1);
+        LocalDate targetDate = LocalDate.of(2024, 2, 8);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+
+        //when
+        instance.updateProgress(Progress.DONE);
+        getSavedCertification(NOT_YET, startDate, participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
+        getSavedCertification(PASSED, startDate.plusDays(6), participant);
+        CertificationInformation information = certificationService.getCertificationInformation(instance,
+                participant, targetDate);
+
+        //then
+        assertThat(information.repository()).isEqualTo(participant.getRepositoryName());
+        assertThat(information.totalAttempt()).isEqualTo(instance.getTotalAttempt());
+        assertThat(information.currentAttempt()).isEqualTo(instance.getTotalAttempt());
+        assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(information.successCount()).isEqualTo(3);
+        assertThat(information.failureCount()).isEqualTo(information.totalAttempt() - 3);
+        assertThat(information.remainCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("챌린지에 참여한 모든 사용자들의 일주일 간 인증 현황을 받아올 수 있다. 단, 본인의 값을 제외한다.")
+    public void should_getWeekCertification_aboutAllParticipants() {
+        //given
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        LocalDate currentDate = LocalDate.of(2024, 3, 6);
+        User user1 = getSavedUser(githubId, "nickname1");
+        User user2 = getSavedUser(githubId, "nickname2");
+        Instance instance = getSavedInstance();
+        Participant participant1 = getParticipantInfo(user1, instance);
+        Participant participant2 = getParticipantInfo(user2, instance);
+
+        //when
+        Slice<WeekResponse> certification = certificationService.getAllWeekCertification(
+                user1.getId(), instance.getId(), currentDate, pageRequest);
+
+        //then
+        assertThat(certification.getContent().size()).isEqualTo(1);
+        assertThat(certification.getContent().get(0).certifications().size()).isEqualTo(3);
+    }
+
+    @Test
+    @DisplayName("아직 인증을 하지 않았고, 패스 아이템이 있을 때 해당 일자의 인증을 패스할 수 있다.")
+    public void should_passCertification_when_conditionIsValid() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(currentDate)
+                .build();
+
+        //when
+        getSavedCertification(NOT_YET, currentDate, participant);
+        getSavedCertification(CERTIFICATED, currentDate.plusDays(1), participant);
+        getSavedCertification(CERTIFICATED, currentDate.plusDays(4), participant);
+        getSavedCertification(CERTIFICATED, currentDate.plusDays(6), participant);
+
+        CertificationResponse certificationResponse = certificationService.passCertification(
+                user.getId(),
+                certificationRequest);
+
+        //then
+        assertThat(certificationResponse.certificationId()).isNotNull();
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(CertificateStatus.PASSED);
+        assertThat(certificationResponse.certificatedAt()).isEqualTo(currentDate);
+        assertThat(certificationResponse.prCount()).isEqualTo(0);
+        assertThat(certificationResponse.prLinks()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("UserItem 정보가 DB에 존재하지 않을 때 인증 패스를 요청하면 예외가 발생해야 한다.")
+    public void should_throwException_when_userItemInfoNotExist() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(currentDate)
+                .build();
+
+        //when
+        getSavedCertification(NOT_YET, currentDate, participant);
+
+        //then
+        assertThatThrownBy(() -> certificationService.passCertification(instance.getId(), certificationRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.USER_ITEM_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("UserItem 정보는 있으나 아이템의 개수가 0 이하일 때 인증 패스를 요청하면 예외가 발생해야 한다.")
+    public void should_throwException_when_outOfStock() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 0);
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(currentDate)
+                .build();
+
+        //when && then
+        assertThatThrownBy(() -> certificationService.passCertification(instance.getId(), certificationRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.USER_ITEM_NOT_FOUND.getMessage());
+    }
+
+    @ParameterizedTest
+    @DisplayName("패스 아이템은 있으나, 챌린지가 인증 필요 상태가 아니라면 예외가 발생해야 한다.")
+    @EnumSource(mode = Mode.INCLUDE, names = {"CERTIFICATED", "PASSED"})
+    public void should_throwException_when_challengeIsNotNOT_YET(CertificateStatus certificateStatus) {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(currentDate)
+                .build();
+
+        //when
+        getSavedCertification(certificateStatus, currentDate, participant);
+
+        //then
+        assertThatThrownBy(() -> certificationService.passCertification(user.getId(), certificationRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.CAN_NOT_USE_PASS_ITEM.getMessage());
+    }
+
+    @Test
+    @DisplayName("패스 아이템을 사용할 수 있고, 기존에 인증을 한 차례 시도했다면 PASSED로 데이터가 덮어진다.")
+    public void should_overwriteData_when_certificatedBefore() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(currentDate)
+                .build();
+
+        //when
+        getSavedCertification(NOT_YET, currentDate, participant);
+        CertificationResponse certificationResponse = certificationService.passCertification(user.getId(),
+                certificationRequest);
+
+        //then
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(PASSED);
+        assertThat(certificationResponse.certificationId()).isNotZero();
+        assertThat(certificationResponse.prCount()).isZero();
+        assertThat(certificationResponse.prLinks().size()).isZero();
+        assertThat(certificationResponse.certificatedAt()).isEqualTo(currentDate);
+    }
+
+    @Test
+    @DisplayName("패스 아이템을 가지고 있고, 이전에 인증을 한차례도 시도하지 않았을 때에도 아이템 사용이 가능하다")
+    public void should_usePassItem_when_conditionIsValid() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getParticipantInfo(user, instance);
+        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(currentDate)
+                .build();
+
+        //when
+        CertificationResponse certificationResponse = certificationService.passCertification(user.getId(),
+                certificationRequest);
+
+        //then
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(PASSED);
+        assertThat(certificationResponse.certificationId()).isNotZero();
+        assertThat(certificationResponse.prCount()).isZero();
+        assertThat(certificationResponse.prLinks().size()).isZero();
+        assertThat(certificationResponse.certificatedAt()).isEqualTo(currentDate);
     }
 
 
@@ -302,12 +551,25 @@ class CertificationServiceTest {
         );
     }
 
+    private User getSavedUser(String githubId, String nickname) {
+        return userRepository.save(
+                User.builder()
+                        .role(Role.USER)
+                        .nickname(nickname)
+                        .providerInfo(ProviderInfo.GITHUB)
+                        .identifier(githubId)
+                        .information("information")
+                        .tags("BE,FE")
+                        .build()
+        );
+    }
+
     private Instance getSavedInstance() {
         return instanceRepository.save(
                 Instance.builder()
                         .progress(Progress.PREACTIVITY)
-                        .startedDate(LocalDateTime.of(2024, 2, 1, 11, 3))
-                        .completedDate(LocalDateTime.of(2024, 2, 29, 23, 59))
+                        .startedDate(LocalDateTime.of(2024, 2, 1, 0, 0))
+                        .completedDate(LocalDateTime.of(2024, 3, 29, 0, 0))
                         .build()
         );
     }
@@ -337,5 +599,15 @@ class CertificationServiceTest {
                 .build();
         certification.setParticipant(participant);
         return certificationRepository.save(certification);
+    }
+
+    private UserItem getSavedUserItem(User user, ItemCategory itemCategory, int count) {
+        Item item = itemRepository.save(Item.builder()
+                .itemCategory(itemCategory)
+                .build());
+        UserItem userItem = new UserItem(count);
+        userItem.setItem(item);
+        userItem.setUser(user);
+        return userItemRepository.save(userItem);
     }
 }

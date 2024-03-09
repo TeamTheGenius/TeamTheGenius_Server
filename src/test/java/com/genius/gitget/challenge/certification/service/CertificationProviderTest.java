@@ -9,8 +9,8 @@ import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.challenge.participantinfo.domain.Participant;
-import com.genius.gitget.challenge.participantinfo.repository.ParticipantRepository;
+import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -95,7 +95,7 @@ class CertificationProviderTest {
         getSavedCertification(endDate.minusDays(2), CERTIFICATED, "link1", participant);
 
         //when
-        int certificated = certificationProvider.countCertificatedByStatus(participant.getId(), CERTIFICATED,
+        int certificated = certificationProvider.countByStatus(participant.getId(), CERTIFICATED,
                 endDate);
 
         //then
@@ -120,6 +120,27 @@ class CertificationProviderTest {
         assertThat(certification.getCertificatedAt()).isEqualTo(targetDate);
     }
 
+    @Test
+    @DisplayName("인증과 관련된 정보를 전달했을 때, 객체의 정보를 업데이트할 수 있다.")
+    public void should_update_when_passInfo() {
+        //given
+        User user = getSavedUser();
+        Instance instance = getSavedInstance();
+        Participant participant = getSavedParticipant(user, instance);
+        LocalDate targetDate = LocalDate.of(2024, 2, 1);
+        Certification certification = getSavedCertification(targetDate, NOT_YET, "", participant);
+        List<String> pullRequests = List.of("pr link1", "pr link2");
+
+        //when
+        Certification updatedCertification = certificationProvider.update(certification, targetDate, pullRequests);
+
+        //then
+        assertThat(updatedCertification.getId()).isEqualTo(certification.getId());
+        assertThat(updatedCertification.getCertificatedAt()).isEqualTo(targetDate);
+        assertThat(updatedCertification.getCertificationStatus()).isEqualTo(CERTIFICATED);
+        assertThat(updatedCertification.getCertificationLinks()).isEqualTo("pr link1,pr link2,");
+    }
+
     private Certification getSavedCertification(LocalDate certificatedAt, CertificateStatus status,
                                                 String link, Participant participant) {
         Certification certification = certificationProvider.save(
@@ -135,7 +156,7 @@ class CertificationProviderTest {
 
     private Participant getSavedParticipant(User user, Instance instance) {
         Participant participant = participantRepository.save(
-                Participant.createDefaultParticipantInfo("repo")
+                Participant.createDefaultParticipant("repo")
         );
         participant.setUserAndInstance(user, instance);
         return participant;
@@ -143,7 +164,7 @@ class CertificationProviderTest {
 
     private Participant getSavedParticipant(Instance instance) {
         Participant participant = participantRepository.save(
-                Participant.createDefaultParticipantInfo("repo")
+                Participant.createDefaultParticipant("repo")
         );
         participant.setUserAndInstance(null, instance);
         return participant;

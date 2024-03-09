@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.certification.dto;
+package com.genius.gitget.challenge.certification.dto.github;
 
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;

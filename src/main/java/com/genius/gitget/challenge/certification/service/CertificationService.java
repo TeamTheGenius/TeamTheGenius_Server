@@ -186,9 +186,7 @@ public class CertificationService {
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
 
-        if (!canCertificate(instance, certificationRequest.targetDate())) {
-            throw new BusinessException(CERTIFICATION_UNABLE);
-        }
+        validCertificationCondition(instance, certificationRequest.targetDate());
 
         List<String> pullRequests = getPullRequestLink(
                 gitHub,
@@ -209,11 +207,13 @@ public class CertificationService {
         return certificationProvider.createCertification(participant, targetDate, pullRequests);
     }
 
-    private boolean canCertificate(Instance instance, LocalDate targetDate) {
+    private void validCertificationCondition(Instance instance, LocalDate targetDate) {
         boolean isValidPeriod = targetDate.isAfter(instance.getStartedDate().toLocalDate()) &&
                 targetDate.isBefore(instance.getCompletedDate().toLocalDate());
 
-        return ((instance.getProgress() == Progress.ACTIVITY) && isValidPeriod);
+        if ((instance.getProgress() != Progress.ACTIVITY) || !isValidPeriod) {
+            throw new BusinessException(CERTIFICATION_UNABLE);
+        }
     }
 
     private List<String> getPullRequestLink(GitHub gitHub, String repositoryName, LocalDate targetDate) {

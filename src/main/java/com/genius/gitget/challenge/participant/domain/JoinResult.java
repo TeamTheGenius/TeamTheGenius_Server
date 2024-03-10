@@ -4,5 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum JoinResult {
-    FAIL, SUCCESS, PROCESSING
+    READY,
+    PROCESSING,
+    FAIL,
+    SUCCESS
 }

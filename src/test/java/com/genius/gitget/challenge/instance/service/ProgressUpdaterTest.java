@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
+import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
+import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
@@ -17,21 +19,30 @@ import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @SpringBootTest
 @Transactional
+@ActiveProfiles({"github"})
 class ProgressUpdaterTest {
     @Autowired
+    private InstanceDetailService instanceDetailService;
+    @Autowired
     private ProgressUpdater progressUpdater;
+    @Autowired
+    private GithubService githubService;
     @Autowired
     private InstanceRepository instanceRepository;
     @Autowired
@@ -43,6 +54,13 @@ class ProgressUpdaterTest {
     @Autowired
     private InstanceProvider instanceProvider;
 
+    @Value("${github.personalKey}")
+    private String personalKey;
+    @Value("${github.githubId}")
+    private String githubId;
+    @Value("${github.repository}")
+    private String targetRepo;
+
     @Test
     @DisplayName("PRE_ACTIVITY 인스턴스들 중, 특정 조건에 해당하는 인스턴스들을 ACTIVITY로 상태를 바꿀 수 있다.")
     public void should_updateToActivity_when_conditionMatches() {
@@ -51,18 +69,33 @@ class ProgressUpdaterTest {
         LocalDate completedDate = LocalDate.of(2024, 3, 30);
         LocalDate currentDate = LocalDate.of(2024, 3, 6);
 
-        getSavedInstance(startedDate, completedDate);
+        User user = getSavedUser("nickname1", githubId);
+        Instance instance1 = getSavedInstance(startedDate, completedDate);
         getSavedInstance(startedDate, completedDate);
         getSavedInstance(startedDate, completedDate);
 
+        githubService.registerGithubPersonalToken(user, personalKey);
+        instanceDetailService.joinNewChallenge(
+                user,
+                JoinRequest.builder()
+                        .repository(targetRepo)
+                        .instanceId(instance1.getId())
+                        .build()
+        );
+
+        Participant participant1 = participantRepository.findByJoinInfo(user.getId(), instance1.getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.PARTICIPANT_NOT_FOUND));
+
         //when
         List<Instance> preActivities = instanceProvider.findAllByProgress(Progress.PREACTIVITY);
+        assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.READY);
         progressUpdater.updateToActivity(currentDate);
         List<Instance> activities = instanceProvider.findAllByProgress(Progress.ACTIVITY);
 
         //then
         assertThat(preActivities.size()).isEqualTo(3);
         assertThat(activities.size()).isEqualTo(3);
+        assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.PROCESSING);
     }
 
     @Test
@@ -160,6 +193,19 @@ class ProgressUpdaterTest {
         );
         participant.setUserAndInstance(user, instance);
         return participant;
+    }
+
+    private User getSavedUser(String nickname, String githubId) {
+        return userRepository.save(
+                User.builder()
+                        .role(Role.USER)
+                        .nickname(nickname)
+                        .providerInfo(ProviderInfo.GITHUB)
+                        .identifier(githubId)
+                        .information("information")
+                        .tags("BE,FE")
+                        .build()
+        );
     }
 
     private User getSavedUser(String nickname) {

@@ -20,7 +20,7 @@ public enum ErrorCode {
 
     INVALID_INSTANCE_DATE(HttpStatus.BAD_REQUEST, "인스턴스 생성/종료 일자는 현재 일자 이후여야 합니다."),
     INSTANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 인스턴스를 찾을 수 없습니다."),
-    PARTICIPANT_INFO_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 참여 정보를 찾을 수 없습니다."),
+    PARTICIPANT_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 참여 정보를 찾을 수 없습니다."),
     CERTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 인증 정보를 찾을 수 없습니다."),
 
     ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, "이미 회원가입이 완료된 사용자입니다."),

@@ -31,8 +31,15 @@ public class ProgressUpdater {
             LocalDate completedDate = preActivity.getCompletedDate().toLocalDate();
 
             if (currentDate.isAfter(startedDate) && currentDate.isBefore(completedDate)) {
-                preActivity.updateProgress(Progress.ACTIVITY);
+                updateActivityInstance(preActivity);
             }
+        }
+    }
+
+    private void updateActivityInstance(Instance preActivity) {
+        preActivity.updateProgress(Progress.ACTIVITY);
+        for (Participant participant : preActivity.getParticipantList()) {
+            participant.updateJoinResult(JoinResult.PROCESSING);
         }
     }
 
@@ -47,12 +54,12 @@ public class ProgressUpdater {
             LocalDate completedDate = instance.getCompletedDate().toLocalDate();
 
             if (currentDate.isAfter(startedDate) && currentDate.isAfter(completedDate)) {
-                updateParticipants(instance, currentDate);
+                updateDoneInstance(instance, currentDate);
             }
         }
     }
 
-    private void updateParticipants(Instance instance, LocalDate currentDate) {
+    private void updateDoneInstance(Instance instance, LocalDate currentDate) {
         instance.updateProgress(Progress.DONE);
         for (Participant participant : instance.getParticipantList()) {
             int totalAttempt = instance.getTotalAttempt();

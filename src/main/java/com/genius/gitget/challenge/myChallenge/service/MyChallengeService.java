@@ -63,7 +63,6 @@ public class MyChallengeService {
         return preActivity;
     }
 
-    //TODO: 사용자의 달성률이 85%가 되지 않았을 때에는 joinResult가 Fail이어야 함
     public List<DoneResponse> getDoneInstances(User user, LocalDate targetDate) {
         List<DoneResponse> done = new ArrayList<>();
         List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.DONE);

@@ -77,7 +77,7 @@ class InstanceDetailServiceTest {
 
         //then
         assertThat(joinResponse.joinStatus()).isEqualTo(JoinStatus.YES);
-        assertThat(joinResponse.joinResult()).isEqualTo(JoinResult.PROCESSING);
+        assertThat(joinResponse.joinResult()).isEqualTo(JoinResult.READY);
         assertThat(instance.getParticipantCount()).isEqualTo(1);
     }
 

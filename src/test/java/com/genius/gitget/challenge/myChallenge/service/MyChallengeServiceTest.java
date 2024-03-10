@@ -22,6 +22,7 @@ import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.challenge.participant.domain.RewardStatus;
 import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
@@ -207,6 +208,7 @@ class MyChallengeServiceTest {
                 Participant.builder()
                         .joinResult(joinResult)
                         .joinStatus(JoinStatus.YES)
+                        .rewardStatus(RewardStatus.NO)
                         .build()
         );
         participant.setUserAndInstance(user, instance);

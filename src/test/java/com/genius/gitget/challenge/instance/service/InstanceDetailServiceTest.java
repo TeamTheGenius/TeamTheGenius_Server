@@ -3,7 +3,7 @@ package com.genius.gitget.challenge.instance.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_JOIN_INSTANCE;
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_QUIT_INSTANCE;
 import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOUND;
-import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_INFO_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -202,7 +202,7 @@ class InstanceDetailServiceTest {
         //when & then
         assertThatThrownBy(() -> instanceDetailService.quitChallenge(savedUser, savedInstance.getId()))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(PARTICIPANT_INFO_NOT_FOUND.getMessage());
+                .hasMessageContaining(PARTICIPANT_NOT_FOUND.getMessage());
     }
 
     @Test

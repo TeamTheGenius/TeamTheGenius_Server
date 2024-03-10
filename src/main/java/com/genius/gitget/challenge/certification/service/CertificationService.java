@@ -154,6 +154,8 @@ public class CertificationService {
 
         validatePassCondition(userItem, optional);
 
+        userItem.useItem();
+
         //TODO: 리팩토링 시급...
         if (optional.isPresent()) {
             Certification certification = optional.get();

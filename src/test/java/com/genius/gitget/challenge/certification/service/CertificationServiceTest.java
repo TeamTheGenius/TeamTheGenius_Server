@@ -420,6 +420,7 @@ class CertificationServiceTest {
         assertThat(activatedResponse.numOfPassItem()).isEqualTo(0);
         assertThat(activatedResponse.canUsePassItem()).isFalse();
         assertThat(activatedResponse.fileResponse()).isNotNull();
+        assertThat(userItem.getCount()).isEqualTo(0);
     }
 
     @Test

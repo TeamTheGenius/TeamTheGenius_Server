@@ -3,8 +3,8 @@ package com.genius.gitget.challenge.certification.service;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
-import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.NOT_CERTIFICATE_PERIOD;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -136,7 +136,7 @@ class CertificationServiceTest {
         //when && then
         assertThatThrownBy(() -> certificationService.updateCertification(user, certificationRequest))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(CERTIFICATION_UNABLE.getMessage());
+                .hasMessageContaining(NOT_CERTIFICATE_PERIOD.getMessage());
     }
 
     @Test
@@ -402,6 +402,7 @@ class CertificationServiceTest {
                 .build();
 
         //when
+        instance.updateProgress(Progress.ACTIVITY);
         getSavedCertification(NOT_YET, currentDate, participant);
         getSavedCertification(CERTIFICATED, currentDate.plusDays(1), participant);
         getSavedCertification(CERTIFICATED, currentDate.plusDays(4), participant);
@@ -459,6 +460,8 @@ class CertificationServiceTest {
                 .targetDate(currentDate)
                 .build();
 
+        instance.updateProgress(Progress.ACTIVITY);
+
         //when && then
         assertThatThrownBy(() -> certificationService.passCertification(instance.getId(), certificationRequest))
                 .isInstanceOf(BusinessException.class)
@@ -481,6 +484,7 @@ class CertificationServiceTest {
                 .build();
 
         //when
+        instance.updateProgress(Progress.ACTIVITY);
         getSavedCertification(certificateStatus, currentDate, participant);
 
         //then
@@ -504,6 +508,7 @@ class CertificationServiceTest {
                 .build();
 
         //when
+        instance.updateProgress(Progress.ACTIVITY);
         getSavedCertification(NOT_YET, currentDate, participant);
         ActivatedResponse activatedResponse = certificationService.passCertification(user.getId(),
                 certificationRequest);
@@ -534,6 +539,7 @@ class CertificationServiceTest {
                 .build();
 
         //when
+        instance.updateProgress(Progress.ACTIVITY);
         ActivatedResponse activatedResponse = certificationService.passCertification(user.getId(),
                 certificationRequest);
 

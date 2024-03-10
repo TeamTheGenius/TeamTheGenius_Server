@@ -3,7 +3,6 @@ package com.genius.gitget.challenge.certification.service;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
-import static com.genius.gitget.global.util.exception.ErrorCode.CERTIFICATION_UNABLE;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.CertificationInformation;
@@ -152,6 +151,7 @@ public class CertificationService {
         UserItem userItem = userItemProvider.findUserItemByUser(userId, ItemCategory.CERTIFICATION_PASSER);
         Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
 
+        validCertificationCondition(instance, targetDate);
         validatePassCondition(userItem, optional);
 
         userItem.useItem();
@@ -210,11 +210,14 @@ public class CertificationService {
     }
 
     private void validCertificationCondition(Instance instance, LocalDate targetDate) {
+        if (instance.getProgress() != Progress.ACTIVITY) {
+            throw new BusinessException(ErrorCode.NOT_ACTIVITY_INSTANCE);
+        }
+
         boolean isValidPeriod = targetDate.isAfter(instance.getStartedDate().toLocalDate()) &&
                 targetDate.isBefore(instance.getCompletedDate().toLocalDate());
-
-        if ((instance.getProgress() != Progress.ACTIVITY) || !isValidPeriod) {
-            throw new BusinessException(CERTIFICATION_UNABLE);
+        if (!isValidPeriod) {
+            throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
         }
     }
 

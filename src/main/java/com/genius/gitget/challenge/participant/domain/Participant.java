@@ -65,28 +65,26 @@ public class Participant {
     private int rewardPoints;
 
     @Builder
-    private Participant(JoinStatus joinStatus, JoinResult joinResult, String repositoryName) {
+    private Participant(JoinStatus joinStatus, JoinResult joinResult, String repositoryName,
+                        RewardStatus rewardStatus, int rewardPoints) {
         this.joinStatus = joinStatus;
         this.joinResult = joinResult;
         this.repositoryName = repositoryName;
-        this.rewardStatus = RewardStatus.NO;
-        this.rewardPoints = 0;
+        this.rewardStatus = rewardStatus;
+        this.rewardPoints = rewardPoints;
     }
 
     public static Participant createDefaultParticipant(String repositoryName) {
         return Participant.builder()
                 .joinStatus(JoinStatus.YES)
-                .joinResult(JoinResult.PROCESSING)
+                .joinResult(JoinResult.READY)
                 .repositoryName(repositoryName)
+                .rewardStatus(RewardStatus.NO)
+                .rewardPoints(0)
                 .build();
     }
 
     //=== 비지니스 로직 ===//
-    public void joinChallenge() {
-        this.joinStatus = JoinStatus.YES;
-        this.joinResult = JoinResult.PROCESSING;
-    }
-
     public void quitChallenge() {
         this.joinStatus = JoinStatus.NO;
         this.joinResult = JoinResult.FAIL;

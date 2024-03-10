@@ -23,14 +23,18 @@ public final class DateUtil {
         int weekAttempt = targetDate.getDayOfWeek().ordinal() + 1;
         int totalAttempt = getAttemptCount(challengeStartDate, targetDate);
 
-        if ((challengeStartDate.getDayOfWeek() != DayOfWeek.MONDAY) && (totalAttempt < 8)) {
+        if (isNotStartWithMonday(challengeStartDate, targetDate)) {
             return totalAttempt;
         }
 
         return weekAttempt;
     }
 
-    public static LocalDate getWeekStartDate(LocalDate currentDate) {
+    public static LocalDate getWeekStartDate(LocalDate challengeStartDate, LocalDate currentDate) {
+        if (isNotStartWithMonday(challengeStartDate, currentDate)) {
+            return challengeStartDate;
+        }
+
         return currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
     }
 
@@ -39,6 +43,15 @@ public final class DateUtil {
                 date.toInstant(),
                 ZoneId.of("Asia/Seoul")
         );
+    }
+
+    private static boolean isNotStartWithMonday(LocalDate challengeStartDate, LocalDate currentDate) {
+        int totalAttempt = getAttemptCount(challengeStartDate, currentDate);
+        // 첫째주이고 && 시작일이 월요일이 아닐 때
+        if ((challengeStartDate.getDayOfWeek() != DayOfWeek.MONDAY) && (totalAttempt < 8)) {
+            return true;
+        }
+        return false;
     }
 }
 

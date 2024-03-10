@@ -58,7 +58,7 @@ public class CertificationService {
     public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
         LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
         int curAttempt = DateUtil.getWeekAttempt(startDate, currentDate);
-        LocalDate weekStartDate = DateUtil.getWeekStartDate(currentDate);
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 weekStartDate,
@@ -79,12 +79,10 @@ public class CertificationService {
     private WeekResponse convertToWeekResponse(Participant participant, LocalDate currentDate) {
         User user = participant.getUser();
         LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
-        LocalDate weekStartDate = DateUtil.getWeekStartDate(currentDate);
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
 
         List<Certification> certifications = certificationProvider.findByDuration(
-                weekStartDate,
-                currentDate,
-                participant.getId());
+                weekStartDate, currentDate, participant.getId());
 
         List<CertificationResponse> certificationResponses = convertToCertificationResponse(
                 certifications,

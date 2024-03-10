@@ -58,13 +58,14 @@ public class CertificationService {
     public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
         LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
         int curAttempt = DateUtil.getWeekAttempt(startDate, currentDate);
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(currentDate);
 
         List<Certification> certifications = certificationProvider.findByDuration(
-                DateUtil.getWeekStartDate(currentDate),
+                weekStartDate,
                 currentDate,
                 participantId);
 
-        return convertToCertificationResponse(certifications, curAttempt, currentDate);
+        return convertToCertificationResponse(certifications, curAttempt, weekStartDate);
     }
 
     public Slice<WeekResponse> getAllWeekCertification(Long userId, Long instanceId,
@@ -78,15 +79,18 @@ public class CertificationService {
     private WeekResponse convertToWeekResponse(Participant participant, LocalDate currentDate) {
         User user = participant.getUser();
         LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(currentDate);
 
         List<Certification> certifications = certificationProvider.findByDuration(
-                DateUtil.getWeekStartDate(currentDate),
+                weekStartDate,
                 currentDate,
                 participant.getId());
+
         List<CertificationResponse> certificationResponses = convertToCertificationResponse(
                 certifications,
                 DateUtil.getWeekAttempt(startDate, currentDate),
-                currentDate);
+                weekStartDate);
+
         FileResponse fileResponse = FileResponse.create(user.getFiles());
 
         return WeekResponse.create(user, fileResponse, certificationResponses);
@@ -102,8 +106,8 @@ public class CertificationService {
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
 
-        List<CertificationResponse> certificationResponses = convertToCertificationResponse(certifications, curAttempt,
-                currentDate);
+        List<CertificationResponse> certificationResponses = convertToCertificationResponse(
+                certifications, curAttempt, startDate);
 
         return TotalResponse.builder()
                 .totalAttempts(totalAttempts)
@@ -112,18 +116,19 @@ public class CertificationService {
     }
 
     private List<CertificationResponse> convertToCertificationResponse(List<Certification> certifications,
-                                                                       int curAttempt, LocalDate currentDate) {
+                                                                       int curAttempt, LocalDate startedDate) {
         List<CertificationResponse> result = new ArrayList<>();
         Map<Integer, Certification> certificationMap = convertToMap(certifications);
-        currentDate = DateUtil.getWeekStartDate(currentDate).minusDays(1);
+
+        startedDate = startedDate.minusDays(1);
 
         for (int cur = 1; cur <= curAttempt; cur++) {
-            currentDate = currentDate.plusDays(1);
+            startedDate = startedDate.plusDays(1);
             if (certificationMap.containsKey(cur)) {
                 result.add(CertificationResponse.createExist(certificationMap.get(cur)));
                 continue;
             }
-            result.add(CertificationResponse.createNonExist(cur, currentDate));
+            result.add(CertificationResponse.createNonExist(cur, startedDate));
         }
 
         return result;
@@ -160,7 +165,7 @@ public class CertificationService {
         Certification certification = Certification.createPassed(targetDate);
         certification.setParticipant(participant);
         certificationProvider.save(certification);
-        
+
         return ActivatedResponse.create(instance, certification.getCertificationStatus(),
                 0, participant.getRepositoryName());
     }

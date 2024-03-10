@@ -54,7 +54,8 @@ public enum ErrorCode {
     CAN_NOT_JOIN_INSTANCE(HttpStatus.BAD_REQUEST, "해당 인스턴스에 참여할 수 없습니다."),
     CAN_NOT_QUIT_INSTANCE(HttpStatus.BAD_REQUEST, "해당 인스턴스의 참여를 취소할 수 없습니다."),
 
-    CERTIFICATION_UNABLE(HttpStatus.BAD_REQUEST, "해당 챌린지는 인증을 할 수 없는 상태입니다."),
+    NOT_ACTIVITY_INSTANCE(HttpStatus.BAD_REQUEST, "진행 중인 챌린지에 대해서만 인증이 가능합니다."),
+    NOT_CERTIFICATE_PERIOD(HttpStatus.BAD_REQUEST, "챌린지 인증은 챌린지 진행 기간 내에만 가능합니다. 챌린지 진행 기간인지 확인해주세요."),
 
     USER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다."),
     HAS_NO_ITEM(HttpStatus.NOT_FOUND, "해당 아이템을 보유하고 있지 않습니다."),

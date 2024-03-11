@@ -5,6 +5,8 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,8 +36,12 @@ public class UserItem {
 
     private int count;
 
-    public UserItem(int count) {
+    @Enumerated(value = EnumType.STRING)
+    private EquipStatus equipStatus;
+
+    public UserItem(int count, EquipStatus equipStatus) {
         this.count = count;
+        this.equipStatus = equipStatus;
     }
 
     //=== 비지니스 로직 ===//

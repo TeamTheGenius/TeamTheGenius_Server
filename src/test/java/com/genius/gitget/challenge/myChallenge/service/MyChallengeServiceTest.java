@@ -11,6 +11,7 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
+import com.genius.gitget.challenge.item.domain.EquipStatus;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.domain.UserItem;
@@ -234,7 +235,7 @@ class MyChallengeServiceTest {
         Item item = itemRepository.save(Item.builder()
                 .itemCategory(itemCategory)
                 .build());
-        UserItem userItem = new UserItem(count);
+        UserItem userItem = new UserItem(count, EquipStatus.UNAVAILABLE);
         userItem.setItem(item);
         userItem.setUser(user);
         return userItemRepository.save(userItem);

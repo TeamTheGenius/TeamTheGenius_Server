@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.item.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.genius.gitget.challenge.item.domain.EquipStatus;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.domain.UserItem;
@@ -115,7 +116,7 @@ class UserItemProviderTest {
     }
 
     private UserItem getSavedUserItem(User user, Item item, int count) {
-        UserItem userItem = new UserItem(count);
+        UserItem userItem = new UserItem(count, EquipStatus.UNAVAILABLE);
         userItem.setUser(user);
         userItem.setItem(item);
         return userItemRepository.save(userItem);

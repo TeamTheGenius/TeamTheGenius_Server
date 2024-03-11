@@ -21,19 +21,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ItemController {
     private final ItemService itemService;
-    
+
     @GetMapping("/items")
     public ResponseEntity<ListResponse<ItemResponse>> getItemList(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String category
     ) {
-        List<ItemResponse> itemResponses;
         ItemCategory itemCategory = ItemCategory.findCategory(category);
-        if (itemCategory == ItemCategory.PROFILE_FRAME) {
-            itemResponses = itemService.getProfileList(userPrincipal.getUser());
-        } else {
-            itemResponses = itemService.getItemsByCategory(userPrincipal.getUser(), itemCategory);
-        }
+        List<ItemResponse> itemResponses = itemService.getItemsByCategory(userPrincipal.getUser(), itemCategory);
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponses)

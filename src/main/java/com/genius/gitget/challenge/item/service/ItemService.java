@@ -19,32 +19,25 @@ public class ItemService {
     private final ItemProvider itemProvider;
     private final UserItemProvider userItemProvider;
 
-    public List<ItemResponse> getProfileList(User user) {
-        List<ItemResponse> profileResponses = new ArrayList<>();
-        List<Item> items = itemProvider.findAllByCategory(ItemCategory.PROFILE_FRAME);
-
-        for (Item item : items) {
-            EquipStatus equipStatus = userItemProvider.getEquipStatus(user.getId(), ItemCategory.PROFILE_FRAME);
-
-            ProfileResponse profileResponse = ProfileResponse.create(item, equipStatus.getTag());
-            profileResponses.add(profileResponse);
-        }
-
-        return profileResponses;
-    }
-
 
     public List<ItemResponse> getItemsByCategory(User user, ItemCategory itemCategory) {
         List<ItemResponse> itemResponses = new ArrayList<>();
         List<Item> items = itemProvider.findAllByCategory(itemCategory);
 
         for (Item item : items) {
-            int count = userItemProvider.countNumOfItem(user, itemCategory);
-
-            ItemResponse itemResponse = ItemResponse.create(item, count);
+            ItemResponse itemResponse = getItemResponse(user, item, itemCategory);
             itemResponses.add(itemResponse);
         }
 
         return itemResponses;
+    }
+
+    private ItemResponse getItemResponse(User user, Item item, ItemCategory itemCategory) {
+        if (itemCategory == ItemCategory.PROFILE_FRAME) {
+            EquipStatus equipStatus = userItemProvider.getEquipStatus(user.getId(), ItemCategory.PROFILE_FRAME);
+            return ProfileResponse.create(item, equipStatus.getTag());
+        }
+        int count = userItemProvider.countNumOfItem(user, itemCategory);
+        return ItemResponse.create(item, count);
     }
 }

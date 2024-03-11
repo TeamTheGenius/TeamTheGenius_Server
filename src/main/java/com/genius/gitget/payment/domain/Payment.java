@@ -63,17 +63,27 @@ public class Payment extends BaseTimeEntity {
         this.user = user;
     }
 
+    //== 연관 관계 로직 ==//
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    //== 비즈니스 로직 ==//
+
+    /*
+    * 결제 성공
+    * */
     public void setPaymentSuccessStatus(String paymentKey, boolean isSuccess) {
         this.paymentKey = paymentKey;
         this.isSuccess = isSuccess;
     }
 
+    /*
+    * 결제 실패
+    * */
     public void setPaymentFailStatus(String message, boolean isSuccess) {
         this.failReason = message;
         this.isSuccess = isSuccess;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

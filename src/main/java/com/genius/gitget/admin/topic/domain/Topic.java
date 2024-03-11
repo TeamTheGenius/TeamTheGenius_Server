@@ -59,11 +59,24 @@ public class Topic extends BaseTimeEntity {
         this.pointPerPerson = pointPerPerson;
     }
 
+    //== 연관관계 로직 ==//
+    public void setFiles(Files files) {
+        this.files = files;
+    }
+
     //== 비즈니스 로직 ==//
+
+    /*
+     * 존재하는 인스턴스 수정
+     *  */
     public void updateExistInstance(String description) {
         this.description = description;
     }
 
+
+    /*
+     * 존재하지 않는 인스턴스 수정
+     * */
     public void updateNotExistInstance(String title, String description, String tags, String notice,
                                        int pointPerPerson) {
         this.title = title;
@@ -73,11 +86,10 @@ public class Topic extends BaseTimeEntity {
         this.pointPerPerson = pointPerPerson;
     }
 
+    /*
+     * 파일 조회
+     * */
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
-    }
-
-    public void setFiles(Files files) {
-        this.files = files;
     }
 }

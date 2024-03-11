@@ -3,13 +3,15 @@ package com.genius.gitget.profile.dto;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class UserTagsUpdateRequest {
+@NoArgsConstructor
+public class UserInterestUpdateRequest {
     private List<String> tags;
 
     @Builder
-    public UserTagsUpdateRequest(List<String> tags) {
+    public UserInterestUpdateRequest(List<String> tags) {
         this.tags = tags;
     }
 }

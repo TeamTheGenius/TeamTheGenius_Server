@@ -22,8 +22,8 @@ import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserInterestResponse;
+import com.genius.gitget.profile.dto.UserInterestUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
-import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -120,12 +120,12 @@ public class ProfileService {
 
     // 마이페이지 - 관심사 수정
     @Transactional
-    public void updateUserTags(User user, UserTagsUpdateRequest userTagsUpdateRequest) {
-        if (userTagsUpdateRequest.getTags() == null) {
+    public void updateUserTags(User user, UserInterestUpdateRequest userInterestUpdateRequest) {
+        if (userInterestUpdateRequest.getTags() == null) {
             throw new BusinessException();
         }
         User findUser = getUserByIdentifier(user.getIdentifier());
-        String interest = String.join(",", userTagsUpdateRequest.getTags());
+        String interest = String.join(",", userInterestUpdateRequest.getTags());
         findUser.updateUserTags(interest);
         userRepository.save(findUser);
     }
@@ -160,6 +160,7 @@ public class ProfileService {
             if (participantInfoList.get(i).getJoinStatus() == YES) {
                 JoinResult joinResult = participantInfoList.get(i).getJoinResult();
                 if (participantHashMap.containsKey(joinResult)) { // hashmap에 저장된 key와 일치 여부 확인
+
                     List<Long> participantIdList = participantHashMap.get(joinResult);
                     participantIdList.add(participantInfoList.get(i).getId()); // 일치한다면, 해당 key의 value인 list에 id 저장
                     participantHashMap.put(joinResult, participantIdList); // 최종적으로 hashmap에 저장
@@ -171,11 +172,13 @@ public class ProfileService {
         int success = participantHashMap.get(SUCCESS).size();
         int processing = participantHashMap.get(PROCESSING).size();
 
+        System.out.println(
+                participanTotalCount - (fail - success - processing) + " " + fail + " " + success + " " + processing);
         return UserChallengeResultResponse.builder()
                 .fail(fail)
                 .success(success)
                 .processing(processing)
-                .beforeStart(participanTotalCount - fail - success - processing)
+                .beforeStart(participanTotalCount - (fail + success + processing))
                 .build();
     }
 

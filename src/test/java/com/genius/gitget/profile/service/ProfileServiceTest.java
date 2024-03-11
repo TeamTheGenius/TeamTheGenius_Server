@@ -23,8 +23,8 @@ import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserInterestResponse;
+import com.genius.gitget.profile.dto.UserInterestUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
-import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,10 +131,10 @@ public class ProfileServiceTest {
     @Test
     void 유저_관심사_수정() {
         profileService.updateUserTags(user1,
-                UserTagsUpdateRequest.builder().tags(new ArrayList<>(Arrays.asList("FE", "BE"))).build());
+                UserInterestUpdateRequest.builder().tags(new ArrayList<>(Arrays.asList("FE", "AI"))).build());
         User user = userRepository.findByIdentifier(user1.getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        Assertions.assertThat(user.getTags()).isEqualTo("FE,BE");
+        Assertions.assertThat(user.getTags()).isEqualTo("FE,AI");
     }
 
 

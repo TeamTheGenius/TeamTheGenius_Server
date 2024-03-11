@@ -41,6 +41,10 @@ public class Files extends BaseTimeEntity {
     }
 
     //== 비지니스 로직 ==//
+
+    /*
+     * 파일 수정
+     * */
     public void updateFiles(UpdateDTO updateDTO) {
         this.originalFilename = updateDTO.originalFilename();
         this.savedFilename = updateDTO.savedFilename();

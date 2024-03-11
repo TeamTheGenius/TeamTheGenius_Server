@@ -7,7 +7,6 @@ import com.genius.gitget.challenge.item.dto.ItemResponse;
 import com.genius.gitget.challenge.item.service.ItemService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +21,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ItemController {
     private final ItemService itemService;
-
-    @GetMapping("/points")
+    
+    @GetMapping("/items")
     public ResponseEntity<ListResponse<ItemResponse>> getItemList(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String category
     ) {
-        List<ItemResponse> itemResponses = new ArrayList<>();
+        List<ItemResponse> itemResponses;
         ItemCategory itemCategory = ItemCategory.findCategory(category);
         if (itemCategory == ItemCategory.PROFILE_FRAME) {
-            itemResponses = itemService.getProfileItemList(userPrincipal.getUser());
+            itemResponses = itemService.getProfileList(userPrincipal.getUser());
+        } else {
+            itemResponses = itemService.getItemsByCategory(userPrincipal.getUser(), itemCategory);
         }
 
         return ResponseEntity.ok().body(

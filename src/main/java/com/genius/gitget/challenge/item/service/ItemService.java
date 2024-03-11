@@ -19,7 +19,7 @@ public class ItemService {
     private final ItemProvider itemProvider;
     private final UserItemProvider userItemProvider;
 
-    public List<ItemResponse> getProfileItemList(User user) {
+    public List<ItemResponse> getProfileList(User user) {
         List<ItemResponse> profileResponses = new ArrayList<>();
         List<Item> items = itemProvider.findAllByCategory(ItemCategory.PROFILE_FRAME);
 
@@ -31,5 +31,20 @@ public class ItemService {
         }
 
         return profileResponses;
+    }
+
+
+    public List<ItemResponse> getItemsByCategory(User user, ItemCategory itemCategory) {
+        List<ItemResponse> itemResponses = new ArrayList<>();
+        List<Item> items = itemProvider.findAllByCategory(itemCategory);
+
+        for (Item item : items) {
+            int count = userItemProvider.countNumOfItem(user, itemCategory);
+
+            ItemResponse itemResponse = ItemResponse.create(item, count);
+            itemResponses.add(itemResponse);
+        }
+
+        return itemResponses;
     }
 }

@@ -136,7 +136,7 @@ public class MyChallengeService {
         int rewardPoints = pointPerPerson;
 
         if (rewardRequest.canUseItem()) {
-            UserItem userItem = userItemProvider.findUserItemByUser(user.getId(), ItemCategory.POINT_MULTIPLIER);
+            UserItem userItem = userItemProvider.findByCategory(user.getId(), ItemCategory.POINT_MULTIPLIER);
             userItem.useItem();
             rewardPoints = pointPerPerson * 2;
         }

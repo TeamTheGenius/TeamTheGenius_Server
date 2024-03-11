@@ -45,7 +45,7 @@ class UserItemProviderTest {
         getSavedUserItem(user, item, 1);
 
         //when
-        UserItem userItemByUser = userItemProvider.findUserItemByUser(user.getId(), ItemCategory.PROFILE_FRAME);
+        UserItem userItemByUser = userItemProvider.findByCategory(user.getId(), ItemCategory.PROFILE_FRAME);
 
         //then
         Assertions.assertThat(userItemByUser.getCount()).isEqualTo(1);
@@ -59,7 +59,7 @@ class UserItemProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when & then
-        assertThatThrownBy(() -> userItemProvider.findUserItemByUser(user.getId(), ItemCategory.PROFILE_FRAME))
+        assertThatThrownBy(() -> userItemProvider.findByCategory(user.getId(), ItemCategory.PROFILE_FRAME))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.USER_ITEM_NOT_FOUND.getMessage());
     }

@@ -19,13 +19,22 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserItemProvider {
     private final UserItemRepository userItemRepository;
 
-    public UserItem findUserItemByUser(Long userId, ItemCategory itemCategory) {
-        return userItemRepository.findUserItemByUser(userId, itemCategory)
+
+    public UserItem save(UserItem userItem) {
+        return userItemRepository.save(userItem);
+    }
+
+    public UserItem findByCategory(Long userId, ItemCategory itemCategory) {
+        return userItemRepository.findByCategory(userId, itemCategory)
                 .orElseThrow(() -> new BusinessException(USER_ITEM_NOT_FOUND));
     }
 
+    public Optional<UserItem> findOptionalById(Long userId, Long itemId) {
+        return userItemRepository.findByUserId(userId, itemId);
+    }
+
     public EquipStatus getEquipStatus(Long userId, ItemCategory itemCategory) {
-        Optional<UserItem> optionalUserItem = userItemRepository.findUserItemByUser(userId, itemCategory);
+        Optional<UserItem> optionalUserItem = userItemRepository.findByCategory(userId, itemCategory);
         if (optionalUserItem.isPresent()) {
             return optionalUserItem.get().getEquipStatus();
         }
@@ -33,7 +42,7 @@ public class UserItemProvider {
     }
 
     public int countNumOfItem(User user, ItemCategory itemCategory) {
-        Optional<UserItem> optionalUserItem = userItemRepository.findUserItemByUser(user.getId(), itemCategory);
+        Optional<UserItem> optionalUserItem = userItemRepository.findByCategory(user.getId(), itemCategory);
         return optionalUserItem.map(UserItem::getCount)
                 .orElse(0);
     }

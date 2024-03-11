@@ -146,7 +146,7 @@ public class CertificationService {
         Participant participant = participantProvider.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
-        UserItem userItem = userItemProvider.findUserItemByUser(userId, ItemCategory.CERTIFICATION_PASSER);
+        UserItem userItem = userItemProvider.findByCategory(userId, ItemCategory.CERTIFICATION_PASSER);
         Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
 
         validCertificationCondition(instance, targetDate);

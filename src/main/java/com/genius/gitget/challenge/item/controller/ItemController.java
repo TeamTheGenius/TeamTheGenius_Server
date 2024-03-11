@@ -7,11 +7,14 @@ import com.genius.gitget.challenge.item.dto.ItemResponse;
 import com.genius.gitget.challenge.item.service.ItemService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
+import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,6 +35,18 @@ public class ItemController {
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponses)
+        );
+    }
+
+    @PostMapping("/items/order/{itemId}")
+    public ResponseEntity<SingleResponse<ItemResponse>> purchaseItem(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long itemId
+    ) {
+        ItemResponse itemResponse = itemService.orderItem(userPrincipal.getUser(), itemId);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponse)
         );
     }
 }

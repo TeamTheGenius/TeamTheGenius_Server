@@ -39,14 +39,26 @@ public class UserItem {
     @Enumerated(value = EnumType.STRING)
     private EquipStatus equipStatus;
 
-    public UserItem(int count, EquipStatus equipStatus) {
+    private UserItem(int count, EquipStatus equipStatus) {
         this.count = count;
         this.equipStatus = equipStatus;
+    }
+
+    public static UserItem createDefault(ItemCategory itemCategory) {
+        if (itemCategory == ItemCategory.PROFILE_FRAME) {
+            return new UserItem(0, EquipStatus.AVAILABLE);
+        }
+        return new UserItem(0, EquipStatus.UNAVAILABLE);
     }
 
     //=== 비지니스 로직 ===//
     public boolean hasItem() {
         return this.count > 0;
+    }
+
+    public int purchase() {
+        this.count++;
+        return count;
     }
 
     public void useItem() {

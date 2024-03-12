@@ -129,6 +129,10 @@ public class Instance {
         this.progress = progress;
     }
 
+    public int getLikesCount() {
+        return this.likesList.size();
+    }
+
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
     }

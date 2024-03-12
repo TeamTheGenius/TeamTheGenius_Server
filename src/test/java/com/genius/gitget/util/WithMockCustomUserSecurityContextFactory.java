@@ -25,7 +25,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
     private final UserService userService;
     private final CustomUserDetailsService customUserDetailsService;
 
-    @Value("${github.githubId}")
+    @Value("${github.yeon-githubId}")
     private String githubId;
 
     @Override

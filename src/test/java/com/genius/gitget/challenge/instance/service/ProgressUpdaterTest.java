@@ -54,11 +54,11 @@ class ProgressUpdaterTest {
     @Autowired
     private InstanceProvider instanceProvider;
 
-    @Value("${github.personalKey}")
+    @Value("${github.yeon-personalKey}")
     private String personalKey;
-    @Value("${github.githubId}")
+    @Value("${github.yeon-githubId}")
     private String githubId;
-    @Value("${github.repository}")
+    @Value("${github.yeon-repository}")
     private String targetRepo;
 
     @Test

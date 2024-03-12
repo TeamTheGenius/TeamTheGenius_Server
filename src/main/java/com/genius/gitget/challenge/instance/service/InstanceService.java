@@ -19,6 +19,7 @@ import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,21 +38,31 @@ public class InstanceService {
     // 인스턴스 생성
     @Transactional
     public Long createInstance(InstanceCreateRequest instanceCreateRequest,
-                               MultipartFile multipartFile, String type, LocalDate currentDate) {
+                               MultipartFile multipartFile, String type,
+                               LocalDate currentDate) {
+        // 토픽 조회
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
+        // 파일 업로드
         Files uploadedFile = filesService.uploadFile(topic.getFiles(), multipartFile, type);
 
+        // 인스턴스 생성 일자 검증
         validatePeriod(instanceCreateRequest, currentDate);
 
+        // 인스턴스 고유 uuid 생성
+        String uuid = UUID.randomUUID().toString();
+        uuid = uuid.replaceAll("-", "").substring(0, 16);
+
+        // from dto to entity 변환 및 uuid 설정
         Instance instance = Instance.createByRequest(instanceCreateRequest);
+        instance.setInstanceUUID(uuid);
+
+        // 연관 관계 설정
         instance.setTopic(topic);
         instance.setFiles(uploadedFile);
 
-        Instance savedInstance = instanceRepository.save(instance);
-
-        return savedInstance.getId();
+        return instanceRepository.save(instance).getId();
     }
 
     private void validatePeriod(InstanceCreateRequest instanceCreateRequest, LocalDate currentDate) {
@@ -103,8 +114,8 @@ public class InstanceService {
 
     // 인스턴스 수정
     @Transactional
-    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest,
-                               MultipartFile multipartFile, String type) {
+    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest, MultipartFile multipartFile,
+                               String type) {
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
@@ -113,9 +124,8 @@ public class InstanceService {
         filesService.updateFile(findInstanceFileId, multipartFile);
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(),
-                instanceUpdateRequest.pointPerPerson(),
-                instanceUpdateRequest.startedAt(), instanceUpdateRequest.completedAt(),
-                instanceUpdateRequest.certificationMethod());
+                instanceUpdateRequest.pointPerPerson(), instanceUpdateRequest.startedAt(),
+                instanceUpdateRequest.completedAt(), instanceUpdateRequest.certificationMethod());
 
         Instance savedInstance = instanceRepository.save(existingInstance);
 

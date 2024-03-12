@@ -4,8 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
+import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -39,12 +41,39 @@ class InstanceRepositoryTest {
                 .completedDate(LocalDateTime.now().plusDays(3))
                 .build();
 
+        String uuid = UUID.randomUUID().toString();
+        uuid = uuid.replaceAll("-", "").substring(0, 16);
+        instance.setInstanceUUID(uuid);
         //when
         Instance savedInstance = instanceRepository.save(instance);
 
         //then
         Assertions.assertThat(savedInstance.getTitle()).isEqualTo("1일 1알고리즘");
     }
+
+    @Test
+    public void 인스턴스_uuid를_수정할_수_없다() {
+        //given
+        Instance instance = Instance.builder()
+                .title("1일 1알고리즘")
+                .description("하루에 한 문제씩 문제를 해결합니다.")
+                .tags("BE, FE, CS")
+                .pointPerPerson(100)
+                .progress(Progress.PREACTIVITY)
+                .startedDate(LocalDateTime.now())
+                .completedDate(LocalDateTime.now().plusDays(3))
+                .build();
+
+        String uuid = UUID.randomUUID().toString();
+        uuid = uuid.replaceAll("-", "").substring(0, 16);
+        instance.setInstanceUUID(uuid);
+        //when
+        Instance savedInstance = instanceRepository.save(instance);
+
+        org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class, () ->
+                savedInstance.setInstanceUUID(UUID.randomUUID().toString()));
+    }
+
 
     @Test
     public void 인스턴스_수정() throws Exception {

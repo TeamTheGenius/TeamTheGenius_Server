@@ -7,6 +7,8 @@ import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -81,6 +83,8 @@ public class Instance {
     @Column(name = "completed_at")
     private LocalDateTime completedDate;
 
+    private String instanceUUID;
+
     @Builder
     public Instance(String title, String description, String tags, int pointPerPerson, Progress progress, String notice,
                     String certificationMethod,
@@ -110,7 +114,23 @@ public class Instance {
                 .build();
     }
 
+    //== 연관관계 편의 메서드 ==//
+    public void setTopic(Topic topic) {
+        this.topic = topic;
+        if (!topic.getInstanceList().contains(this)) {
+            topic.getInstanceList().add(this);
+        }
+    }
+
+    public void setFiles(Files files) {
+        this.files = files;
+    }
+
     //== 비지니스 로직 ==//
+
+    /*
+     * 인스턴스 수정
+     * */
     public void updateInstance(String description, String notice, int pointPerPerson, LocalDateTime startedDate,
                                LocalDateTime completedDate, String certificationMethod) {
         this.description = description;
@@ -121,10 +141,16 @@ public class Instance {
         this.certificationMethod = certificationMethod;
     }
 
+    /*
+     * 참가자 수 정보 수정
+     * */
     public void updateParticipantCount(int amount) {
         this.participantCount += amount;
     }
 
+    /*
+     * 진행 상황 수정
+     *  */
     public void updateProgress(Progress progress) {
         this.progress = progress;
     }
@@ -133,23 +159,28 @@ public class Instance {
         return this.likesList.size();
     }
 
+    /*
+     * 파일 조회
+     * */
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
     }
 
-    public void setFiles(Files files) {
-        this.files = files;
-    }
-
+    /*
+     * 챌린지 전체 인증 일자 조회
+     * */
     public int getTotalAttempt() {
         return DateUtil.getAttemptCount(startedDate.toLocalDate(), completedDate.toLocalDate());
     }
 
-    //== 연관관계 편의 메서드 ==//
-    public void setTopic(Topic topic) {
-        this.topic = topic;
-        if (!topic.getInstanceList().contains(this)) {
-            topic.getInstanceList().add(this);
+    /*
+     * 인스턴스 고유 uuid 설정
+     * */
+    public void setInstanceUUID(String instanceUUID) {
+        if (this.instanceUUID != null) {
+            throw new BusinessException(ErrorCode.UUID_ALREADY_EXISTS);
+        } else {
+            this.instanceUUID = instanceUUID;
         }
     }
 }

@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.dto.ItemResponse;
 import com.genius.gitget.challenge.item.service.ItemService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.util.List;
@@ -30,8 +31,13 @@ public class ItemController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String category
     ) {
-        ItemCategory itemCategory = ItemCategory.findCategory(category);
-        List<ItemResponse> itemResponses = itemService.getItemsByCategory(userPrincipal.getUser(), itemCategory);
+        List<ItemResponse> itemResponses;
+        if (category.trim().equalsIgnoreCase("all")) {
+            itemResponses = itemService.getAllItems(userPrincipal.getUser());
+        } else {
+            ItemCategory itemCategory = ItemCategory.findCategory(category);
+            itemResponses = itemService.getItemsByCategory(userPrincipal.getUser(), itemCategory);
+        }
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponses)
@@ -47,6 +53,18 @@ public class ItemController {
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponse)
+        );
+    }
+
+    // 사용하는 아이템 -> 프로필 프레임, 인증 패스권, 챌린지 보상 획득 2배
+    @PostMapping("/item/use/{itemId}")
+    public ResponseEntity<CommonResponse> useItem(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long itemId
+    ) {
+
+        return ResponseEntity.ok().body(
+                new CommonResponse()
         );
     }
 }

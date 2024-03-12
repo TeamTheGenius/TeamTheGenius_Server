@@ -24,6 +24,13 @@ public class ItemService {
     private final ItemProvider itemProvider;
     private final UserItemProvider userItemProvider;
 
+    public List<ItemResponse> getAllItems(User user) {
+        List<ItemResponse> itemResponses = new ArrayList<>();
+        for (ItemCategory itemCategory : ItemCategory.values()) {
+            itemResponses.addAll(getItemsByCategory(user, itemCategory));
+        }
+        return itemResponses;
+    }
 
     public List<ItemResponse> getItemsByCategory(User user, ItemCategory itemCategory) {
         List<ItemResponse> itemResponses = new ArrayList<>();

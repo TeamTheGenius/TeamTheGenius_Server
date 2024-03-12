@@ -9,12 +9,16 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
+import com.genius.gitget.challenge.instance.dto.detail.LikesInfo;
+import com.genius.gitget.challenge.likes.domain.Likes;
+import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GitHub;
@@ -30,15 +34,28 @@ public class InstanceDetailService {
     private final InstanceProvider instanceProvider;
     private final ParticipantProvider participantProvider;
     private final GithubProvider githubProvider;
+    private final LikesRepository likesRepository;
 
 
     public InstanceResponse getInstanceDetailInformation(User user, Long instanceId) {
         Instance instance = instanceProvider.findById(instanceId);
+        LikesInfo likesInfo = getLikesInfo(user.getId(), instance);
+
         if (participantProvider.hasParticipant(user.getId(), instanceId)) {
-            return InstanceResponse.createByEntity(instance, JoinStatus.YES);
+            return InstanceResponse.createByEntity(instance, likesInfo, JoinStatus.YES);
         }
 
-        return InstanceResponse.createByEntity(instance, JoinStatus.NO);
+        return InstanceResponse.createByEntity(instance, likesInfo, JoinStatus.NO);
+    }
+
+    private LikesInfo getLikesInfo(Long userId, Instance instance) {
+        Optional<Likes> optionalLikes = likesRepository.findSpecificLike(userId, instance.getId());
+        if (optionalLikes.isPresent()) {
+            Likes likes = optionalLikes.get();
+            return LikesInfo.createExist(likes.getId(), instance.getLikesCount());
+        }
+
+        return LikesInfo.createNotExist();
     }
 
     @Transactional

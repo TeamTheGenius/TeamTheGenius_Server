@@ -77,13 +77,13 @@ class CertificationServiceTest {
     @Autowired
     private UserItemRepository userItemRepository;
 
-    @Value("${github.personalKey}")
+    @Value("${github.yeon-personalKey}")
     private String personalKey;
 
-    @Value("${github.githubId}")
+    @Value("${github.yeon-githubId}")
     private String githubId;
 
-    @Value("${github.repository}")
+    @Value("${github.yeon-repository}")
     private String targetRepo;
 
 
@@ -93,7 +93,7 @@ class CertificationServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        getParticipantInfo(user, instance);
+        getSavedParticipant(user, instance);
         githubService.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
@@ -123,7 +123,7 @@ class CertificationServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        getParticipantInfo(user, instance);
+        getSavedParticipant(user, instance);
         githubService.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 12, 6);
@@ -146,7 +146,7 @@ class CertificationServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        getParticipantInfo(user, instance);
+        getSavedParticipant(user, instance);
         githubService.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 6);
@@ -204,7 +204,7 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 2, 3);
         LocalDate startDate = LocalDate.of(2024, 2, 1);
         LocalDate endDate = LocalDate.of(2024, 2, 4);
-        Participant participant = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+        Participant participant = getSavedParticipant(getSavedUser(githubId), getSavedInstance());
 
         //when
         getSavedCertification(NOT_YET, startDate, participant);
@@ -227,7 +227,7 @@ class CertificationServiceTest {
         LocalDate endDate = LocalDate.of(2024, 2, 29);
         LocalDate currentDate = LocalDate.of(2024, 2, 8);
 
-        Participant participant = getParticipantInfo(getSavedUser(githubId), getSavedInstance());
+        Participant participant = getSavedParticipant(getSavedUser(githubId), getSavedInstance());
 
         //when
         getSavedCertification(NOT_YET, startDate, participant);
@@ -255,7 +255,7 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 2, 8);
 
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(getSavedUser(githubId), instance);
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
 
         //when
         getSavedCertification(NOT_YET, startDate, participant);
@@ -277,7 +277,7 @@ class CertificationServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
 
         //when
         InstancePreviewResponse instancePreviewResponse = certificationService.getInstancePreview(instance.getId());
@@ -293,7 +293,7 @@ class CertificationServiceTest {
         LocalDate targetDate = LocalDate.of(2024, 2, 8);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
 
         //when
         CertificationInformation information = certificationService.getCertificationInformation(instance,
@@ -317,7 +317,7 @@ class CertificationServiceTest {
         LocalDate targetDate = LocalDate.of(2024, 2, 8);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
@@ -346,7 +346,7 @@ class CertificationServiceTest {
         LocalDate targetDate = LocalDate.of(2024, 2, 8);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
 
         //when
         instance.updateProgress(Progress.DONE);
@@ -376,8 +376,8 @@ class CertificationServiceTest {
         User user1 = getSavedUser(githubId, "nickname1");
         User user2 = getSavedUser(githubId, "nickname2");
         Instance instance = getSavedInstance();
-        Participant participant1 = getParticipantInfo(user1, instance);
-        Participant participant2 = getParticipantInfo(user2, instance);
+        Participant participant1 = getSavedParticipant(user1, instance);
+        Participant participant2 = getSavedParticipant(user2, instance);
 
         //when
         Slice<WeekResponse> certification = certificationService.getAllWeekCertification(
@@ -395,7 +395,7 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 3, 1);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
         UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
@@ -432,7 +432,7 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 3, 1);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(currentDate)
@@ -442,7 +442,7 @@ class CertificationServiceTest {
         getSavedCertification(NOT_YET, currentDate, participant);
 
         //then
-        assertThatThrownBy(() -> certificationService.passCertification(instance.getId(), certificationRequest))
+        assertThatThrownBy(() -> certificationService.passCertification(user.getId(), certificationRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.USER_ITEM_NOT_FOUND.getMessage());
     }
@@ -454,7 +454,7 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 3, 1);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
         UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 0);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
@@ -464,7 +464,7 @@ class CertificationServiceTest {
         instance.updateProgress(Progress.ACTIVITY);
 
         //when && then
-        assertThatThrownBy(() -> certificationService.passCertification(instance.getId(), certificationRequest))
+        assertThatThrownBy(() -> certificationService.passCertification(user.getId(), certificationRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.USER_ITEM_NOT_FOUND.getMessage());
     }
@@ -477,7 +477,7 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 3, 1);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
         UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
@@ -501,7 +501,7 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 3, 1);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
         UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
@@ -532,7 +532,7 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 3, 1);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+        Participant participant = getSavedParticipant(user, instance);
         UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
@@ -592,7 +592,7 @@ class CertificationServiceTest {
         );
     }
 
-    private Participant getParticipantInfo(User user, Instance instance) {
+    private Participant getSavedParticipant(User user, Instance instance) {
         Participant participant = participantRepository.save(
                 Participant.builder()
                         .joinResult(JoinResult.PROCESSING)

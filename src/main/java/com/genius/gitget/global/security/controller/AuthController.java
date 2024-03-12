@@ -5,9 +5,11 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.security.dto.TokenDTO;
 import com.genius.gitget.global.security.service.JwtService;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
+import com.genius.gitget.global.util.response.dto.SingleResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,16 +29,17 @@ public class AuthController {
     private final JwtService jwtService;
 
     @PostMapping("/auth")
-    public ResponseEntity<CommonResponse> generateToken(HttpServletResponse response,
-                                                        @RequestBody TokenDTO tokenRequest) {
+    public ResponseEntity<SingleResponse<AuthResponse>> generateToken(HttpServletResponse response,
+                                                                      @RequestBody TokenDTO tokenRequest) {
         User requestUser = userService.findUserByIdentifier(tokenRequest.identifier());
         jwtService.validateUser(requestUser);
 
         jwtService.generateAccessToken(response, requestUser);
         jwtService.generateRefreshToken(response, requestUser);
+        AuthResponse authResponse = new AuthResponse(requestUser.getRole());
 
         return ResponseEntity.ok().body(
-                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), authResponse)
         );
     }
 

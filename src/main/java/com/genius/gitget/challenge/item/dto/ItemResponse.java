@@ -10,20 +10,14 @@ public class ItemResponse {
     private int cost;
     private int count;
 
-    protected ItemResponse(Long itemId, String name, int cost) {
-        this.itemId = itemId;
-        this.name = name;
-        this.cost = cost;
-    }
-
-    private ItemResponse(Long itemId, String name, int cost, int count) {
-        this.itemId = itemId;
-        this.name = name;
-        this.cost = cost;
+    protected ItemResponse(Item item, int count) {
+        this.itemId = item.getId();
+        this.name = item.getName();
+        this.cost = item.getCost();
         this.count = count;
     }
 
     public static ItemResponse create(Item item, int count) {
-        return new ItemResponse(item.getId(), item.getName(), item.getCost(), count);
+        return new ItemResponse(item, count);
     }
 }

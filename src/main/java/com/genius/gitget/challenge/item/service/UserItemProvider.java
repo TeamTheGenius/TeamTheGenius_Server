@@ -5,6 +5,7 @@ import static com.genius.gitget.global.util.exception.ErrorCode.USER_ITEM_NOT_FO
 import com.genius.gitget.challenge.item.domain.EquipStatus;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.domain.UserItem;
+import com.genius.gitget.challenge.item.repository.ItemRepository;
 import com.genius.gitget.challenge.item.repository.UserItemRepository;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserItemProvider {
+    private final ItemRepository itemRepository;
     private final UserItemRepository userItemRepository;
 
 
@@ -33,8 +35,8 @@ public class UserItemProvider {
         return userItemRepository.findByUserId(userId, itemId);
     }
 
-    public EquipStatus getEquipStatus(Long userId, ItemCategory itemCategory) {
-        Optional<UserItem> optionalUserItem = userItemRepository.findByCategory(userId, itemCategory);
+    public EquipStatus getEquipStatus(Long userId, Long itemId) {
+        Optional<UserItem> optionalUserItem = userItemRepository.findByUserId(userId, itemId);
         if (optionalUserItem.isPresent()) {
             return optionalUserItem.get().getEquipStatus();
         }
@@ -42,7 +44,14 @@ public class UserItemProvider {
     }
 
     public int countNumOfItem(User user, ItemCategory itemCategory) {
+        //TODO: itemCategory에 해당하는 얘들을 모두 모아서 count해야 함 -> @Query부터 고쳐야 함
         Optional<UserItem> optionalUserItem = userItemRepository.findByCategory(user.getId(), itemCategory);
+        return optionalUserItem.map(UserItem::getCount)
+                .orElse(0);
+    }
+
+    public int countNumOfItem(User user, Long itemId) {
+        Optional<UserItem> optionalUserItem = userItemRepository.findByUserId(user.getId(), itemId);
         return optionalUserItem.map(UserItem::getCount)
                 .orElse(0);
     }

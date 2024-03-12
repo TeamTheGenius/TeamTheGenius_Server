@@ -57,6 +57,9 @@ public class UserItem {
     }
 
     public int purchase() {
+        if (this.item.getItemCategory() == ItemCategory.PROFILE_FRAME && hasItem()) {
+            throw new BusinessException(ErrorCode.ALREADY_PURCHASED);
+        }
         this.count++;
         return count;
     }

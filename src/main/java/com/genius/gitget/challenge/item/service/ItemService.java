@@ -30,14 +30,14 @@ public class ItemService {
         List<Item> items = itemProvider.findAllByCategory(itemCategory);
 
         for (Item item : items) {
-            ItemResponse itemResponse = getItemResponse(user, item, itemCategory);
+            int numOfItem = userItemProvider.countNumOfItem(user, item.getId());
+            ItemResponse itemResponse = getItemResponse(user, item, numOfItem);
             itemResponses.add(itemResponse);
         }
 
         return itemResponses;
     }
 
-    //TODO: 재구매가 불가능함 -> userItem을 찾는 과정에서 2개의 결과가 나온다고 함. 원래는 하나만 나와야 함
     @Transactional
     public ItemResponse orderItem(User user, Long itemId) {
         User persistUser = userService.findUserById(user.getId());
@@ -49,10 +49,11 @@ public class ItemService {
         }
 
         UserItem userItem = userItemProvider.findOptionalById(persistUser.getId(), itemId)
-                .orElse(createNew(persistUser, item));
+                .orElseGet(() -> createNew(persistUser, item));
+        int numOfItem = userItem.purchase();
+        persistUser.updatePoints((long) item.getCost() * -1);
 
-        userItem.purchase();
-        return getItemResponse(persistUser, item, item.getItemCategory());
+        return getItemResponse(persistUser, item, numOfItem);
     }
 
     private UserItem createNew(User user, Item item) {
@@ -63,12 +64,11 @@ public class ItemService {
     }
 
 
-    private ItemResponse getItemResponse(User user, Item item, ItemCategory itemCategory) {
-        if (itemCategory == ItemCategory.PROFILE_FRAME) {
-            EquipStatus equipStatus = userItemProvider.getEquipStatus(user.getId(), ItemCategory.PROFILE_FRAME);
-            return ProfileResponse.create(item, equipStatus.getTag());
+    private ItemResponse getItemResponse(User user, Item item, int numOfItem) {
+        if (item.getItemCategory() == ItemCategory.PROFILE_FRAME) {
+            EquipStatus equipStatus = userItemProvider.getEquipStatus(user.getId(), item.getId());
+            return ProfileResponse.create(item, numOfItem, equipStatus.getTag());
         }
-        int count = userItemProvider.countNumOfItem(user, itemCategory);
-        return ItemResponse.create(item, count);
+        return ItemResponse.create(item, numOfItem);
     }
 }

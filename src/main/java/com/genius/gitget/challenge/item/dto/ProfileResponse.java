@@ -11,12 +11,12 @@ public class ProfileResponse extends ItemResponse {
     private String equipStatus;
 
     @Builder
-    public ProfileResponse(Item item, String equipStatus) {
-        super(item.getId(), item.getName(), item.getCost());
+    public ProfileResponse(Item item, int numOfItem, String equipStatus) {
+        super(item, numOfItem);
         this.equipStatus = equipStatus;
     }
 
-    public static ProfileResponse create(Item item, String equipStatus) {
-        return new ProfileResponse(item, equipStatus);
+    public static ProfileResponse create(Item item, int numOfItem, String equipStatus) {
+        return new ProfileResponse(item, numOfItem, equipStatus);
     }
 }

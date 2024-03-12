@@ -53,11 +53,11 @@ class InstanceDetailServiceTest {
     @Autowired
     ParticipantRepository participantRepository;
 
-    @Value("${github.personalKey}")
+    @Value("${github.yeon-personalKey}")
     private String githubToken;
-    @Value("${github.githubId}")
+    @Value("${github.yeon-githubId}")
     private String githubId;
-    @Value("${github.repository}")
+    @Value("${github.yeon-repository}")
     private String targetRepo;
 
 

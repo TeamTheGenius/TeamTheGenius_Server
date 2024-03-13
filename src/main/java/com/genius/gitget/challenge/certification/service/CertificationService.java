@@ -147,27 +147,26 @@ public class CertificationService {
         LocalDate targetDate = certificationRequest.targetDate();
 
         UserItem userItem = userItemProvider.findUserItemByUser(userId, ItemCategory.CERTIFICATION_PASSER);
-        Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
+        Optional<Certification> optionalCertification = certificationProvider.findByDate(targetDate,
+                participant.getId());
 
         validCertificationCondition(instance, targetDate);
-        validatePassCondition(userItem, optional);
+        validatePassCondition(userItem, optionalCertification);
 
+        Certification certification = optionalCertification.map(result -> {
+            result.updateToPass(targetDate);
+            return result;
+        }).orElseGet(() -> {
+            Certification result = Certification.createPassed(targetDate);
+            result.setParticipant(participant);
+            certificationProvider.save(result);
+            return result;
+        });
+        
         userItem.useItem();
 
-        //TODO: 리팩토링 시급...
-        if (optional.isPresent()) {
-            Certification certification = optional.get();
-            certification.updateToPass(targetDate);
-            return ActivatedResponse.create(instance, certification.getCertificationStatus(),
-                    0, participant.getRepositoryName());
-        }
-
-        Certification certification = Certification.createPassed(targetDate);
-        certification.setParticipant(participant);
-        certificationProvider.save(certification);
-
-        return ActivatedResponse.create(instance, certification.getCertificationStatus(),
-                0, participant.getRepositoryName());
+        return ActivatedResponse.create(instance, certification.getCertificationStatus(), 0,
+                participant.getRepositoryName());
     }
 
     private void validatePassCondition(UserItem userItem, Optional<Certification> optional) {

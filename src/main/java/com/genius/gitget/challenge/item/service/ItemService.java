@@ -87,6 +87,7 @@ public class ItemService {
             case CERTIFICATION_PASSER -> {
                 ActivatedResponse activatedResponse = certificationService.passCertification(persistUser.getId(),
                         new CertificationRequest(instanceId, LocalDate.now()));
+                activatedResponse.setItemId(itemId);
                 return activatedResponse;
             }
             case POINT_MULTIPLIER -> {

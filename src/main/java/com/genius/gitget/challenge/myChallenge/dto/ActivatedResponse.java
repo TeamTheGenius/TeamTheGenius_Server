@@ -13,17 +13,19 @@ import lombok.Setter;
 public class ActivatedResponse extends ItemUseResponse {
     private String repository;
     private String certificateStatus;
+    private Long itemId;
     private int numOfPassItem;
     private boolean canUsePassItem;
     private FileResponse fileResponse;
 
     @Builder
     public ActivatedResponse(Long instanceId, String title, int pointPerPerson, String repository,
-                             String certificateStatus,
+                             String certificateStatus, Long itemId,
                              int numOfPassItem, boolean canUsePassItem, FileResponse fileResponse) {
         super(instanceId, title, pointPerPerson);
         this.repository = repository;
         this.certificateStatus = certificateStatus;
+        this.itemId = itemId;
         this.numOfPassItem = numOfPassItem;
         this.canUsePassItem = canUsePassItem;
         this.fileResponse = fileResponse;

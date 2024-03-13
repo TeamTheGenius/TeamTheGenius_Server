@@ -11,8 +11,10 @@ import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
+import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.domain.UserItem;
+import com.genius.gitget.challenge.item.service.ItemProvider;
 import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
@@ -39,6 +41,7 @@ public class MyChallengeService {
     private final UserService userService;
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
+    private final ItemProvider itemProvider;
     private final UserItemProvider userItemProvider;
 
 
@@ -104,12 +107,16 @@ public class MyChallengeService {
             Instance instance = participant.getInstance();
             Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
                     .orElse(getDummyCertification());
+
+            //TODO: 로직 수정 필요
+            Item item = itemProvider.findAllByCategory(ItemCategory.CERTIFICATION_PASSER).get(0);
             int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.CERTIFICATION_PASSER);
 
             ActivatedResponse activatedResponse = ActivatedResponse.create(
                     instance, certification.getCertificationStatus(),
                     numOfPassItem, participant.getRepositoryName()
             );
+            activatedResponse.setItemId(item.getId());
             activated.add(activatedResponse);
         }
         return activated;

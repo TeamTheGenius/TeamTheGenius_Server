@@ -186,19 +186,35 @@ public class CertificationService {
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
 
-        validCertificationCondition(instance, certificationRequest.targetDate());
+        String repositoryName = participant.getRepositoryName();
+        LocalDate targetDate = certificationRequest.targetDate();
 
-        List<String> pullRequests = getPullRequestLink(
-                gitHub,
-                participant.getRepositoryName(),
-                certificationRequest.targetDate());
+        validCertificationCondition(instance, targetDate);
 
-        Certification certification = createOrUpdate(participant, certificationRequest.targetDate(), pullRequests);
+        List<String> filteredPullRequests = filterValidPR(
+                githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate),
+                instance.getPrTemplate(targetDate)
+        );
+
+        Certification certification = createOrUpdate(participant, targetDate, filteredPullRequests);
 
         return CertificationResponse.createExist(certification);
     }
 
-    private Certification createOrUpdate(Participant participant, LocalDate targetDate, List<String> pullRequests) {
+    private List<String> filterValidPR(List<GHPullRequest> ghPullRequests, String prTemplate) {
+        List<String> validPullRequests = ghPullRequests.stream()
+                .filter(ghPullRequest -> ghPullRequest.getBody().contains(prTemplate))
+                .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
+                .toList();
+        if (validPullRequests.isEmpty()) {
+            throw new BusinessException(ErrorCode.PR_TEMPLATE_NOT_FOUND);
+        }
+
+        return validPullRequests;
+    }
+
+    private Certification createOrUpdate(Participant participant, LocalDate targetDate,
+                                         List<String> pullRequests) {
         Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
         if (optional.isPresent()) {
             return certificationProvider.update(optional.get(), targetDate, pullRequests);

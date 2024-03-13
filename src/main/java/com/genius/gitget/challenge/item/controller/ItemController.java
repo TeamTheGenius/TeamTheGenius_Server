@@ -10,6 +10,7 @@ import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -65,7 +66,8 @@ public class ItemController {
             @RequestParam(required = false) Long instanceId
     ) {
         instanceId = instanceId == null ? 0 : instanceId;
-        ItemUseResponse itemUseResponse = itemService.useItem(userPrincipal.getUser(), itemId, instanceId);
+        ItemUseResponse itemUseResponse = itemService.useItem(
+                userPrincipal.getUser(), itemId, instanceId, LocalDate.now());
         if (itemUseResponse.getInstanceId() == 0L) {
             return ResponseEntity.ok().body(
                     new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())

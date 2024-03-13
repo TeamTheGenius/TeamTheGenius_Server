@@ -388,14 +388,13 @@ class CertificationServiceTest {
     }
 
     @Test
-    @DisplayName("아직 인증을 하지 않았고, 패스 아이템이 있을 때 해당 일자의 인증을 패스할 수 있다.")
+    @DisplayName("아직 인증을 하지 않았을 때 해당 일자의 인증을 패스할 수 있다.")
     public void should_passCertification_when_conditionIsValid() {
         //given
         LocalDate currentDate = LocalDate.of(2024, 3, 1);
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
-        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(currentDate)
@@ -413,59 +412,14 @@ class CertificationServiceTest {
                 certificationRequest);
 
         //then
-        assertThat(activatedResponse.instanceId()).isEqualTo(instance.getId());
-        assertThat(activatedResponse.title()).isEqualTo(instance.getTitle());
-        assertThat(activatedResponse.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
-        assertThat(activatedResponse.repository()).isEqualTo(participant.getRepositoryName());
-        assertThat(activatedResponse.certificateStatus()).isEqualTo(PASSED.getTag());
-        assertThat(activatedResponse.numOfPassItem()).isEqualTo(0);
-        assertThat(activatedResponse.canUsePassItem()).isFalse();
-        assertThat(activatedResponse.fileResponse()).isNotNull();
-        assertThat(userItem.getCount()).isEqualTo(0);
-    }
-
-    @Test
-    @DisplayName("UserItem 정보가 DB에 존재하지 않을 때 인증 패스를 요청하면 예외가 발생해야 한다.")
-    public void should_throwException_when_userItemInfoNotExist() {
-        //given
-        LocalDate currentDate = LocalDate.of(2024, 3, 1);
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-        Participant participant = getSavedParticipant(user, instance);
-        CertificationRequest certificationRequest = CertificationRequest.builder()
-                .instanceId(instance.getId())
-                .targetDate(currentDate)
-                .build();
-
-        //when
-        getSavedCertification(NOT_YET, currentDate, participant);
-
-        //then
-        assertThatThrownBy(() -> certificationService.passCertification(user.getId(), certificationRequest))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.USER_ITEM_NOT_FOUND.getMessage());
-    }
-
-    @Test
-    @DisplayName("UserItem 정보는 있으나 아이템의 개수가 0 이하일 때 인증 패스를 요청하면 예외가 발생해야 한다.")
-    public void should_throwException_when_outOfStock() {
-        //given
-        LocalDate currentDate = LocalDate.of(2024, 3, 1);
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-        Participant participant = getSavedParticipant(user, instance);
-        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 0);
-        CertificationRequest certificationRequest = CertificationRequest.builder()
-                .instanceId(instance.getId())
-                .targetDate(currentDate)
-                .build();
-
-        instance.updateProgress(Progress.ACTIVITY);
-
-        //when && then
-        assertThatThrownBy(() -> certificationService.passCertification(user.getId(), certificationRequest))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.USER_ITEM_NOT_FOUND.getMessage());
+        assertThat(activatedResponse.getInstanceId()).isEqualTo(instance.getId());
+        assertThat(activatedResponse.getTitle()).isEqualTo(instance.getTitle());
+        assertThat(activatedResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(activatedResponse.getRepository()).isEqualTo(participant.getRepositoryName());
+        assertThat(activatedResponse.getCertificateStatus()).isEqualTo(PASSED.getTag());
+        assertThat(activatedResponse.getNumOfPassItem()).isEqualTo(0);
+        assertThat(activatedResponse.isCanUsePassItem()).isFalse();
+        assertThat(activatedResponse.getFileResponse()).isNotNull();
     }
 
     @ParameterizedTest
@@ -477,7 +431,6 @@ class CertificationServiceTest {
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
-        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(currentDate)
@@ -514,14 +467,14 @@ class CertificationServiceTest {
                 certificationRequest);
 
         //then
-        assertThat(activatedResponse.instanceId()).isEqualTo(instance.getId());
-        assertThat(activatedResponse.title()).isEqualTo(instance.getTitle());
-        assertThat(activatedResponse.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
-        assertThat(activatedResponse.repository()).isEqualTo(participant.getRepositoryName());
-        assertThat(activatedResponse.certificateStatus()).isEqualTo(PASSED.getTag());
-        assertThat(activatedResponse.numOfPassItem()).isEqualTo(0);
-        assertThat(activatedResponse.canUsePassItem()).isFalse();
-        assertThat(activatedResponse.fileResponse()).isNotNull();
+        assertThat(activatedResponse.getInstanceId()).isEqualTo(instance.getId());
+        assertThat(activatedResponse.getTitle()).isEqualTo(instance.getTitle());
+        assertThat(activatedResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(activatedResponse.getRepository()).isEqualTo(participant.getRepositoryName());
+        assertThat(activatedResponse.getCertificateStatus()).isEqualTo(PASSED.getTag());
+        assertThat(activatedResponse.getNumOfPassItem()).isEqualTo(0);
+        assertThat(activatedResponse.isCanUsePassItem()).isFalse();
+        assertThat(activatedResponse.getFileResponse()).isNotNull();
     }
 
     @Test
@@ -544,14 +497,14 @@ class CertificationServiceTest {
                 certificationRequest);
 
         //then
-        assertThat(activatedResponse.instanceId()).isEqualTo(instance.getId());
-        assertThat(activatedResponse.title()).isEqualTo(instance.getTitle());
-        assertThat(activatedResponse.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
-        assertThat(activatedResponse.repository()).isEqualTo(participant.getRepositoryName());
-        assertThat(activatedResponse.certificateStatus()).isEqualTo(PASSED.getTag());
-        assertThat(activatedResponse.numOfPassItem()).isEqualTo(0);
-        assertThat(activatedResponse.canUsePassItem()).isFalse();
-        assertThat(activatedResponse.fileResponse()).isNotNull();
+        assertThat(activatedResponse.getInstanceId()).isEqualTo(instance.getId());
+        assertThat(activatedResponse.getTitle()).isEqualTo(instance.getTitle());
+        assertThat(activatedResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
+        assertThat(activatedResponse.getRepository()).isEqualTo(participant.getRepositoryName());
+        assertThat(activatedResponse.getCertificateStatus()).isEqualTo(PASSED.getTag());
+        assertThat(activatedResponse.getNumOfPassItem()).isEqualTo(0);
+        assertThat(activatedResponse.isCanUsePassItem()).isFalse();
+        assertThat(activatedResponse.getFileResponse()).isNotNull();
     }
 
 

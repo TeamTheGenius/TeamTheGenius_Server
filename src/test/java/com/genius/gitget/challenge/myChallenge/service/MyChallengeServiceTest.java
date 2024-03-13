@@ -105,10 +105,8 @@ class MyChallengeServiceTest {
 
         //then
         assertThat(instances.size()).isEqualTo(2);
-        assertThat(instances.get(0).canUsePassItem()).isTrue();
-        assertThat(instances.get(0).numOfPassItem()).isEqualTo(3);
-        assertThat(instances.get(1).canUsePassItem()).isTrue();
-        assertThat(instances.get(1).numOfPassItem()).isEqualTo(3);
+        assertThat(instances.get(0).getNumOfPassItem()).isEqualTo(3);
+        assertThat(instances.get(1).getNumOfPassItem()).isEqualTo(3);
     }
 
     @ParameterizedTest
@@ -128,10 +126,9 @@ class MyChallengeServiceTest {
 
         //then
         assertThat(instances.size()).isEqualTo(1);
-        assertThat(instances.get(0).certificateStatus()).isEqualTo(certificateStatus.getTag());
-        assertThat(instances.get(0).canUsePassItem()).isFalse();
-        assertThat(instances.get(0).numOfPassItem()).isEqualTo(0);
-        assertThat(instances.get(0).pointPerPerson()).isEqualTo(instance1.getPointPerPerson());
+        assertThat(instances.get(0).getCertificateStatus()).isEqualTo(certificateStatus.getTag());
+        assertThat(instances.get(0).getNumOfPassItem()).isEqualTo(0);
+        assertThat(instances.get(0).getPointPerPerson()).isEqualTo(instance1.getPointPerPerson());
     }
 
     @Test
@@ -150,13 +147,13 @@ class MyChallengeServiceTest {
         //then
         DoneResponse doneResponse = doneResponses.get(0);
         assertThat(doneResponses.size()).isEqualTo(1);
-        assertThat(doneResponse.title()).isEqualTo(instance.getTitle());
-        assertThat(doneResponse.instanceId()).isEqualTo(instance.getId());
-        assertThat(doneResponse.rewardedPoints()).isZero();
-        assertThat(doneResponse.joinResult()).isEqualTo(SUCCESS);
-        assertThat(doneResponse.fileResponse()).isNotNull();
-        assertThat(doneResponse.canGetReward()).isTrue();
-        assertThat(doneResponse.numOfPointItem()).isEqualTo(3);
+        assertThat(doneResponse.getTitle()).isEqualTo(instance.getTitle());
+        assertThat(doneResponse.getInstanceId()).isEqualTo(instance.getId());
+        assertThat(doneResponse.getRewardedPoints()).isZero();
+        assertThat(doneResponse.getJoinResult()).isEqualTo(SUCCESS);
+        assertThat(doneResponse.getFileResponse()).isNotNull();
+        assertThat(doneResponse.isCanGetReward()).isTrue();
+        assertThat(doneResponse.getNumOfPointItem()).isEqualTo(3);
     }
 
     @Test
@@ -173,8 +170,8 @@ class MyChallengeServiceTest {
 
         //then
         assertThat(doneResponses.size()).isEqualTo(1);
-        assertThat(doneResponses.get(0).canGetReward()).isTrue();
-        assertThat(doneResponses.get(0).numOfPointItem()).isEqualTo(3);
+        assertThat(doneResponses.get(0).isCanGetReward()).isTrue();
+        assertThat(doneResponses.get(0).getNumOfPointItem()).isEqualTo(3);
     }
 
 

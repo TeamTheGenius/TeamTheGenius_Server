@@ -73,50 +73,6 @@ public class ItemService {
         return getItemResponse(persistUser, item, numOfItem);
     }
 
-    @Transactional
-    public ItemUseResponse useItem(User user, Long itemId, Long instanceId) {
-        User persistUser = userService.findUserById(user.getId());
-        Item item = itemProvider.findById(itemId);
-
-        UserItem userItem = userItemProvider.findByInfo(user.getId(), itemId);
-        if (!userItem.hasItem()) {
-            throw new BusinessException(ErrorCode.HAS_NO_ITEM);
-        }
-
-        switch (item.getItemCategory()) {
-            case PROFILE_FRAME -> {
-                validateFrameEquip(userItem);
-                userItem.updateEquipStatus(EquipStatus.IN_USE);
-                userItem.useItem();
-                return new ItemUseResponse(0L, "", 0);
-            }
-            case CERTIFICATION_PASSER -> {
-                ActivatedResponse activatedResponse = certificationService.passCertification(persistUser.getId(),
-                        new CertificationRequest(instanceId, LocalDate.now()));
-                activatedResponse.setItemId(itemId);
-                userItem.useItem();
-                return activatedResponse;
-            }
-            case POINT_MULTIPLIER -> {
-                DoneResponse doneResponse = myChallengeService.getRewards(
-                        new RewardRequest(persistUser, instanceId, LocalDate.now()), true
-                );
-                userItem.useItem();
-                return doneResponse;
-            }
-        }
-        throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
-    }
-
-    private void validateFrameEquip(UserItem frameItem) {
-        if (!frameItem.hasItem()) {
-            throw new BusinessException(ErrorCode.HAS_NO_ITEM);
-        }
-        if (frameItem.getEquipStatus() != EquipStatus.AVAILABLE) {
-            throw new BusinessException(ErrorCode.INVALID_EQUIP_CONDITION);
-        }
-    }
-
     private void validateUserPoint(long userPoint, int itemCost) {
         if (userPoint < itemCost) {
             throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
@@ -130,6 +86,64 @@ public class ItemService {
         return userItemProvider.save(userItem);
     }
 
+    @Transactional
+    public ItemUseResponse useItem(User user, Long itemId, Long instanceId, LocalDate currentDate) {
+        Item item = itemProvider.findById(itemId);
+        UserItem userItem = userItemProvider.findByInfo(user.getId(), itemId);
+
+        if (!userItem.hasItem()) {
+            throw new BusinessException(ErrorCode.HAS_NO_ITEM);
+        }
+
+        switch (item.getItemCategory()) {
+            case PROFILE_FRAME -> {
+                return useProfileFrameItem(userItem);
+            }
+            case CERTIFICATION_PASSER -> {
+                return usePasserItem(userItem, instanceId, currentDate);
+            }
+            case POINT_MULTIPLIER -> {
+                return usePointMultiplierItem(userItem, instanceId, currentDate);
+            }
+        }
+        throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
+    }
+
+    //TODO: 기존에 장착하고 있던 프레임을 장착 해제 시켜야 함
+    private ItemUseResponse useProfileFrameItem(UserItem userItem) {
+        validateFrameEquip(userItem);
+        userItem.updateEquipStatus(EquipStatus.IN_USE);
+        return new ItemUseResponse(0L, "", 0);
+    }
+
+    private void validateFrameEquip(UserItem frameItem) {
+        if (!frameItem.hasItem()) {
+            throw new BusinessException(ErrorCode.HAS_NO_ITEM);
+        }
+        if (frameItem.getEquipStatus() != EquipStatus.AVAILABLE) {
+            throw new BusinessException(ErrorCode.INVALID_EQUIP_CONDITION);
+        }
+    }
+
+    private ItemUseResponse usePasserItem(UserItem userItem, Long instanceId, LocalDate currentDate) {
+        Long userId = userItem.getUser().getId();
+        Long itemId = userItem.getItem().getId();
+        ActivatedResponse activatedResponse = certificationService.passCertification(
+                userId,
+                new CertificationRequest(instanceId, currentDate));
+        activatedResponse.setItemId(itemId);
+        userItem.useItem();
+        return activatedResponse;
+    }
+
+    private ItemUseResponse usePointMultiplierItem(UserItem userItem, Long instanceId, LocalDate currentDate) {
+        User user = userItem.getUser();
+        DoneResponse doneResponse = myChallengeService.getRewards(
+                new RewardRequest(user, instanceId, currentDate), true
+        );
+        userItem.useItem();
+        return doneResponse;
+    }
 
     private ItemResponse getItemResponse(User user, Item item, int numOfItem) {
         if (item.getItemCategory() == ItemCategory.PROFILE_FRAME) {

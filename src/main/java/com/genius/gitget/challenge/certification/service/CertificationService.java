@@ -15,7 +15,6 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
-import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -148,6 +147,7 @@ public class CertificationService {
         Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
 
         validCertificationCondition(instance, targetDate);
+        validatePassCondition(optional);
 
         //TODO: 리팩토링 시급...
         if (optional.isPresent()) {
@@ -165,14 +165,10 @@ public class CertificationService {
                 0, participant.getRepositoryName());
     }
 
-    private void validatePassCondition(UserItem userItem, Optional<Certification> optional) {
-        if (!userItem.hasItem()) {
-            throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
+    private void validatePassCondition(Optional<Certification> optional) {
+        if (optional.isPresent() && optional.get().getCertificationStatus() != NOT_YET) {
+            throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
         }
-        if (optional.isEmpty() || optional.get().getCertificationStatus() == NOT_YET) {
-            return;
-        }
-        throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
     }
 
     @Transactional

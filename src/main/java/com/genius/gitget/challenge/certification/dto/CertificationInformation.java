@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record CertificationInformation(
+        String prTemplate,
         String repository,
         double successPercent,
         int totalAttempt,

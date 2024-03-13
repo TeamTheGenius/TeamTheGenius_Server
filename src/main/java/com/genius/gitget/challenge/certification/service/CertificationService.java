@@ -262,6 +262,7 @@ public class CertificationService {
         }
 
         return CertificationInformation.builder()
+                .prTemplate(instance.getPrTemplate(currentDate))
                 .repository(participant.getRepositoryName())
                 .successPercent(getSuccessPercent(successCount, currentAttempt))
                 .totalAttempt(totalAttempt)

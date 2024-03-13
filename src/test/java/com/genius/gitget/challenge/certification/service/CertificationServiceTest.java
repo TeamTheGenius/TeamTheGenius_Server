@@ -295,10 +295,12 @@ class CertificationServiceTest {
         Participant participant = getSavedParticipant(user, instance);
 
         //when
+        instance.setInstanceUUID("instanceUUID");
         CertificationInformation information = certificationService.getCertificationInformation(instance,
                 participant, targetDate);
 
         //then
+        assertThat(information.prTemplate()).isEqualTo(instance.getPrTemplate(targetDate));
         assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
         assertThat(information.remainCount()).isEqualTo(information.totalAttempt());
         assertThat(information.totalAttempt()).isEqualTo(instance.getTotalAttempt());

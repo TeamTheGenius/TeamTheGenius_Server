@@ -15,7 +15,6 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
-import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
@@ -146,13 +145,9 @@ public class CertificationService {
         Participant participant = participantProvider.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
-        UserItem userItem = userItemProvider.findByCategory(userId, ItemCategory.CERTIFICATION_PASSER);
         Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
 
         validCertificationCondition(instance, targetDate);
-        validatePassCondition(userItem, optional);
-
-        userItem.useItem();
 
         //TODO: 리팩토링 시급...
         if (optional.isPresent()) {

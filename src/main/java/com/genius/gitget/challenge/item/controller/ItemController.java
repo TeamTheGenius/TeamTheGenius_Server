@@ -4,6 +4,7 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.dto.ItemResponse;
+import com.genius.gitget.challenge.item.dto.ItemUseResponse;
 import com.genius.gitget.challenge.item.service.ItemService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
@@ -57,14 +58,22 @@ public class ItemController {
     }
 
     // 사용하는 아이템 -> 프로필 프레임, 인증 패스권, 챌린지 보상 획득 2배
-    @PostMapping("/item/use/{itemId}")
+    @PostMapping("/items/use/{itemId}")
     public ResponseEntity<CommonResponse> useItem(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long itemId
+            @PathVariable Long itemId,
+            @RequestParam(required = false) Long instanceId
     ) {
+        instanceId = instanceId == null ? 0 : instanceId;
+        ItemUseResponse itemUseResponse = itemService.useItem(userPrincipal.getUser(), itemId, instanceId);
+        if (itemUseResponse.getInstanceId() == 0L) {
+            return ResponseEntity.ok().body(
+                    new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
+            );
+        }
 
         return ResponseEntity.ok().body(
-                new CommonResponse()
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemUseResponse)
         );
     }
 }

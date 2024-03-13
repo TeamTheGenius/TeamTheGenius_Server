@@ -92,7 +92,7 @@ public class ItemService {
             }
             case POINT_MULTIPLIER -> {
                 return myChallengeService.getRewards(
-                        new RewardRequest(persistUser, instanceId, true, LocalDate.now())
+                        new RewardRequest(persistUser, instanceId, LocalDate.now())
                 );
             }
         }

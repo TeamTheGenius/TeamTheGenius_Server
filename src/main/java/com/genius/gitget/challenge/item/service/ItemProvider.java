@@ -24,4 +24,8 @@ public class ItemProvider {
     public List<Item> findAllByCategory(ItemCategory itemCategory) {
         return itemRepository.findAllByCategory(itemCategory);
     }
+
+    public ItemCategory getCategoryById(Long itemId) {
+        return findById(itemId).getItemCategory();
+    }
 }

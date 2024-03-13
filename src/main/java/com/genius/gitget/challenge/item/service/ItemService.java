@@ -49,13 +49,10 @@ public class ItemService {
     public ItemResponse orderItem(User user, Long itemId) {
         User persistUser = userService.findUserById(user.getId());
         Item item = itemProvider.findById(itemId);
-        Long userPoint = persistUser.getPoint();
 
-        if (item.getCost() > userPoint) {
-            throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
-        }
+        validateUserPoint(persistUser.getPoint(), item.getCost());
 
-        UserItem userItem = userItemProvider.findOptionalById(persistUser.getId(), itemId)
+        UserItem userItem = userItemProvider.findOptionalByInfo(persistUser.getId(), itemId)
                 .orElseGet(() -> createNew(persistUser, item));
         int numOfItem = userItem.purchase();
         persistUser.updatePoints((long) item.getCost() * -1);
@@ -63,8 +60,49 @@ public class ItemService {
         return getItemResponse(persistUser, item, numOfItem);
     }
 
+    @Transactional
+    public void useItem(User user, Long itemId) {
+        User persistUser = userService.findUserById(user.getId());
+        Item item = itemProvider.findById(itemId);
+
+        validateUserPoint(user.getPoint(), item.getCost());
+
+        switch (item.getItemCategory()) {
+            case PROFILE_FRAME -> {
+                applyProfileFrame(persistUser, item);
+            }
+            case CERTIFICATION_PASSER -> {
+
+            }
+            case POINT_MULTIPLIER -> {
+
+            }
+        }
+    }
+
+    private void applyProfileFrame(User user, Item item) {
+        UserItem userItem = userItemProvider.findByInfo(user.getId(), item.getId());
+        validateFrameEquip(userItem);
+        userItem.updateEquipStatus(EquipStatus.IN_USE);
+    }
+
+    private void validateFrameEquip(UserItem frameItem) {
+        if (!frameItem.hasItem()) {
+            throw new BusinessException(ErrorCode.HAS_NO_ITEM);
+        }
+        if (frameItem.getEquipStatus() != EquipStatus.AVAILABLE) {
+            throw new BusinessException(ErrorCode.INVALID_EQUIP_CONDITION);
+        }
+    }
+
+    private void validateUserPoint(long userPoint, int itemCost) {
+        if (userPoint < itemCost) {
+            throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
+        }
+    }
+
     private UserItem createNew(User user, Item item) {
-        UserItem userItem = UserItem.createDefault(item.getItemCategory());
+        UserItem userItem = UserItem.createDefault(1, item.getItemCategory());
         userItem.setUser(user);
         userItem.setItem(item);
         return userItemProvider.save(userItem);

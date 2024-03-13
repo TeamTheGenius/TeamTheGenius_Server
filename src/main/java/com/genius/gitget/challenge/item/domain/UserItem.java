@@ -44,11 +44,11 @@ public class UserItem {
         this.equipStatus = equipStatus;
     }
 
-    public static UserItem createDefault(ItemCategory itemCategory) {
+    public static UserItem createDefault(int count, ItemCategory itemCategory) {
         if (itemCategory == ItemCategory.PROFILE_FRAME) {
-            return new UserItem(0, EquipStatus.AVAILABLE);
+            return new UserItem(count, EquipStatus.AVAILABLE);
         }
-        return new UserItem(0, EquipStatus.UNAVAILABLE);
+        return new UserItem(count, EquipStatus.UNAVAILABLE);
     }
 
     //=== 비지니스 로직 ===//
@@ -69,6 +69,10 @@ public class UserItem {
             throw new BusinessException(ErrorCode.HAS_NO_ITEM);
         }
         this.count -= 1;
+    }
+
+    public void updateEquipStatus(EquipStatus equipStatus) {
+        this.equipStatus = equipStatus;
     }
 
     //=== 연관관계 편의 메서드 ===//

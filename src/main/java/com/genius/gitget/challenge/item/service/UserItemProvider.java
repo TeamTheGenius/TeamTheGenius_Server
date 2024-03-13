@@ -26,13 +26,19 @@ public class UserItemProvider {
         return userItemRepository.save(userItem);
     }
 
+    //TODO: 수정 필요
     public UserItem findByCategory(Long userId, ItemCategory itemCategory) {
         return userItemRepository.findByCategory(userId, itemCategory)
                 .orElseThrow(() -> new BusinessException(USER_ITEM_NOT_FOUND));
     }
 
-    public Optional<UserItem> findOptionalById(Long userId, Long itemId) {
+    public Optional<UserItem> findOptionalByInfo(Long userId, Long itemId) {
         return userItemRepository.findByUserId(userId, itemId);
+    }
+
+    public UserItem findByInfo(Long userId, Long itemId) {
+        return userItemRepository.findByUserId(userId, itemId)
+                .orElseThrow(() -> new BusinessException(USER_ITEM_NOT_FOUND));
     }
 
     public EquipStatus getEquipStatus(Long userId, Long itemId) {

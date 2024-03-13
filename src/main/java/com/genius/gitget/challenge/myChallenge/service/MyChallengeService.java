@@ -13,7 +13,6 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.item.service.ItemProvider;
 import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
@@ -139,14 +138,14 @@ public class MyChallengeService {
 
         validRewardCondition(participant);
 
-        int pointPerPerson = instance.getPointPerPerson();
-        int rewardPoints = pointPerPerson;
+        int rewardPoints = instance.getPointPerPerson();
 
-        if (rewardRequest.canUseItem()) {
-            UserItem userItem = userItemProvider.findByCategory(user.getId(), ItemCategory.POINT_MULTIPLIER);
-            userItem.useItem();
-            rewardPoints = pointPerPerson * 2;
-        }
+        //TODO: 정리하기
+//        if (rewardRequest.canUseItem()) {
+//            UserItem userItem = userItemProvider.findByCategory(user.getId(), ItemCategory.POINT_MULTIPLIER);
+//            userItem.useItem();
+//            rewardPoints = pointPerPerson * 2;
+//        }
 
         user.updatePoints((long) rewardPoints);
         double achievementRate = getAchievementRate(instance, participant.getId(), rewardRequest.targetDate());

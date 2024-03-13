@@ -14,6 +14,7 @@ import lombok.Setter;
 @Setter
 public class DoneResponse extends ItemUseResponse {
     private JoinResult joinResult;
+    private Long itemId;
     private boolean canGetReward;
     private int numOfPointItem;
     private int rewardedPoints;

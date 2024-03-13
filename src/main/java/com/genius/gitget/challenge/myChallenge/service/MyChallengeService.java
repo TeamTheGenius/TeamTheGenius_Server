@@ -1,6 +1,8 @@
 package com.genius.gitget.challenge.myChallenge.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
+import static com.genius.gitget.challenge.item.domain.ItemCategory.CERTIFICATION_PASSER;
+import static com.genius.gitget.challenge.item.domain.ItemCategory.POINT_MULTIPLIER;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.NO;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.YES;
@@ -12,7 +14,6 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.item.domain.Item;
-import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.service.ItemProvider;
 import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
@@ -74,8 +75,10 @@ public class MyChallengeService {
 
             // 포인트를 아직 수령하지 않았을 때
             if (participant.getRewardStatus() == NO) {
-                int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.POINT_MULTIPLIER);
+                Item item = itemProvider.findAllByCategory(POINT_MULTIPLIER).get(0);
+                int numOfPassItem = userItemProvider.countNumOfItem(user, POINT_MULTIPLIER);
                 DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant, numOfPassItem);
+                doneResponse.setItemId(item.getId());
                 done.add(doneResponse);
                 continue;
             }
@@ -108,8 +111,8 @@ public class MyChallengeService {
                     .orElse(getDummyCertification());
 
             //TODO: 로직 수정 필요
-            Item item = itemProvider.findAllByCategory(ItemCategory.CERTIFICATION_PASSER).get(0);
-            int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.CERTIFICATION_PASSER);
+            Item item = itemProvider.findAllByCategory(CERTIFICATION_PASSER).get(0);
+            int numOfPassItem = userItemProvider.countNumOfItem(user, CERTIFICATION_PASSER);
 
             ActivatedResponse activatedResponse = ActivatedResponse.create(
                     instance, certification.getCertificationStatus(),

@@ -10,6 +10,7 @@ import com.genius.gitget.challenge.item.dto.ItemResponse;
 import com.genius.gitget.challenge.item.dto.ItemUseResponse;
 import com.genius.gitget.challenge.item.dto.ProfileResponse;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
+import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
 import com.genius.gitget.challenge.myChallenge.service.MyChallengeService;
 import com.genius.gitget.challenge.user.domain.User;
@@ -77,32 +78,34 @@ public class ItemService {
         User persistUser = userService.findUserById(user.getId());
         Item item = itemProvider.findById(itemId);
 
-        validateUserPoint(user.getPoint(), item.getCost());
+        UserItem userItem = userItemProvider.findByInfo(user.getId(), itemId);
+        if (!userItem.hasItem()) {
+            throw new BusinessException(ErrorCode.HAS_NO_ITEM);
+        }
 
         switch (item.getItemCategory()) {
             case PROFILE_FRAME -> {
-                applyProfileFrame(persistUser, item);
+                validateFrameEquip(userItem);
+                userItem.updateEquipStatus(EquipStatus.IN_USE);
+                userItem.useItem();
                 return new ItemUseResponse(0L, "", 0);
             }
             case CERTIFICATION_PASSER -> {
                 ActivatedResponse activatedResponse = certificationService.passCertification(persistUser.getId(),
                         new CertificationRequest(instanceId, LocalDate.now()));
                 activatedResponse.setItemId(itemId);
+                userItem.useItem();
                 return activatedResponse;
             }
             case POINT_MULTIPLIER -> {
-                return myChallengeService.getRewards(
-                        new RewardRequest(persistUser, instanceId, LocalDate.now())
+                DoneResponse doneResponse = myChallengeService.getRewards(
+                        new RewardRequest(persistUser, instanceId, LocalDate.now()), true
                 );
+                userItem.useItem();
+                return doneResponse;
             }
         }
         throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
-    }
-
-    private void applyProfileFrame(User user, Item item) {
-        UserItem userItem = userItemProvider.findByInfo(user.getId(), item.getId());
-        validateFrameEquip(userItem);
-        userItem.updateEquipStatus(EquipStatus.IN_USE);
     }
 
     private void validateFrameEquip(UserItem frameItem) {

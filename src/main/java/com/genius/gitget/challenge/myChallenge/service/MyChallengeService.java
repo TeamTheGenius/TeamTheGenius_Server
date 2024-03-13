@@ -134,7 +134,7 @@ public class MyChallengeService {
     }
 
     @Transactional
-    public DoneResponse getRewards(RewardRequest rewardRequest) {
+    public DoneResponse getRewards(RewardRequest rewardRequest, boolean useItem) {
         User user = userService.findUserById(rewardRequest.user().getId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), rewardRequest.instanceId());
         Instance instance = participant.getInstance();
@@ -142,13 +142,9 @@ public class MyChallengeService {
         validRewardCondition(participant);
 
         int rewardPoints = instance.getPointPerPerson();
-
-        //TODO: 정리하기
-//        if (rewardRequest.canUseItem()) {
-//            UserItem userItem = userItemProvider.findByCategory(user.getId(), ItemCategory.POINT_MULTIPLIER);
-//            userItem.useItem();
-//            rewardPoints = pointPerPerson * 2;
-//        }
+        if (useItem) {
+            rewardPoints *= 2;
+        }
 
         user.updatePoints((long) rewardPoints);
         double achievementRate = getAchievementRate(instance, participant.getId(), rewardRequest.targetDate());

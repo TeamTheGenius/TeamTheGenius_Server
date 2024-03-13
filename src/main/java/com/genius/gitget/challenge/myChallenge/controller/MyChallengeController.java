@@ -67,7 +67,6 @@ public class MyChallengeController {
         );
     }
 
-    // /api/challenges/reward/1?item=true
     @GetMapping("/reward/{instanceId}")
     public ResponseEntity<SingleResponse<DoneResponse>> getRewards(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -75,7 +74,7 @@ public class MyChallengeController {
     ) {
 
         RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser(), instanceId, LocalDate.now());
-        DoneResponse doneResponse = myChallengeService.getRewards(rewardRequest);
+        DoneResponse doneResponse = myChallengeService.getRewards(rewardRequest, false);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), doneResponse)

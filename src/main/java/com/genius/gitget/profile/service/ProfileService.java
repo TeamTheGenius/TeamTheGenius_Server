@@ -22,8 +22,8 @@ import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserInterestResponse;
+import com.genius.gitget.profile.dto.UserInterestUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
-import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -124,12 +124,12 @@ public class ProfileService {
 
     // 마이페이지 - 관심사 수정
     @Transactional
-    public void updateUserTags(User user, UserTagsUpdateRequest userTagsUpdateRequest) {
-        if (userTagsUpdateRequest.getTags() == null) {
+    public void updateUserTags(User user, UserInterestUpdateRequest userInterestUpdateRequest) {
+        if (userInterestUpdateRequest.getTags() == null) {
             throw new BusinessException();
         }
         User findUser = getUserByIdentifier(user.getIdentifier());
-        String interest = String.join(",", userTagsUpdateRequest.getTags());
+        String interest = String.join(",", userInterestUpdateRequest.getTags());
         findUser.updateUserTags(interest);
         userRepository.save(findUser);
     }

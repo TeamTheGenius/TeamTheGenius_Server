@@ -10,9 +10,9 @@ import com.genius.gitget.profile.dto.UserInformationRequest;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserInterestResponse;
+import com.genius.gitget.profile.dto.UserInterestUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
 import com.genius.gitget.profile.dto.UserSignoutRequest;
-import com.genius.gitget.profile.dto.UserTagsUpdateRequest;
 import com.genius.gitget.profile.service.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -86,8 +86,8 @@ public class ProfileController {
     // 마이페이지 - 관심사 수정
     @PostMapping("/interest")
     public ResponseEntity<CommonResponse> updateUserTags(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                         @RequestBody UserTagsUpdateRequest userTagsUpdateRequest) {
-        profileService.updateUserTags(userPrincipal.getUser(), userTagsUpdateRequest);
+                                                         @RequestBody UserInterestUpdateRequest userInterestUpdateRequest) {
+        profileService.updateUserTags(userPrincipal.getUser(), userInterestUpdateRequest);
 
         return ResponseEntity.ok()
                 .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));

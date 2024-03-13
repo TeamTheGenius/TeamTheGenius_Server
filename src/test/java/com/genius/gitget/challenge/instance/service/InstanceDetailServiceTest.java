@@ -14,6 +14,8 @@ import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
+import com.genius.gitget.challenge.likes.dto.UserLikesAddResponse;
+import com.genius.gitget.challenge.likes.service.LikesService;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -42,6 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
 class InstanceDetailServiceTest {
     @Autowired
     InstanceDetailService instanceDetailService;
+    @Autowired
+    LikesService likesService;
     @Autowired
     ParticipantProvider participantProvider;
     @Autowired
@@ -250,7 +254,9 @@ class InstanceDetailServiceTest {
         assertThat(instanceResponse.pointPerPerson()).isEqualTo(100);
         assertThat(instanceResponse.description()).isEqualTo(savedInstance.getDescription());
         assertThat(instanceResponse.joinStatus()).isEqualTo(JoinStatus.YES);
-        assertThat(instanceResponse.likesCount()).isEqualTo(0);
+        assertThat(instanceResponse.likesInfo().likesCount()).isEqualTo(0);
+        assertThat(instanceResponse.likesInfo().likesId()).isEqualTo(0);
+        assertThat(instanceResponse.likesInfo().isLiked()).isFalse();
     }
 
     @Test
@@ -271,7 +277,34 @@ class InstanceDetailServiceTest {
         assertThat(instanceResponse.pointPerPerson()).isEqualTo(100);
         assertThat(instanceResponse.description()).isEqualTo(savedInstance.getDescription());
         assertThat(instanceResponse.joinStatus()).isEqualTo(JoinStatus.NO);
-        assertThat(instanceResponse.likesCount()).isEqualTo(0);
+        assertThat(instanceResponse.likesInfo().likesCount()).isEqualTo(0);
+        assertThat(instanceResponse.likesInfo().likesId()).isEqualTo(0);
+        assertThat(instanceResponse.likesInfo().isLiked()).isFalse();
+    }
+
+    @Test
+    @DisplayName("시용자가 좋아요를 한 이후, 상세 정보를 요청하면 좋아요 관련된 정보를 받을 수 있다.")
+    public void should_returnLikesData_when_userPushLikes() {
+        //given
+        User savedUser = getSavedUser(githubId);
+        Instance savedInstance = getSavedInstance(Progress.PREACTIVITY, LocalDate.now().plusDays(2));
+
+        //when
+        UserLikesAddResponse userLikesAddResponse = likesService.addLikes(savedUser, savedUser.getIdentifier(),
+                savedInstance.getId());
+        InstanceResponse instanceResponse = instanceDetailService.getInstanceDetailInformation(savedUser,
+                savedInstance.getId());
+
+        //then
+        assertThat(instanceResponse.instanceId()).isEqualTo(savedInstance.getId());
+        assertThat(instanceResponse.remainDays()).isEqualTo(2);
+        assertThat(instanceResponse.participantCount()).isEqualTo(0);
+        assertThat(instanceResponse.pointPerPerson()).isEqualTo(100);
+        assertThat(instanceResponse.description()).isEqualTo(savedInstance.getDescription());
+        assertThat(instanceResponse.joinStatus()).isEqualTo(JoinStatus.NO);
+        assertThat(instanceResponse.likesInfo().likesCount()).isEqualTo(1);
+        assertThat(instanceResponse.likesInfo().likesId()).isEqualTo(userLikesAddResponse.getLikesId());
+        assertThat(instanceResponse.likesInfo().isLiked()).isTrue();
     }
 
     @Test

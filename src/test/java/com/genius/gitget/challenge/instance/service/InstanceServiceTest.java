@@ -12,6 +12,7 @@ import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.util.file.FileTestUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,13 +67,14 @@ public class InstanceServiceTest {
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
 
         //when
-        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
+        instanceService.createInstance(instanceCreateRequest,
                 FileTestUtil.getMultipartFile("name"), fileType, currentDate);
 
         //then
-        Optional<Instance> byId = instanceRepository.findById(savedInstanceId);
-        Assertions.assertThat(byId.get().getId()).isEqualTo(savedInstanceId);
+        List<Instance> all = instanceRepository.findAll();
+        Assertions.assertThat(all.size()).isEqualTo(1);
     }
+
 
     @Test
     public void 인스턴스_수정() throws Exception {

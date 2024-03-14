@@ -153,16 +153,18 @@ public class CertificationService {
         validCertificationCondition(instance, targetDate);
         validatePassCondition(userItem, optionalCertification);
 
-        Certification certification = optionalCertification.map(result -> {
-            result.updateToPass(targetDate);
-            return result;
-        }).orElseGet(() -> {
-            Certification result = Certification.createPassed(targetDate);
-            result.setParticipant(participant);
-            certificationProvider.save(result);
-            return result;
-        });
-        
+        Certification certification = optionalCertification
+                .map(passed -> {
+                    passed.updateToPass(targetDate);
+                    return passed;
+                })
+                .orElseGet(() -> {
+                    Certification passed = Certification.createPassed(targetDate);
+                    passed.setParticipant(participant);
+                    certificationProvider.save(passed);
+                    return passed;
+                });
+
         userItem.useItem();
 
         return ActivatedResponse.create(instance, certification.getCertificationStatus(), 0,
@@ -195,31 +197,20 @@ public class CertificationService {
                 instance.getPrTemplate(targetDate)
         );
 
-        Certification certification = createOrUpdate(participant, targetDate, filteredPullRequests);
+        Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
+                .map(updated -> certificationProvider.update(updated, targetDate, filteredPullRequests))
+                .orElseGet(
+                        () -> certificationProvider.createCertification(participant, targetDate, filteredPullRequests)
+                );
 
         return CertificationResponse.createExist(certification);
     }
 
     private List<String> filterValidPR(List<GHPullRequest> ghPullRequests, String prTemplate) {
-        List<String> validPullRequests = ghPullRequests.stream()
+        return ghPullRequests.stream()
                 .filter(ghPullRequest -> ghPullRequest.getBody().contains(prTemplate))
                 .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
                 .toList();
-        if (validPullRequests.isEmpty()) {
-            throw new BusinessException(ErrorCode.PR_TEMPLATE_NOT_FOUND);
-        }
-
-        return validPullRequests;
-    }
-
-    private Certification createOrUpdate(Participant participant, LocalDate targetDate,
-                                         List<String> pullRequests) {
-        Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
-        if (optional.isPresent()) {
-            return certificationProvider.update(optional.get(), targetDate, pullRequests);
-        }
-
-        return certificationProvider.createCertification(participant, targetDate, pullRequests);
     }
 
     private void validCertificationCondition(Instance instance, LocalDate targetDate) {
@@ -232,14 +223,6 @@ public class CertificationService {
         if (!isValidPeriod) {
             throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
         }
-    }
-
-    private List<String> getPullRequestLink(GitHub gitHub, String repositoryName, LocalDate targetDate) {
-        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate);
-
-        return ghPullRequests.stream()
-                .map(pr -> pr.getHtmlUrl().toString())
-                .toList();
     }
 
     public InstancePreviewResponse getInstancePreview(Long instanceId) {

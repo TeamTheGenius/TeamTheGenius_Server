@@ -10,11 +10,14 @@ import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -22,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final FilesService filesService;
     private final EncryptUtil encryptUtil;
 
 
@@ -41,17 +45,18 @@ public class UserService {
     }
 
     @Transactional
-    public Long signup(SignupRequest requestUser) {
+    public Long signup(SignupRequest requestUser, MultipartFile multipartFile) {
         User user = findUserByIdentifier(requestUser.identifier());
         isAlreadyRegistered(user);
 
-        //TODO: Converter 클래스 만들어서 적용하기
         String interest = String.join(",", requestUser.interest());
-
         user.updateUser(requestUser.nickname(),
                 requestUser.information(),
                 interest);
         user.updateRole(Role.USER);
+
+        Files files = filesService.uploadFile(multipartFile, "profile");
+        user.setFiles(files);
 
         return user.getId();
     }

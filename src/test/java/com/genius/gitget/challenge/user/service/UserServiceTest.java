@@ -8,9 +8,12 @@ import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.domain.FileType;
+import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.util.file.FileTestUtil;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +23,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @Transactional
@@ -27,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private UserService userService;
 
@@ -43,11 +46,12 @@ class UserServiceTest {
                 .information("information")
                 .interest(List.of("관심사1", "관심사2"))
                 .build();
+        MultipartFile multipartFile = FileTestUtil.getMultipartFile("profile");
 
         //when
         User user = userService.findUserByIdentifier(email);
 
-        Long signupUserId = userService.signup(signupRequest);
+        Long signupUserId = userService.signup(signupRequest, multipartFile);
         User foundUser = userService.findUserById(signupUserId);
         //then
         assertThat(user.getIdentifier()).isEqualTo(foundUser.getIdentifier());
@@ -55,6 +59,10 @@ class UserServiceTest {
         assertThat(user.getProviderInfo()).isEqualTo(foundUser.getProviderInfo());
         assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());
         assertThat(user.getTags()).isEqualTo(foundUser.getTags());
+
+        Files files = user.getFiles().get();
+        assertThat(files.getFileType()).isEqualTo(FileType.PROFILE);
+        assertThat(files.getOriginalFilename()).contains(multipartFile.getOriginalFilename());
     }
 
     @Test
@@ -69,13 +77,14 @@ class UserServiceTest {
                 .information("information")
                 .interest(List.of("관심사1", "관심사2"))
                 .build();
+        MultipartFile multipartFile = FileTestUtil.getMultipartFile("profile");
 
         //when
         User user = userService.findUserByIdentifier(email);
-        Long signupUserId = userService.signup(signupRequest);
+        Long signupUserId = userService.signup(signupRequest, multipartFile);
 
         //then
-        assertThatThrownBy(() -> userService.signup(signupRequest))
+        assertThatThrownBy(() -> userService.signup(signupRequest, multipartFile))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_REGISTERED.getMessage());
     }

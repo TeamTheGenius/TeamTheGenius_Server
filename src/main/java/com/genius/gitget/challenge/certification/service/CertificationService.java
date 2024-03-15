@@ -144,25 +144,26 @@ public class CertificationService {
         Participant participant = participantProvider.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
-        Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
+        Optional<Certification> optionalCertification = certificationProvider.findByDate(targetDate,
+                participant.getId());
 
         validCertificationCondition(instance, targetDate);
-        validatePassCondition(optional);
+        validatePassCondition(optionalCertification);
 
-        //TODO: 리팩토링 시급...
-        if (optional.isPresent()) {
-            Certification certification = optional.get();
-            certification.updateToPass(targetDate);
-            return ActivatedResponse.create(instance, certification.getCertificationStatus(),
-                    0, participant.getRepositoryName());
-        }
+        Certification certification = optionalCertification
+                .map(passed -> {
+                    passed.updateToPass(targetDate);
+                    return passed;
+                })
+                .orElseGet(() -> {
+                    Certification passed = Certification.createPassed(targetDate);
+                    passed.setParticipant(participant);
+                    certificationProvider.save(passed);
+                    return passed;
+                });
 
-        Certification certification = Certification.createPassed(targetDate);
-        certification.setParticipant(participant);
-        certificationProvider.save(certification);
-
-        return ActivatedResponse.create(instance, certification.getCertificationStatus(),
-                0, participant.getRepositoryName());
+        return ActivatedResponse.create(instance, certification.getCertificationStatus(), 0,
+                participant.getRepositoryName());
     }
 
     private void validatePassCondition(Optional<Certification> optional) {
@@ -177,25 +178,30 @@ public class CertificationService {
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
 
-        validCertificationCondition(instance, certificationRequest.targetDate());
+        String repositoryName = participant.getRepositoryName();
+        LocalDate targetDate = certificationRequest.targetDate();
 
-        List<String> pullRequests = getPullRequestLink(
-                gitHub,
-                participant.getRepositoryName(),
-                certificationRequest.targetDate());
+        validCertificationCondition(instance, targetDate);
 
-        Certification certification = createOrUpdate(participant, certificationRequest.targetDate(), pullRequests);
+        List<String> filteredPullRequests = filterValidPR(
+                githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate),
+                instance.getPrTemplate(targetDate)
+        );
+
+        Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
+                .map(updated -> certificationProvider.update(updated, targetDate, filteredPullRequests))
+                .orElseGet(
+                        () -> certificationProvider.createCertification(participant, targetDate, filteredPullRequests)
+                );
 
         return CertificationResponse.createExist(certification);
     }
 
-    private Certification createOrUpdate(Participant participant, LocalDate targetDate, List<String> pullRequests) {
-        Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
-        if (optional.isPresent()) {
-            return certificationProvider.update(optional.get(), targetDate, pullRequests);
-        }
-
-        return certificationProvider.createCertification(participant, targetDate, pullRequests);
+    private List<String> filterValidPR(List<GHPullRequest> ghPullRequests, String prTemplate) {
+        return ghPullRequests.stream()
+                .filter(ghPullRequest -> ghPullRequest.getBody().contains(prTemplate))
+                .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
+                .toList();
     }
 
     private void validCertificationCondition(Instance instance, LocalDate targetDate) {
@@ -208,14 +214,6 @@ public class CertificationService {
         if (!isValidPeriod) {
             throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
         }
-    }
-
-    private List<String> getPullRequestLink(GitHub gitHub, String repositoryName, LocalDate targetDate) {
-        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate);
-
-        return ghPullRequests.stream()
-                .map(pr -> pr.getHtmlUrl().toString())
-                .toList();
     }
 
     public InstancePreviewResponse getInstancePreview(Long instanceId) {
@@ -253,6 +251,7 @@ public class CertificationService {
         }
 
         return CertificationInformation.builder()
+                .prTemplate(instance.getPrTemplate(currentDate))
                 .repository(participant.getRepositoryName())
                 .successPercent(getSuccessPercent(successCount, currentAttempt))
                 .totalAttempt(totalAttempt)

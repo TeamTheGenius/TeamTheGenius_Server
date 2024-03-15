@@ -117,6 +117,34 @@ class CertificationServiceTest {
     }
 
     @Test
+    @DisplayName("기존에 저장되어있는 인증 내역이 있더라도, 인증 시도를 다시 하면 최신의 내용으로 갱신된다.")
+    public void should_updateCertification_when_certificateOnce() {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getSavedParticipant(user, instance);
+        githubService.registerGithubPersonalToken(user, personalKey);
+
+        LocalDate targetDate = LocalDate.of(2024, 2, 5);
+
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(targetDate)
+                .build();
+        instance.updateProgress(Progress.ACTIVITY);
+
+        //when
+        Certification certification = getSavedCertification(CERTIFICATED, targetDate, participant);
+        CertificationResponse certificationResponse = certificationService.updateCertification(user,
+                certificationRequest);
+
+        //then
+        assertThat(certificationResponse.certificatedAt()).isEqualTo(targetDate);
+        assertThat(certificationResponse.certificationId()).isEqualTo(certification.getId());
+        assertThat(certificationResponse.certificateStatus()).isEqualTo(certification.getCertificationStatus());
+    }
+
+    @Test
     @DisplayName("인증을 시도한 날짜가 챌린지의 진행 기간과 겹치지 않는다면 예외를 발생한다.")
     public void should_throwException_when_progressIsNotActivity() {
         //given
@@ -299,6 +327,7 @@ class CertificationServiceTest {
                 participant, targetDate);
 
         //then
+        assertThat(information.prTemplate()).isEqualTo(instance.getPrTemplate(targetDate));
         assertThat(information.pointPerPerson()).isEqualTo(instance.getPointPerPerson());
         assertThat(information.remainCount()).isEqualTo(information.totalAttempt());
         assertThat(information.totalAttempt()).isEqualTo(instance.getTotalAttempt());
@@ -535,13 +564,13 @@ class CertificationServiceTest {
     }
 
     private Instance getSavedInstance() {
-        return instanceRepository.save(
-                Instance.builder()
-                        .progress(Progress.PREACTIVITY)
-                        .startedDate(LocalDateTime.of(2024, 2, 1, 0, 0))
-                        .completedDate(LocalDateTime.of(2024, 3, 29, 0, 0))
-                        .build()
-        );
+        Instance instance = Instance.builder()
+                .progress(Progress.PREACTIVITY)
+                .startedDate(LocalDateTime.of(2024, 2, 1, 0, 0))
+                .completedDate(LocalDateTime.of(2024, 3, 29, 0, 0))
+                .build();
+        instance.setInstanceUUID("instanceUUID");
+        return instanceRepository.save(instance);
     }
 
     private Participant getSavedParticipant(User user, Instance instance) {

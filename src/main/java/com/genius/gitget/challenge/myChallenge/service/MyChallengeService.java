@@ -1,6 +1,8 @@
 package com.genius.gitget.challenge.myChallenge.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
+import static com.genius.gitget.challenge.item.domain.ItemCategory.CERTIFICATION_PASSER;
+import static com.genius.gitget.challenge.item.domain.ItemCategory.POINT_MULTIPLIER;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.NO;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.YES;
@@ -11,9 +13,9 @@ import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.UserItem;
-import com.genius.gitget.challenge.item.service.UserItemProvider;
+import com.genius.gitget.challenge.item.domain.Item;
+import com.genius.gitget.challenge.item.service.ItemProvider;
+import com.genius.gitget.challenge.item.service.OrderProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
@@ -39,7 +41,8 @@ public class MyChallengeService {
     private final UserService userService;
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
-    private final UserItemProvider userItemProvider;
+    private final ItemProvider itemProvider;
+    private final OrderProvider orderProvider;
 
 
     public List<PreActivityResponse> getPreActivityInstances(User user, LocalDate targetDate) {
@@ -72,8 +75,10 @@ public class MyChallengeService {
 
             // 포인트를 아직 수령하지 않았을 때
             if (participant.getRewardStatus() == NO) {
-                int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.POINT_MULTIPLIER);
+                Item item = itemProvider.findAllByCategory(POINT_MULTIPLIER).get(0);
+                int numOfPassItem = orderProvider.countNumOfItem(user, item.getId());
                 DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant, numOfPassItem);
+                doneResponse.setItemId(item.getId());
                 done.add(doneResponse);
                 continue;
             }
@@ -104,12 +109,16 @@ public class MyChallengeService {
             Instance instance = participant.getInstance();
             Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
                     .orElse(getDummyCertification());
-            int numOfPassItem = userItemProvider.countNumOfItem(user, ItemCategory.CERTIFICATION_PASSER);
+
+            //TODO: 로직 수정 필요
+            Item item = itemProvider.findAllByCategory(CERTIFICATION_PASSER).get(0);
+            int numOfPassItem = orderProvider.countNumOfItem(user, item.getId());
 
             ActivatedResponse activatedResponse = ActivatedResponse.create(
                     instance, certification.getCertificationStatus(),
                     numOfPassItem, participant.getRepositoryName()
             );
+            activatedResponse.setItemId(item.getId());
             activated.add(activatedResponse);
         }
         return activated;
@@ -125,20 +134,16 @@ public class MyChallengeService {
     }
 
     @Transactional
-    public DoneResponse getRewards(RewardRequest rewardRequest) {
+    public DoneResponse getRewards(RewardRequest rewardRequest, boolean useItem) {
         User user = userService.findUserById(rewardRequest.user().getId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), rewardRequest.instanceId());
         Instance instance = participant.getInstance();
 
         validRewardCondition(participant);
 
-        int pointPerPerson = instance.getPointPerPerson();
-        int rewardPoints = pointPerPerson;
-
-        if (rewardRequest.canUseItem()) {
-            UserItem userItem = userItemProvider.findUserItemByUser(user.getId(), ItemCategory.POINT_MULTIPLIER);
-            userItem.useItem();
-            rewardPoints = pointPerPerson * 2;
+        int rewardPoints = instance.getPointPerPerson();
+        if (useItem) {
+            rewardPoints *= 2;
         }
 
         user.updatePoints((long) rewardPoints);

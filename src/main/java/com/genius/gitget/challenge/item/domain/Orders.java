@@ -20,10 +20,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Order {
+public class Orders {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    @Column(name = "orders_id")
     Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,16 +39,16 @@ public class Order {
     @Enumerated(value = EnumType.STRING)
     private EquipStatus equipStatus;
 
-    private Order(int count, EquipStatus equipStatus) {
+    private Orders(int count, EquipStatus equipStatus) {
         this.count = count;
         this.equipStatus = equipStatus;
     }
 
-    public static Order createDefault(int count, ItemCategory itemCategory) {
+    public static Orders createDefault(int count, ItemCategory itemCategory) {
         if (itemCategory == ItemCategory.PROFILE_FRAME) {
-            return new Order(count, EquipStatus.AVAILABLE);
+            return new Orders(count, EquipStatus.AVAILABLE);
         }
-        return new Order(count, EquipStatus.UNAVAILABLE);
+        return new Orders(count, EquipStatus.UNAVAILABLE);
     }
 
     //=== 비지니스 로직 ===//
@@ -78,15 +78,15 @@ public class Order {
     //=== 연관관계 편의 메서드 ===//
     public void setUser(User user) {
         this.user = user;
-        if (!user.getOrderList().contains(this)) {
-            user.getOrderList().add(this);
+        if (!user.getOrdersList().contains(this)) {
+            user.getOrdersList().add(this);
         }
     }
 
     public void setItem(Item item) {
         this.item = item;
-        if (!item.getOrderList().contains(this)) {
-            item.getOrderList().add(this);
+        if (!item.getOrdersList().contains(this)) {
+            item.getOrdersList().add(this);
         }
     }
 }

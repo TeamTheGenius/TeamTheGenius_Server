@@ -13,9 +13,9 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.Order;
+import com.genius.gitget.challenge.item.domain.Orders;
 import com.genius.gitget.challenge.item.repository.ItemRepository;
-import com.genius.gitget.challenge.item.repository.OrderRepository;
+import com.genius.gitget.challenge.item.repository.OrdersRepository;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
@@ -56,7 +56,7 @@ class MyChallengeServiceTest {
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
-    private OrderRepository orderRepository;
+    private OrdersRepository ordersRepository;
     @Autowired
     private CertificationRepository certificationRepository;
 
@@ -99,7 +99,7 @@ class MyChallengeServiceTest {
         Participant participant2 = getSavedParticipant(user, instance2, PROCESSING);
 
         Item item = itemRepository.findAllByCategory(ItemCategory.CERTIFICATION_PASSER).get(0);
-        Order order = getSavedOrder(user, item, item.getItemCategory(), 3);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 3);
 
         //when
         getSavedCertification(CertificateStatus.NOT_YET, targetDate, participant2);
@@ -255,10 +255,10 @@ class MyChallengeServiceTest {
                 .build());
     }
 
-    private Order getSavedOrder(User user, Item item, ItemCategory itemCategory, int count) {
-        Order order = Order.createDefault(count, itemCategory);
-        order.setItem(item);
-        order.setUser(user);
-        return orderRepository.save(order);
+    private Orders getSavedOrder(User user, Item item, ItemCategory itemCategory, int count) {
+        Orders orders = Orders.createDefault(count, itemCategory);
+        orders.setItem(item);
+        orders.setUser(user);
+        return ordersRepository.save(orders);
     }
 }

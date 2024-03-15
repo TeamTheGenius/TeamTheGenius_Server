@@ -5,7 +5,7 @@ import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.item.domain.EquipStatus;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.Order;
+import com.genius.gitget.challenge.item.domain.Orders;
 import com.genius.gitget.challenge.item.dto.ItemResponse;
 import com.genius.gitget.challenge.item.dto.ItemUseResponse;
 import com.genius.gitget.challenge.item.dto.ProfileResponse;
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ItemService {
     private final UserService userService;
     private final ItemProvider itemProvider;
-    private final OrderProvider orderProvider;
+    private final OrdersProvider ordersProvider;
 
     //TODO: Service를 의존하는게 맘에 들지 않는다 provider만을 의존하게 할 순 없을까?
     private final CertificationService certificationService;
@@ -49,7 +49,7 @@ public class ItemService {
         List<Item> items = itemProvider.findAllByCategory(itemCategory);
 
         for (Item item : items) {
-            int numOfItem = orderProvider.countNumOfItem(user, item.getId());
+            int numOfItem = ordersProvider.countNumOfItem(user, item.getId());
             ItemResponse itemResponse = getItemResponse(user, item, numOfItem);
             itemResponses.add(itemResponse);
         }
@@ -64,9 +64,9 @@ public class ItemService {
 
         validateUserPoint(persistUser.getPoint(), item.getCost());
 
-        Order order = orderProvider.findOptionalByOrderInfo(persistUser.getId(), itemId)
+        Orders orders = ordersProvider.findOptionalByOrderInfo(persistUser.getId(), itemId)
                 .orElseGet(() -> createNew(persistUser, item));
-        int numOfItem = order.purchase();
+        int numOfItem = orders.purchase();
         persistUser.updatePoints((long) item.getCost() * -1);
 
         return getItemResponse(persistUser, item, numOfItem);
@@ -78,29 +78,29 @@ public class ItemService {
         }
     }
 
-    private Order createNew(User user, Item item) {
-        Order order = Order.createDefault(0, item.getItemCategory());
-        order.setUser(user);
-        order.setItem(item);
-        return orderProvider.save(order);
+    private Orders createNew(User user, Item item) {
+        Orders orders = Orders.createDefault(0, item.getItemCategory());
+        orders.setUser(user);
+        orders.setItem(item);
+        return ordersProvider.save(orders);
     }
 
     @Transactional
     public ProfileResponse unmountFrame(User user, Long itemId) {
-        Order order = orderProvider.findByOrderInfo(user.getId(), itemId);
-        validateUnmountCondition(order);
+        Orders orders = ordersProvider.findByOrderInfo(user.getId(), itemId);
+        validateUnmountCondition(orders);
 
-        order.updateEquipStatus(EquipStatus.AVAILABLE);
+        orders.updateEquipStatus(EquipStatus.AVAILABLE);
 
         return ProfileResponse.create(
-                order.getItem(), order.getCount(), order.getEquipStatus().getTag());
+                orders.getItem(), orders.getCount(), orders.getEquipStatus().getTag());
     }
 
-    private void validateUnmountCondition(Order order) {
-        if (order.getItem().getItemCategory() != ItemCategory.PROFILE_FRAME) {
+    private void validateUnmountCondition(Orders orders) {
+        if (orders.getItem().getItemCategory() != ItemCategory.PROFILE_FRAME) {
             throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
         }
-        if (order.getEquipStatus() != EquipStatus.IN_USE) {
+        if (orders.getEquipStatus() != EquipStatus.IN_USE) {
             throw new BusinessException(ErrorCode.IN_USE_FRAME_NOT_FOUND);
         }
     }
@@ -108,64 +108,64 @@ public class ItemService {
     @Transactional
     public ItemUseResponse useItem(User user, Long itemId, Long instanceId, LocalDate currentDate) {
         Item item = itemProvider.findById(itemId);
-        Order order = orderProvider.findByOrderInfo(user.getId(), itemId);
+        Orders orders = ordersProvider.findByOrderInfo(user.getId(), itemId);
 
-        if (!order.hasItem()) {
+        if (!orders.hasItem()) {
             throw new BusinessException(ErrorCode.HAS_NO_ITEM);
         }
 
         switch (item.getItemCategory()) {
             case PROFILE_FRAME -> {
-                return useProfileFrameItem(order);
+                return useProfileFrameItem(orders);
             }
             case CERTIFICATION_PASSER -> {
-                return usePasserItem(order, instanceId, currentDate);
+                return usePasserItem(orders, instanceId, currentDate);
             }
             case POINT_MULTIPLIER -> {
-                return usePointMultiplierItem(order, instanceId, currentDate);
+                return usePointMultiplierItem(orders, instanceId, currentDate);
             }
         }
         throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
     }
 
-    private ItemUseResponse useProfileFrameItem(Order order) {
-        validateFrameEquip(order);
-        order.updateEquipStatus(EquipStatus.IN_USE);
+    private ItemUseResponse useProfileFrameItem(Orders orders) {
+        validateFrameEquip(orders);
+        orders.updateEquipStatus(EquipStatus.IN_USE);
         return new ItemUseResponse(0L, "", 0);
     }
 
-    private void validateFrameEquip(Order order) {
-        if (!order.hasItem()) {
+    private void validateFrameEquip(Orders orders) {
+        if (!orders.hasItem()) {
             throw new BusinessException(ErrorCode.HAS_NO_ITEM);
         }
-        if (order.getEquipStatus() != EquipStatus.AVAILABLE) {
+        if (orders.getEquipStatus() != EquipStatus.AVAILABLE) {
             throw new BusinessException(ErrorCode.INVALID_EQUIP_CONDITION);
         }
     }
 
-    private ItemUseResponse usePasserItem(Order order, Long instanceId, LocalDate currentDate) {
-        Long userId = order.getUser().getId();
-        Long itemId = order.getItem().getId();
+    private ItemUseResponse usePasserItem(Orders orders, Long instanceId, LocalDate currentDate) {
+        Long userId = orders.getUser().getId();
+        Long itemId = orders.getItem().getId();
         ActivatedResponse activatedResponse = certificationService.passCertification(
                 userId,
                 new CertificationRequest(instanceId, currentDate));
         activatedResponse.setItemId(itemId);
-        order.useItem();
+        orders.useItem();
         return activatedResponse;
     }
 
-    private ItemUseResponse usePointMultiplierItem(Order order, Long instanceId, LocalDate currentDate) {
-        User user = order.getUser();
+    private ItemUseResponse usePointMultiplierItem(Orders orders, Long instanceId, LocalDate currentDate) {
+        User user = orders.getUser();
         DoneResponse doneResponse = myChallengeService.getRewards(
                 new RewardRequest(user, instanceId, currentDate), true
         );
-        order.useItem();
+        orders.useItem();
         return doneResponse;
     }
 
     private ItemResponse getItemResponse(User user, Item item, int numOfItem) {
         if (item.getItemCategory() == ItemCategory.PROFILE_FRAME) {
-            EquipStatus equipStatus = orderProvider.getEquipStatus(user.getId(), item.getId());
+            EquipStatus equipStatus = ordersProvider.getEquipStatus(user.getId(), item.getId());
             return ProfileResponse.create(item, numOfItem, equipStatus.getTag());
         }
         return ItemResponse.create(item, numOfItem);

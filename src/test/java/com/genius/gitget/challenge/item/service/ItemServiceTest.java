@@ -16,12 +16,12 @@ import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.item.domain.EquipStatus;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.Order;
+import com.genius.gitget.challenge.item.domain.Orders;
 import com.genius.gitget.challenge.item.dto.ItemResponse;
 import com.genius.gitget.challenge.item.dto.ItemUseResponse;
 import com.genius.gitget.challenge.item.dto.ProfileResponse;
 import com.genius.gitget.challenge.item.repository.ItemRepository;
-import com.genius.gitget.challenge.item.repository.OrderRepository;
+import com.genius.gitget.challenge.item.repository.OrdersRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -57,7 +57,7 @@ class ItemServiceTest {
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
-    private OrderRepository orderRepository;
+    private OrdersRepository ordersRepository;
     @Autowired
     private InstanceRepository instanceRepository;
     @Autowired
@@ -85,7 +85,7 @@ class ItemServiceTest {
         //given
         User user = getSavedUser();
         Item item = getSavedItem(itemCategory);
-        Order order = getSavedOrder(user, item, itemCategory, 1);
+        Orders orders = getSavedOrder(user, item, itemCategory, 1);
 
         //when
         List<ItemResponse> itemResponses = itemService.getItemsByCategory(user, itemCategory);
@@ -139,7 +139,7 @@ class ItemServiceTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
-        Order order = getSavedOrder(user, item, ItemCategory.CERTIFICATION_PASSER, 0);
+        Orders orders = getSavedOrder(user, item, ItemCategory.CERTIFICATION_PASSER, 0);
 
         instance.updateProgress(Progress.ACTIVITY);
 
@@ -177,14 +177,14 @@ class ItemServiceTest {
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
-        Order order = getSavedOrder(user, item, item.getItemCategory(), 1);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
         //when
-        order.updateEquipStatus(EquipStatus.AVAILABLE);
+        orders.updateEquipStatus(EquipStatus.AVAILABLE);
         ItemUseResponse itemUseResponse = itemService.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
-        assertThat(order.getEquipStatus()).isEqualTo(EquipStatus.IN_USE);
+        assertThat(orders.getEquipStatus()).isEqualTo(EquipStatus.IN_USE);
     }
 
     @Test
@@ -225,9 +225,9 @@ class ItemServiceTest {
         //given
         User user = getSavedUser();
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
-        Order order = getSavedOrder(user, item, ItemCategory.PROFILE_FRAME, 3);
+        Orders orders = getSavedOrder(user, item, ItemCategory.PROFILE_FRAME, 3);
 
-        order.updateEquipStatus(equipStatus);
+        orders.updateEquipStatus(equipStatus);
 
         //when && then
         assertThatThrownBy(() -> itemService.useItem(user, item.getId(), 0L, LocalDate.now()))
@@ -244,7 +244,7 @@ class ItemServiceTest {
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
         Item item = getSavedItem(ItemCategory.CERTIFICATION_PASSER);
-        Order order = getSavedOrder(user, item, item.getItemCategory(), 1);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
@@ -255,7 +255,7 @@ class ItemServiceTest {
         assertThat(itemUseResponse.getInstanceId()).isEqualTo(instance.getId());
         assertThat(itemUseResponse.getTitle()).isEqualTo(instance.getTitle());
         assertThat(itemUseResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
-        assertThat(order.getCount()).isEqualTo(0);
+        assertThat(orders.getCount()).isEqualTo(0);
         assertThat(certification.getCertificationStatus()).isEqualTo(PASSED);
     }
 
@@ -268,7 +268,7 @@ class ItemServiceTest {
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
         Item item = getSavedItem(ItemCategory.CERTIFICATION_PASSER);
-        Order order = getSavedOrder(user, item, item.getItemCategory(), 1);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
@@ -281,7 +281,7 @@ class ItemServiceTest {
         assertThat(itemUseResponse.getInstanceId()).isEqualTo(instance.getId());
         assertThat(itemUseResponse.getTitle()).isEqualTo(instance.getTitle());
         assertThat(itemUseResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
-        assertThat(order.getCount()).isEqualTo(0);
+        assertThat(orders.getCount()).isEqualTo(0);
         assertThat(certification).isPresent();
         assertThat(certification.get().getCertificationStatus()).isEqualTo(PASSED);
     }
@@ -295,7 +295,7 @@ class ItemServiceTest {
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
         Item item = getSavedItem(ItemCategory.CERTIFICATION_PASSER);
-        Order order = getSavedOrder(user, item, item.getItemCategory(), 1);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
         //when & then
         assertThatThrownBy(() -> itemService.useItem(user, item.getId(), instance.getId(), currentDate))
@@ -334,7 +334,7 @@ class ItemServiceTest {
         Instance instance = getSavedInstance(currentDate, currentDate.plusDays(1));
         Participant participant = getSavedParticipant(user, instance);
         Item item = getSavedItem(ItemCategory.POINT_MULTIPLIER);
-        Order order = getSavedOrder(user, item, item.getItemCategory(), 1);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
         //when
         Long previousPoint = user.getPoint();
@@ -347,7 +347,7 @@ class ItemServiceTest {
 
         //then
         assertThat(afterRewards - previousPoint).isEqualTo(instance.getPointPerPerson() * 2L);
-        assertThat(order.getCount()).isEqualTo(0);
+        assertThat(orders.getCount()).isEqualTo(0);
     }
 
     @Test
@@ -376,7 +376,7 @@ class ItemServiceTest {
         //given
         User user = getSavedUser();
         Item item = getSavedItem(itemCategory);
-        Order order = getSavedOrder(user, item, item.getItemCategory(), 1);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
         //when & then
         assertThatThrownBy(() -> itemService.unmountFrame(user, item.getId()))
@@ -418,11 +418,11 @@ class ItemServiceTest {
                 .build());
     }
 
-    private Order getSavedOrder(User user, Item item, ItemCategory itemCategory, int count) {
-        Order order = Order.createDefault(count, itemCategory);
-        order.setItem(item);
-        order.setUser(user);
-        return orderRepository.save(order);
+    private Orders getSavedOrder(User user, Item item, ItemCategory itemCategory, int count) {
+        Orders orders = Orders.createDefault(count, itemCategory);
+        orders.setItem(item);
+        orders.setUser(user);
+        return ordersRepository.save(orders);
     }
 
     private Instance getSavedInstance() {

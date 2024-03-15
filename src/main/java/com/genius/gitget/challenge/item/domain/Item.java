@@ -26,7 +26,7 @@ public class Item extends BaseTimeEntity {
     private Long id;
 
     @OneToMany(mappedBy = "item")
-    private List<Order> orderList = new ArrayList<>();
+    private List<Orders> ordersList = new ArrayList<>();
 
     private String name;
 

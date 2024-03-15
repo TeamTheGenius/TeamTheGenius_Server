@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.Order;
+import com.genius.gitget.challenge.item.domain.Orders;
 import com.genius.gitget.challenge.item.repository.ItemRepository;
-import com.genius.gitget.challenge.item.repository.OrderRepository;
+import com.genius.gitget.challenge.item.repository.OrdersRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -21,15 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class OrderProviderTest {
+class OrdersProviderTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
-    private OrderRepository orderRepository;
+    private OrdersRepository ordersRepository;
     @Autowired
-    private OrderProvider orderProvider;
+    private OrdersProvider ordersProvider;
 
     @Test
     @DisplayName("사용자가 특정 아이템을 보유하고 있을 때, 보유하고 있는 아이템의 개수를 반환받을 수 있다.")
@@ -40,7 +40,7 @@ class OrderProviderTest {
         getSavedOrder(user, item, 1);
 
         //when
-        int numOfItem = orderProvider.countNumOfItem(user, item.getId());
+        int numOfItem = ordersProvider.countNumOfItem(user, item.getId());
 
         //then
         assertThat(numOfItem).isEqualTo(1);
@@ -54,7 +54,7 @@ class OrderProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when
-        int numOfItem = orderProvider.countNumOfItem(user, item.getId());
+        int numOfItem = ordersProvider.countNumOfItem(user, item.getId());
 
         //then
         assertThat(numOfItem).isEqualTo(0);
@@ -82,10 +82,10 @@ class OrderProviderTest {
         );
     }
 
-    private Order getSavedOrder(User user, Item item, int count) {
-        Order order = Order.createDefault(count, item.getItemCategory());
-        order.setUser(user);
-        order.setItem(item);
-        return orderRepository.save(order);
+    private Orders getSavedOrder(User user, Item item, int count) {
+        Orders orders = Orders.createDefault(count, item.getItemCategory());
+        orders.setUser(user);
+        orders.setItem(item);
+        return ordersRepository.save(orders);
     }
 }

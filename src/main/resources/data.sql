@@ -5,8 +5,10 @@ FROM (SELECT 100                    AS cost,
              NULL                   AS deleted_at,
              NULL                   AS updated_at,
              '프로필을 꾸밀 수 있는 프레임입니다.' AS details,
-             '프로필 프레임'              AS name,
+             '성탄절 프레임'              AS name,
              'PROFILE_FRAME'        AS item_category
+      UNION ALL
+      SELECT 100, NULL, NULL, NULL, '프로필을 꾸밀 수 있는 프레임입니다.', '어둠의 힘 프레임', 'PROFILE_FRAME'
       UNION ALL
       SELECT 100, NULL, NULL, NULL, '오늘의 인증을 넘길 수 있는 아이템입니다.', '인증 패스 아이템', 'CERTIFICATION_PASSER'
       UNION ALL

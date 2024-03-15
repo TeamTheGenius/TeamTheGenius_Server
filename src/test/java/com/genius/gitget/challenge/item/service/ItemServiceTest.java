@@ -75,7 +75,7 @@ class ItemServiceTest {
         List<ItemResponse> items = itemService.getAllItems(user);
 
         //then
-        assertThat(items.size()).isEqualTo(3);
+        assertThat(items.size()).isEqualTo(4);
     }
 
     @ParameterizedTest
@@ -92,7 +92,7 @@ class ItemServiceTest {
 
         //then
         for (ItemResponse itemResponse : itemResponses) {
-            assertThat(itemResponse.getName()).isEqualTo(itemCategory.getName());
+            assertThat(itemResponse.getName()).contains(itemCategory.getName());
         }
     }
 

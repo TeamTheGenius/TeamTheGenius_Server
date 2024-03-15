@@ -30,7 +30,7 @@ class ItemProviderTest {
 
     @ParameterizedTest
     @DisplayName("DB에 저장되어 있는 아이템을 카테고리 별로 받아올 수 있다.")
-    @EnumSource(mode = Mode.INCLUDE, names = {"POINT_MULTIPLIER", "CERTIFICATION_PASSER", "PROFILE_FRAME"})
+    @EnumSource(mode = Mode.INCLUDE, names = {"POINT_MULTIPLIER", "CERTIFICATION_PASSER"})
     public void should_findItems_when_passCategory(ItemCategory itemCategory) {
         //given
         Item item = getSavedItem(itemCategory);

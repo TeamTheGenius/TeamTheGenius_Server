@@ -1,8 +1,8 @@
 package com.genius.gitget.challenge.myChallenge.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
-import static com.genius.gitget.challenge.item.domain.ItemCategory.CERTIFICATION_PASSER;
-import static com.genius.gitget.challenge.item.domain.ItemCategory.POINT_MULTIPLIER;
+import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PASSER;
+import static com.genius.gitget.store.item.domain.ItemCategory.POINT_MULTIPLIER;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.NO;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.YES;
@@ -13,9 +13,9 @@ import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.item.domain.Item;
-import com.genius.gitget.challenge.item.service.ItemProvider;
-import com.genius.gitget.challenge.item.service.OrdersProvider;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.service.ItemProvider;
+import com.genius.gitget.store.item.service.OrdersProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;

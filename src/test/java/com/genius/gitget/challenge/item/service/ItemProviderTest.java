@@ -3,11 +3,12 @@ package com.genius.gitget.challenge.item.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.genius.gitget.challenge.item.domain.Item;
-import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.repository.ItemRepository;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.domain.ItemCategory;
+import com.genius.gitget.store.item.repository.ItemRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.store.item.service.ItemProvider;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;

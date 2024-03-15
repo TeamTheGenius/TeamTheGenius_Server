@@ -1,7 +1,7 @@
 package com.genius.gitget.challenge.myChallenge.dto;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.domain.RewardStatus;

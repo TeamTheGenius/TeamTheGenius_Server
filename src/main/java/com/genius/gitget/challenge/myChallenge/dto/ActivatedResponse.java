@@ -2,7 +2,7 @@ package com.genius.gitget.challenge.myChallenge.dto;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.global.file.dto.FileResponse;
 import lombok.Builder;
 import lombok.Getter;

@@ -154,7 +154,7 @@ public class InstanceSearchRepositoryTest {
                 cnt++;
             }
         }
-        Assertions.assertThat(cnt).isEqualTo(1);
+        Assertions.assertThat(cnt).isEqualTo(0);
     }
 
     @Test

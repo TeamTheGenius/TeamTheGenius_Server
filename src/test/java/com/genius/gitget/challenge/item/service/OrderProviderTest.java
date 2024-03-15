@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.UserItem;
+import com.genius.gitget.challenge.item.domain.Order;
 import com.genius.gitget.challenge.item.repository.ItemRepository;
-import com.genius.gitget.challenge.item.repository.UserItemRepository;
+import com.genius.gitget.challenge.item.repository.OrderRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -21,15 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class UserItemProviderTest {
+class OrderProviderTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
-    private UserItemRepository userItemRepository;
+    private OrderRepository orderRepository;
     @Autowired
-    private UserItemProvider userItemProvider;
+    private OrderProvider orderProvider;
 
     @Test
     @DisplayName("사용자가 특정 아이템을 보유하고 있을 때, 보유하고 있는 아이템의 개수를 반환받을 수 있다.")
@@ -37,10 +37,10 @@ class UserItemProviderTest {
         //given
         User user = getSavedUser();
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
-        getSavedUserItem(user, item, 1);
+        getSavedOrder(user, item, 1);
 
         //when
-        int numOfItem = userItemProvider.countNumOfItem(user, item.getId());
+        int numOfItem = orderProvider.countNumOfItem(user, item.getId());
 
         //then
         assertThat(numOfItem).isEqualTo(1);
@@ -54,7 +54,7 @@ class UserItemProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when
-        int numOfItem = userItemProvider.countNumOfItem(user, item.getId());
+        int numOfItem = orderProvider.countNumOfItem(user, item.getId());
 
         //then
         assertThat(numOfItem).isEqualTo(0);
@@ -82,10 +82,10 @@ class UserItemProviderTest {
         );
     }
 
-    private UserItem getSavedUserItem(User user, Item item, int count) {
-        UserItem userItem = UserItem.createDefault(count, item.getItemCategory());
-        userItem.setUser(user);
-        userItem.setItem(item);
-        return userItemRepository.save(userItem);
+    private Order getSavedOrder(User user, Item item, int count) {
+        Order order = Order.createDefault(count, item.getItemCategory());
+        order.setUser(user);
+        order.setItem(item);
+        return orderRepository.save(order);
     }
 }

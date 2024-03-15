@@ -23,9 +23,9 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.UserItem;
+import com.genius.gitget.challenge.item.domain.Order;
 import com.genius.gitget.challenge.item.repository.ItemRepository;
-import com.genius.gitget.challenge.item.repository.UserItemRepository;
+import com.genius.gitget.challenge.item.repository.OrderRepository;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
@@ -74,7 +74,7 @@ class CertificationServiceTest {
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
-    private UserItemRepository userItemRepository;
+    private OrderRepository orderRepository;
 
     @Value("${github.yeon-personalKey}")
     private String personalKey;
@@ -454,7 +454,7 @@ class CertificationServiceTest {
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
-        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
+        Order order = getSavedOrder(user, ItemCategory.CERTIFICATION_PASSER, 1);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(currentDate)
@@ -485,7 +485,7 @@ class CertificationServiceTest {
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
-        UserItem userItem = getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 1);
+        Order order = getSavedOrder(user, ItemCategory.CERTIFICATION_PASSER, 1);
         CertificationRequest certificationRequest = CertificationRequest.builder()
                 .instanceId(instance.getId())
                 .targetDate(currentDate)
@@ -571,13 +571,13 @@ class CertificationServiceTest {
         return certificationRepository.save(certification);
     }
 
-    private UserItem getSavedUserItem(User user, ItemCategory itemCategory, int count) {
+    private Order getSavedOrder(User user, ItemCategory itemCategory, int count) {
         Item item = itemRepository.save(Item.builder()
                 .itemCategory(itemCategory)
                 .build());
-        UserItem userItem = UserItem.createDefault(count, itemCategory);
-        userItem.setItem(item);
-        userItem.setUser(user);
-        return userItemRepository.save(userItem);
+        Order order = Order.createDefault(count, itemCategory);
+        order.setItem(item);
+        order.setUser(user);
+        return orderRepository.save(order);
     }
 }

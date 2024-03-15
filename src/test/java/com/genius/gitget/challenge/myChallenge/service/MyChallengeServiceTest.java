@@ -13,9 +13,9 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.UserItem;
+import com.genius.gitget.challenge.item.domain.Order;
 import com.genius.gitget.challenge.item.repository.ItemRepository;
-import com.genius.gitget.challenge.item.repository.UserItemRepository;
+import com.genius.gitget.challenge.item.repository.OrderRepository;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
@@ -56,7 +56,7 @@ class MyChallengeServiceTest {
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
-    private UserItemRepository userItemRepository;
+    private OrderRepository orderRepository;
     @Autowired
     private CertificationRepository certificationRepository;
 
@@ -99,7 +99,7 @@ class MyChallengeServiceTest {
         Participant participant2 = getSavedParticipant(user, instance2, PROCESSING);
 
         Item item = itemRepository.findAllByCategory(ItemCategory.CERTIFICATION_PASSER).get(0);
-        UserItem userItem = getSavedUserItem(user, item, item.getItemCategory(), 3);
+        Order order = getSavedOrder(user, item, item.getItemCategory(), 3);
 
         //when
         getSavedCertification(CertificateStatus.NOT_YET, targetDate, participant2);
@@ -122,7 +122,7 @@ class MyChallengeServiceTest {
         Participant participant1 = getSavedParticipant(user, instance1, PROCESSING);
 
         Item item = getSavedItem(ItemCategory.CERTIFICATION_PASSER);
-        getSavedUserItem(user, item, item.getItemCategory(), 3);
+        getSavedOrder(user, item, item.getItemCategory(), 3);
 
         //when
         getSavedCertification(certificateStatus, targetDate, participant1);
@@ -144,7 +144,7 @@ class MyChallengeServiceTest {
         Instance instance = getSavedInstance(Progress.DONE, targetDate, targetDate.plusDays(1));
         Participant participant = getSavedParticipant(user, instance, SUCCESS);
         Item item = itemRepository.findAllByCategory(ItemCategory.POINT_MULTIPLIER).get(0);
-        getSavedUserItem(user, item, item.getItemCategory(), 3);
+        getSavedOrder(user, item, item.getItemCategory(), 3);
 
         //when
         getSavedCertification(CertificateStatus.PASSED, targetDate.toLocalDate(), participant);
@@ -172,7 +172,7 @@ class MyChallengeServiceTest {
         getSavedParticipant(user, instance, SUCCESS);
 
         Item item = getSavedItem(ItemCategory.POINT_MULTIPLIER);
-        getSavedUserItem(user, item, item.getItemCategory(), 3);
+        getSavedOrder(user, item, item.getItemCategory(), 3);
 
         //when
         List<DoneResponse> doneResponses = myChallengeService.getDoneInstances(user, targetDate);
@@ -255,10 +255,10 @@ class MyChallengeServiceTest {
                 .build());
     }
 
-    private UserItem getSavedUserItem(User user, Item item, ItemCategory itemCategory, int count) {
-        UserItem userItem = UserItem.createDefault(count, itemCategory);
-        userItem.setItem(item);
-        userItem.setUser(user);
-        return userItemRepository.save(userItem);
+    private Order getSavedOrder(User user, Item item, ItemCategory itemCategory, int count) {
+        Order order = Order.createDefault(count, itemCategory);
+        order.setItem(item);
+        order.setUser(user);
+        return orderRepository.save(order);
     }
 }

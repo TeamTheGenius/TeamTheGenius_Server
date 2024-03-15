@@ -15,7 +15,7 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.item.domain.Item;
 import com.genius.gitget.challenge.item.service.ItemProvider;
-import com.genius.gitget.challenge.item.service.UserItemProvider;
+import com.genius.gitget.challenge.item.service.OrderProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
@@ -42,7 +42,7 @@ public class MyChallengeService {
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
     private final ItemProvider itemProvider;
-    private final UserItemProvider userItemProvider;
+    private final OrderProvider orderProvider;
 
 
     public List<PreActivityResponse> getPreActivityInstances(User user, LocalDate targetDate) {
@@ -76,7 +76,7 @@ public class MyChallengeService {
             // 포인트를 아직 수령하지 않았을 때
             if (participant.getRewardStatus() == NO) {
                 Item item = itemProvider.findAllByCategory(POINT_MULTIPLIER).get(0);
-                int numOfPassItem = userItemProvider.countNumOfItem(user, item.getId());
+                int numOfPassItem = orderProvider.countNumOfItem(user, item.getId());
                 DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant, numOfPassItem);
                 doneResponse.setItemId(item.getId());
                 done.add(doneResponse);
@@ -112,7 +112,7 @@ public class MyChallengeService {
 
             //TODO: 로직 수정 필요
             Item item = itemProvider.findAllByCategory(CERTIFICATION_PASSER).get(0);
-            int numOfPassItem = userItemProvider.countNumOfItem(user, item.getId());
+            int numOfPassItem = orderProvider.countNumOfItem(user, item.getId());
 
             ActivatedResponse activatedResponse = ActivatedResponse.create(
                     instance, certification.getCertificationStatus(),

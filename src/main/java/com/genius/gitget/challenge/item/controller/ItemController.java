@@ -59,7 +59,6 @@ public class ItemController {
         );
     }
 
-    // 사용하는 아이템 -> 프로필 프레임, 인증 패스권, 챌린지 보상 획득 2배
     @PostMapping("/items/use/{itemId}")
     public ResponseEntity<CommonResponse> useItem(
             @AuthenticationPrincipal UserPrincipal userPrincipal,

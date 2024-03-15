@@ -15,7 +15,7 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
-import com.genius.gitget.challenge.item.service.UserItemProvider;
+import com.genius.gitget.challenge.item.service.OrderProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
@@ -49,7 +49,7 @@ public class CertificationService {
     private final CertificationProvider certificationProvider;
     private final ParticipantProvider participantProvider;
     private final InstanceProvider instanceProvider;
-    private final UserItemProvider userItemProvider;
+    private final OrderProvider orderProvider;
 
 
     public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {

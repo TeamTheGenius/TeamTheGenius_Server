@@ -76,7 +76,7 @@ public class MyChallengeService {
             // 포인트를 아직 수령하지 않았을 때
             if (participant.getRewardStatus() == NO) {
                 Item item = itemProvider.findAllByCategory(POINT_MULTIPLIER).get(0);
-                int numOfPassItem = userItemProvider.countNumOfItem(user, POINT_MULTIPLIER);
+                int numOfPassItem = userItemProvider.countNumOfItem(user, item.getId());
                 DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant, numOfPassItem);
                 doneResponse.setItemId(item.getId());
                 done.add(doneResponse);
@@ -112,7 +112,7 @@ public class MyChallengeService {
 
             //TODO: 로직 수정 필요
             Item item = itemProvider.findAllByCategory(CERTIFICATION_PASSER).get(0);
-            int numOfPassItem = userItemProvider.countNumOfItem(user, CERTIFICATION_PASSER);
+            int numOfPassItem = userItemProvider.countNumOfItem(user, item.getId());
 
             ActivatedResponse activatedResponse = ActivatedResponse.create(
                     instance, certification.getCertificationStatus(),

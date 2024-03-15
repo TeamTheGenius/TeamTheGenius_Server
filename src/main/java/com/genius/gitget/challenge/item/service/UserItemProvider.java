@@ -41,7 +41,7 @@ public class UserItemProvider {
         return EquipStatus.UNAVAILABLE;
     }
 
-    public int countNumOfItem(User user, ItemCategory itemCategory) {
+    public int countNumOfCategory(User user, ItemCategory itemCategory) {
         return userItemRepository.findByCategory(user.getId(), itemCategory).size();
     }
 

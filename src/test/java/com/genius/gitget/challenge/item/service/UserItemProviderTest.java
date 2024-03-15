@@ -40,7 +40,7 @@ class UserItemProviderTest {
         getSavedUserItem(user, item, 1);
 
         //when
-        int numOfItem = userItemProvider.countNumOfItem(user, ItemCategory.PROFILE_FRAME);
+        int numOfItem = userItemProvider.countNumOfItem(user, item.getId());
 
         //then
         assertThat(numOfItem).isEqualTo(1);
@@ -54,7 +54,7 @@ class UserItemProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when
-        int numOfItem = userItemProvider.countNumOfItem(user, ItemCategory.PROFILE_FRAME);
+        int numOfItem = userItemProvider.countNumOfItem(user, item.getId());
 
         //then
         assertThat(numOfItem).isEqualTo(0);

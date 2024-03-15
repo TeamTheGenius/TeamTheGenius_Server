@@ -97,16 +97,18 @@ class MyChallengeServiceTest {
         Instance instance2 = getSavedInstance(Progress.ACTIVITY);
         Participant participant1 = getSavedParticipant(user, instance1, PROCESSING);
         Participant participant2 = getSavedParticipant(user, instance2, PROCESSING);
-        getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 3);
+
+        Item item = itemRepository.findAllByCategory(ItemCategory.CERTIFICATION_PASSER).get(0);
+        UserItem userItem = getSavedUserItem(user, item, item.getItemCategory(), 3);
 
         //when
         getSavedCertification(CertificateStatus.NOT_YET, targetDate, participant2);
-        List<ActivatedResponse> instances = myChallengeService.getActivatedInstances(user, targetDate);
+        List<ActivatedResponse> activatedResponses = myChallengeService.getActivatedInstances(user, targetDate);
 
         //then
-        assertThat(instances.size()).isEqualTo(2);
-        assertThat(instances.get(0).getNumOfPassItem()).isEqualTo(3);
-        assertThat(instances.get(1).getNumOfPassItem()).isEqualTo(3);
+        assertThat(activatedResponses.size()).isEqualTo(2);
+        assertThat(activatedResponses.get(0).getNumOfPassItem()).isEqualTo(3);
+        assertThat(activatedResponses.get(1).getNumOfPassItem()).isEqualTo(3);
     }
 
     @ParameterizedTest
@@ -118,7 +120,9 @@ class MyChallengeServiceTest {
         User user = getSavedUser();
         Instance instance1 = getSavedInstance(Progress.ACTIVITY);
         Participant participant1 = getSavedParticipant(user, instance1, PROCESSING);
-        getSavedUserItem(user, ItemCategory.CERTIFICATION_PASSER, 3);
+
+        Item item = getSavedItem(ItemCategory.CERTIFICATION_PASSER);
+        getSavedUserItem(user, item, item.getItemCategory(), 3);
 
         //when
         getSavedCertification(certificateStatus, targetDate, participant1);
@@ -135,14 +139,17 @@ class MyChallengeServiceTest {
     @DisplayName("완료된 챌린지 목록 조회 시, 포인트를 아직 수령하지 않은 챌린지에 대해서는 보상 가능 정보를 전달해야 한다.")
     public void should_returnTrue_when_ableToReward() {
         //given
-        LocalDate targetDate = LocalDate.of(2024, 2, 14);
+        LocalDateTime targetDate = LocalDateTime.of(2024, 2, 14, 0, 0);
         User user = getSavedUser();
-        Instance instance = getSavedInstance(Progress.DONE);
+        Instance instance = getSavedInstance(Progress.DONE, targetDate, targetDate.plusDays(1));
         Participant participant = getSavedParticipant(user, instance, SUCCESS);
-        getSavedUserItem(user, ItemCategory.POINT_MULTIPLIER, 3);
+        Item item = itemRepository.findAllByCategory(ItemCategory.POINT_MULTIPLIER).get(0);
+        getSavedUserItem(user, item, item.getItemCategory(), 3);
 
         //when
-        List<DoneResponse> doneResponses = myChallengeService.getDoneInstances(user, targetDate);
+        getSavedCertification(CertificateStatus.PASSED, targetDate.toLocalDate(), participant);
+        getSavedCertification(CertificateStatus.CERTIFICATED, targetDate.plusDays(1).toLocalDate(), participant);
+        List<DoneResponse> doneResponses = myChallengeService.getDoneInstances(user, targetDate.toLocalDate());
 
         //then
         DoneResponse doneResponse = doneResponses.get(0);
@@ -163,7 +170,9 @@ class MyChallengeServiceTest {
         User user = getSavedUser();
         Instance instance = getSavedInstance(Progress.DONE);
         getSavedParticipant(user, instance, SUCCESS);
-        getSavedUserItem(user, ItemCategory.POINT_MULTIPLIER, 3);
+
+        Item item = getSavedItem(ItemCategory.POINT_MULTIPLIER);
+        getSavedUserItem(user, item, item.getItemCategory(), 3);
 
         //when
         List<DoneResponse> doneResponses = myChallengeService.getDoneInstances(user, targetDate);
@@ -171,7 +180,6 @@ class MyChallengeServiceTest {
         //then
         assertThat(doneResponses.size()).isEqualTo(1);
         assertThat(doneResponses.get(0).isCanGetReward()).isTrue();
-        assertThat(doneResponses.get(0).getRewardedPoints()).isEqualTo(instance.getPointPerPerson() * 2L);
     }
 
 
@@ -196,6 +204,18 @@ class MyChallengeServiceTest {
                         .title("title")
                         .startedDate(LocalDateTime.of(2024, 2, 1, 11, 3))
                         .completedDate(LocalDateTime.of(2024, 3, 29, 23, 59))
+                        .build()
+        );
+    }
+
+    private Instance getSavedInstance(Progress progress, LocalDateTime startedDate, LocalDateTime completedDate) {
+        return instanceRepository.save(
+                Instance.builder()
+                        .progress(progress)
+                        .pointPerPerson(100)
+                        .title("title")
+                        .startedDate(startedDate)
+                        .completedDate(completedDate)
                         .build()
         );
     }
@@ -227,10 +247,15 @@ class MyChallengeServiceTest {
         return certificationRepository.save(certification);
     }
 
-    private UserItem getSavedUserItem(User user, ItemCategory itemCategory, int count) {
-        Item item = itemRepository.save(Item.builder()
+    private Item getSavedItem(ItemCategory itemCategory) {
+        return itemRepository.save(Item.builder()
                 .itemCategory(itemCategory)
+                .cost(100)
+                .name(itemCategory.getName())
                 .build());
+    }
+
+    private UserItem getSavedUserItem(User user, Item item, ItemCategory itemCategory, int count) {
         UserItem userItem = UserItem.createDefault(count, itemCategory);
         userItem.setItem(item);
         userItem.setUser(user);

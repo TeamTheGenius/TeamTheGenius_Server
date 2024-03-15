@@ -62,9 +62,16 @@ public enum ErrorCode {
     NOT_ACTIVITY_INSTANCE(HttpStatus.BAD_REQUEST, "진행 중인 챌린지에 대해서만 인증이 가능합니다."),
     NOT_CERTIFICATE_PERIOD(HttpStatus.BAD_REQUEST, "챌린지 인증은 챌린지 진행 기간 내에만 가능합니다. 챌린지 진행 기간인지 확인해주세요."),
 
+    NOT_ENOUGH_POINT(HttpStatus.BAD_REQUEST, "사용자의 보유 포인트가 충분하지 않습니다."),
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "아이템 정보를 찾을 수 없습니다."),
     USER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다."),
     HAS_NO_ITEM(HttpStatus.NOT_FOUND, "해당 아이템을 보유하고 있지 않습니다."),
     CAN_NOT_USE_PASS_ITEM(HttpStatus.BAD_REQUEST, "인증 패스 아이템을 사용할 수 없는 조건입니다."),
+    ITEM_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 카테고리에 맞는 아이템을 찾을 수 없습니다."),
+
+    ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "프로필 프레임은 재구매가 불가능 합니다."),
+    INVALID_EQUIP_CONDITION(HttpStatus.BAD_REQUEST, "프로필 프레임을 장착할 수 있는 상태가 아닙니다."),
+    IN_USE_FRAME_NOT_FOUND(HttpStatus.NOT_FOUND, "사용 중인 프로필 프레임을 찾을 수 없습니다"),
 
     CAN_NOT_GET_REWARDS(HttpStatus.BAD_REQUEST, "챌린지 보상을 받을 수 있는 조건이 아닙니다."),
     ALREADY_REWARDED(HttpStatus.BAD_REQUEST, "해당 챌린지 보상은 이미 지급되었습니다.");

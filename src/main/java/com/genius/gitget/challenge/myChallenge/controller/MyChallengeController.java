@@ -18,7 +18,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -68,16 +67,14 @@ public class MyChallengeController {
         );
     }
 
-    // /api/challenges/reward/1?item=true
     @GetMapping("/reward/{instanceId}")
     public ResponseEntity<SingleResponse<DoneResponse>> getRewards(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long instanceId,
-            @RequestParam(value = "item") boolean useItem
+            @PathVariable Long instanceId
     ) {
 
-        RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser(), instanceId, useItem, LocalDate.now());
-        DoneResponse doneResponse = myChallengeService.getRewards(rewardRequest);
+        RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser(), instanceId, LocalDate.now());
+        DoneResponse doneResponse = myChallengeService.getRewards(rewardRequest, false);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), doneResponse)

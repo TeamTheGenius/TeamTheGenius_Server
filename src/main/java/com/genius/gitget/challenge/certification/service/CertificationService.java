@@ -15,9 +15,7 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
-import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.UserItem;
-import com.genius.gitget.challenge.item.service.UserItemProvider;
+import com.genius.gitget.challenge.item.service.OrdersProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
@@ -51,7 +49,7 @@ public class CertificationService {
     private final CertificationProvider certificationProvider;
     private final ParticipantProvider participantProvider;
     private final InstanceProvider instanceProvider;
-    private final UserItemProvider userItemProvider;
+    private final OrdersProvider ordersProvider;
 
 
     public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
@@ -146,12 +144,11 @@ public class CertificationService {
         Participant participant = participantProvider.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
-        UserItem userItem = userItemProvider.findUserItemByUser(userId, ItemCategory.CERTIFICATION_PASSER);
         Optional<Certification> optionalCertification = certificationProvider.findByDate(targetDate,
                 participant.getId());
 
         validCertificationCondition(instance, targetDate);
-        validatePassCondition(userItem, optionalCertification);
+        validatePassCondition(optionalCertification);
 
         Certification certification = optionalCertification
                 .map(passed -> {
@@ -165,20 +162,14 @@ public class CertificationService {
                     return passed;
                 });
 
-        userItem.useItem();
-
         return ActivatedResponse.create(instance, certification.getCertificationStatus(), 0,
                 participant.getRepositoryName());
     }
 
-    private void validatePassCondition(UserItem userItem, Optional<Certification> optional) {
-        if (!userItem.hasItem()) {
-            throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
+    private void validatePassCondition(Optional<Certification> optional) {
+        if (optional.isPresent() && optional.get().getCertificationStatus() != NOT_YET) {
+            throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
         }
-        if (optional.isEmpty() || optional.get().getCertificationStatus() == NOT_YET) {
-            return;
-        }
-        throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
     }
 
     @Transactional

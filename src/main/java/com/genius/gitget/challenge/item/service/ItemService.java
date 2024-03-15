@@ -32,8 +32,7 @@ public class ItemService {
     private final ItemProvider itemProvider;
     private final UserItemProvider userItemProvider;
 
-    //TODO: Service를 의존하는게 맘에 들지 않는다
-    // provider만을 의존하게 할 순 없을까?
+    //TODO: Service를 의존하는게 맘에 들지 않는다 provider만을 의존하게 할 순 없을까?
     private final CertificationService certificationService;
     private final MyChallengeService myChallengeService;
 
@@ -65,7 +64,7 @@ public class ItemService {
 
         validateUserPoint(persistUser.getPoint(), item.getCost());
 
-        UserItem userItem = userItemProvider.findOptionalByInfo(persistUser.getId(), itemId)
+        UserItem userItem = userItemProvider.findOptionalByOrderInfo(persistUser.getId(), itemId)
                 .orElseGet(() -> createNew(persistUser, item));
         int numOfItem = userItem.purchase();
         persistUser.updatePoints((long) item.getCost() * -1);
@@ -87,9 +86,29 @@ public class ItemService {
     }
 
     @Transactional
+    public ProfileResponse unmountFrame(User user, Long itemId) {
+        UserItem userItem = userItemProvider.findByOrderInfo(user.getId(), itemId);
+        validateUnmountCondition(userItem);
+
+        userItem.updateEquipStatus(EquipStatus.AVAILABLE);
+
+        return ProfileResponse.create(
+                userItem.getItem(), userItem.getCount(), userItem.getEquipStatus().getTag());
+    }
+
+    private void validateUnmountCondition(UserItem userItem) {
+        if (userItem.getItem().getItemCategory() != ItemCategory.PROFILE_FRAME) {
+            throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
+        }
+        if (userItem.getEquipStatus() != EquipStatus.IN_USE) {
+            throw new BusinessException(ErrorCode.IN_USE_FRAME_NOT_FOUND);
+        }
+    }
+
+    @Transactional
     public ItemUseResponse useItem(User user, Long itemId, Long instanceId, LocalDate currentDate) {
         Item item = itemProvider.findById(itemId);
-        UserItem userItem = userItemProvider.findByInfo(user.getId(), itemId);
+        UserItem userItem = userItemProvider.findByOrderInfo(user.getId(), itemId);
 
         if (!userItem.hasItem()) {
             throw new BusinessException(ErrorCode.HAS_NO_ITEM);
@@ -109,18 +128,17 @@ public class ItemService {
         throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
     }
 
-    //TODO: 기존에 장착하고 있던 프레임을 장착 해제 시켜야 함
     private ItemUseResponse useProfileFrameItem(UserItem userItem) {
         validateFrameEquip(userItem);
         userItem.updateEquipStatus(EquipStatus.IN_USE);
         return new ItemUseResponse(0L, "", 0);
     }
 
-    private void validateFrameEquip(UserItem frameItem) {
-        if (!frameItem.hasItem()) {
+    private void validateFrameEquip(UserItem userItem) {
+        if (!userItem.hasItem()) {
             throw new BusinessException(ErrorCode.HAS_NO_ITEM);
         }
-        if (frameItem.getEquipStatus() != EquipStatus.AVAILABLE) {
+        if (userItem.getEquipStatus() != EquipStatus.AVAILABLE) {
             throw new BusinessException(ErrorCode.INVALID_EQUIP_CONDITION);
         }
     }

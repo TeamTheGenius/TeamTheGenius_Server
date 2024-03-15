@@ -15,4 +15,8 @@ public class ItemUseResponse {
         this.title = title;
         this.pointPerPerson = pointPerPerson;
     }
+
+    public boolean isFrameResponse() {
+        return this.instanceId == 0L;
+    }
 }

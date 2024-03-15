@@ -161,8 +161,8 @@ class MyChallengeServiceTest {
     public void should_returnRewardInfo_when_alreadyRewarded() {
         LocalDate targetDate = LocalDate.of(2024, 2, 14);
         User user = getSavedUser();
-        Instance instance1 = getSavedInstance(Progress.DONE);
-        Participant participant1 = getSavedParticipant(user, instance1, SUCCESS);
+        Instance instance = getSavedInstance(Progress.DONE);
+        getSavedParticipant(user, instance, SUCCESS);
         getSavedUserItem(user, ItemCategory.POINT_MULTIPLIER, 3);
 
         //when
@@ -171,7 +171,7 @@ class MyChallengeServiceTest {
         //then
         assertThat(doneResponses.size()).isEqualTo(1);
         assertThat(doneResponses.get(0).isCanGetReward()).isTrue();
-        assertThat(doneResponses.get(0).getNumOfPointItem()).isEqualTo(3);
+        assertThat(doneResponses.get(0).getRewardedPoints()).isEqualTo(instance.getPointPerPerson() * 2L);
     }
 
 

@@ -5,6 +5,7 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.dto.ItemResponse;
 import com.genius.gitget.challenge.item.dto.ItemUseResponse;
+import com.genius.gitget.challenge.item.dto.ProfileResponse;
 import com.genius.gitget.challenge.item.service.ItemService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
@@ -65,10 +66,9 @@ public class ItemController {
             @PathVariable Long itemId,
             @RequestParam(required = false) Long instanceId
     ) {
-        instanceId = instanceId == null ? 0 : instanceId;
         ItemUseResponse itemUseResponse = itemService.useItem(
                 userPrincipal.getUser(), itemId, instanceId, LocalDate.now());
-        if (itemUseResponse.getInstanceId() == 0L) {
+        if (itemUseResponse.isFrameResponse()) {
             return ResponseEntity.ok().body(
                     new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
             );
@@ -76,6 +76,18 @@ public class ItemController {
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemUseResponse)
+        );
+    }
+
+    @PostMapping("/items/unuse/{itemId}")
+    public ResponseEntity<SingleResponse<ProfileResponse>> unmountItem(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @PathVariable Long itemId
+    ) {
+        ProfileResponse profileResponse = itemService.unmountFrame(userPrincipal.getUser(), itemId);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), profileResponse)
         );
     }
 }

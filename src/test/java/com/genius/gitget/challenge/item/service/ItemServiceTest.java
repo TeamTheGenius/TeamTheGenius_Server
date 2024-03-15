@@ -19,6 +19,7 @@ import com.genius.gitget.challenge.item.domain.ItemCategory;
 import com.genius.gitget.challenge.item.domain.UserItem;
 import com.genius.gitget.challenge.item.dto.ItemResponse;
 import com.genius.gitget.challenge.item.dto.ItemUseResponse;
+import com.genius.gitget.challenge.item.dto.ProfileResponse;
 import com.genius.gitget.challenge.item.repository.ItemRepository;
 import com.genius.gitget.challenge.item.repository.UserItemRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
@@ -347,6 +348,54 @@ class ItemServiceTest {
         //then
         assertThat(afterRewards - previousPoint).isEqualTo(instance.getPointPerPerson() * 2L);
         assertThat(userItem.getCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("사용자가 특정 프로필 프레임을 장착하고 있을 떄, 장착 해제할 수 있다.")
+    public void should_unmountFrame_when_mountAlready() {
+        //given
+        User user = getSavedUser();
+        Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
+        getSavedUserItem(user, item, ItemCategory.PROFILE_FRAME, 1);
+
+        //when
+        itemService.useItem(user, item.getId(), 0L, LocalDate.now());
+        ProfileResponse profileResponse = itemService.unmountFrame(user, item.getId());
+
+        //then
+        assertThat(profileResponse.getItemId()).isEqualTo(item.getId());
+        assertThat(profileResponse.getCost()).isEqualTo(item.getCost());
+        assertThat(profileResponse.getItemCategory()).isEqualTo(ItemCategory.PROFILE_FRAME);
+        assertThat(profileResponse.getEquipStatus()).isEqualTo(EquipStatus.AVAILABLE.getTag());
+    }
+
+    @ParameterizedTest
+    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 프로필 프레임이 아니라면 예외가 발생한다.")
+    @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
+    public void should_throwException_when_categoryIsNotFrame(ItemCategory itemCategory) {
+        //given
+        User user = getSavedUser();
+        Item item = getSavedItem(itemCategory);
+        UserItem userItem = getSavedUserItem(user, item, item.getItemCategory(), 1);
+
+        //when & then
+        assertThatThrownBy(() -> itemService.unmountFrame(user, item.getId()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.ITEM_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 사용 상태가 IN_USE가 아니라면 예외가 발생한다.")
+    public void should_throwException_when_equipStatusIsNotIS_USE() {
+        //given
+        User user = getSavedUser();
+        Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
+        getSavedUserItem(user, item, item.getItemCategory(), 1);
+
+        //when & then
+        assertThatThrownBy(() -> itemService.unmountFrame(user, item.getId()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.IN_USE_FRAME_NOT_FOUND.getMessage());
     }
 
 

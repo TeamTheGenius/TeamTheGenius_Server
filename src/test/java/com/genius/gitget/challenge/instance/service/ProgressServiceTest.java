@@ -21,6 +21,7 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.scheduling.service.ProgressService;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -36,11 +37,11 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @ActiveProfiles({"github"})
-class ProgressUpdaterTest {
+class ProgressServiceTest {
     @Autowired
     private InstanceDetailService instanceDetailService;
     @Autowired
-    private ProgressUpdater progressUpdater;
+    private ProgressService scheduleService;
     @Autowired
     private GithubService githubService;
     @Autowired
@@ -89,7 +90,7 @@ class ProgressUpdaterTest {
         //when
         List<Instance> preActivities = instanceProvider.findAllByProgress(Progress.PREACTIVITY);
         assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.READY);
-        progressUpdater.updateToActivity(currentDate);
+        scheduleService.updateToActivity(currentDate);
         List<Instance> activities = instanceProvider.findAllByProgress(Progress.ACTIVITY);
 
         //then
@@ -112,7 +113,7 @@ class ProgressUpdaterTest {
 
         //when
         List<Instance> activities = instanceProvider.findAllByProgress(Progress.PREACTIVITY);
-        progressUpdater.updateToDone(currentDate);
+        scheduleService.updateToDone(currentDate);
         List<Instance> done = instanceProvider.findAllByProgress(Progress.DONE);
 
         //then
@@ -138,7 +139,7 @@ class ProgressUpdaterTest {
         getSavedCertification(CertificateStatus.PASSED, completedDate, participant1);
 
         //when
-        progressUpdater.updateToDone(currentDate);
+        scheduleService.updateToDone(currentDate);
 
         //then
         List<Instance> done = instanceProvider.findAllByProgress(Progress.DONE);
@@ -164,7 +165,7 @@ class ProgressUpdaterTest {
         getSavedCertification(CertificateStatus.PASSED, completedDate, participant1);
 
         //when
-        progressUpdater.updateToDone(currentDate);
+        scheduleService.updateToDone(currentDate);
 
         //then
         List<Instance> done = instanceProvider.findAllByProgress(Progress.DONE);

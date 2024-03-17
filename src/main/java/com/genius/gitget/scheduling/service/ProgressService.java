@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.instance.service;
+package com.genius.gitget.scheduling.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
@@ -6,19 +6,22 @@ import static com.genius.gitget.challenge.certification.domain.CertificateStatus
 import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
+import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ProgressUpdater {
+public class ProgressService {
     private final InstanceProvider instanceProvider;
     private final CertificationProvider certificationProvider;
     private final double SUCCESS_THRESHOLD = 85;

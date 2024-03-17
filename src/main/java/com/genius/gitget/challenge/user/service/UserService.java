@@ -30,7 +30,7 @@ public class UserService {
     private final FilesService filesService;
     private final EncryptUtil encryptUtil;
 
-    @Value("${githubId}")
+    @Value("${admin.githubId}")
     private List<String> adminIds;
 
 

@@ -4,6 +4,8 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -50,9 +52,13 @@ public class Payment extends BaseTimeEntity {
     @Column(name = "success_at", updatable = false)
     private LocalDateTime successDate;
 
+    @Enumerated(EnumType.STRING)
+    private OrderType orderType;
+
+
     @Builder
     public Payment(String orderId, String paymentKey, Long amount, Long pointAmount, String orderName,
-                   boolean isSuccess, String failReason, User user) {
+                   boolean isSuccess, String failReason, User user, OrderType orderType) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
@@ -61,6 +67,7 @@ public class Payment extends BaseTimeEntity {
         this.isSuccess = isSuccess;
         this.failReason = failReason;
         this.user = user;
+        this.orderType = orderType;
     }
 
     public void setPaymentSuccessStatus(String paymentKey, boolean isSuccess) {

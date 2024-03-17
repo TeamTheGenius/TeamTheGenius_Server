@@ -12,3 +12,4 @@ public enum EquipStatus {
 
     private final String tag;
 }
+

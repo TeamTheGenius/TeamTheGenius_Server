@@ -1,4 +1,4 @@
-package com.genius.gitget.scheduling.service;
+package com.genius.gitget.schedule.service;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;

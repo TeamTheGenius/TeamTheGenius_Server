@@ -1,4 +1,4 @@
-package com.genius.gitget.scheduling.service;
+package com.genius.gitget.schedule.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;

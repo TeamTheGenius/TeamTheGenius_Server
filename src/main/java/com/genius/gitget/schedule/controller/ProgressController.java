@@ -1,9 +1,9 @@
-package com.genius.gitget.scheduling.controller;
+package com.genius.gitget.schedule.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.global.util.response.dto.CommonResponse;
-import com.genius.gitget.scheduling.service.ProgressService;
+import com.genius.gitget.schedule.service.ProgressService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -21,7 +21,7 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
-import com.genius.gitget.scheduling.service.ProgressService;
+import com.genius.gitget.schedule.service.ProgressService;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;

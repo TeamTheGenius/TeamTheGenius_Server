@@ -93,7 +93,7 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
-        User user = userPrincipal.getUser();
+        User user = userService.findUserById(userPrincipal.getUser().getId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
         List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
                 participant.getId(), LocalDate.now());

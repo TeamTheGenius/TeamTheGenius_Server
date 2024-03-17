@@ -15,7 +15,6 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
-import com.genius.gitget.store.item.service.OrdersProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
@@ -24,6 +23,7 @@ import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.store.item.service.OrdersProvider;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -189,7 +189,12 @@ public class CertificationService {
         );
 
         Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
-                .map(updated -> certificationProvider.update(updated, targetDate, filteredPullRequests))
+                .map(updated -> {
+                    if (updated.getCertificationStatus() == PASSED) {
+                        throw new BusinessException(ErrorCode.ALREADY_PASSED_CERTIFICATION);
+                    }
+                    return certificationProvider.update(updated, targetDate, filteredPullRequests);
+                })
                 .orElseGet(
                         () -> certificationProvider.createCertification(participant, targetDate, filteredPullRequests)
                 );

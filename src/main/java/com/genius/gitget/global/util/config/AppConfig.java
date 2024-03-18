@@ -2,6 +2,7 @@ package com.genius.gitget.global.util.config;
 
 import com.genius.gitget.global.util.formatter.LocalDateFormatter;
 import com.genius.gitget.global.util.formatter.LocalDateTimeFormatter;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +19,8 @@ public class AppConfig {
     @Bean
     public AesBytesEncryptor aesBytesEncryptor() {
         return new AesBytesEncryptor(
-                env.getProperty("github.encryptSecretKey"),
-                env.getProperty("github.salt"));
+                Objects.requireNonNull(env.getProperty("github.encryptSecretKey")),
+                Objects.requireNonNull(env.getProperty("github.salt")));
     }
 
     @Bean

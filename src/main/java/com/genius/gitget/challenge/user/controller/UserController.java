@@ -5,7 +5,7 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.service.UserService;
-import com.genius.gitget.global.security.dto.TokenDTO;
+import com.genius.gitget.global.security.dto.SignupResponse;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,14 +33,14 @@ public class UserController {
     }
 
     @PostMapping("/auth/signup")
-    public ResponseEntity<SingleResponse<TokenDTO>> signup(
+    public ResponseEntity<SingleResponse<SignupResponse>> signup(
             @RequestPart(value = "data") SignupRequest signupRequest,
             @RequestPart(value = "files") MultipartFile multipartFile) {
         Long signupUserId = userService.signup(signupRequest, multipartFile);
         String identifier = userService.findUserById(signupUserId).getIdentifier();
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), new TokenDTO(identifier))
+                new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), new SignupResponse(identifier))
         );
     }
 }

@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.certification.service;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
+import static com.genius.gitget.global.util.exception.ErrorCode.ALREADY_PASSED_CERTIFICATION;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_CERTIFICATE_PERIOD;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,11 +22,6 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.store.item.domain.Item;
-import com.genius.gitget.store.item.domain.ItemCategory;
-import com.genius.gitget.store.item.domain.Orders;
-import com.genius.gitget.store.item.repository.ItemRepository;
-import com.genius.gitget.store.item.repository.OrdersRepository;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
@@ -37,6 +33,11 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.domain.ItemCategory;
+import com.genius.gitget.store.item.domain.Orders;
+import com.genius.gitget.store.item.repository.ItemRepository;
+import com.genius.gitget.store.item.repository.OrdersRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -165,6 +166,32 @@ class CertificationServiceTest {
         assertThatThrownBy(() -> certificationService.updateCertification(user, certificationRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_CERTIFICATE_PERIOD.getMessage());
+    }
+
+    @Test
+    @DisplayName("패스를 완료했을 때, 인증 갱신을 요청한다면 예외가 발생한다.")
+    public void should_throwException_when_passedAlready() {
+        //given
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance();
+        Participant participant = getSavedParticipant(user, instance);
+        githubService.registerGithubPersonalToken(user, personalKey);
+
+        LocalDate targetDate = LocalDate.of(2024, 2, 6);
+
+        CertificationRequest certificationRequest = CertificationRequest.builder()
+                .instanceId(instance.getId())
+                .targetDate(targetDate)
+                .build();
+        instance.updateProgress(Progress.ACTIVITY);
+
+        //when
+        getSavedCertification(PASSED, targetDate, participant);
+
+        //then
+        assertThatThrownBy(() -> certificationService.updateCertification(user, certificationRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ALREADY_PASSED_CERTIFICATION.getMessage());
     }
 
     @Test

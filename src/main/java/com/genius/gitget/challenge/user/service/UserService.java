@@ -13,8 +13,10 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +29,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final FilesService filesService;
     private final EncryptUtil encryptUtil;
+
+    @Value("${admin.githubId}")
+    private List<String> adminIds;
 
 
     public User findUserById(Long id) {
@@ -53,12 +58,20 @@ public class UserService {
         user.updateUser(requestUser.nickname(),
                 requestUser.information(),
                 interest);
-        user.updateRole(Role.USER);
+        updateRole(user);
 
         Files files = filesService.uploadFile(multipartFile, "profile");
         user.setFiles(files);
 
         return user.getId();
+    }
+
+    private void updateRole(User user) {
+        if (adminIds.contains(user.getIdentifier())) {
+            user.updateRole(Role.ADMIN);
+            return;
+        }
+        user.updateRole(Role.USER);
     }
 
     public void isNicknameDuplicate(String nickname) {

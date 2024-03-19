@@ -38,10 +38,10 @@ class UserServiceTest {
     @DisplayName("특정 사용자를 가입한 이후, 사용자를 찾았을 때 가입했을 때 입력한 정보와 일치해야 한다.")
     public void should_matchValues_when_signupUser() {
         //given
-        String email = "test@naver.com";
-        saveUnsignedUser();
+        String identifier = "identifier";
+        saveUnsignedUser(identifier);
         SignupRequest signupRequest = SignupRequest.builder()
-                .identifier(email)
+                .identifier(identifier)
                 .nickname("nickname")
                 .information("information")
                 .interest(List.of("관심사1", "관심사2"))
@@ -49,16 +49,18 @@ class UserServiceTest {
         MultipartFile multipartFile = FileTestUtil.getMultipartFile("profile");
 
         //when
-        User user = userService.findUserByIdentifier(email);
+        User user = userService.findUserByIdentifier(identifier);
 
         Long signupUserId = userService.signup(signupRequest, multipartFile);
         User foundUser = userService.findUserById(signupUserId);
+
         //then
         assertThat(user.getIdentifier()).isEqualTo(foundUser.getIdentifier());
         assertThat(user.getNickname()).isEqualTo(foundUser.getNickname());
         assertThat(user.getProviderInfo()).isEqualTo(foundUser.getProviderInfo());
         assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());
         assertThat(user.getTags()).isEqualTo(foundUser.getTags());
+        assertThat(user.getRole()).isEqualTo(Role.USER);
 
         Files files = user.getFiles().get();
         assertThat(files.getFileType()).isEqualTo(FileType.PROFILE);
@@ -66,13 +68,13 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("사용자가 한 차례 회원가입을 진행한 후, 한 번 더 회원가입을 요청하면 예외가 발생해야 한다.")
-    public void should_throwException_when_requestRegisterAgain() {
+    @DisplayName("어드민 깃허브 계정에 해당하는 사용자가 가입을 요청하는 경우, ROLE이 자동으로 ADMIN으로 설정된다.")
+    public void should_setRoleAdmin_when_identifierMatchesWithAdmin() {
         //given
-        String email = "test@naver.com";
-        saveUnsignedUser();
+        String identifier = "SSung023";
+        saveUnsignedUser(identifier);
         SignupRequest signupRequest = SignupRequest.builder()
-                .identifier(email)
+                .identifier(identifier)
                 .nickname("nickname")
                 .information("information")
                 .interest(List.of("관심사1", "관심사2"))
@@ -80,7 +82,29 @@ class UserServiceTest {
         MultipartFile multipartFile = FileTestUtil.getMultipartFile("profile");
 
         //when
-        User user = userService.findUserByIdentifier(email);
+        Long signupUserId = userService.signup(signupRequest, multipartFile);
+        User signupUser = userService.findUserById(signupUserId);
+
+        //then
+        assertThat(signupUser.getRole()).isEqualTo(Role.ADMIN);
+    }
+
+    @Test
+    @DisplayName("사용자가 한 차례 회원가입을 진행한 후, 한 번 더 회원가입을 요청하면 예외가 발생해야 한다.")
+    public void should_throwException_when_requestRegisterAgain() {
+        //given
+        String identifier = "identifier";
+        saveUnsignedUser(identifier);
+        SignupRequest signupRequest = SignupRequest.builder()
+                .identifier(identifier)
+                .nickname("nickname")
+                .information("information")
+                .interest(List.of("관심사1", "관심사2"))
+                .build();
+        MultipartFile multipartFile = FileTestUtil.getMultipartFile("profile");
+
+        //when
+        User user = userService.findUserByIdentifier(identifier);
         Long signupUserId = userService.signup(signupRequest, multipartFile);
 
         //then
@@ -171,11 +195,11 @@ class UserServiceTest {
     }
 
 
-    private void saveUnsignedUser() {
+    private void saveUnsignedUser(String identifier) {
         userRepository.save(User.builder()
                 .role(Role.NOT_REGISTERED)
                 .providerInfo(ProviderInfo.NAVER)
-                .identifier("test@naver.com")
+                .identifier(identifier)
                 .build());
     }
 

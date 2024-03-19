@@ -229,7 +229,7 @@ class UserServiceTest {
 
         //then
         assertThat(authResponse.role()).isEqualTo(Role.USER);
-        assertThat(authResponse.frameItemId()).isEqualTo(null);
+        assertThat(authResponse.frameId()).isEqualTo(null);
     }
 
     @Test
@@ -246,7 +246,7 @@ class UserServiceTest {
 
         //then
         assertThat(authResponse.role()).isEqualTo(Role.USER);
-        assertThat(authResponse.frameItemId()).isEqualTo(item.getId());
+        assertThat(authResponse.frameId()).isEqualTo(item.getId());
     }
 
 

@@ -87,8 +87,9 @@ public class CertificationService {
                 weekStartDate);
 
         FileResponse fileResponse = FileResponse.create(user.getFiles());
+        Long frameId = ordersProvider.getUsingFrame(user.getId()).getId();
 
-        return WeekResponse.create(user, fileResponse, certificationResponses);
+        return WeekResponse.create(user, frameId, fileResponse, certificationResponses);
     }
 
     public TotalResponse getTotalCertification(Long participantId, LocalDate currentDate) {

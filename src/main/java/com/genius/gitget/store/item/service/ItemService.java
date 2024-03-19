@@ -79,7 +79,13 @@ public class ItemService {
         return getItemResponse(persistUser, item, numOfItem);
     }
 
-    private static Payment getPayment(User user, Item item) {
+    private void validateUserPoint(long userPoint, int itemCost) {
+        if (userPoint < itemCost) {
+            throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
+        }
+    }
+
+    private Payment getPayment(User user, Item item) {
         return Payment.builder()
                 .user(user)
                 .orderType(OrderType.ITEM)
@@ -87,12 +93,6 @@ public class ItemService {
                 .pointAmount(Long.parseLong(String.valueOf(item.getCost())))
                 .orderName(item.getName())
                 .build();
-    }
-
-    private void validateUserPoint(long userPoint, int itemCost) {
-        if (userPoint < itemCost) {
-            throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
-        }
     }
 
     private Orders createNew(User user, Item item) {
@@ -146,6 +146,8 @@ public class ItemService {
     }
 
     private ItemUseResponse useProfileFrameItem(Orders orders) {
+        //TODO: 프로필 프레임을 사용할 때, 이미 IN_USE인 profile이 있으면 예외 처리?
+        // or 모두 AVAILABLE로 만들어버리고
         validateFrameEquip(orders);
         orders.updateEquipStatus(EquipStatus.IN_USE);
         return new ItemUseResponse(0L, "", 0);

@@ -2,12 +2,15 @@ package com.genius.gitget.store.item.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.USER_ITEM_NOT_FOUND;
 
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.item.domain.EquipStatus;
+import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.repository.OrdersRepository;
-import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.global.util.exception.BusinessException;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,8 +44,21 @@ public class OrdersProvider {
         return EquipStatus.UNAVAILABLE;
     }
 
-    public int countNumOfCategory(User user, ItemCategory itemCategory) {
-        return ordersRepository.findByCategory(user.getId(), itemCategory).size();
+    public Item getUsingFrame(Long userId) {
+        List<Orders> frames = ordersRepository.findAllByCategory(userId, ItemCategory.PROFILE_FRAME);
+        List<Orders> usingFrames = frames.stream()
+                .filter(frame -> frame.getEquipStatus() == EquipStatus.IN_USE)
+                .toList();
+        if (usingFrames.size() > 1) {
+            throw new BusinessException(ErrorCode.TOO_MANY_USING_FRAME);
+        }
+
+        if (usingFrames.isEmpty()) {
+            return Item.builder()
+                    .itemCategory(ItemCategory.PROFILE_FRAME)
+                    .build();
+        }
+        return usingFrames.get(0).getItem();
     }
 
     public int countNumOfItem(User user, Long itemId) {

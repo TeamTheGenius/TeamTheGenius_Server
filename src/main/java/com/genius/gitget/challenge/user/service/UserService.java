@@ -12,7 +12,10 @@ import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.service.OrdersProvider;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final OrdersProvider ordersProvider;
     private final FilesService filesService;
     private final EncryptUtil encryptUtil;
 
@@ -92,5 +96,12 @@ public class UserService {
         if (user.getRole() != Role.NOT_REGISTERED) {
             throw new BusinessException(ALREADY_REGISTERED);
         }
+    }
+
+    public AuthResponse getUserInfo(String identifier) {
+        User user = userRepository.findByIdentifier(identifier)
+                .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
+        Item usingFrame = ordersProvider.getUsingFrame(user.getId());
+        return new AuthResponse(user.getRole(), usingFrame.getId());
     }
 }

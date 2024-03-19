@@ -103,14 +103,20 @@ public class ItemService {
     }
 
     @Transactional
-    public ProfileResponse unmountFrame(User user, Long itemId) {
-        Orders orders = ordersProvider.findByOrderInfo(user.getId(), itemId);
-        validateUnmountCondition(orders);
+    public List<ProfileResponse> unmountFrame(User user) {
+        List<ProfileResponse> profileResponses = new ArrayList<>();
+        List<Orders> frameOrders = ordersProvider.findAllByCategory(user.getId(), ItemCategory.PROFILE_FRAME)
+                .stream()
+                .filter(frameOrder -> frameOrder.getEquipStatus() == EquipStatus.IN_USE)
+                .toList();
 
-        orders.updateEquipStatus(EquipStatus.AVAILABLE);
+        for (Orders frameOrder : frameOrders) {
+            validateUnmountCondition(frameOrder);
+            frameOrder.updateEquipStatus(EquipStatus.AVAILABLE);
+            profileResponses.add(ProfileResponse.createByEntity(frameOrder));
+        }
 
-        return ProfileResponse.create(
-                orders.getItem(), orders.getCount(), orders.getEquipStatus().getTag());
+        return profileResponses;
     }
 
     private void validateUnmountCondition(Orders orders) {

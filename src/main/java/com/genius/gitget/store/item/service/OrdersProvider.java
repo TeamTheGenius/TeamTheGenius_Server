@@ -36,6 +36,11 @@ public class OrdersProvider {
                 .orElseThrow(() -> new BusinessException(USER_ITEM_NOT_FOUND));
     }
 
+
+    public List<Orders> findAllByCategory(Long useId, ItemCategory itemCategory) {
+        return ordersRepository.findAllByCategory(useId, itemCategory);
+    }
+
     public EquipStatus getEquipStatus(Long userId, Long itemId) {
         Optional<Orders> optionalUserItem = ordersRepository.findByOrderInfo(userId, itemId);
         if (optionalUserItem.isPresent()) {

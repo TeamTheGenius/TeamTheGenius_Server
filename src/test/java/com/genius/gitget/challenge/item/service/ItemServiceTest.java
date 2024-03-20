@@ -13,15 +13,6 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.store.item.domain.EquipStatus;
-import com.genius.gitget.store.item.domain.Item;
-import com.genius.gitget.store.item.domain.ItemCategory;
-import com.genius.gitget.store.item.domain.Orders;
-import com.genius.gitget.store.item.dto.ItemResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
-import com.genius.gitget.store.item.dto.ProfileResponse;
-import com.genius.gitget.store.item.repository.ItemRepository;
-import com.genius.gitget.store.item.repository.OrdersRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -32,6 +23,15 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.store.item.domain.EquipStatus;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.domain.ItemCategory;
+import com.genius.gitget.store.item.domain.Orders;
+import com.genius.gitget.store.item.dto.ItemResponse;
+import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.ProfileResponse;
+import com.genius.gitget.store.item.repository.ItemRepository;
+import com.genius.gitget.store.item.repository.OrdersRepository;
 import com.genius.gitget.store.item.service.ItemService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -361,7 +361,7 @@ class ItemServiceTest {
 
         //when
         itemService.useItem(user, item.getId(), 0L, LocalDate.now());
-        ProfileResponse profileResponse = itemService.unmountFrame(user, item.getId());
+        ProfileResponse profileResponse = itemService.unmountFrame(user).get(0);
 
         //then
         assertThat(profileResponse.getItemId()).isEqualTo(item.getId());
@@ -371,7 +371,7 @@ class ItemServiceTest {
     }
 
     @ParameterizedTest
-    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 프로필 프레임이 아니라면 예외가 발생한다.")
+    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 프로필 프레임이 아니라면 응답 데이터의 크기가 0이다.")
     @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
     public void should_throwException_when_categoryIsNotFrame(ItemCategory itemCategory) {
         //given
@@ -379,24 +379,26 @@ class ItemServiceTest {
         Item item = getSavedItem(itemCategory);
         Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
+        //when
+        List<ProfileResponse> profileResponses = itemService.unmountFrame(user);
+
         //when & then
-        assertThatThrownBy(() -> itemService.unmountFrame(user, item.getId()))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.ITEM_NOT_FOUND.getMessage());
+        assertThat(profileResponses.size()).isEqualTo(0);
     }
 
     @Test
-    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 사용 상태가 IN_USE가 아니라면 예외가 발생한다.")
+    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 사용 상태가 IN_USE가 아니라면 반환데이터의 크기가 0이다.")
     public void should_throwException_when_equipStatusIsNotIS_USE() {
         //given
         User user = getSavedUser();
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
         getSavedOrder(user, item, item.getItemCategory(), 1);
 
+        // when
+        List<ProfileResponse> profileResponses = itemService.unmountFrame(user);
+
         //when & then
-        assertThatThrownBy(() -> itemService.unmountFrame(user, item.getId()))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.IN_USE_FRAME_NOT_FOUND.getMessage());
+        assertThat(profileResponses.size()).isEqualTo(0);
     }
 
 

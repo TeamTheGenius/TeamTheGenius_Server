@@ -37,8 +37,15 @@ public class OrdersProvider {
     }
 
 
-    public List<Orders> findAllByCategory(Long useId, ItemCategory itemCategory) {
-        return ordersRepository.findAllByCategory(useId, itemCategory);
+    public List<Orders> findAllByCategory(Long userId, ItemCategory itemCategory) {
+        return ordersRepository.findAllByCategory(userId, itemCategory);
+    }
+
+    public List<Orders> findAllUsingFrames(Long userId) {
+        return findAllByCategory(userId, ItemCategory.PROFILE_FRAME)
+                .stream()
+                .filter(frameOrder -> frameOrder.getEquipStatus() == EquipStatus.IN_USE)
+                .toList();
     }
 
     public EquipStatus getEquipStatus(Long userId, Long itemId) {
@@ -50,10 +57,7 @@ public class OrdersProvider {
     }
 
     public Item getUsingFrame(Long userId) {
-        List<Orders> frames = ordersRepository.findAllByCategory(userId, ItemCategory.PROFILE_FRAME);
-        List<Orders> usingFrames = frames.stream()
-                .filter(frame -> frame.getEquipStatus() == EquipStatus.IN_USE)
-                .toList();
+        List<Orders> usingFrames = findAllUsingFrames(userId);
         if (usingFrames.size() > 1) {
             throw new BusinessException(ErrorCode.TOO_MANY_USING_FRAME);
         }

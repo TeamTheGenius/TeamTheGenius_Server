@@ -219,21 +219,36 @@ class ItemServiceTest {
                 .hasMessageContaining(ErrorCode.HAS_NO_ITEM.getMessage());
     }
 
-    @ParameterizedTest
-    @DisplayName("프로필 프레임을 사용하려 할 때, 프레임의 장착 상태가 AVAILABLE이 아니라면 예외가 발생해야 한다.")
-    @EnumSource(mode = Mode.INCLUDE, names = {"IN_USE", "UNAVAILABLE"})
-    public void should_throwException_when_notAvailable(EquipStatus equipStatus) {
+    @Test
+    @DisplayName("프로필 프레임을 사용하려 할 때, 프레임의 장착 상태가 Unavailable인 경우 장착 가능 상태가 아니라는 예외가 발생한다.")
+    public void should_throwException_when_notAvailable() {
         //given
         User user = getSavedUser();
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
         Orders orders = getSavedOrder(user, item, ItemCategory.PROFILE_FRAME, 3);
 
-        orders.updateEquipStatus(equipStatus);
+        orders.updateEquipStatus(EquipStatus.UNAVAILABLE);
 
         //when && then
         assertThatThrownBy(() -> itemService.useItem(user, item.getId(), 0L, LocalDate.now()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.INVALID_EQUIP_CONDITION.getMessage());
+    }
+
+    @Test
+    @DisplayName("프로필 프레임을 사용하려할 때, 장착 중인 프레임이 있는 경우 장착 해제를 먼저 실행하라는 예외가 발생한다.")
+    public void should_throwException_when_inUseItemExist() {
+        //given
+        User user = getSavedUser();
+        Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
+        Orders orders = getSavedOrder(user, item, ItemCategory.PROFILE_FRAME, 3);
+
+        orders.updateEquipStatus(EquipStatus.IN_USE);
+
+        //when && then
+        assertThatThrownBy(() -> itemService.useItem(user, item.getId(), 0L, LocalDate.now()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.TOO_MANY_USING_FRAME.getMessage());
     }
 
     @Test

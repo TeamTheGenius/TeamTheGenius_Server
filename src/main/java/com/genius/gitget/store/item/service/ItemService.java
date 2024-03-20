@@ -105,10 +105,7 @@ public class ItemService {
     @Transactional
     public List<ProfileResponse> unmountFrame(User user) {
         List<ProfileResponse> profileResponses = new ArrayList<>();
-        List<Orders> frameOrders = ordersProvider.findAllByCategory(user.getId(), ItemCategory.PROFILE_FRAME)
-                .stream()
-                .filter(frameOrder -> frameOrder.getEquipStatus() == EquipStatus.IN_USE)
-                .toList();
+        List<Orders> frameOrders = ordersProvider.findAllUsingFrames(user.getId());
 
         for (Orders frameOrder : frameOrders) {
             validateUnmountCondition(frameOrder);
@@ -139,7 +136,7 @@ public class ItemService {
 
         switch (item.getItemCategory()) {
             case PROFILE_FRAME -> {
-                return useProfileFrameItem(orders);
+                return useProfileFrameItem(user.getId(), orders);
             }
             case CERTIFICATION_PASSER -> {
                 return usePasserItem(orders, instanceId, currentDate);
@@ -151,15 +148,18 @@ public class ItemService {
         throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
     }
 
-    private ItemUseResponse useProfileFrameItem(Orders orders) {
-        //TODO: 프로필 프레임을 사용할 때, 이미 IN_USE인 profile이 있으면 예외 처리?
-        // or 모두 AVAILABLE로 만들어버리고
-        validateFrameEquip(orders);
+    private ItemUseResponse useProfileFrameItem(Long userId, Orders orders) {
+        validateFrameEquip(userId, orders);
         orders.updateEquipStatus(EquipStatus.IN_USE);
         return new ItemUseResponse(0L, "", 0);
     }
 
-    private void validateFrameEquip(Orders orders) {
+    private void validateFrameEquip(Long userId, Orders orders) {
+        List<Orders> allUsingFrames = ordersProvider.findAllUsingFrames(userId);
+        if (!allUsingFrames.isEmpty()) {
+            throw new BusinessException(ErrorCode.TOO_MANY_USING_FRAME);
+        }
+
         if (!orders.hasItem()) {
             throw new BusinessException(ErrorCode.HAS_NO_ITEM);
         }

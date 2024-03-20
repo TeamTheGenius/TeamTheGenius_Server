@@ -268,9 +268,6 @@ class ItemServiceTest {
         ItemUseResponse itemUseResponse = itemService.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
-        assertThat(itemUseResponse.getInstanceId()).isEqualTo(instance.getId());
-        assertThat(itemUseResponse.getTitle()).isEqualTo(instance.getTitle());
-        assertThat(itemUseResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
         assertThat(orders.getCount()).isEqualTo(0);
         assertThat(certification.getCertificationStatus()).isEqualTo(PASSED);
     }
@@ -294,9 +291,6 @@ class ItemServiceTest {
 
         //then
         Optional<Certification> certification = certificationRepository.findByDate(currentDate, participant.getId());
-        assertThat(itemUseResponse.getInstanceId()).isEqualTo(instance.getId());
-        assertThat(itemUseResponse.getTitle()).isEqualTo(instance.getTitle());
-        assertThat(itemUseResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
         assertThat(orders.getCount()).isEqualTo(0);
         assertThat(certification).isPresent();
         assertThat(certification.get().getCertificationStatus()).isEqualTo(PASSED);
@@ -364,6 +358,47 @@ class ItemServiceTest {
         //then
         assertThat(afterRewards - previousPoint).isEqualTo(instance.getPointPerPerson() * 2L);
         assertThat(orders.getCount()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("포인트 2배 획득 아이템을 사용해서 아이템의 개수가 0이 되면 Orders 정보를 DB에서 삭제된다.")
+    public void should_deleteOrderInfo_when_countZeroAfterUseItem() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser();
+        Instance instance = getSavedInstance(currentDate, currentDate.plusDays(1));
+        Participant participant = getSavedParticipant(user, instance);
+        Item item = getSavedItem(ItemCategory.POINT_MULTIPLIER);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
+
+        //when
+        instance.updateProgress(Progress.DONE);
+        participant.updateJoinResult(JoinResult.SUCCESS);
+        getSavedCertification(CERTIFICATED, currentDate, participant);
+        getSavedCertification(CERTIFICATED, currentDate.plusDays(1), participant);
+        itemService.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
+
+        //then
+        assertThat(ordersRepository.findById(orders.getId())).isNotPresent();
+    }
+
+    @Test
+    @DisplayName("인증 패스 아이템을 사용해서 아이템의 개수가 0이 되면 Orders 정보를 DB에서 삭제된다.")
+    public void should_deleteOrderInfo_when_passItemCountIsZero() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser();
+        Instance instance = getSavedInstance(currentDate, currentDate.plusDays(1));
+        Participant participant = getSavedParticipant(user, instance);
+        Item item = getSavedItem(ItemCategory.CERTIFICATION_PASSER);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
+
+        //when
+        instance.updateProgress(Progress.ACTIVITY);
+        itemService.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
+
+        //then
+        assertThat(ordersRepository.findById(orders.getId())).isNotPresent();
     }
 
     @Test

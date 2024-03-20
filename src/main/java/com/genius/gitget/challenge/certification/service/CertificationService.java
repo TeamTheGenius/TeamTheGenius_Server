@@ -215,8 +215,10 @@ public class CertificationService {
             throw new BusinessException(ErrorCode.NOT_ACTIVITY_INSTANCE);
         }
 
-        boolean isValidPeriod = targetDate.isAfter(instance.getStartedDate().toLocalDate()) &&
-                targetDate.isBefore(instance.getCompletedDate().toLocalDate());
+        LocalDate startedDate = instance.getStartedDate().toLocalDate().minusDays(1);
+        LocalDate completedDate = instance.getCompletedDate().toLocalDate().plusDays(1);
+
+        boolean isValidPeriod = targetDate.isAfter(startedDate) && targetDate.isBefore(completedDate);
         if (!isValidPeriod) {
             throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
         }

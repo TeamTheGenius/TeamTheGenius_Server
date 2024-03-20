@@ -94,6 +94,7 @@ class ItemServiceTest {
         //then
         for (ItemResponse itemResponse : itemResponses) {
             assertThat(itemResponse.getName()).contains(itemCategory.getName());
+            assertThat(itemResponse.getDetails()).isNotBlank();
         }
     }
 
@@ -468,6 +469,7 @@ class ItemServiceTest {
                 .itemCategory(itemCategory)
                 .cost(100)
                 .name(itemCategory.getName())
+                .details("details")
                 .build());
     }
 

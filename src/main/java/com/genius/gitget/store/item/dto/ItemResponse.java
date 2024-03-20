@@ -9,6 +9,7 @@ public class ItemResponse {
     private Long itemId;
     private ItemCategory itemCategory;
     private String name;
+    private String details;
     private int cost;
     private int count;
 
@@ -16,6 +17,7 @@ public class ItemResponse {
         this.itemId = item.getId();
         this.itemCategory = item.getItemCategory();
         this.name = item.getName();
+        this.details = item.getDetails();
         this.cost = item.getCost();
         this.count = count;
     }

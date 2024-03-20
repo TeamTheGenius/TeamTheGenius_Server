@@ -101,7 +101,7 @@ public class UserService {
     public AuthResponse getUserInfo(String identifier) {
         User user = userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
-        Item usingFrame = ordersProvider.getUsingFrame(user.getId());
+        Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
         return new AuthResponse(user.getRole(), usingFrame.getId());
     }
 }

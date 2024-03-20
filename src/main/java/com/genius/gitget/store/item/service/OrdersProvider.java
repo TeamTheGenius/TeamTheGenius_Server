@@ -56,7 +56,7 @@ public class OrdersProvider {
         return EquipStatus.UNAVAILABLE;
     }
 
-    public Item getUsingFrame(Long userId) {
+    public Item getUsingFrameItem(Long userId) {
         List<Orders> usingFrames = findAllUsingFrames(userId);
         if (usingFrames.size() > 1) {
             throw new BusinessException(ErrorCode.TOO_MANY_USING_FRAME);

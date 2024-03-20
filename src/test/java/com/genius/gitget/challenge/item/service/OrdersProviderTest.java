@@ -134,7 +134,7 @@ class OrdersProviderTest {
         Orders orders = getSavedOrder(user, item, 1);
 
         //when
-        Item usingFrame = ordersProvider.getUsingFrame(user.getId());
+        Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
 
         //then
         assertThat(item.getItemCategory()).isEqualTo(usingFrame.getItemCategory());
@@ -153,7 +153,7 @@ class OrdersProviderTest {
         orders2.updateEquipStatus(EquipStatus.IN_USE);
 
         //when & then
-        assertThatThrownBy(() -> ordersProvider.getUsingFrame(user.getId()))
+        assertThatThrownBy(() -> ordersProvider.getUsingFrameItem(user.getId()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.TOO_MANY_USING_FRAME.getMessage());
     }
@@ -166,7 +166,7 @@ class OrdersProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when
-        Item usingFrame = ordersProvider.getUsingFrame(user.getId());
+        Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
 
         //then
         assertThat(usingFrame.getId()).isNull();

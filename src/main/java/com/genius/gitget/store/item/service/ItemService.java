@@ -151,7 +151,9 @@ public class ItemService {
     private ItemUseResponse useProfileFrameItem(Long userId, Orders orders) {
         validateFrameEquip(userId, orders);
         orders.updateEquipStatus(EquipStatus.IN_USE);
-        return new ItemUseResponse(0L, "", 0);
+
+        Item item = orders.getItem();
+        return new ItemUseResponse(item.getId());
     }
 
     private void validateFrameEquip(Long userId, Orders orders) {
@@ -184,6 +186,7 @@ public class ItemService {
         DoneResponse doneResponse = myChallengeService.getRewards(
                 new RewardRequest(user, instanceId, currentDate), true
         );
+        doneResponse.setItemId(orders.getItem().getId());
         orders.useItem();
         return doneResponse;
     }

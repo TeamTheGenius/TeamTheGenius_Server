@@ -61,7 +61,7 @@ public class ProfileService {
     // 사용자 정보 조회
     public UserInformationResponse getUserInformation(Long userId) {
         User findUser = getUserById(userId);
-        Long frameId = ordersProvider.getUsingFrame(userId).getId();
+        Long frameId = ordersProvider.getUsingFrameItem(userId).getId();
         Files files = getFiles(findUser);
         if (isProfileFileType(files)) {
             return UserInformationResponse.createByEntity(findUser, frameId, files);

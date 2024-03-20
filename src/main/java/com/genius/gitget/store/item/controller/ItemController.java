@@ -65,13 +65,8 @@ public class ItemController {
             @PathVariable Long itemId,
             @RequestParam(required = false) Long instanceId
     ) {
-        ItemUseResponse itemUseResponse = itemService.useItem(
-                userPrincipal.getUser(), itemId, instanceId, LocalDate.now());
-        if (itemUseResponse.isFrameResponse()) {
-            return ResponseEntity.ok().body(
-                    new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
-            );
-        }
+        ItemUseResponse itemUseResponse = itemService.useItem(userPrincipal.getUser(), itemId, instanceId,
+                LocalDate.now());
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemUseResponse)

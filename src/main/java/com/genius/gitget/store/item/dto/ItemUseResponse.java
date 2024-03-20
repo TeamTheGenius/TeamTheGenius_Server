@@ -6,17 +6,12 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ItemUseResponse {
-    private Long instanceId;
-    private String title;
-    private int pointPerPerson;
+    Long itemId;
 
-    public ItemUseResponse(Long instanceId, String title, int pointPerPerson) {
-        this.instanceId = instanceId;
-        this.title = title;
-        this.pointPerPerson = pointPerPerson;
+    public ItemUseResponse() {
     }
 
-    public boolean isFrameResponse() {
-        return this.instanceId == 0L;
+    public ItemUseResponse(Long itemId) {
+        this.itemId = itemId;
     }
 }

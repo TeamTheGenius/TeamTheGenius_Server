@@ -3,6 +3,7 @@ package com.genius.gitget.global.security.handler;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.util.config.AppProperties;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import jakarta.servlet.ServletException;
@@ -19,8 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final String SIGNUP_URL = "http://localhost:5173/login/signup";
-    private final String AUTH_URL = "http://localhost:5173/auth";
+    private final AppProperties appProperties;
     private final UserRepository userRepository;
 
     @Override
@@ -38,13 +38,13 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
     private String getRedirectUrlByRole(Role role, String identifier) {
         if (role == Role.NOT_REGISTERED) {
-            return UriComponentsBuilder.fromUriString(SIGNUP_URL)
+            return UriComponentsBuilder.fromUriString(appProperties.getSIGNUP_URL())
                     .queryParam("identifier", identifier)
                     .build()
                     .toUriString();
         }
 
-        return UriComponentsBuilder.fromHttpUrl(AUTH_URL)
+        return UriComponentsBuilder.fromHttpUrl(appProperties.getAUTH_URL())
                 .queryParam("identifier", identifier)
                 .build()
                 .toUriString();

@@ -97,8 +97,7 @@ public class ItemService {
 
     private Orders createNew(User user, Item item) {
         Orders orders = Orders.createDefault(0, item.getItemCategory());
-        orders.setUser(user);
-        orders.setItem(item);
+        orders.setUserAndItem(user, item);
         return ordersProvider.save(orders);
     }
 

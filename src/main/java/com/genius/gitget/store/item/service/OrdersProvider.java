@@ -23,8 +23,14 @@ public class OrdersProvider {
     private final OrdersRepository ordersRepository;
 
 
+    @Transactional
     public Orders save(Orders orders) {
         return ordersRepository.save(orders);
+    }
+
+    @Transactional
+    public void delete(Orders orders) {
+        ordersRepository.delete(orders);
     }
 
     public Optional<Orders> findOptionalByOrderInfo(Long userId, Long itemId) {

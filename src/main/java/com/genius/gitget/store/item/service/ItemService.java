@@ -177,7 +177,7 @@ public class ItemService {
                 userId,
                 new CertificationRequest(instanceId, currentDate));
         activatedResponse.setItemId(itemId);
-        orders.useItem();
+        useItem(orders);
         return activatedResponse;
     }
 
@@ -187,8 +187,15 @@ public class ItemService {
                 new RewardRequest(user, instanceId, currentDate), true
         );
         doneResponse.setItemId(orders.getItem().getId());
-        orders.useItem();
+        useItem(orders);
         return doneResponse;
+    }
+
+    private void useItem(Orders orders) {
+        orders.useItem();
+        if (!orders.hasItem()) {
+            ordersProvider.delete(orders);
+        }
     }
 
     private ItemResponse getItemResponse(User user, Item item, int numOfItem) {

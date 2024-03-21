@@ -79,16 +79,6 @@ public class ItemService {
         return getItemResponse(persistUser, item, numOfItem);
     }
 
-    private static Payment getPayment(User user, Item item) {
-        return Payment.builder()
-                .user(user)
-                .orderType(OrderType.ITEM)
-                .isSuccess(true)
-                .pointAmount(Long.parseLong(String.valueOf(item.getCost())))
-                .orderName(item.getName())
-                .build();
-    }
-
     private void validateUserPoint(long userPoint, int itemCost) {
         if (userPoint < itemCost) {
             throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);

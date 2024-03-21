@@ -2,13 +2,6 @@ package com.genius.gitget.store.item.service;
 
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.service.CertificationService;
-import com.genius.gitget.store.item.domain.EquipStatus;
-import com.genius.gitget.store.item.domain.Item;
-import com.genius.gitget.store.item.domain.ItemCategory;
-import com.genius.gitget.store.item.domain.Orders;
-import com.genius.gitget.store.item.dto.ItemResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
-import com.genius.gitget.store.item.dto.ProfileResponse;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
@@ -17,6 +10,16 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.store.item.domain.EquipStatus;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.domain.ItemCategory;
+import com.genius.gitget.store.item.domain.Orders;
+import com.genius.gitget.store.item.dto.ItemResponse;
+import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.ProfileResponse;
+import com.genius.gitget.store.payment.domain.OrderType;
+import com.genius.gitget.store.payment.domain.Payment;
+import com.genius.gitget.store.payment.repository.PaymentRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,8 @@ public class ItemService {
     //TODO: Service를 의존하는게 맘에 들지 않는다 provider만을 의존하게 할 순 없을까?
     private final CertificationService certificationService;
     private final MyChallengeService myChallengeService;
+
+    private final PaymentRepository paymentRepository;
 
     public List<ItemResponse> getAllItems(User user) {
         List<ItemResponse> itemResponses = new ArrayList<>();
@@ -64,12 +69,24 @@ public class ItemService {
 
         validateUserPoint(persistUser.getPoint(), item.getCost());
 
+        paymentRepository.save(getPayment(user, item));
+
         Orders orders = ordersProvider.findOptionalByOrderInfo(persistUser.getId(), itemId)
                 .orElseGet(() -> createNew(persistUser, item));
         int numOfItem = orders.purchase();
         persistUser.updatePoints((long) item.getCost() * -1);
 
         return getItemResponse(persistUser, item, numOfItem);
+    }
+
+    private static Payment getPayment(User user, Item item) {
+        return Payment.builder()
+                .user(user)
+                .orderType(OrderType.ITEM)
+                .isSuccess(true)
+                .pointAmount(Long.parseLong(String.valueOf(item.getCost())))
+                .orderName(item.getName())
+                .build();
     }
 
     private void validateUserPoint(long userPoint, int itemCost) {

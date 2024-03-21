@@ -84,6 +84,7 @@ public class Instance {
     @Column(name = "completed_at")
     private LocalDateTime completedDate;
 
+    @Column(name = "instance_uuid")
     private String instanceUUID;
 
     @Builder

@@ -8,6 +8,7 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.payment.config.TossPaymentConfig;
 import com.genius.gitget.store.payment.domain.Payment;
+import com.genius.gitget.store.payment.dto.PaymentDetailsResponse;
 import com.genius.gitget.store.payment.dto.PaymentFailRequest;
 import com.genius.gitget.store.payment.dto.PaymentRequest;
 import com.genius.gitget.store.payment.dto.PaymentResponse;
@@ -21,12 +22,22 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,10 +53,7 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse requestTossPayment(User user, PaymentRequest paymentRequest) {
-        User findUser = userRepository.findByIdentifier(user.getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-
-        if (!findUser.getIdentifier().equals(paymentRequest.getUserEmail())) {
+        if (!user.getIdentifier().equals(paymentRequest.getUserEmail())) {
             throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
         }
         if (paymentRequest.getAmount() < 100L) {
@@ -60,6 +68,7 @@ public class PaymentService {
         return PaymentResponse.createByEntity(savedPayment);
     }
 
+
     @Transactional
     public PaymentSuccessResponse tossPaymentSuccess(PaymentSuccessRequest paymentSuccessRequest) throws Exception {
         Payment payment = verifyPayment(paymentSuccessRequest.getOrderId(),
@@ -67,8 +76,7 @@ public class PaymentService {
         PaymentSuccessResponse result = requestPaymentAccept(paymentSuccessRequest);
         payment.setPaymentSuccessStatus(paymentSuccessRequest.getPaymentKey(), true);
 
-        User user = userRepository.findByIdentifier(payment.getUser().getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        User user = verifyUser(payment.getUser());
         user.updatePoints(payment.getPointAmount());
 
         return result;
@@ -148,5 +156,32 @@ public class PaymentService {
                 .orElseThrow(() -> new BusinessException(
                         ErrorCode.FAILED_FINAL_PAYMENT));
         payment.setPaymentFailStatus(paymentFailRequest.getMessage(), false);
+    }
+
+    public Page<PaymentDetailsResponse> getPaymentDetails(User user, Pageable pageable) {
+        User findUser = verifyUser(user);
+        List<Payment> payments = paymentRepository.findPaymentDetailsByUserId(findUser.getId());
+
+        List<PaymentDetailsResponse> paymentDetailsResponses = new ArrayList<>();
+
+        for (Payment payment : payments) {
+            LocalDateTime paymentDate = payment.getCreatedDate();
+
+            // YYYY-MM-dd
+            String paymentDateFormat = paymentDate.format(DateTimeFormatter.ofPattern("YYYY-MM-dd"));
+
+            // 요일 구하기
+            DayOfWeek dayOfWeek = paymentDate.getDayOfWeek();
+            String dayOfWeekKorean = dayOfWeek.getDisplayName(TextStyle.FULL, Locale.KOREAN);
+
+            paymentDetailsResponses.add(
+                    PaymentDetailsResponse.createByEntity(payment, paymentDateFormat, dayOfWeekKorean));
+        }
+        return new PageImpl<>(paymentDetailsResponses, pageable, paymentDetailsResponses.size());
+    }
+
+    private User verifyUser(User user) {
+        return userRepository.findByIdentifier(user.getIdentifier())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

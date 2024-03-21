@@ -13,15 +13,6 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.store.item.domain.EquipStatus;
-import com.genius.gitget.store.item.domain.Item;
-import com.genius.gitget.store.item.domain.ItemCategory;
-import com.genius.gitget.store.item.domain.Orders;
-import com.genius.gitget.store.item.dto.ItemResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
-import com.genius.gitget.store.item.dto.ProfileResponse;
-import com.genius.gitget.store.item.repository.ItemRepository;
-import com.genius.gitget.store.item.repository.OrdersRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -32,6 +23,15 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.store.item.domain.EquipStatus;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.domain.ItemCategory;
+import com.genius.gitget.store.item.domain.Orders;
+import com.genius.gitget.store.item.dto.ItemResponse;
+import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.ProfileResponse;
+import com.genius.gitget.store.item.repository.ItemRepository;
+import com.genius.gitget.store.item.repository.OrdersRepository;
 import com.genius.gitget.store.item.service.ItemService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -65,6 +66,42 @@ class ItemServiceTest {
     private ParticipantRepository participantRepository;
     @Autowired
     private CertificationRepository certificationRepository;
+
+    @Nested
+    class 유저_포인트가_충분할_때 {
+
+        @ParameterizedTest
+        @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
+        public void 아이템을_구매할_수_있다_1(ItemCategory itemCategory) {
+            User user = getSavedUser();
+            Item item = getSavedItem(itemCategory);
+            getSavedOrder(user, item, itemCategory, 0);
+            user.setPoint(1000L);
+
+            ItemResponse itemResponse = itemService.orderItem(user, item.getId());
+
+            assertThat(itemResponse.getItemCategory()).isEqualTo(itemCategory);
+        }
+
+        @ParameterizedTest
+        @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
+        public void 아이템을_구매할_수_있다_2(ItemCategory itemCategory) {
+            User user = getSavedUser();
+            Item item = getSavedItem(itemCategory);
+            getSavedOrder(user, item, itemCategory, 0);
+            user.setPoint(1000L);
+
+            ItemResponse itemResponse1 = itemService.orderItem(user, item.getId());
+
+            assertThat(user.getPoint()).isEqualTo(900L);
+            assertThat(itemResponse1.getCount()).isEqualTo(1);
+
+            ItemResponse itemResponse2 = itemService.orderItem(user, item.getId());
+
+            assertThat(user.getPoint()).isEqualTo(800L);
+            assertThat(itemResponse2.getCount()).isEqualTo(2);
+        }
+    }
 
     @Test
     @DisplayName("데이터베이스에 저장되어 있는 모든 아이템 정보들을 받아올 수 있다.")

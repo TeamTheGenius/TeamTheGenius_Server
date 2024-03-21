@@ -53,9 +53,7 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse requestTossPayment(User user, PaymentRequest paymentRequest) {
-        User findUser = verifyUser(user);
-
-        if (!findUser.getIdentifier().equals(paymentRequest.getUserEmail())) {
+        if (!user.getIdentifier().equals(paymentRequest.getUserEmail())) {
             throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
         }
         if (paymentRequest.getAmount() < 100L) {

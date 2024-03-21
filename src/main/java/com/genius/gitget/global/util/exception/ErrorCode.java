@@ -74,6 +74,7 @@ public enum ErrorCode {
     ALREADY_PURCHASED(HttpStatus.BAD_REQUEST, "프로필 프레임은 재구매가 불가능 합니다."),
     INVALID_EQUIP_CONDITION(HttpStatus.BAD_REQUEST, "프로필 프레임을 장착할 수 있는 상태가 아닙니다."),
     IN_USE_FRAME_NOT_FOUND(HttpStatus.NOT_FOUND, "사용 중인 프로필 프레임을 찾을 수 없습니다"),
+    TOO_MANY_USING_FRAME(HttpStatus.BAD_REQUEST, "사용 중인 프로필 프레임이 너무 많습니다. 장착 해제를 먼저 실행해주세요."),
 
     CAN_NOT_GET_REWARDS(HttpStatus.BAD_REQUEST, "챌린지 보상을 받을 수 있는 조건이 아닙니다."),
     ALREADY_REWARDED(HttpStatus.BAD_REQUEST, "해당 챌린지 보상은 이미 지급되었습니다.");

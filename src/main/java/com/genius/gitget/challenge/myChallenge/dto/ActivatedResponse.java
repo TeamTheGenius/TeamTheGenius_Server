@@ -2,8 +2,8 @@ package com.genius.gitget.challenge.myChallenge.dto;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.store.item.dto.ItemUseResponse;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,9 +11,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ActivatedResponse extends ItemUseResponse {
+    private Long instanceId;
+    private String title;
+    private int pointPerPerson;
     private String repository;
     private String certificateStatus;
-    private Long itemId;
     private int numOfPassItem;
     private boolean canUsePassItem;
     private FileResponse fileResponse;
@@ -22,10 +24,11 @@ public class ActivatedResponse extends ItemUseResponse {
     public ActivatedResponse(Long instanceId, String title, int pointPerPerson, String repository,
                              String certificateStatus, Long itemId,
                              int numOfPassItem, boolean canUsePassItem, FileResponse fileResponse) {
-        super(instanceId, title, pointPerPerson);
+        this.instanceId = instanceId;
+        this.title = title;
+        this.pointPerPerson = pointPerPerson;
         this.repository = repository;
         this.certificateStatus = certificateStatus;
-        this.itemId = itemId;
         this.numOfPassItem = numOfPassItem;
         this.canUsePassItem = canUsePassItem;
         this.fileResponse = fileResponse;

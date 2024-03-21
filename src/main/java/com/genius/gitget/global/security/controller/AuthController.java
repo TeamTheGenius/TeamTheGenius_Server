@@ -6,7 +6,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.security.dto.AuthResponse;
-import com.genius.gitget.global.security.dto.TokenDTO;
+import com.genius.gitget.global.security.dto.SignupResponse;
 import com.genius.gitget.global.security.service.JwtService;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -30,13 +30,14 @@ public class AuthController {
 
     @PostMapping("/auth")
     public ResponseEntity<SingleResponse<AuthResponse>> generateToken(HttpServletResponse response,
-                                                                      @RequestBody TokenDTO tokenRequest) {
+                                                                      @RequestBody SignupResponse tokenRequest) {
         User requestUser = userService.findUserByIdentifier(tokenRequest.identifier());
         jwtService.validateUser(requestUser);
 
         jwtService.generateAccessToken(response, requestUser);
         jwtService.generateRefreshToken(response, requestUser);
-        AuthResponse authResponse = new AuthResponse(requestUser.getRole());
+
+        AuthResponse authResponse = userService.getUserInfo(requestUser.getIdentifier());
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), authResponse)

@@ -2,12 +2,15 @@ package com.genius.gitget.store.item.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.USER_ITEM_NOT_FOUND;
 
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.item.domain.EquipStatus;
+import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.repository.OrdersRepository;
-import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.global.util.exception.BusinessException;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,8 +23,14 @@ public class OrdersProvider {
     private final OrdersRepository ordersRepository;
 
 
+    @Transactional
     public Orders save(Orders orders) {
         return ordersRepository.save(orders);
+    }
+
+    @Transactional
+    public void delete(Orders orders) {
+        ordersRepository.delete(orders);
     }
 
     public Optional<Orders> findOptionalByOrderInfo(Long userId, Long itemId) {
@@ -33,6 +42,18 @@ public class OrdersProvider {
                 .orElseThrow(() -> new BusinessException(USER_ITEM_NOT_FOUND));
     }
 
+
+    public List<Orders> findAllByCategory(Long userId, ItemCategory itemCategory) {
+        return ordersRepository.findAllByCategory(userId, itemCategory);
+    }
+
+    public List<Orders> findAllUsingFrames(Long userId) {
+        return findAllByCategory(userId, ItemCategory.PROFILE_FRAME)
+                .stream()
+                .filter(frameOrder -> frameOrder.getEquipStatus() == EquipStatus.IN_USE)
+                .toList();
+    }
+
     public EquipStatus getEquipStatus(Long userId, Long itemId) {
         Optional<Orders> optionalUserItem = ordersRepository.findByOrderInfo(userId, itemId);
         if (optionalUserItem.isPresent()) {
@@ -41,8 +62,18 @@ public class OrdersProvider {
         return EquipStatus.UNAVAILABLE;
     }
 
-    public int countNumOfCategory(User user, ItemCategory itemCategory) {
-        return ordersRepository.findByCategory(user.getId(), itemCategory).size();
+    public Item getUsingFrameItem(Long userId) {
+        List<Orders> usingFrames = findAllUsingFrames(userId);
+        if (usingFrames.size() > 1) {
+            throw new BusinessException(ErrorCode.TOO_MANY_USING_FRAME);
+        }
+
+        if (usingFrames.isEmpty()) {
+            return Item.builder()
+                    .itemCategory(ItemCategory.PROFILE_FRAME)
+                    .build();
+        }
+        return usingFrames.get(0).getItem();
     }
 
     public int countNumOfItem(User user, Long itemId) {

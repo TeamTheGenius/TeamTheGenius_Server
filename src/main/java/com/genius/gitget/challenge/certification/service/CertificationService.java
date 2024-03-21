@@ -87,8 +87,9 @@ public class CertificationService {
                 weekStartDate);
 
         FileResponse fileResponse = FileResponse.create(user.getFiles());
+        Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
 
-        return WeekResponse.create(user, fileResponse, certificationResponses);
+        return WeekResponse.create(user, frameId, fileResponse, certificationResponses);
     }
 
     public TotalResponse getTotalCertification(Long participantId, LocalDate currentDate) {
@@ -214,8 +215,10 @@ public class CertificationService {
             throw new BusinessException(ErrorCode.NOT_ACTIVITY_INSTANCE);
         }
 
-        boolean isValidPeriod = targetDate.isAfter(instance.getStartedDate().toLocalDate()) &&
-                targetDate.isBefore(instance.getCompletedDate().toLocalDate());
+        LocalDate startedDate = instance.getStartedDate().toLocalDate().minusDays(1);
+        LocalDate completedDate = instance.getCompletedDate().toLocalDate().plusDays(1);
+
+        boolean isValidPeriod = targetDate.isAfter(startedDate) && targetDate.isBefore(completedDate);
         if (!isValidPeriod) {
             throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
         }

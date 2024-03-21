@@ -98,9 +98,9 @@ public class PaymentServiceTest {
         assertThat(user.getPoint()).isEqualTo(900);
         System.out.println(itemCategory);
         if (itemCategory.equals(CERTIFICATION_PASSER)) {
-            assertThat(content.get(0).getOrderName()).isEqualTo("인증 패스 아이템");
+            assertThat(content.get(0).getOrderName()).isEqualTo("인증 패스권");
         } else if (itemCategory.equals(POINT_MULTIPLIER)) {
-            assertThat(content.get(0).getOrderName()).isEqualTo("포인트 2배 획득 아이템");
+            assertThat(content.get(0).getOrderName()).isEqualTo("챌린지 보상 획득 2배 아이템");
         }
         assertThat(content.get(0).getOrderType()).isEqualTo("아이템 구매");
         assertThat(content.get(0).getDecreasedPoint()).isEqualTo("100");

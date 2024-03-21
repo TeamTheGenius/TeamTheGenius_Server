@@ -2,15 +2,15 @@ package com.genius.gitget.store.item.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.global.util.response.dto.CommonResponse;
+import com.genius.gitget.global.util.response.dto.ListResponse;
+import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.dto.ItemResponse;
 import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
 import com.genius.gitget.store.item.service.ItemService;
-import com.genius.gitget.global.security.domain.UserPrincipal;
-import com.genius.gitget.global.util.response.dto.CommonResponse;
-import com.genius.gitget.global.util.response.dto.ListResponse;
-import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -65,28 +65,22 @@ public class ItemController {
             @PathVariable Long itemId,
             @RequestParam(required = false) Long instanceId
     ) {
-        ItemUseResponse itemUseResponse = itemService.useItem(
-                userPrincipal.getUser(), itemId, instanceId, LocalDate.now());
-        if (itemUseResponse.isFrameResponse()) {
-            return ResponseEntity.ok().body(
-                    new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
-            );
-        }
+        ItemUseResponse itemUseResponse = itemService.useItem(userPrincipal.getUser(), itemId, instanceId,
+                LocalDate.now());
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemUseResponse)
         );
     }
 
-    @PostMapping("/items/unuse/{itemId}")
-    public ResponseEntity<SingleResponse<ProfileResponse>> unmountItem(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long itemId
+    @PostMapping("/items/unuse")
+    public ResponseEntity<ListResponse<ProfileResponse>> unmountItem(
+            @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        ProfileResponse profileResponse = itemService.unmountFrame(userPrincipal.getUser(), itemId);
+        List<ProfileResponse> profileResponses = itemService.unmountFrame(userPrincipal.getUser());
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), profileResponse)
+                new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), profileResponses)
         );
     }
 }

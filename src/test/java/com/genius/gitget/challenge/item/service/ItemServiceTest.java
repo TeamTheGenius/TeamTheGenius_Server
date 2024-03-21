@@ -131,6 +131,7 @@ class ItemServiceTest {
         //then
         for (ItemResponse itemResponse : itemResponses) {
             assertThat(itemResponse.getName()).contains(itemCategory.getName());
+            assertThat(itemResponse.getDetails()).isNotBlank();
         }
     }
 
@@ -256,21 +257,36 @@ class ItemServiceTest {
                 .hasMessageContaining(ErrorCode.HAS_NO_ITEM.getMessage());
     }
 
-    @ParameterizedTest
-    @DisplayName("프로필 프레임을 사용하려 할 때, 프레임의 장착 상태가 AVAILABLE이 아니라면 예외가 발생해야 한다.")
-    @EnumSource(mode = Mode.INCLUDE, names = {"IN_USE", "UNAVAILABLE"})
-    public void should_throwException_when_notAvailable(EquipStatus equipStatus) {
+    @Test
+    @DisplayName("프로필 프레임을 사용하려 할 때, 프레임의 장착 상태가 Unavailable인 경우 장착 가능 상태가 아니라는 예외가 발생한다.")
+    public void should_throwException_when_notAvailable() {
         //given
         User user = getSavedUser();
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
         Orders orders = getSavedOrder(user, item, ItemCategory.PROFILE_FRAME, 3);
 
-        orders.updateEquipStatus(equipStatus);
+        orders.updateEquipStatus(EquipStatus.UNAVAILABLE);
 
         //when && then
         assertThatThrownBy(() -> itemService.useItem(user, item.getId(), 0L, LocalDate.now()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.INVALID_EQUIP_CONDITION.getMessage());
+    }
+
+    @Test
+    @DisplayName("프로필 프레임을 사용하려할 때, 장착 중인 프레임이 있는 경우 장착 해제를 먼저 실행하라는 예외가 발생한다.")
+    public void should_throwException_when_inUseItemExist() {
+        //given
+        User user = getSavedUser();
+        Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
+        Orders orders = getSavedOrder(user, item, ItemCategory.PROFILE_FRAME, 3);
+
+        orders.updateEquipStatus(EquipStatus.IN_USE);
+
+        //when && then
+        assertThatThrownBy(() -> itemService.useItem(user, item.getId(), 0L, LocalDate.now()))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.TOO_MANY_USING_FRAME.getMessage());
     }
 
     @Test
@@ -290,9 +306,6 @@ class ItemServiceTest {
         ItemUseResponse itemUseResponse = itemService.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
-        assertThat(itemUseResponse.getInstanceId()).isEqualTo(instance.getId());
-        assertThat(itemUseResponse.getTitle()).isEqualTo(instance.getTitle());
-        assertThat(itemUseResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
         assertThat(orders.getCount()).isEqualTo(0);
         assertThat(certification.getCertificationStatus()).isEqualTo(PASSED);
     }
@@ -316,9 +329,6 @@ class ItemServiceTest {
 
         //then
         Optional<Certification> certification = certificationRepository.findByDate(currentDate, participant.getId());
-        assertThat(itemUseResponse.getInstanceId()).isEqualTo(instance.getId());
-        assertThat(itemUseResponse.getTitle()).isEqualTo(instance.getTitle());
-        assertThat(itemUseResponse.getPointPerPerson()).isEqualTo(instance.getPointPerPerson());
         assertThat(orders.getCount()).isEqualTo(0);
         assertThat(certification).isPresent();
         assertThat(certification.get().getCertificationStatus()).isEqualTo(PASSED);
@@ -389,6 +399,47 @@ class ItemServiceTest {
     }
 
     @Test
+    @DisplayName("포인트 2배 획득 아이템을 사용해서 아이템의 개수가 0이 되면 Orders 정보를 DB에서 삭제된다.")
+    public void should_deleteOrderInfo_when_countZeroAfterUseItem() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser();
+        Instance instance = getSavedInstance(currentDate, currentDate.plusDays(1));
+        Participant participant = getSavedParticipant(user, instance);
+        Item item = getSavedItem(ItemCategory.POINT_MULTIPLIER);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
+
+        //when
+        instance.updateProgress(Progress.DONE);
+        participant.updateJoinResult(JoinResult.SUCCESS);
+        getSavedCertification(CERTIFICATED, currentDate, participant);
+        getSavedCertification(CERTIFICATED, currentDate.plusDays(1), participant);
+        itemService.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
+
+        //then
+        assertThat(ordersRepository.findById(orders.getId())).isNotPresent();
+    }
+
+    @Test
+    @DisplayName("인증 패스 아이템을 사용해서 아이템의 개수가 0이 되면 Orders 정보를 DB에서 삭제된다.")
+    public void should_deleteOrderInfo_when_passItemCountIsZero() {
+        //given
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+        User user = getSavedUser();
+        Instance instance = getSavedInstance(currentDate, currentDate.plusDays(1));
+        Participant participant = getSavedParticipant(user, instance);
+        Item item = getSavedItem(ItemCategory.CERTIFICATION_PASSER);
+        Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
+
+        //when
+        instance.updateProgress(Progress.ACTIVITY);
+        itemService.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
+
+        //then
+        assertThat(ordersRepository.findById(orders.getId())).isNotPresent();
+    }
+
+    @Test
     @DisplayName("사용자가 특정 프로필 프레임을 장착하고 있을 떄, 장착 해제할 수 있다.")
     public void should_unmountFrame_when_mountAlready() {
         //given
@@ -398,7 +449,7 @@ class ItemServiceTest {
 
         //when
         itemService.useItem(user, item.getId(), 0L, LocalDate.now());
-        ProfileResponse profileResponse = itemService.unmountFrame(user, item.getId());
+        ProfileResponse profileResponse = itemService.unmountFrame(user).get(0);
 
         //then
         assertThat(profileResponse.getItemId()).isEqualTo(item.getId());
@@ -408,7 +459,7 @@ class ItemServiceTest {
     }
 
     @ParameterizedTest
-    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 프로필 프레임이 아니라면 예외가 발생한다.")
+    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 프로필 프레임이 아니라면 응답 데이터의 크기가 0이다.")
     @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
     public void should_throwException_when_categoryIsNotFrame(ItemCategory itemCategory) {
         //given
@@ -416,24 +467,26 @@ class ItemServiceTest {
         Item item = getSavedItem(itemCategory);
         Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
+        //when
+        List<ProfileResponse> profileResponses = itemService.unmountFrame(user);
+
         //when & then
-        assertThatThrownBy(() -> itemService.unmountFrame(user, item.getId()))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.ITEM_NOT_FOUND.getMessage());
+        assertThat(profileResponses.size()).isEqualTo(0);
     }
 
     @Test
-    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 사용 상태가 IN_USE가 아니라면 예외가 발생한다.")
+    @DisplayName("사용자가 아이템 장착 해제를 요청했을 때, 사용 상태가 IN_USE가 아니라면 반환데이터의 크기가 0이다.")
     public void should_throwException_when_equipStatusIsNotIS_USE() {
         //given
         User user = getSavedUser();
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
         getSavedOrder(user, item, item.getItemCategory(), 1);
 
+        // when
+        List<ProfileResponse> profileResponses = itemService.unmountFrame(user);
+
         //when & then
-        assertThatThrownBy(() -> itemService.unmountFrame(user, item.getId()))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.IN_USE_FRAME_NOT_FOUND.getMessage());
+        assertThat(profileResponses.size()).isEqualTo(0);
     }
 
 
@@ -453,6 +506,7 @@ class ItemServiceTest {
                 .itemCategory(itemCategory)
                 .cost(100)
                 .name(itemCategory.getName())
+                .details("details")
                 .build());
     }
 

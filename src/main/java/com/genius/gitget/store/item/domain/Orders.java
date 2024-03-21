@@ -76,6 +76,11 @@ public class Orders {
     }
 
     //=== 연관관계 편의 메서드 ===//
+    public void setUserAndItem(User user, Item item) {
+        setUser(user);
+        setItem(item);
+    }
+
     public void setUser(User user) {
         this.user = user;
         if (!user.getOrdersList().contains(this)) {

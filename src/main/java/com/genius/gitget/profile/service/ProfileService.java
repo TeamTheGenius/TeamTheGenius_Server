@@ -24,6 +24,7 @@ import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserInterestResponse;
 import com.genius.gitget.profile.dto.UserInterestUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
+import com.genius.gitget.store.item.service.OrdersProvider;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,6 +44,7 @@ public class ProfileService {
     private final FilesRepository filesRepository;
     private final FilesService filesService;
     private final SignoutRepository signoutRepository;
+    private final OrdersProvider ordersProvider;
 
     private static boolean isProfileFileType(Files files) {
         return files != null && files.getFileType().equals(FileType.PROFILE);
@@ -59,11 +61,12 @@ public class ProfileService {
     // 사용자 정보 조회
     public UserInformationResponse getUserInformation(Long userId) {
         User findUser = getUserById(userId);
+        Long frameId = ordersProvider.getUsingFrameItem(userId).getId();
         Files files = getFiles(findUser);
         if (isProfileFileType(files)) {
-            return UserInformationResponse.createByEntity(findUser, files);
+            return UserInformationResponse.createByEntity(findUser, frameId, files);
         } else {
-            return UserInformationResponse.createByEntity(findUser, null);
+            return UserInformationResponse.createByEntity(findUser, frameId, null);
         }
     }
 

@@ -79,7 +79,13 @@ public class ItemService {
         return getItemResponse(persistUser, item, numOfItem);
     }
 
-    private static Payment getPayment(User user, Item item) {
+    private void validateUserPoint(long userPoint, int itemCost) {
+        if (userPoint < itemCost) {
+            throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
+        }
+    }
+
+    private Payment getPayment(User user, Item item) {
         return Payment.builder()
                 .user(user)
                 .orderType(OrderType.ITEM)
@@ -89,28 +95,24 @@ public class ItemService {
                 .build();
     }
 
-    private void validateUserPoint(long userPoint, int itemCost) {
-        if (userPoint < itemCost) {
-            throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
-        }
-    }
-
     private Orders createNew(User user, Item item) {
         Orders orders = Orders.createDefault(0, item.getItemCategory());
-        orders.setUser(user);
-        orders.setItem(item);
+        orders.setUserAndItem(user, item);
         return ordersProvider.save(orders);
     }
 
     @Transactional
-    public ProfileResponse unmountFrame(User user, Long itemId) {
-        Orders orders = ordersProvider.findByOrderInfo(user.getId(), itemId);
-        validateUnmountCondition(orders);
+    public List<ProfileResponse> unmountFrame(User user) {
+        List<ProfileResponse> profileResponses = new ArrayList<>();
+        List<Orders> frameOrders = ordersProvider.findAllUsingFrames(user.getId());
 
-        orders.updateEquipStatus(EquipStatus.AVAILABLE);
+        for (Orders frameOrder : frameOrders) {
+            validateUnmountCondition(frameOrder);
+            frameOrder.updateEquipStatus(EquipStatus.AVAILABLE);
+            profileResponses.add(ProfileResponse.createByEntity(frameOrder));
+        }
 
-        return ProfileResponse.create(
-                orders.getItem(), orders.getCount(), orders.getEquipStatus().getTag());
+        return profileResponses;
     }
 
     private void validateUnmountCondition(Orders orders) {
@@ -133,7 +135,7 @@ public class ItemService {
 
         switch (item.getItemCategory()) {
             case PROFILE_FRAME -> {
-                return useProfileFrameItem(orders);
+                return useProfileFrameItem(user.getId(), orders);
             }
             case CERTIFICATION_PASSER -> {
                 return usePasserItem(orders, instanceId, currentDate);
@@ -145,13 +147,20 @@ public class ItemService {
         throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
     }
 
-    private ItemUseResponse useProfileFrameItem(Orders orders) {
-        validateFrameEquip(orders);
+    private ItemUseResponse useProfileFrameItem(Long userId, Orders orders) {
+        validateFrameEquip(userId, orders);
         orders.updateEquipStatus(EquipStatus.IN_USE);
-        return new ItemUseResponse(0L, "", 0);
+
+        Item item = orders.getItem();
+        return new ItemUseResponse(item.getId());
     }
 
-    private void validateFrameEquip(Orders orders) {
+    private void validateFrameEquip(Long userId, Orders orders) {
+        List<Orders> allUsingFrames = ordersProvider.findAllUsingFrames(userId);
+        if (!allUsingFrames.isEmpty()) {
+            throw new BusinessException(ErrorCode.TOO_MANY_USING_FRAME);
+        }
+
         if (!orders.hasItem()) {
             throw new BusinessException(ErrorCode.HAS_NO_ITEM);
         }
@@ -167,7 +176,7 @@ public class ItemService {
                 userId,
                 new CertificationRequest(instanceId, currentDate));
         activatedResponse.setItemId(itemId);
-        orders.useItem();
+        useItem(orders);
         return activatedResponse;
     }
 
@@ -176,8 +185,16 @@ public class ItemService {
         DoneResponse doneResponse = myChallengeService.getRewards(
                 new RewardRequest(user, instanceId, currentDate), true
         );
-        orders.useItem();
+        doneResponse.setItemId(orders.getItem().getId());
+        useItem(orders);
         return doneResponse;
+    }
+
+    private void useItem(Orders orders) {
+        orders.useItem();
+        if (!orders.hasItem()) {
+            ordersProvider.delete(orders);
+        }
     }
 
     private ItemResponse getItemResponse(User user, Item item, int numOfItem) {

@@ -138,7 +138,7 @@ public class CertificationService {
                 result.add(CertificationResponse.createExist(certificationMap.get(cur)));
                 continue;
             }
-            result.add(CertificationResponse.createNonExist(cur, startedDate));
+            result.add(CertificationResponse.createNonExist(startedDate));
         }
 
         return result;

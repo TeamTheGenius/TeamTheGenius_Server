@@ -175,6 +175,10 @@ public class Instance {
         return DateUtil.getAttemptCount(startedDate.toLocalDate(), completedDate.toLocalDate());
     }
 
+    public boolean isActivatedInstance() {
+        return this.progress == Progress.ACTIVITY;
+    }
+
     /*
      * 인스턴스 고유 uuid 설정
      * */

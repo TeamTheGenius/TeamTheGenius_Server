@@ -53,7 +53,12 @@ public class CertificationService {
 
 
     public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
-        LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
+        Instance instance = participantProvider.getInstanceById(participantId);
+        if (!instance.isActivatedInstance()) {
+            return new ArrayList<>();
+        }
+
+        LocalDate startDate = instance.getStartedDate().toLocalDate();
         int curAttempt = DateUtil.getWeekAttempt(startDate, currentDate);
         LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
 
@@ -75,8 +80,17 @@ public class CertificationService {
 
     private WeekResponse convertToWeekResponse(Participant participant, LocalDate currentDate) {
         User user = participant.getUser();
-        LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
+        Instance instance = participant.getInstance();
+
+        LocalDate startDate = instance.getStartedDate().toLocalDate();
         LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
+
+        FileResponse fileResponse = FileResponse.create(user.getFiles());
+        Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
+
+        if (!instance.isActivatedInstance()) {
+            return WeekResponse.create(user, frameId, fileResponse, new ArrayList<>());
+        }
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 weekStartDate, currentDate, participant.getId());
@@ -85,9 +99,6 @@ public class CertificationService {
                 certifications,
                 DateUtil.getWeekAttempt(startDate, currentDate),
                 weekStartDate);
-
-        FileResponse fileResponse = FileResponse.create(user.getFiles());
-        Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
 
         return WeekResponse.create(user, frameId, fileResponse, certificationResponses);
     }

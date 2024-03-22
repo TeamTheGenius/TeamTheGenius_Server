@@ -24,6 +24,7 @@ import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.item.service.OrdersProvider;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +54,12 @@ public class CertificationService {
 
 
     public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
-        LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
+        Instance instance = participantProvider.getInstanceById(participantId);
+        if (!instance.isActivatedInstance()) {
+            return new ArrayList<>();
+        }
+
+        LocalDate startDate = instance.getStartedDate().toLocalDate();
         int curAttempt = DateUtil.getWeekAttempt(startDate, currentDate);
         LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
 
@@ -61,8 +67,9 @@ public class CertificationService {
                 weekStartDate,
                 currentDate,
                 participantId);
+        Map<Integer, Certification> certificationMap = convertToWeekMap(certifications);
 
-        return convertToCertificationResponse(certifications, curAttempt, weekStartDate);
+        return convertToCertificationResponse(certificationMap, curAttempt, weekStartDate);
     }
 
     public Slice<WeekResponse> getAllWeekCertification(Long userId, Long instanceId,
@@ -75,19 +82,26 @@ public class CertificationService {
 
     private WeekResponse convertToWeekResponse(Participant participant, LocalDate currentDate) {
         User user = participant.getUser();
-        LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
+        Instance instance = participant.getInstance();
+
+        LocalDate startDate = instance.getStartedDate().toLocalDate();
         LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
-
-        List<Certification> certifications = certificationProvider.findByDuration(
-                weekStartDate, currentDate, participant.getId());
-
-        List<CertificationResponse> certificationResponses = convertToCertificationResponse(
-                certifications,
-                DateUtil.getWeekAttempt(startDate, currentDate),
-                weekStartDate);
 
         FileResponse fileResponse = FileResponse.create(user.getFiles());
         Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
+
+        if (!instance.isActivatedInstance()) {
+            return WeekResponse.create(user, frameId, fileResponse, new ArrayList<>());
+        }
+
+        List<Certification> certifications = certificationProvider.findByDuration(
+                weekStartDate, currentDate, participant.getId());
+        Map<Integer, Certification> certificationMap = convertToWeekMap(certifications);
+
+        List<CertificationResponse> certificationResponses = convertToCertificationResponse(
+                certificationMap,
+                DateUtil.getWeekAttempt(startDate, currentDate),
+                weekStartDate);
 
         return WeekResponse.create(user, frameId, fileResponse, certificationResponses);
     }
@@ -101,9 +115,10 @@ public class CertificationService {
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
+        Map<Integer, Certification> certificationMap = convertToTotalMap(certifications);
 
         List<CertificationResponse> certificationResponses = convertToCertificationResponse(
-                certifications, curAttempt, startDate);
+                certificationMap, curAttempt, startDate);
 
         return TotalResponse.builder()
                 .totalAttempts(totalAttempts)
@@ -111,10 +126,9 @@ public class CertificationService {
                 .build();
     }
 
-    private List<CertificationResponse> convertToCertificationResponse(List<Certification> certifications,
+    private List<CertificationResponse> convertToCertificationResponse(Map<Integer, Certification> certificationMap,
                                                                        int curAttempt, LocalDate startedDate) {
         List<CertificationResponse> result = new ArrayList<>();
-        Map<Integer, Certification> certificationMap = convertToMap(certifications);
 
         startedDate = startedDate.minusDays(1);
 
@@ -124,17 +138,27 @@ public class CertificationService {
                 result.add(CertificationResponse.createExist(certificationMap.get(cur)));
                 continue;
             }
-            result.add(CertificationResponse.createNonExist(cur, startedDate));
+            result.add(CertificationResponse.createNonExist(startedDate));
         }
 
         return result;
     }
 
-    private Map<Integer, Certification> convertToMap(List<Certification> certifications) {
+    private Map<Integer, Certification> convertToTotalMap(List<Certification> certifications) {
         Map<Integer, Certification> certificationMap = new HashMap<>();
 
         for (Certification certification : certifications) {
             certificationMap.put(certification.getCurrentAttempt(), certification);
+        }
+        return certificationMap;
+    }
+
+    private Map<Integer, Certification> convertToWeekMap(List<Certification> certifications) {
+        Map<Integer, Certification> certificationMap = new HashMap<>();
+
+        for (Certification certification : certifications) {
+            DayOfWeek dayOfWeek = certification.getCertificatedAt().getDayOfWeek();
+            certificationMap.put(dayOfWeek.ordinal() + 1, certification);
         }
         return certificationMap;
     }

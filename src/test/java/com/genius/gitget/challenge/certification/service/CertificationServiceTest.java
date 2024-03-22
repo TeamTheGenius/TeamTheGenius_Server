@@ -258,9 +258,11 @@ class CertificationServiceTest {
         LocalDate currentDate = LocalDate.of(2024, 2, 3);
         LocalDate startDate = LocalDate.of(2024, 2, 1);
         LocalDate endDate = LocalDate.of(2024, 2, 4);
-        Participant participant = getSavedParticipant(getSavedUser(githubId), getSavedInstance());
+        Instance instance = getSavedInstance();
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
 
         //when
+        instance.updateProgress(Progress.ACTIVITY);
         getSavedCertification(NOT_YET, startDate, participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
         getSavedCertification(CERTIFICATED, endDate.minusDays(1), participant);
@@ -281,9 +283,11 @@ class CertificationServiceTest {
         LocalDate endDate = LocalDate.of(2024, 2, 29);
         LocalDate currentDate = LocalDate.of(2024, 2, 8);
 
-        Participant participant = getSavedParticipant(getSavedUser(githubId), getSavedInstance());
+        Instance instance = getSavedInstance();
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
 
         //when
+        instance.updateProgress(Progress.ACTIVITY);
         getSavedCertification(NOT_YET, startDate, participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
@@ -294,10 +298,6 @@ class CertificationServiceTest {
 
         //then
         assertThat(weekCertification.size()).isEqualTo(4);
-        assertThat(weekCertification.get(0).certificationAttempt()).isEqualTo(1);
-        assertThat(weekCertification.get(1).certificationAttempt()).isEqualTo(2);
-        assertThat(weekCertification.get(2).certificationAttempt()).isEqualTo(3);
-        assertThat(weekCertification.get(3).certificationAttempt()).isEqualTo(4);
     }
 
     @Test
@@ -435,6 +435,7 @@ class CertificationServiceTest {
         Participant participant2 = getSavedParticipant(user2, instance);
 
         //when
+        instance.updateProgress(Progress.ACTIVITY);
         Slice<WeekResponse> certification = certificationService.getAllWeekCertification(
                 user1.getId(), instance.getId(), currentDate, pageRequest);
 

@@ -109,9 +109,14 @@ public class CertificationService {
     public TotalResponse getTotalCertification(Long participantId, LocalDate currentDate) {
         Instance instance = participantProvider.getInstanceById(participantId);
         LocalDate startDate = instance.getStartedDate().toLocalDate();
-        int totalAttempts = instance.getTotalAttempt();
 
+        int totalAttempts = instance.getTotalAttempt();
         int curAttempt = DateUtil.getAttemptCount(startDate, currentDate);
+
+        if (instance.getProgress() == Progress.DONE) {
+            currentDate = instance.getCompletedDate().toLocalDate();
+            curAttempt = totalAttempts;
+        }
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
@@ -138,7 +143,7 @@ public class CertificationService {
                 result.add(CertificationResponse.createExist(certificationMap.get(cur)));
                 continue;
             }
-            result.add(CertificationResponse.createNonExist(startedDate));
+            result.add(CertificationResponse.createNonExist(cur, startedDate));
         }
 
         return result;

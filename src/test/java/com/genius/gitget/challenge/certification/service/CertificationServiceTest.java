@@ -326,6 +326,64 @@ class CertificationServiceTest {
     }
 
     @Test
+    @DisplayName("아직 시작하지 않은 챌린지에 대해 전체 인증 조회를 했을 때, 데이터의 개수는 0개여야 한다.")
+    public void should_return0_when_preActivityInstance() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 3, 10);
+        LocalDate endDate = LocalDate.of(2024, 3, 20);
+        LocalDate currentDate = LocalDate.of(2024, 2, 20);
+        Instance instance = getSavedInstance(startDate, endDate);
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
+
+        //when
+        TotalResponse totalCertification = certificationService.getTotalCertification(participant.getId(), currentDate);
+
+        //then
+        assertThat(totalCertification.totalAttempts()).isEqualTo(DateUtil.getAttemptCount(startDate, endDate));
+        assertThat(totalCertification.certifications().size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("진행 중인 챌린지의 전체 인증 조회를 했을 때, 시작일자부터 오늘일자까지의 데이터를 전달해야 한다.")
+    public void should_returnEmptyList_when_activityInstance() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 3, 10);
+        LocalDate endDate = LocalDate.of(2024, 3, 30);
+        LocalDate currentDate = LocalDate.of(2024, 3, 20);
+        Instance instance = getSavedInstance(startDate, endDate);
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
+
+        //when
+        instance.updateProgress(Progress.ACTIVITY);
+        getSavedCertification(PASSED, currentDate, participant);
+        TotalResponse totalCertification = certificationService.getTotalCertification(participant.getId(), currentDate);
+
+        //then
+        assertThat(totalCertification.totalAttempts()).isEqualTo(DateUtil.getAttemptCount(startDate, endDate));
+        assertThat(totalCertification.certifications().size()).isEqualTo(11);
+    }
+
+    @Test
+    @DisplayName("완료된 챌린지의 전체 인증 조회를 했을 때, 챌린지의 시작일자부터 완료일자까지의 데이터를 전달해야 한다.")
+    public void should_returnPeriod_when_doneInstance() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 3, 10);
+        LocalDate endDate = LocalDate.of(2024, 3, 30);
+        LocalDate currentDate = LocalDate.of(2024, 4, 20);
+        Instance instance = getSavedInstance(startDate, endDate);
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
+
+        //when
+        instance.updateProgress(Progress.DONE);
+        TotalResponse totalCertification = certificationService.getTotalCertification(participant.getId(), currentDate);
+
+        //then
+        int totalAttempt = DateUtil.getAttemptCount(startDate, endDate);
+        assertThat(totalCertification.totalAttempts()).isEqualTo(totalAttempt);
+        assertThat(totalCertification.certifications().size()).isEqualTo(totalAttempt);
+    }
+
+    @Test
     @DisplayName("사용자가 참여한 챌린지에 대한 상세 정보를 받을 수 있다.")
     public void should_returnDetailInfo_when_participate() {
         //given
@@ -596,6 +654,16 @@ class CertificationServiceTest {
                 .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.of(2024, 2, 1, 0, 0))
                 .completedDate(LocalDateTime.of(2024, 3, 29, 0, 0))
+                .build();
+        instance.setInstanceUUID("instanceUUID");
+        return instanceRepository.save(instance);
+    }
+
+    private Instance getSavedInstance(LocalDate startedDate, LocalDate completedDate) {
+        Instance instance = Instance.builder()
+                .progress(Progress.PREACTIVITY)
+                .startedDate(startedDate.atTime(0, 0))
+                .completedDate(completedDate.atTime(0, 0))
                 .build();
         instance.setInstanceUUID("instanceUUID");
         return instanceRepository.save(instance);

@@ -22,10 +22,10 @@ public record CertificationResponse(
 ) {
 
 
-    public static CertificationResponse createNonExist(LocalDate certificatedAt) {
+    public static CertificationResponse createNonExist(int certificationAttempt, LocalDate certificatedAt) {
         return CertificationResponse.builder()
                 .certificationId(0L)
-                .certificationAttempt(0)
+                .certificationAttempt(certificationAttempt)
                 .dayOfWeek(certificatedAt.getDayOfWeek())
                 .certificatedAt(certificatedAt)
                 .certificateStatus(NOT_YET)

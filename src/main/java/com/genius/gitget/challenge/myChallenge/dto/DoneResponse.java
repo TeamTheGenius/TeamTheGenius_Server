@@ -5,20 +5,39 @@ import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.domain.RewardStatus;
 import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.store.item.dto.ItemUseResponse;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@Builder
-public record DoneResponse(
-        Long instanceId,
-        String title,
-        int pointPerPerson,
-        JoinResult joinResult,
-        boolean canGetReward,
-        int numOfPointItem,
-        int rewardedPoints,
-        double achievementRate,
-        FileResponse fileResponse
-) {
+@Getter
+@Setter
+public class DoneResponse extends ItemUseResponse {
+    private Long instanceId;
+    private String title;
+    private int pointPerPerson;
+    private JoinResult joinResult;
+    private boolean canGetReward;
+    private int numOfPointItem;
+    private int rewardedPoints;
+    private double achievementRate;
+    private FileResponse fileResponse;
+
+    @Builder
+    public DoneResponse(Long instanceId, String title, int pointPerPerson, JoinResult joinResult, boolean canGetReward,
+                        int numOfPointItem, int rewardedPoints, double achievementRate, FileResponse fileResponse) {
+
+        this.instanceId = instanceId;
+        this.title = title;
+        this.pointPerPerson = pointPerPerson;
+        this.joinResult = joinResult;
+        this.canGetReward = canGetReward;
+        this.numOfPointItem = numOfPointItem;
+        this.rewardedPoints = rewardedPoints;
+        this.achievementRate = achievementRate;
+        this.fileResponse = fileResponse;
+    }
+
     public static DoneResponse createNotRewarded(Instance instance,
                                                  Participant participant,
                                                  int numOfPointItem) {

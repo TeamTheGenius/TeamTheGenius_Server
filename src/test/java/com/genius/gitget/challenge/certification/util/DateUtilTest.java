@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.certification.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
@@ -92,5 +93,47 @@ class DateUtilTest {
 
         //then
         assertThat(remainDays).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("챌린지 시작 일자가 월요일이 아니고 시작한 그 주일 때, 시작일자를 반환해야 한다.")
+    public void should_returnStartDate_when_StartDateNotMonDayAndSecondWeek() {
+        LocalDate challengeStartDate = LocalDate.of(2024, 3, 13);
+        LocalDate targetDate = LocalDate.of(2024, 3, 15);
+
+        //when
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(challengeStartDate, targetDate);
+
+        //then
+        assertThat(weekStartDate).isEqualTo(challengeStartDate);
+    }
+
+    @Test
+    @DisplayName("챌린지 시작일자가 월요일이 아니고 그 다움주일 때, 해당 주의 월요일을 반환해야 한다.")
+    public void should_returnMonday_when_startDateIsNotMonday() {
+        LocalDate challengeStartDate = LocalDate.of(2024, 3, 10);
+        LocalDate targetDate = LocalDate.of(2024, 3, 15);
+
+        //when
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(challengeStartDate, targetDate);
+
+        //then
+
+        assertThat(weekStartDate.getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
+    }
+
+    @Test
+    @DisplayName("챌린지 시작일자에 상관없이 시작한지 두 번째 주 일 때, 해당 주의 월요일을 전달해야한다")
+    public void should_returnMonday_when_secondWeek() {
+        //given
+        LocalDate challengeStartDate = LocalDate.of(2024, 3, 10);
+        LocalDate targetDate = LocalDate.of(2024, 3, 20);
+
+        //when
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(challengeStartDate, targetDate);
+
+        //then
+        assertThat(weekStartDate).isEqualTo(LocalDate.of(2024, 3, 18));
+        assertThat(weekStartDate.getDayOfWeek()).isEqualTo(DayOfWeek.MONDAY);
     }
 }

@@ -24,6 +24,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,6 +84,7 @@ public class Instance {
     @Column(name = "completed_at")
     private LocalDateTime completedDate;
 
+    @Column(name = "instance_uuid")
     private String instanceUUID;
 
     @Builder
@@ -122,12 +124,6 @@ public class Instance {
         }
     }
 
-    public void setFiles(Files files) {
-        this.files = files;
-    }
-
-    //== 비지니스 로직 ==//
-
     /*
      * 인스턴스 수정
      * */
@@ -140,6 +136,8 @@ public class Instance {
         this.completedDate = completedDate;
         this.certificationMethod = certificationMethod;
     }
+
+    //== 비지니스 로직 ==//
 
     /*
      * 참가자 수 정보 수정
@@ -166,11 +164,19 @@ public class Instance {
         return Optional.ofNullable(this.files);
     }
 
+    public void setFiles(Files files) {
+        this.files = files;
+    }
+
     /*
      * 챌린지 전체 인증 일자 조회
      * */
     public int getTotalAttempt() {
         return DateUtil.getAttemptCount(startedDate.toLocalDate(), completedDate.toLocalDate());
+    }
+
+    public boolean isActivatedInstance() {
+        return this.progress == Progress.ACTIVITY;
     }
 
     /*
@@ -182,5 +188,10 @@ public class Instance {
         } else {
             this.instanceUUID = instanceUUID;
         }
+    }
+
+    public String getPrTemplate(LocalDate currentDate) {
+        String today = currentDate.toString().replace("-", "");
+        return "GITGET-" + instanceUUID + "-" + today;
     }
 }

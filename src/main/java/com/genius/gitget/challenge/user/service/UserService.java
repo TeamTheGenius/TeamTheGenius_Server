@@ -10,11 +10,19 @@ import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.service.OrdersProvider;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -22,7 +30,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final OrdersProvider ordersProvider;
+    private final FilesService filesService;
     private final EncryptUtil encryptUtil;
+
+    @Value("${admin.githubId}")
+    private List<String> adminIds;
 
 
     public User findUserById(Long id) {
@@ -41,19 +54,28 @@ public class UserService {
     }
 
     @Transactional
-    public Long signup(SignupRequest requestUser) {
+    public Long signup(SignupRequest requestUser, MultipartFile multipartFile) {
         User user = findUserByIdentifier(requestUser.identifier());
         isAlreadyRegistered(user);
 
-        //TODO: Converter 클래스 만들어서 적용하기
         String interest = String.join(",", requestUser.interest());
-
         user.updateUser(requestUser.nickname(),
                 requestUser.information(),
                 interest);
-        user.updateRole(Role.USER);
+        updateRole(user);
+
+        Files files = filesService.uploadFile(multipartFile, "profile");
+        user.setFiles(files);
 
         return user.getId();
+    }
+
+    private void updateRole(User user) {
+        if (adminIds.contains(user.getIdentifier())) {
+            user.updateRole(Role.ADMIN);
+            return;
+        }
+        user.updateRole(Role.USER);
     }
 
     public void isNicknameDuplicate(String nickname) {
@@ -74,5 +96,12 @@ public class UserService {
         if (user.getRole() != Role.NOT_REGISTERED) {
             throw new BusinessException(ALREADY_REGISTERED);
         }
+    }
+
+    public AuthResponse getUserInfo(String identifier) {
+        User user = userRepository.findByIdentifier(identifier)
+                .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
+        Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
+        return new AuthResponse(user.getRole(), usingFrame.getId());
     }
 }

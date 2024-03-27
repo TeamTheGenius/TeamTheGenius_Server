@@ -15,9 +15,6 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
-import com.genius.gitget.challenge.item.domain.ItemCategory;
-import com.genius.gitget.challenge.item.domain.UserItem;
-import com.genius.gitget.challenge.item.service.UserItemProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
@@ -26,6 +23,8 @@ import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.store.item.service.OrdersProvider;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,11 +50,16 @@ public class CertificationService {
     private final CertificationProvider certificationProvider;
     private final ParticipantProvider participantProvider;
     private final InstanceProvider instanceProvider;
-    private final UserItemProvider userItemProvider;
+    private final OrdersProvider ordersProvider;
 
 
     public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
-        LocalDate startDate = participantProvider.getInstanceStartDate(participantId);
+        Instance instance = participantProvider.getInstanceById(participantId);
+        if (!instance.isActivatedInstance()) {
+            return new ArrayList<>();
+        }
+
+        LocalDate startDate = instance.getStartedDate().toLocalDate();
         int curAttempt = DateUtil.getWeekAttempt(startDate, currentDate);
         LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
 
@@ -63,8 +67,9 @@ public class CertificationService {
                 weekStartDate,
                 currentDate,
                 participantId);
+        Map<Integer, Certification> certificationMap = convertToWeekMap(certifications);
 
-        return convertToCertificationResponse(certifications, curAttempt, weekStartDate);
+        return convertToCertificationResponse(certificationMap, curAttempt, weekStartDate);
     }
 
     public Slice<WeekResponse> getAllWeekCertification(Long userId, Long instanceId,
@@ -77,20 +82,28 @@ public class CertificationService {
 
     private WeekResponse convertToWeekResponse(Participant participant, LocalDate currentDate) {
         User user = participant.getUser();
-        LocalDate startDate = participantProvider.getInstanceStartDate(participant.getId());
+        Instance instance = participant.getInstance();
+
+        LocalDate startDate = instance.getStartedDate().toLocalDate();
         LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
+
+        FileResponse fileResponse = FileResponse.create(user.getFiles());
+        Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
+
+        if (!instance.isActivatedInstance()) {
+            return WeekResponse.create(user, frameId, fileResponse, new ArrayList<>());
+        }
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 weekStartDate, currentDate, participant.getId());
+        Map<Integer, Certification> certificationMap = convertToWeekMap(certifications);
 
         List<CertificationResponse> certificationResponses = convertToCertificationResponse(
-                certifications,
+                certificationMap,
                 DateUtil.getWeekAttempt(startDate, currentDate),
                 weekStartDate);
 
-        FileResponse fileResponse = FileResponse.create(user.getFiles());
-
-        return WeekResponse.create(user, fileResponse, certificationResponses);
+        return WeekResponse.create(user, frameId, fileResponse, certificationResponses);
     }
 
     public TotalResponse getTotalCertification(Long participantId, LocalDate currentDate) {
@@ -102,9 +115,10 @@ public class CertificationService {
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
+        Map<Integer, Certification> certificationMap = convertToTotalMap(certifications);
 
         List<CertificationResponse> certificationResponses = convertToCertificationResponse(
-                certifications, curAttempt, startDate);
+                certificationMap, curAttempt, startDate);
 
         return TotalResponse.builder()
                 .totalAttempts(totalAttempts)
@@ -112,10 +126,9 @@ public class CertificationService {
                 .build();
     }
 
-    private List<CertificationResponse> convertToCertificationResponse(List<Certification> certifications,
+    private List<CertificationResponse> convertToCertificationResponse(Map<Integer, Certification> certificationMap,
                                                                        int curAttempt, LocalDate startedDate) {
         List<CertificationResponse> result = new ArrayList<>();
-        Map<Integer, Certification> certificationMap = convertToMap(certifications);
 
         startedDate = startedDate.minusDays(1);
 
@@ -125,17 +138,27 @@ public class CertificationService {
                 result.add(CertificationResponse.createExist(certificationMap.get(cur)));
                 continue;
             }
-            result.add(CertificationResponse.createNonExist(cur, startedDate));
+            result.add(CertificationResponse.createNonExist(startedDate));
         }
 
         return result;
     }
 
-    private Map<Integer, Certification> convertToMap(List<Certification> certifications) {
+    private Map<Integer, Certification> convertToTotalMap(List<Certification> certifications) {
         Map<Integer, Certification> certificationMap = new HashMap<>();
 
         for (Certification certification : certifications) {
             certificationMap.put(certification.getCurrentAttempt(), certification);
+        }
+        return certificationMap;
+    }
+
+    private Map<Integer, Certification> convertToWeekMap(List<Certification> certifications) {
+        Map<Integer, Certification> certificationMap = new HashMap<>();
+
+        for (Certification certification : certifications) {
+            DayOfWeek dayOfWeek = certification.getCertificatedAt().getDayOfWeek();
+            certificationMap.put(dayOfWeek.ordinal() + 1, certification);
         }
         return certificationMap;
     }
@@ -146,38 +169,32 @@ public class CertificationService {
         Participant participant = participantProvider.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
-        UserItem userItem = userItemProvider.findUserItemByUser(userId, ItemCategory.CERTIFICATION_PASSER);
-        Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
+        Optional<Certification> optionalCertification = certificationProvider.findByDate(targetDate,
+                participant.getId());
 
         validCertificationCondition(instance, targetDate);
-        validatePassCondition(userItem, optional);
+        validatePassCondition(optionalCertification);
 
-        userItem.useItem();
+        Certification certification = optionalCertification
+                .map(passed -> {
+                    passed.updateToPass(targetDate);
+                    return passed;
+                })
+                .orElseGet(() -> {
+                    Certification passed = Certification.createPassed(targetDate);
+                    passed.setParticipant(participant);
+                    certificationProvider.save(passed);
+                    return passed;
+                });
 
-        //TODO: 리팩토링 시급...
-        if (optional.isPresent()) {
-            Certification certification = optional.get();
-            certification.updateToPass(targetDate);
-            return ActivatedResponse.create(instance, certification.getCertificationStatus(),
-                    0, participant.getRepositoryName());
-        }
-
-        Certification certification = Certification.createPassed(targetDate);
-        certification.setParticipant(participant);
-        certificationProvider.save(certification);
-
-        return ActivatedResponse.create(instance, certification.getCertificationStatus(),
-                0, participant.getRepositoryName());
+        return ActivatedResponse.create(instance, certification.getCertificationStatus(), 0,
+                participant.getRepositoryName());
     }
 
-    private void validatePassCondition(UserItem userItem, Optional<Certification> optional) {
-        if (!userItem.hasItem()) {
-            throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
+    private void validatePassCondition(Optional<Certification> optional) {
+        if (optional.isPresent() && optional.get().getCertificationStatus() != NOT_YET) {
+            throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
         }
-        if (optional.isEmpty() || optional.get().getCertificationStatus() == NOT_YET) {
-            return;
-        }
-        throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
     }
 
     @Transactional
@@ -186,25 +203,35 @@ public class CertificationService {
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
 
-        validCertificationCondition(instance, certificationRequest.targetDate());
+        String repositoryName = participant.getRepositoryName();
+        LocalDate targetDate = certificationRequest.targetDate();
 
-        List<String> pullRequests = getPullRequestLink(
-                gitHub,
-                participant.getRepositoryName(),
-                certificationRequest.targetDate());
+        validCertificationCondition(instance, targetDate);
 
-        Certification certification = createOrUpdate(participant, certificationRequest.targetDate(), pullRequests);
+        List<String> filteredPullRequests = filterValidPR(
+                githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate),
+                instance.getPrTemplate(targetDate)
+        );
+
+        Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
+                .map(updated -> {
+                    if (updated.getCertificationStatus() == PASSED) {
+                        throw new BusinessException(ErrorCode.ALREADY_PASSED_CERTIFICATION);
+                    }
+                    return certificationProvider.update(updated, targetDate, filteredPullRequests);
+                })
+                .orElseGet(
+                        () -> certificationProvider.createCertification(participant, targetDate, filteredPullRequests)
+                );
 
         return CertificationResponse.createExist(certification);
     }
 
-    private Certification createOrUpdate(Participant participant, LocalDate targetDate, List<String> pullRequests) {
-        Optional<Certification> optional = certificationProvider.findByDate(targetDate, participant.getId());
-        if (optional.isPresent()) {
-            return certificationProvider.update(optional.get(), targetDate, pullRequests);
-        }
-
-        return certificationProvider.createCertification(participant, targetDate, pullRequests);
+    private List<String> filterValidPR(List<GHPullRequest> ghPullRequests, String prTemplate) {
+        return ghPullRequests.stream()
+                .filter(ghPullRequest -> ghPullRequest.getBody().contains(prTemplate))
+                .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
+                .toList();
     }
 
     private void validCertificationCondition(Instance instance, LocalDate targetDate) {
@@ -212,19 +239,13 @@ public class CertificationService {
             throw new BusinessException(ErrorCode.NOT_ACTIVITY_INSTANCE);
         }
 
-        boolean isValidPeriod = targetDate.isAfter(instance.getStartedDate().toLocalDate()) &&
-                targetDate.isBefore(instance.getCompletedDate().toLocalDate());
+        LocalDate startedDate = instance.getStartedDate().toLocalDate().minusDays(1);
+        LocalDate completedDate = instance.getCompletedDate().toLocalDate().plusDays(1);
+
+        boolean isValidPeriod = targetDate.isAfter(startedDate) && targetDate.isBefore(completedDate);
         if (!isValidPeriod) {
             throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
         }
-    }
-
-    private List<String> getPullRequestLink(GitHub gitHub, String repositoryName, LocalDate targetDate) {
-        List<GHPullRequest> ghPullRequests = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate);
-
-        return ghPullRequests.stream()
-                .map(pr -> pr.getHtmlUrl().toString())
-                .toList();
     }
 
     public InstancePreviewResponse getInstancePreview(Long instanceId) {
@@ -262,6 +283,7 @@ public class CertificationService {
         }
 
         return CertificationInformation.builder()
+                .prTemplate(instance.getPrTemplate(currentDate))
                 .repository(participant.getRepositoryName())
                 .successPercent(getSuccessPercent(successCount, currentAttempt))
                 .totalAttempt(totalAttempt)

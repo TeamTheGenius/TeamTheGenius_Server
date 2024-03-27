@@ -6,7 +6,6 @@ import java.time.LocalDate;
 public record RewardRequest(
         User user,
         Long instanceId,
-        Boolean canUseItem,
         LocalDate targetDate
 ) {
 }

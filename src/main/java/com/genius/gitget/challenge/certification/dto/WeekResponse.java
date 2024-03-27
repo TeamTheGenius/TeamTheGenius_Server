@@ -9,24 +9,28 @@ import lombok.Builder;
 public record WeekResponse(
         Long userId,
         String nickname,
+        Long frameId,
         List<CertificationResponse> certifications,
         FileResponse profile
 
 ) {
-
-    public static WeekResponse create(User user, List<CertificationResponse> certifications) {
-        return WeekResponse.builder()
-                .userId(user.getId())
-                .nickname(user.getNickname())
-                .certifications(certifications)
-                .build();
-    }
 
     public static WeekResponse create(User user, FileResponse fileResponse,
                                       List<CertificationResponse> certifications) {
         return WeekResponse.builder()
                 .userId(user.getId())
                 .nickname(user.getNickname())
+                .certifications(certifications)
+                .profile(fileResponse)
+                .build();
+    }
+
+    public static WeekResponse create(User user, Long frameId, FileResponse fileResponse,
+                                      List<CertificationResponse> certifications) {
+        return WeekResponse.builder()
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .frameId(frameId)
                 .certifications(certifications)
                 .profile(fileResponse)
                 .build();

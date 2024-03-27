@@ -1,6 +1,5 @@
 package com.genius.gitget.challenge.certification.util;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
@@ -23,7 +22,7 @@ public final class DateUtil {
         int weekAttempt = targetDate.getDayOfWeek().ordinal() + 1;
         int totalAttempt = getAttemptCount(challengeStartDate, targetDate);
 
-        if (isNotStartWithMonday(challengeStartDate, targetDate)) {
+        if (isFirstWeek(challengeStartDate, targetDate)) {
             return totalAttempt;
         }
 
@@ -31,11 +30,11 @@ public final class DateUtil {
     }
 
     public static LocalDate getWeekStartDate(LocalDate challengeStartDate, LocalDate currentDate) {
-        if (isNotStartWithMonday(challengeStartDate, currentDate)) {
+        if (isFirstWeek(challengeStartDate, currentDate)) {
             return challengeStartDate;
         }
-
-        return currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
+        LocalDate mondayOfWeek = currentDate.minusDays(currentDate.getDayOfWeek().ordinal());
+        return mondayOfWeek;
     }
 
     public static LocalDate convertToLocalDate(Date date) {
@@ -45,10 +44,12 @@ public final class DateUtil {
         );
     }
 
-    private static boolean isNotStartWithMonday(LocalDate challengeStartDate, LocalDate currentDate) {
-        int totalAttempt = getAttemptCount(challengeStartDate, currentDate);
-        // 첫째주이고 && 시작일이 월요일이 아닐 때
-        if ((challengeStartDate.getDayOfWeek() != DayOfWeek.MONDAY) && (totalAttempt < 8)) {
+    private static boolean isFirstWeek(LocalDate challengeStartDate, LocalDate currentDate) {
+        LocalDate mondayOfWeek = challengeStartDate.minusDays(challengeStartDate.getDayOfWeek().ordinal());
+        LocalDate sundayOfWeek = mondayOfWeek.plusDays(6);
+        
+        if (currentDate.isAfter(mondayOfWeek.minusDays(1))
+                && currentDate.isBefore(sundayOfWeek.plusDays(1))) {
             return true;
         }
         return false;

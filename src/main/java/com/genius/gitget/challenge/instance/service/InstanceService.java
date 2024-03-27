@@ -103,11 +103,13 @@ public class InstanceService {
         Instance instance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
 
-        Optional<Files> findInstanceFile = instance.getFiles();
-        Long findInstanceFileId = findInstanceFile.get().getId();
+        Files files = instance.getFiles().orElse(null);
+        Long filesId = files != null ? files.getId() : null;
 
-        filesService.deleteFile(findInstanceFileId);
-        instance.setFiles(null);
+        if (filesId != null) {
+            filesService.deleteFile(filesId);
+            instance.setFiles(null);
+        }
         instanceRepository.delete(instance);
     }
 

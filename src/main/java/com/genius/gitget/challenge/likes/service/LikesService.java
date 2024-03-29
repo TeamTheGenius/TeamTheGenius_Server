@@ -71,14 +71,14 @@ public class LikesService {
         likesRepository.deleteById(findLikes.getId());
     }
 
-    @Transactional
-    public void deleteLikesLazy(User user, Long likesId) {
-        try {
-            likesRepository.deleteById(likesId);
-        } catch (Exception e) {
-            e.getStackTrace();
-        }
-    }
+//    @Transactional
+//    public void deleteLikesLazy(User user, Long likesId) {
+//        try {
+//            likesRepository.deleteById(likesId);
+//        } catch (Exception e) {
+//            e.getStackTrace();
+//        }
+//    }
 
 
     private User verifyUser(User user) {
@@ -96,10 +96,5 @@ public class LikesService {
             throw new BusinessException(ErrorCode.MEMBER_NOT_FOUND);
         }
         return AuthenticatedUser;
-    }
-
-    private Likes getLikes(Long likesId) {
-        return likesRepository.findById(likesId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.LIKES_NOT_FOUND));
     }
 }

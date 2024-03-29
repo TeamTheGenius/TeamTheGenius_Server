@@ -71,24 +71,12 @@ class LikesServiceTest {
         instance2.setTopic(topic1);
         instance3.setTopic(topic1);
 
-//        topic1.setFiles(files1);
-//        topicRepository.save(topic1);
-//
-//        instance1.setFiles(files2);
-//        instanceRepository.save(instance1);
-//        instance2.setFiles(files4);
-//        instanceRepository.save(instance2);
-//
-//        user1.setFiles(files3);
-//        userRepository.save(user1);
-
         Likes likes1 = new Likes(user1, instance1);
         Likes likes2 = new Likes(user1, instance2);
         Likes likes3 = new Likes(user1, instance3);
         likesRepository.save(likes1);
         likesRepository.save(likes2);
         likesRepository.save(likes3);
-
     }
 
 

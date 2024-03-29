@@ -19,6 +19,7 @@ import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
@@ -162,6 +163,19 @@ public class ProfileServiceTest {
         userRepository.save(user);
         UserPointResponse userPoint = profileService.getUserPoint(user1);
         Assertions.assertThat(userPoint.getPoint()).isEqualTo(1500);
+    }
+
+    @Test
+    void 챌린지_현황_조회() {
+        // TODO 챌린지 현황 조회
+        User user = userRepository.findByIdentifier(user1.getIdentifier())
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        UserChallengeResultResponse userChallengeResult = profileService.getUserChallengeResult(user);
+        System.out.println(userChallengeResult.getBeforeStart());
+        System.out.println(userChallengeResult.getProcessing());
+        System.out.println(userChallengeResult.getFail());
+        System.out.println(userChallengeResult.getSuccess());
     }
 
 

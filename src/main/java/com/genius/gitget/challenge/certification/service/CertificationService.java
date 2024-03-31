@@ -64,9 +64,7 @@ public class CertificationService {
         LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
 
         List<Certification> certifications = certificationProvider.findByDuration(
-                weekStartDate,
-                currentDate,
-                participantId);
+                weekStartDate, currentDate, participantId);
         Map<Integer, Certification> certificationMap = convertToWeekMap(certifications);
 
         return convertToCertificationResponse(certificationMap, curAttempt, weekStartDate);
@@ -234,7 +232,12 @@ public class CertificationService {
 
     private List<String> filterValidPR(List<GHPullRequest> ghPullRequests, String prTemplate) {
         return ghPullRequests.stream()
-                .filter(ghPullRequest -> ghPullRequest.getBody().contains(prTemplate))
+                .filter(ghPullRequest -> {
+                    if (ghPullRequest.getBody() == null) {
+                        return false;
+                    }
+                    return ghPullRequest.getBody().contains(prTemplate);
+                })
                 .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
                 .toList();
     }

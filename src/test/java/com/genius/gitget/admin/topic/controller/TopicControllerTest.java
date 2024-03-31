@@ -1,6 +1,7 @@
 package com.genius.gitget.admin.topic.controller;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -17,6 +18,7 @@ import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;
 import com.genius.gitget.util.file.FileTestUtil;
 import java.nio.charset.StandardCharsets;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,8 @@ public class TopicControllerTest {
     TopicRepository topicRepository;
     @Autowired
     FilesService filesService;
+    @Autowired
+    private ObjectMapper objectMapper;
 
 
     @BeforeEach
@@ -61,14 +65,52 @@ public class TopicControllerTest {
         Topic savedTopic = getSavedTopic();
         Long id = savedTopic.getId();
 
-        mockMvc.perform(get("/api/admin/topic?" + id).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/admin/topic/" + id).cookie(tokenTestUtil.createAccessCookie()))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.numberOfElements").value(1));
+                .andExpect(jsonPath("$.data.title").value("title"));
     }
+
+    @Test
+    @WithMockCustomUser(role = Role.ADMIN)
+    @DisplayName("토픽 리스트를 요청하면, 해당 토픽의 정보를 리스트로 반환한다.")
+    public void 토픽_리스트_요청() throws Exception {
+        getSavedTopic();
+        getSavedTopic();
+        getSavedTopic();
+
+        mockMvc.perform(get("/api/admin/topic")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .cookie(tokenTestUtil.createAccessCookie()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.numberOfElements").value(3))
+                .andExpect(jsonPath("$.data.content[0].title").value("title"))
+                .andExpect(jsonPath("$.data.content[1].title").value("title"))
+                .andExpect(jsonPath("$.data.content[2].title").value("title"))
+                .andExpect(jsonPath("$.data.content[3].title").doesNotExist());
+    }
+
+    @Test
+    @WithMockCustomUser(role = Role.ADMIN)
+    @DisplayName("토픽을 삭제하면, 200 상태코드를 반환한다.")
+    public void 토픽_삭제() throws Exception {
+        Topic savedTopic = getSavedTopic();
+        Long id = savedTopic.getId();
+
+        mockMvc.perform(delete("/api/admin/topic/" + id).cookie(tokenTestUtil.createAccessCookie()))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.numberOfElements").doesNotExist());
+
+        Assertions.assertThat(topicRepository.findById(id)).isEmpty();
+    }
+
+    // TODO 토픽 수정 multipart
 
 
     // @Test
+    // TODO 토픽 생성 multipart
     @WithMockCustomUser(role = Role.ADMIN)
     @DisplayName("토픽을 정상적으로 생성하면, 201 코드를 반환한다.")
     public void 토픽_생성() throws Exception {

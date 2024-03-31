@@ -268,11 +268,11 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, endDate.minusDays(1), participant);
         getSavedCertification(CERTIFICATED, endDate, participant);
 
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        WeekResponse weekCertification = certificationService.getMyWeekCertifications(
                 participant.getId(), currentDate);
 
         //then
-        assertThat(weekCertification.size()).isEqualTo(3);
+        assertThat(weekCertification.certifications().size()).isEqualTo(3);
     }
 
     @Test
@@ -293,11 +293,11 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
 
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        WeekResponse weekCertification = certificationService.getMyWeekCertifications(
                 participant.getId(), currentDate);
 
         //then
-        assertThat(weekCertification.size()).isEqualTo(4);
+        assertThat(weekCertification.certifications().size()).isEqualTo(4);
     }
 
     @Test
@@ -494,7 +494,7 @@ class CertificationServiceTest {
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
-        Slice<WeekResponse> certification = certificationService.getAllWeekCertification(
+        Slice<WeekResponse> certification = certificationService.getOthersWeekCertifications(
                 user1.getId(), instance.getId(), currentDate, pageRequest);
 
         //then

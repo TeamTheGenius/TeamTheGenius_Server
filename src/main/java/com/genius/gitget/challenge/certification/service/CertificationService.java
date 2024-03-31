@@ -19,12 +19,12 @@ import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.dto.UserProfileInfo;
+import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
-import com.genius.gitget.store.item.service.OrdersProvider;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,63 +45,65 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CertificationService {
+    private final UserService userService;
     private final FilesService filesService;
     private final GithubProvider githubProvider;
     private final CertificationProvider certificationProvider;
     private final ParticipantProvider participantProvider;
     private final InstanceProvider instanceProvider;
-    private final OrdersProvider ordersProvider;
 
 
-    public List<CertificationResponse> getWeekCertification(Long participantId, LocalDate currentDate) {
-        Instance instance = participantProvider.getInstanceById(participantId);
-        if (!instance.isActivatedInstance()) {
-            return new ArrayList<>();
-        }
-
-        LocalDate startDate = instance.getStartedDate().toLocalDate();
-        int curAttempt = DateUtil.getWeekAttempt(startDate, currentDate);
-        LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
-
-        List<Certification> certifications = certificationProvider.findByDuration(
-                weekStartDate, currentDate, participantId);
-        Map<Integer, Certification> certificationMap = convertToWeekMap(certifications);
-
-        return convertToCertificationResponse(certificationMap, curAttempt, weekStartDate);
+    public WeekResponse getMyWeekCertifications(Long participantId, LocalDate currentDate) {
+        Participant participant = participantProvider.findById(participantId);
+        return getWeekResponse(participant, currentDate);
     }
 
-    public Slice<WeekResponse> getAllWeekCertification(Long userId, Long instanceId,
-                                                       LocalDate currentDate, Pageable pageable) {
+    public Slice<WeekResponse> getOthersWeekCertifications(Long userId, Long instanceId,
+                                                           LocalDate currentDate, Pageable pageable) {
         Slice<Participant> participants = participantProvider.findAllByInstanceId(userId, instanceId, pageable);
         return participants.map(
-                participant -> convertToWeekResponse(participant, currentDate)
+                participant -> getWeekResponse(participant, currentDate)
         );
     }
 
-    private WeekResponse convertToWeekResponse(Participant participant, LocalDate currentDate) {
-        User user = participant.getUser();
+    private WeekResponse getWeekResponse(Participant participant, LocalDate currentDate) {
         Instance instance = participant.getInstance();
+        LocalDate instanceStartDate = instance.getStartedDate().toLocalDate();
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(instanceStartDate, currentDate);
 
-        LocalDate startDate = instance.getStartedDate().toLocalDate();
-        LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate);
-
-        FileResponse fileResponse = FileResponse.create(user.getFiles());
-        Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
+        UserProfileInfo userProfileInfo = userService.getUserProfileInfo(participant.getUser());
 
         if (!instance.isActivatedInstance()) {
-            return WeekResponse.create(user, frameId, fileResponse, new ArrayList<>());
+            return WeekResponse.create(userProfileInfo, new ArrayList<>());
         }
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 weekStartDate, currentDate, participant.getId());
-        Map<Integer, Certification> certificationMap = convertToWeekMap(certifications);
 
-        List<CertificationResponse> certificationResponses = convertToCertificationResponse(
-                certificationMap,
-                DateUtil.getWeekAttempt(startDate, currentDate),
-                weekStartDate);
+        List<CertificationResponse> weekCertifications = getWeekCertifications(
+                certifications, instanceStartDate, currentDate);
 
-        return WeekResponse.create(user, frameId, fileResponse, certificationResponses);
+        return WeekResponse.create(userProfileInfo, weekCertifications);
+    }
+
+    private List<CertificationResponse> getWeekCertifications(List<Certification> certifications,
+                                                              LocalDate startDate, LocalDate currentDate) {
+        List<CertificationResponse> results = new ArrayList<>();
+        Map<LocalDate, Certification> weekMap = new HashMap<>();
+        for (Certification certification : certifications) {
+            weekMap.put(certification.getCertificatedAt(), certification);
+        }
+
+        LocalDate weekStartDate = DateUtil.getWeekStartDate(startDate, currentDate).minusDays(1);
+        while (weekStartDate.isBefore(currentDate)) {
+            weekStartDate = weekStartDate.plusDays(1);
+            if (weekMap.containsKey(weekStartDate)) {
+                results.add(CertificationResponse.createExist(weekMap.get(weekStartDate)));
+                continue;
+            }
+            results.add(CertificationResponse.createNonExist(0, weekStartDate));
+        }
+        return results;
     }
 
     public TotalResponse getTotalCertification(Long participantId, LocalDate currentDate) {
@@ -118,52 +120,37 @@ public class CertificationService {
 
         List<Certification> certifications = certificationProvider.findByDuration(
                 startDate, currentDate, participantId);
-        Map<Integer, Certification> certificationMap = convertToTotalMap(certifications);
 
-        List<CertificationResponse> certificationResponses = convertToCertificationResponse(
-                certificationMap, curAttempt, startDate);
+        List<CertificationResponse> totalCertifications = getTotalCertifications(
+                certifications, curAttempt, startDate);
 
         return TotalResponse.builder()
                 .totalAttempts(totalAttempts)
-                .certifications(certificationResponses)
+                .certifications(totalCertifications)
                 .build();
     }
 
-    private List<CertificationResponse> convertToCertificationResponse(Map<Integer, Certification> certificationMap,
-                                                                       int curAttempt, LocalDate startedDate) {
+    private List<CertificationResponse> getTotalCertifications(List<Certification> certifications,
+                                                               int curAttempt, LocalDate startedDate) {
         List<CertificationResponse> result = new ArrayList<>();
+        Map<Integer, Certification> totalMap = new HashMap<>();
+
+        for (Certification certification : certifications) {
+            totalMap.put(certification.getCurrentAttempt(), certification);
+        }
 
         startedDate = startedDate.minusDays(1);
 
         for (int cur = 1; cur <= curAttempt; cur++) {
             startedDate = startedDate.plusDays(1);
-            if (certificationMap.containsKey(cur)) {
-                result.add(CertificationResponse.createExist(certificationMap.get(cur)));
+            if (totalMap.containsKey(cur)) {
+                result.add(CertificationResponse.createExist(totalMap.get(cur)));
                 continue;
             }
             result.add(CertificationResponse.createNonExist(cur, startedDate));
         }
 
         return result;
-    }
-
-    private Map<Integer, Certification> convertToTotalMap(List<Certification> certifications) {
-        Map<Integer, Certification> certificationMap = new HashMap<>();
-
-        for (Certification certification : certifications) {
-            certificationMap.put(certification.getCurrentAttempt(), certification);
-        }
-        return certificationMap;
-    }
-
-    private Map<Integer, Certification> convertToWeekMap(List<Certification> certifications) {
-        Map<Integer, Certification> certificationMap = new HashMap<>();
-
-        for (Certification certification : certifications) {
-            DayOfWeek dayOfWeek = certification.getCertificatedAt().getDayOfWeek();
-            certificationMap.put(dayOfWeek.ordinal() + 1, certification);
-        }
-        return certificationMap;
     }
 
     @Transactional

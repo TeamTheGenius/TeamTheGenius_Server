@@ -9,6 +9,7 @@ import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
+import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
@@ -98,10 +99,15 @@ public class UserService {
         }
     }
 
-    public AuthResponse getUserInfo(String identifier) {
+    public AuthResponse getUserAuthInfo(String identifier) {
         User user = userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
         Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
         return new AuthResponse(user.getRole(), usingFrame.getId());
+    }
+
+    public UserProfileInfo getUserProfileInfo(User user) {
+        Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
+        return UserProfileInfo.createByEntity(user, frameId);
     }
 }

@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.participant.domain;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.user.domain.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -45,7 +46,7 @@ public class Participant {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "participant")
+    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Certification> certificationList = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

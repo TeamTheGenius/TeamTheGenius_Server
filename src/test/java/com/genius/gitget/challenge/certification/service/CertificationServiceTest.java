@@ -252,7 +252,7 @@ class CertificationServiceTest {
     }
 
     @Test
-    @DisplayName("특정 사용자가 일주일 간 인증한 현황들을 받아올 수 있다.")
+    @DisplayName("챌린지의 시작일자가 월요일이 아니고 첫째 주 일 때, 챌린지 시작일부터 현재일자까지의 인증 내역을 반환해야 한다.")
     public void should_returnCertifications_when_passDuration() {
         //given
         LocalDate currentDate = LocalDate.of(2024, 2, 3);
@@ -268,11 +268,15 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, endDate.minusDays(1), participant);
         getSavedCertification(CERTIFICATED, endDate, participant);
 
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        WeekResponse weekCertification = certificationService.getMyWeekCertifications(
                 participant.getId(), currentDate);
 
         //then
-        assertThat(weekCertification.size()).isEqualTo(3);
+        List<CertificationResponse> certifications = weekCertification.certifications();
+        assertThat(certifications.size()).isEqualTo(3);
+        assertThat(certifications.get(0).certificateStatus()).isEqualTo(NOT_YET);
+        assertThat(certifications.get(1).certificateStatus()).isEqualTo(CERTIFICATED);
+        assertThat(certifications.get(2).certificateStatus()).isEqualTo(CERTIFICATED);
     }
 
     @Test
@@ -291,13 +295,18 @@ class CertificationServiceTest {
         getSavedCertification(NOT_YET, startDate, participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
+        getSavedCertification(CERTIFICATED, currentDate, participant);
 
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        WeekResponse weekCertification = certificationService.getMyWeekCertifications(
                 participant.getId(), currentDate);
 
         //then
-        assertThat(weekCertification.size()).isEqualTo(4);
+        List<CertificationResponse> certifications = weekCertification.certifications();
+        assertThat(certifications.size()).isEqualTo(4);
+        assertThat(certifications.get(0).certificateStatus()).isEqualTo(CERTIFICATED);
+        assertThat(certifications.get(1).certificateStatus()).isEqualTo(NOT_YET);
+        assertThat(certifications.get(2).certificateStatus()).isEqualTo(NOT_YET);
+        assertThat(certifications.get(3).certificateStatus()).isEqualTo(CERTIFICATED);
     }
 
     @Test
@@ -494,7 +503,7 @@ class CertificationServiceTest {
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
-        Slice<WeekResponse> certification = certificationService.getAllWeekCertification(
+        Slice<WeekResponse> certification = certificationService.getOthersWeekCertifications(
                 user1.getId(), instance.getId(), currentDate, pageRequest);
 
         //then

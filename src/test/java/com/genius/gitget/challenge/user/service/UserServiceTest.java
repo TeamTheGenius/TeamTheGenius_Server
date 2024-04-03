@@ -225,7 +225,7 @@ class UserServiceTest {
         User user = getSavedUser();
 
         //when
-        AuthResponse authResponse = userService.getUserInfo(user.getIdentifier());
+        AuthResponse authResponse = userService.getUserAuthInfo(user.getIdentifier());
 
         //then
         assertThat(authResponse.role()).isEqualTo(Role.USER);
@@ -242,7 +242,7 @@ class UserServiceTest {
         orders.updateEquipStatus(EquipStatus.IN_USE);
 
         //when
-        AuthResponse authResponse = userService.getUserInfo(user.getIdentifier());
+        AuthResponse authResponse = userService.getUserAuthInfo(user.getIdentifier());
 
         //then
         assertThat(authResponse.role()).isEqualTo(Role.USER);

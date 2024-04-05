@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -45,6 +46,7 @@ public class Likes {
     @Column(name = "liked_at")
     private LocalDateTime likedAt; // 찜하기 누른 시각
 
+    @Builder
     public Likes(User user, Instance instance) {
         this.instance = instance;
         this.user = user;

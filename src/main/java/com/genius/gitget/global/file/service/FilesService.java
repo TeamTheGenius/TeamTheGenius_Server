@@ -55,9 +55,7 @@ public class FilesService {
     @Transactional
     public Files uploadFile(MultipartFile receivedFile, String typeStr) {
         FileUtil.validateFile(receivedFile);
-
         UploadDTO uploadDTO = FileUtil.getUploadInfo(receivedFile, typeStr, UPLOAD_PATH);
-
         FileUtil.saveFile(receivedFile, uploadDTO.fileURI());
 
         Files file = Files.builder()

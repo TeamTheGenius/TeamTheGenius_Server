@@ -1,11 +1,13 @@
 package com.genius.gitget.profile.dto;
 
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 public class UserSignoutRequest {
     private String reason;
 

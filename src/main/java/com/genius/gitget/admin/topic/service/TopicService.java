@@ -51,6 +51,10 @@ public class TopicService {
     // 토픽 생성 요청
     @Transactional
     public Long createTopic(TopicCreateRequest topicCreateRequest, MultipartFile multipartFile, String type) {
+        System.out.println("토픽 생성 요청");
+        System.out.println(topicCreateRequest.title());
+        System.out.println(multipartFile.getOriginalFilename());
+        System.out.println(type);
         Files uploadedFile = filesService.uploadFile(multipartFile, type);
 
         Topic topic = Topic.builder()

@@ -1,4 +1,4 @@
-package com.genius.gitget.payment;
+package com.genius.gitget.payment.service;
 
 import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PASSER;
 import static com.genius.gitget.store.item.domain.ItemCategory.POINT_MULTIPLIER;

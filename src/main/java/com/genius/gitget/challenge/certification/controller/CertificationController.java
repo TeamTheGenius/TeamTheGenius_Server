@@ -16,12 +16,10 @@ import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
-import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.global.util.response.dto.SlicingResponse;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -93,15 +91,12 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
-        User user = userService.findUserById(userPrincipal.getUser().getId());
-        Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        Participant participant = participantProvider.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
+        WeekResponse weekCertification = certificationService.getMyWeekCertifications(
                 participant.getId(), LocalDate.now());
-        FileResponse fileResponse = FileResponse.create(user.getFiles());
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
-                        WeekResponse.create(user, fileResponse, weekCertification))
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekCertification)
         );
     }
 
@@ -112,7 +107,7 @@ public class CertificationController {
             @PageableDefault Pageable pageable
     ) {
         User user = userPrincipal.getUser();
-        Slice<WeekResponse> certifications = certificationService.getAllWeekCertification(
+        Slice<WeekResponse> certifications = certificationService.getOthersWeekCertifications(
                 user.getId(), instanceId, LocalDate.now(), pageable);
 
         return ResponseEntity.ok().body(

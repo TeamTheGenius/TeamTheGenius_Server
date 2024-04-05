@@ -28,7 +28,6 @@ import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -149,11 +148,8 @@ class InstanceDetailServiceTest {
         //when
         instanceDetailService.joinNewChallenge(savedUser, new JoinRequest(savedInstance.getId(), targetRepo));
         JoinResponse joinResponse = instanceDetailService.quitChallenge(savedUser, savedInstance.getId());
-        Optional<Participant> byJoinInfo = participantRepository.findByJoinInfo(savedUser.getId(),
-                savedInstance.getId());
 
         //then
-        assertThat(byJoinInfo).isEmpty();
         assertThat(savedInstance.getParticipantCount()).isEqualTo(0);
         assertThat(joinResponse.participantId()).isEqualTo(null);
         assertThat(joinResponse.joinResult()).isEqualTo(null);

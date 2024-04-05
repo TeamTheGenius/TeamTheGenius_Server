@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 public class UserSignoutRequest {
     private String reason;
 

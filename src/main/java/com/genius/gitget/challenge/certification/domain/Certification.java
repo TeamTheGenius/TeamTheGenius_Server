@@ -4,7 +4,6 @@ import static com.genius.gitget.challenge.certification.domain.CertificateStatus
 
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -33,7 +32,7 @@ public class Certification extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "participant_id")
     private Participant participant;
 

@@ -252,7 +252,7 @@ class CertificationServiceTest {
     }
 
     @Test
-    @DisplayName("특정 사용자가 일주일 간 인증한 현황들을 받아올 수 있다.")
+    @DisplayName("챌린지의 시작일자가 월요일이 아니고 첫째 주 일 때, 챌린지 시작일부터 현재일자까지의 인증 내역을 반환해야 한다.")
     public void should_returnCertifications_when_passDuration() {
         //given
         LocalDate currentDate = LocalDate.of(2024, 2, 3);
@@ -268,11 +268,15 @@ class CertificationServiceTest {
         getSavedCertification(CERTIFICATED, endDate.minusDays(1), participant);
         getSavedCertification(CERTIFICATED, endDate, participant);
 
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        WeekResponse weekCertification = certificationService.getMyWeekCertifications(
                 participant.getId(), currentDate);
 
         //then
-        assertThat(weekCertification.size()).isEqualTo(3);
+        List<CertificationResponse> certifications = weekCertification.certifications();
+        assertThat(certifications.size()).isEqualTo(3);
+        assertThat(certifications.get(0).certificateStatus()).isEqualTo(NOT_YET);
+        assertThat(certifications.get(1).certificateStatus()).isEqualTo(CERTIFICATED);
+        assertThat(certifications.get(2).certificateStatus()).isEqualTo(CERTIFICATED);
     }
 
     @Test
@@ -291,13 +295,18 @@ class CertificationServiceTest {
         getSavedCertification(NOT_YET, startDate, participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
-        getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
+        getSavedCertification(CERTIFICATED, currentDate, participant);
 
-        List<CertificationResponse> weekCertification = certificationService.getWeekCertification(
+        WeekResponse weekCertification = certificationService.getMyWeekCertifications(
                 participant.getId(), currentDate);
 
         //then
-        assertThat(weekCertification.size()).isEqualTo(4);
+        List<CertificationResponse> certifications = weekCertification.certifications();
+        assertThat(certifications.size()).isEqualTo(4);
+        assertThat(certifications.get(0).certificateStatus()).isEqualTo(CERTIFICATED);
+        assertThat(certifications.get(1).certificateStatus()).isEqualTo(NOT_YET);
+        assertThat(certifications.get(2).certificateStatus()).isEqualTo(NOT_YET);
+        assertThat(certifications.get(3).certificateStatus()).isEqualTo(CERTIFICATED);
     }
 
     @Test
@@ -323,6 +332,64 @@ class CertificationServiceTest {
         //then
         assertThat(totalResponse.certifications().size()).isEqualTo(8);
         assertThat(totalResponse.totalAttempts()).isEqualTo(instance.getTotalAttempt());
+    }
+
+    @Test
+    @DisplayName("아직 시작하지 않은 챌린지에 대해 전체 인증 조회를 했을 때, 데이터의 개수는 0개여야 한다.")
+    public void should_return0_when_preActivityInstance() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 3, 10);
+        LocalDate endDate = LocalDate.of(2024, 3, 20);
+        LocalDate currentDate = LocalDate.of(2024, 2, 20);
+        Instance instance = getSavedInstance(startDate, endDate);
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
+
+        //when
+        TotalResponse totalCertification = certificationService.getTotalCertification(participant.getId(), currentDate);
+
+        //then
+        assertThat(totalCertification.totalAttempts()).isEqualTo(DateUtil.getAttemptCount(startDate, endDate));
+        assertThat(totalCertification.certifications().size()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("진행 중인 챌린지의 전체 인증 조회를 했을 때, 시작일자부터 오늘일자까지의 데이터를 전달해야 한다.")
+    public void should_returnEmptyList_when_activityInstance() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 3, 10);
+        LocalDate endDate = LocalDate.of(2024, 3, 30);
+        LocalDate currentDate = LocalDate.of(2024, 3, 20);
+        Instance instance = getSavedInstance(startDate, endDate);
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
+
+        //when
+        instance.updateProgress(Progress.ACTIVITY);
+        getSavedCertification(PASSED, currentDate, participant);
+        TotalResponse totalCertification = certificationService.getTotalCertification(participant.getId(), currentDate);
+
+        //then
+        assertThat(totalCertification.totalAttempts()).isEqualTo(DateUtil.getAttemptCount(startDate, endDate));
+        assertThat(totalCertification.certifications().size()).isEqualTo(11);
+    }
+
+    @Test
+    @DisplayName("완료된 챌린지의 전체 인증 조회를 했을 때, 챌린지의 시작일자부터 완료일자까지의 데이터를 전달해야 한다.")
+    public void should_returnPeriod_when_doneInstance() {
+        //given
+        LocalDate startDate = LocalDate.of(2024, 3, 10);
+        LocalDate endDate = LocalDate.of(2024, 3, 30);
+        LocalDate currentDate = LocalDate.of(2024, 4, 20);
+        Instance instance = getSavedInstance(startDate, endDate);
+        Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
+
+        //when
+        instance.updateProgress(Progress.DONE);
+        TotalResponse totalCertification = certificationService.getTotalCertification(participant.getId(), currentDate);
+
+        //then
+        int totalAttempt = DateUtil.getAttemptCount(startDate, endDate);
+        assertThat(totalCertification.totalAttempts()).isEqualTo(totalAttempt);
+        assertThat(totalCertification.certifications().size()).isEqualTo(totalAttempt);
     }
 
     @Test
@@ -436,7 +503,7 @@ class CertificationServiceTest {
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
-        Slice<WeekResponse> certification = certificationService.getAllWeekCertification(
+        Slice<WeekResponse> certification = certificationService.getOthersWeekCertifications(
                 user1.getId(), instance.getId(), currentDate, pageRequest);
 
         //then
@@ -596,6 +663,16 @@ class CertificationServiceTest {
                 .progress(Progress.PREACTIVITY)
                 .startedDate(LocalDateTime.of(2024, 2, 1, 0, 0))
                 .completedDate(LocalDateTime.of(2024, 3, 29, 0, 0))
+                .build();
+        instance.setInstanceUUID("instanceUUID");
+        return instanceRepository.save(instance);
+    }
+
+    private Instance getSavedInstance(LocalDate startedDate, LocalDate completedDate) {
+        Instance instance = Instance.builder()
+                .progress(Progress.PREACTIVITY)
+                .startedDate(startedDate.atTime(0, 0))
+                .completedDate(completedDate.atTime(0, 0))
                 .build();
         instance.setInstanceUUID("instanceUUID");
         return instanceRepository.save(instance);

@@ -1,6 +1,6 @@
 package com.genius.gitget.challenge.certification.dto;
 
-import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.global.file.dto.FileResponse;
 import java.util.List;
 import lombok.Builder;
@@ -14,25 +14,14 @@ public record WeekResponse(
         FileResponse profile
 
 ) {
-
-    public static WeekResponse create(User user, FileResponse fileResponse,
+    public static WeekResponse create(UserProfileInfo userProfileInfo,
                                       List<CertificationResponse> certifications) {
         return WeekResponse.builder()
-                .userId(user.getId())
-                .nickname(user.getNickname())
+                .userId(userProfileInfo.userId())
+                .nickname(userProfileInfo.nickname())
+                .frameId(userProfileInfo.frameId())
                 .certifications(certifications)
-                .profile(fileResponse)
-                .build();
-    }
-
-    public static WeekResponse create(User user, Long frameId, FileResponse fileResponse,
-                                      List<CertificationResponse> certifications) {
-        return WeekResponse.builder()
-                .userId(user.getId())
-                .nickname(user.getNickname())
-                .frameId(frameId)
-                .certifications(certifications)
-                .profile(fileResponse)
+                .profile(userProfileInfo.fileResponse())
                 .build();
     }
 }

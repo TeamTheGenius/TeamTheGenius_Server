@@ -60,7 +60,7 @@ public class InstanceControllerTest {
 
         savedTopic1 = getSavedTopic();
         savedTopic2 = getSavedTopic();
-        
+
         savedInstance1 = getSavedInstance("title1", "FE", 50, 1000);
         savedInstance2 = getSavedInstance("title2", "BE, CS", 50, 1000);
 
@@ -121,8 +121,8 @@ public class InstanceControllerTest {
 
     @Test
     @WithMockCustomUser(role = Role.ADMIN)
-    @DisplayName("인스턴스를 삭제하면, 상태코드 200을 반환한다.")
-    public void 인스턴스_삭제() throws Exception {
+    @DisplayName("인스턴스 삭제 성공하면, 상태코드 200을 반환한다.")
+    public void 인스턴스_삭제_성공() throws Exception {
         Long instanceId = savedInstance1.getId();
 
         mockMvc.perform(delete("/api/admin/instance/" + instanceId).cookie(tokenTestUtil.createAccessCookie()))
@@ -133,9 +133,17 @@ public class InstanceControllerTest {
         Assertions.assertThat(instanceRepository.findById(instanceId)).isEmpty();
     }
 
-    // TODO 인스턴스 생성 multipart
+    @Test
+    @WithMockCustomUser(role = Role.ADMIN)
+    @DisplayName("인스턴스 삭제 실패하면, 상태코드 4xx을 반환한다.")
+    public void 인스턴스_삭제_성공_실패() throws Exception {
+        Long instanceId = savedInstance1.getId();
 
-    // TODO 인스턴스 수정 multipart
+        mockMvc.perform(delete("/api/admin/instance/" + instanceId + 1).cookie(tokenTestUtil.createAccessCookie()))
+                .andDo(print())
+                .andExpect(status().is4xxClientError());
+    }
+
 
     private Topic getSavedTopic() {
         MultipartFile filename = FileTestUtil.getMultipartFile("sky");

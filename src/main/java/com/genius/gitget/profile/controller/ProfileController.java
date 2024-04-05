@@ -32,13 +32,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class ProfileController {
     private final ProfileService profileService;
 
-    // TODO 마이페이지 - 결제 내역 조회
-
     // 마이페이지 - 사용자 상세 정보 조회
     @GetMapping
     public ResponseEntity<SingleResponse<UserDetailsInformationResponse>> getUserDetailsInformation(
-            @AuthenticationPrincipal
-            UserPrincipal userPrincipal) {
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
         UserDetailsInformationResponse userInformation = profileService.getUserDetailsInformation(
                 userPrincipal.getUser());
         return ResponseEntity.ok()
@@ -93,6 +90,7 @@ public class ProfileController {
                 .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
     }
 
+
     // 마이페이지 - 챌린지 현황
     @GetMapping("/challenges")
     public ResponseEntity<SingleResponse<UserChallengeResultResponse>> getUserChallengeResult(
@@ -104,6 +102,7 @@ public class ProfileController {
                         userChallengeResult));
     }
 
+
     // 마이페이지 - 탈퇴하기
     @DeleteMapping
     public ResponseEntity<CommonResponse> deleteUserInformation(@AuthenticationPrincipal UserPrincipal userPrincipal,
@@ -113,6 +112,7 @@ public class ProfileController {
         return ResponseEntity.ok()
                 .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
     }
+
 
     // 포인트 조회
     @GetMapping("/point")

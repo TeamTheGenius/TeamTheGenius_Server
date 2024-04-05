@@ -31,8 +31,14 @@ public class LikesService {
     private final LikesRepository likesRepository;
 
     public Page<UserLikesResponse> getLikesList(User user, Pageable pageable) {
-        User verifiedUser = verifyUser(user);
-        List<Likes> likes = verifiedUser.getLikesList();
+        List<User> userList = verifyUser(user);
+        List<Likes> likes = new ArrayList<>();
+
+        for (User userObject : userList) {
+            if (userObject.getIdentifier().equals(user.getIdentifier())) {
+                likes = userObject.getLikesList();
+            }
+        }
         List<UserLikesResponse> userLikesResponses = new ArrayList<>();
 
         for (Likes like : likes) {
@@ -54,7 +60,15 @@ public class LikesService {
     @Transactional
     public UserLikesAddResponse addLikes(User user, String identifier, Long instanceId) {
         User comparedUser = compareToUserIdentifier(user, identifier);
-        User findUser = verifyUser(comparedUser);
+        List<User> userList = verifyUser(comparedUser);
+        User findUser = null;
+
+        for (User userObject : userList) {
+            System.out.println("!!!!!!!!!" + userObject.getIdentifier() + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            if (userObject.getIdentifier().equals(identifier)) {
+                findUser = userObject;
+            }
+        }
         Instance findInstance = verifyInstance(instanceId);
 
         Likes likes = new Likes(findUser, findInstance);
@@ -81,9 +95,8 @@ public class LikesService {
 //    }
 
 
-    private User verifyUser(User user) {
-        return userRepository.findByIdentifier(user.getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+    private List<User> verifyUser(User user) {
+        return userRepository.findAllByIdentifier(user.getIdentifier());
     }
 
     private Instance verifyInstance(Long instanceId) {

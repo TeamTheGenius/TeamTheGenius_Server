@@ -54,7 +54,7 @@ jobs:
           echo "${{ secrets.OAUTH }}" > ./application-oauth.yml
           
           cd ./src/main/resources
-          touch ./application-db.yml
+          touch ./application-payment.yml
           echo "${{ secrets.PAYMENT }}" > ./application-payment.yml
 
 

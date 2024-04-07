@@ -22,9 +22,7 @@ jobs:
           distribution: 'temurin'
 
       - name: make application.yml
-        #        uses: actions/checkout@v4
         run: |
-          mkdir ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml

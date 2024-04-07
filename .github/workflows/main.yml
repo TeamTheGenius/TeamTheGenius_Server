@@ -2,9 +2,9 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "chore/release-test-hey" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "chore/release-test-hey" ]
 
 jobs:
   deploy:
@@ -14,12 +14,32 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: create yaml files
+        uses: actions/checkout@v4
+      - run: touch .src/main/resources/application.yml
+      - run: touch .src/main/resources/application-config.yml
+      - run: touch .src/main/resources/application-db.yml
+      - run: touch .src/main/resources/application-file.yml
+      - run: touch .src/main/resources/application-github.yml
+      - run: touch .src/main/resources/application-jwt.yml
+      - run: touch .src/main/resources/application-oauth.yml
+      - run: touch .src/main/resources/application-payment.yml
+      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
+      - run: echo "${{ secrets.CONFIG }}" > ./src/main/resources/application-config.yml
+      - run: echo "${{ secrets.DB }}" > ./src/main/resources/application-db.yml
+      - run: echo "${{ secrets.FILE }}" > ./src/main/resources/application-file.yml
+      - run: echo "${{ secrets.GITHUB }}" > ./src/main/resources/application-github.yml
+      - run: echo "${{ secrets.JWT }}" > ./src/main/resources/application-jwt.yml
+      - run: echo "${{ secrets.OAUTH }}" > ./src/main/resources/application-oauth.yml
+      - run: echo "${{ secrets.PAYMENT }}" > ./src/main/resources/application-payment.yml
+
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

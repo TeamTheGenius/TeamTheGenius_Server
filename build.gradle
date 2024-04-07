@@ -67,6 +67,16 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
+bootJar {
+    archiveBaseName = 'GitGetApplication'
+    archiveFileName = 'GitGetApplication.jar'
+    archiveVersion = "0.0.1"
+}
+
+jar {
+    enabled = false
+}
+
 tasks.named('test') {
     useJUnitPlatform()
 }

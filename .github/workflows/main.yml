@@ -82,9 +82,6 @@ jobs:
         run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$AWS_S3_BUCKET/$GITHUB_SHA.zip
 
       #      - name: S3에 업로드
-      #        run: aws s3 cp --region ap-northeast-2 --acl private ./springboor-with-githubaction.zip s3://springboot-with-githubaction/
-
-      #      - name: S3에 업로드
       #        run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://$AWS_S3_BUCKET/cicdtest/$GITHUB_SHA.zip --source .
 
       - name: EC2에 배포

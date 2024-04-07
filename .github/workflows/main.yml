@@ -35,6 +35,7 @@ jobs:
 
       - name: make other application-{profile}.yml
         run: |
+          cd ./src/main/resources
           touch ./application-config.yml
           echo "${{ secrets.CONFIG }}" > ./application-config.yml
           

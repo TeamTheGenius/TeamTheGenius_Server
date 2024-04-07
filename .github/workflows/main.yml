@@ -21,24 +21,13 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: create yaml files
+      - name: make application.yml
         uses: actions/checkout@v4
-      - run: touch .src/main/resources/application.yml
-      - run: touch .src/main/resources/application-config.yml
-      - run: touch .src/main/resources/application-db.yml
-      - run: touch .src/main/resources/application-file.yml
-      - run: touch .src/main/resources/application-github.yml
-      - run: touch .src/main/resources/application-jwt.yml
-      - run: touch .src/main/resources/application-oauth.yml
-      - run: touch .src/main/resources/application-payment.yml
-      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.yml
-      - run: echo "${{ secrets.CONFIG }}" > ./src/main/resources/application-config.yml
-      - run: echo "${{ secrets.DB }}" > ./src/main/resources/application-db.yml
-      - run: echo "${{ secrets.FILE }}" > ./src/main/resources/application-file.yml
-      - run: echo "${{ secrets.GITHUB }}" > ./src/main/resources/application-github.yml
-      - run: echo "${{ secrets.JWT }}" > ./src/main/resources/application-jwt.yml
-      - run: echo "${{ secrets.OAUTH }}" > ./src/main/resources/application-oauth.yml
-      - run: echo "${{ secrets.PAYMENT }}" > ./src/main/resources/application-payment.yml
+        run: |
+          mkdir ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
+          echo "${{ secrets.APPLICATION }}" > ./application.yml
 
 
       - name: Grant execute permission for gradlew

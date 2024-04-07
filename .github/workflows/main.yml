@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [ "chore/release-test-hey" ]
 
+env:
+  AWS_REGION: ap-northeast-2
+  AWS_S3_BUCKET: gitget-bucket-hey
+  AWS_CODE_DEPLOY_APPLICATION: GitGet-Application-HEY
+  AWS_CODE_DEPLOY_GROUP: GitGet-CodeDeploy-Role-HEY
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -51,9 +57,26 @@ jobs:
           echo "${{ secrets.PAYMENT }}" > ./application-payment.yml
 
 
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
 
       - name: Build and Test
         run: ./gradlew build test
+
+      - name: AWS credential 설정
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY_HEY }}
+          aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY_HEY }}
+
+      - name: S3에 업로드
+        run: aws deploy push --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --ignore-hidden-files --s3-location s3://$AWS_S3_BUCKET/cicdtest/$GITHUB_SHA.zip --source .
+
+#      - name: EC2에 배포
+#        run: aws deploy create-deployment --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} --s3-location bucket=$AWS_S3_BUCKET,key=cicdtest/$GITHUB_SHA.zip,bundleType=zip
+#
+
+

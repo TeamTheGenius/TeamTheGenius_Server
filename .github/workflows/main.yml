@@ -23,7 +23,7 @@ jobs:
 
       - name: make application.yml
         uses: actions/checkout@v4
-        run: |
+        run:
           mkdir ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml

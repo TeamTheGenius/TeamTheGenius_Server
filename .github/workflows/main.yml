@@ -10,7 +10,7 @@ env:
   AWS_REGION: ap-northeast-2
   AWS_S3_BUCKET: gitget-bucket-hey
   AWS_CODE_DEPLOY_APPLICATION: GitGet-Application-HEY
-  AWS_CODE_DEPLOY_GROUP: GitGet-CodeDeploy-Role-HEY
+  AWS_CODE_DEPLOY_GROUP: GitGet-CICD-group-hey
 
 jobs:
   deploy:

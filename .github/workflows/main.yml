@@ -27,6 +27,36 @@ jobs:
           touch ./application.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml
 
+      - name: make other application-{profile}.yml
+        run: |
+          cd ./src/main/resources
+          touch ./application-config.yml
+          echo "${{ secrets.CONFIG }}" > ./application-config.yml
+          
+          cd ./src/main/resources
+          touch ./application-db.yml
+          echo "${{ secrets.DB }}" > ./application-db.yml
+          
+          cd ./src/main/resources
+          touch ./application-file.yml
+          echo "${{ secrets.FILE }}" > ./application-file.yml
+          
+          cd ./src/main/resources
+          touch ./application-github.yml
+          echo "${{ secrets.GITHUB }}" > ./application-github.yml
+          
+          cd ./src/main/resources
+          touch ./application-jwt.yml
+          echo "${{ secrets.JWT }}" > ./application-jwt.yml
+          
+          cd ./src/main/resources
+          touch ./application-oauth.yml
+          echo "${{ secrets.OAUTH }}" > ./application-oauth.yml
+          
+          cd ./src/main/resources
+          touch ./application-db.yml
+          echo "${{ secrets.PAYMENT }}" > ./application-payment.yml
+
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

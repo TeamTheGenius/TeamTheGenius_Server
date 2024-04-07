@@ -16,7 +16,6 @@ hooks:
     - location: scripts/deploy.sh
       timeout: 60
 
-
 #  AfterInstall:
 #    - location: scripts/stop.sh
 #      timeout: 60

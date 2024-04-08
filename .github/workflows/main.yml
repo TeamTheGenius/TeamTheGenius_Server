@@ -65,7 +65,7 @@ jobs:
         shell: bash
 
       - name: Build and Test
-        run: ./gradlew build -x test # 임시로 테스트 없이 빌드 시행
+        run: ./gradlew build -x test # 임시로 테스트 없이 빌드 실행
       #        run: ./gradlew build test
 
       - name: Make zip file

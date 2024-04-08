@@ -41,7 +41,7 @@ jobs:
           echo "${{ secrets.CONFIG }}" > ./application-config.yml
           
           touch ./application-db.yml
-          echo "${{ secrets.DB }}" > ./application-db.yml
+          echo "${{ secrets.DATABASE }}" > ./application-db.yml
           
           touch ./application-file.yml
           echo "${{ secrets.FILE }}" > ./application-file.yml

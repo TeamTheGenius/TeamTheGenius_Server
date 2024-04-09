@@ -50,9 +50,12 @@ dependencies {
 
     // MongoDB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 
     // H2
+    implementation 'com.h2database:h2'
     runtimeOnly 'com.h2database:h2:2.2.222'
+    testRuntimeOnly 'com.h2database:h2'
 
     // Github API for Java
     implementation 'org.kohsuke:github-api:1.318'

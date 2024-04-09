@@ -10,7 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.encrypt.AesBytesEncryptor;
 
 @Configuration
-@PropertySource("classpath:application-github.yml")
+@PropertySource("classpath:application-common.yml")
 @RequiredArgsConstructor
 public class AppConfig {
     private final Environment env;

@@ -32,33 +32,20 @@ jobs:
           mkdir -p ./src/main/resources
           cd ./src/main/resources
           touch ./application.yml
+          touch ./application-common.yml
+          touch ./application-prod.yml
           echo "${{ secrets.APPLICATION }}" > ./application.yml
+          echo "${{ secrets.COMMON }}" > ./application-common.yml
+          echo "${{ secrets.PROD }}" > ./application-prod.yml
 
-      - name: make other application-{profile}.yml
+      - name: make test application.yml
         run: |
-          cd ./src/main/resources
-          touch ./application-config.yml
-          echo "${{ secrets.CONFIG }}" > ./application-config.yml
-          
-          touch ./application-db.yml
-          echo "${{ secrets.DATABASE }}" > ./application-db.yml
-          
-          touch ./application-file.yml
-          echo "${{ secrets.FILE }}" > ./application-file.yml
-          
-          touch ./application-github.yml
-          echo "${{ secrets.GITHUB }}" > ./application-github.yml
-          
-          touch ./application-jwt.yml
-          echo "${{ secrets.JWT }}" > ./application-jwt.yml
-          
-          touch ./application-oauth.yml
-          echo "${{ secrets.OAUTH }}" > ./application-oauth.yml
-          
-          touch ./application-payment.yml
-          echo "${{ secrets.PAYMENT }}" > ./application-payment.yml
-
-
+          mkdir -p ./src/test/resources
+          cd ./src/test/resources
+          touch ./application.yml
+          touch ./application-test.yml
+          echo "${{ secrets.APPLICATION_TEST }}" > ./application.yml
+          echo "${{ secrets.TEST }}" > ./application-test.yml
 
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew

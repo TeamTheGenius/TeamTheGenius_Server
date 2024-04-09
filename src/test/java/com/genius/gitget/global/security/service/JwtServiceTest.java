@@ -13,7 +13,6 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.constants.ProviderInfo;
-import com.genius.gitget.global.security.repository.TokenRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.util.TokenTestUtil;
@@ -40,8 +39,6 @@ class JwtServiceTest {
     private JwtService jwtService;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private TokenRepository tokenRepository;
     @Autowired
     private TokenTestUtil tokenTestUtil;
 

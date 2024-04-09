@@ -50,7 +50,7 @@ dependencies {
 
     // MongoDB
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+//    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 
     // H2
     implementation 'com.h2database:h2'

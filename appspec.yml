@@ -15,11 +15,3 @@ hooks:
   ApplicationStart:
     - location: scripts/deploy.sh
       timeout: 60
-
-# 백업
-#  AfterInstall:
-#    - location: scripts/stop.sh
-#      timeout: 60
-#  ApplicationStart:
-#    - location: scripts/start.sh
-#      timeout: 60

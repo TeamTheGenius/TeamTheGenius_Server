@@ -19,7 +19,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.security.Key;
-import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -88,7 +87,8 @@ public class JwtService {
                 .path("/")
                 .maxAge(maxAgeSeconds)
                 .httpOnly(true)
-                .secure(true)
+                .sameSite("None")
+//                .secure(true)
                 .build();
     }
 
@@ -108,6 +108,7 @@ public class JwtService {
     public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenPrefix) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
+            //TODO: 현재 여기에서 걸림 쿠키가 없다고 뜸
             throw new BusinessException(JWT_TOKEN_NOT_FOUND);
         }
         return jwtUtil.resolveTokenFromCookie(cookies, tokenPrefix);
@@ -136,8 +137,6 @@ public class JwtService {
                     .getBody()
                     .getSubject();
         } catch (Exception e) {
-            //TODO: 배포 디버그 용으로 사용
-            log.error(Arrays.toString(e.getStackTrace()));
             throw new BusinessException(ErrorCode.INVALID_JWT);
         }
     }

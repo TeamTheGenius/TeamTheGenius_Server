@@ -19,6 +19,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.security.Key;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
@@ -135,6 +136,8 @@ public class JwtService {
                     .getBody()
                     .getSubject();
         } catch (Exception e) {
+            //TODO: 배포 디버그 용으로 사용
+            log.error(Arrays.toString(e.getStackTrace()));
             throw new BusinessException(ErrorCode.INVALID_JWT);
         }
     }

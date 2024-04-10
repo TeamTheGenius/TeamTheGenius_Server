@@ -88,7 +88,7 @@ public class JwtService {
                 .maxAge(maxAgeSeconds)
                 .httpOnly(true)
                 .sameSite("None")
-//                .secure(true)
+                .secure(true)
                 .build();
     }
 
@@ -108,7 +108,6 @@ public class JwtService {
     public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenPrefix) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            //TODO: 현재 여기에서 걸림 쿠키가 없다고 뜸
             throw new BusinessException(JWT_TOKEN_NOT_FOUND);
         }
         return jwtUtil.resolveTokenFromCookie(cookies, tokenPrefix);

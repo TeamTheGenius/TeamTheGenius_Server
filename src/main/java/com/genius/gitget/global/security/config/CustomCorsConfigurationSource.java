@@ -3,14 +3,19 @@ package com.genius.gitget.global.security.config;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Component
 public class CustomCorsConfigurationSource implements CorsConfigurationSource {
-    private static final String ALLOWED_ORIGIN = "http://localhost:5173";
-    private static final List<String> ALLOWED_METHODS = List.of("POST", "GET", "PATCH", "OPTIONS", "DELETE");
+    private final String ALLOWED_ORIGIN;
+    private final List<String> ALLOWED_METHODS = List.of("POST", "GET", "PATCH", "OPTIONS", "DELETE");
+
+    public CustomCorsConfigurationSource(@Value("${url.base}") String BASE_URL) {
+        ALLOWED_ORIGIN = BASE_URL;
+    }
 
     @Override
     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {

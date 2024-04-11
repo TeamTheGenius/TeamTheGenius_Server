@@ -1,0 +1,76 @@
+name: Build and Deploy to EC2
+
+on:
+  push:
+    branches: [ "production" ] ## 나중에 production으로 변경하기
+  pull_request:
+    branches: [ "production" ]
+
+env:
+  AWS_REGION: ap-northeast-2
+  AWS_S3_BUCKET: gitget-bucket-hey
+  AWS_CODE_DEPLOY_APPLICATION: GitGet-Application-HEY
+  AWS_CODE_DEPLOY_GROUP: GitGet-CICD-group-hey
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: make application.yml
+        run: |
+          mkdir -p ./src/main/resources
+          cd ./src/main/resources
+          touch ./application.yml
+          touch ./application-common.yml
+          touch ./application-prod.yml
+          echo "${{ secrets.APPLICATION }}" > ./application.yml
+          echo "${{ secrets.COMMON }}" > ./application-common.yml
+          echo "${{ secrets.PROD }}" > ./application-prod.yml
+
+      - name: make test application.yml
+        run: |
+          mkdir -p ./src/test/resources
+          cd ./src/test/resources
+          touch ./application.yml
+          touch ./application-test.yml
+          echo "${{ secrets.APPLICATION_TEST }}" > ./application.yml
+          echo "${{ secrets.TEST }}" > ./application-test.yml
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+        shell: bash
+
+      - name: Build and Test
+        run: ./gradlew build -x test #./gradlew build test
+
+      - name: Make zip file
+        run: zip -r ./$GITHUB_SHA.zip .
+        shell: bash
+
+      - name: AWS credential 설정
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY_HEY }}
+          aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY_HEY }}
+
+
+      - name: Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$AWS_S3_BUCKET/$GITHUB_SHA.zip
+
+      - name: EC2에 배포
+        run: aws deploy create-deployment --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} --s3-location bucket=$AWS_S3_BUCKET,key=$GITHUB_SHA.zip,bundleType=zip
+
+
+

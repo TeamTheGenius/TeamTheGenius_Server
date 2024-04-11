@@ -9,7 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -17,11 +17,19 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
-@RequiredArgsConstructor
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final String SIGNUP_URL = "http://localhost:5173/login/signup";
-    private final String AUTH_URL = "http://localhost:5173/auth";
+    private final String SIGNUP_URL;
+    private final String AUTH_URL;
     private final UserRepository userRepository;
+
+    public OAuth2SuccessHandler(@Value("${url.base}") String BASE_URL,
+                                @Value("${url.path.signup}") String SIGN_UP_PATH,
+                                @Value("${url.path.auth}") String AUTH_PATH,
+                                UserRepository userRepository) {
+        this.userRepository = userRepository;
+        this.SIGNUP_URL = BASE_URL + SIGN_UP_PATH;
+        this.AUTH_URL = BASE_URL + AUTH_PATH;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,

@@ -87,6 +87,7 @@ public class JwtService {
                 .path("/")
                 .maxAge(maxAgeSeconds)
                 .httpOnly(true)
+                .sameSite("None")
                 .secure(true)
                 .build();
     }

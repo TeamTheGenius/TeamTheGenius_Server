@@ -8,8 +8,9 @@ echo ">>> build 파일 복사" >> /home/ubuntu/deploy.log
 DEPLOY_PATH=/home/ubuntu/app/
 cp $BUILD_JAR $DEPLOY_PATH
 
-echo ">>> 현재 실행중인 애플리케이션 pid 확인" >> /home/ubuntu/deploy.log
-pkill -9 -ef java
+echo ">>> 현재 실행중인 애플리케이션 pid 확인 후 일괄 종료" >> /home/ubuntu/deploy.log
+sudo ps -ef | grep java | awk '{print $2}' | xargs kill -15
+#pkill -9 -ef java
 #CURRENT_PID=$(pgrep -f $JAR_NAME)
 #
 #if [ -z $CURRENT_PID ]

@@ -12,6 +12,7 @@ import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -45,7 +46,8 @@ public class InstanceService {
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
         // 파일 업로드
-        Files uploadedFile = filesService.uploadFile(topic.getFiles(), multipartFile, type);
+        FileType fileType = FileType.findType(type);
+        Files uploadedFile = filesService.uploadFile(topic.getFiles(), multipartFile, fileType);
 
         // 인스턴스 생성 일자 검증
         validatePeriod(instanceCreateRequest, currentDate);

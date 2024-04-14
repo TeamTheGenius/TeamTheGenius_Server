@@ -33,6 +33,8 @@ import org.springframework.web.multipart.MultipartFile;
 @ActiveProfiles({"file"})
 class FileUtilTest {
     @Autowired
+    private FileUtil fileUtil;
+    @Autowired
     private FilesService filesService;
     @Value("${file.upload.path}")
     private String UPLOAD_PATH;
@@ -44,7 +46,7 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile(null);
 
         //when&then
-        assertThatThrownBy(() -> FileUtil.validateFile(multipartFile))
+        assertThatThrownBy(() -> fileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(FILE_NOT_EXIST.getMessage());
     }
@@ -56,7 +58,7 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile("");
 
         //when&then
-        assertThatThrownBy(() -> FileUtil.validateFile(multipartFile))
+        assertThatThrownBy(() -> fileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(FILE_NOT_EXIST.getMessage());
     }
@@ -68,7 +70,7 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile("sky.pdf");
 
         //when&then
-        assertThatThrownBy(() -> FileUtil.validateFile(multipartFile))
+        assertThatThrownBy(() -> fileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_SUPPORTED_EXTENSION.getMessage());
     }
@@ -80,7 +82,7 @@ class FileUtilTest {
         MultipartFile multipartFile = getTestMultiPartFile("sky.png");
 
         //when
-        UploadDTO uploadDTO = FileUtil.getUploadInfo(multipartFile, "profile", UPLOAD_PATH);
+        UploadDTO uploadDTO = fileUtil.getUploadInfo(multipartFile, FileType.PROFILE, UPLOAD_PATH);
 
         //then
         assertThat(uploadDTO.fileURI()).contains(UPLOAD_PATH);
@@ -95,7 +97,7 @@ class FileUtilTest {
         FileType fileType = FileType.PROFILE;
 
         //when
-        UpdateDTO updateDTO = FileUtil.getUpdateInfo(multipartFile, fileType, UPLOAD_PATH);
+        UpdateDTO updateDTO = fileUtil.getUpdateInfo(multipartFile, fileType, UPLOAD_PATH);
 
         //then
         assertThat(updateDTO.originalFilename()).isEqualTo(originalFilename);
@@ -115,7 +117,7 @@ class FileUtilTest {
                 .build();
 
         //when
-        CopyDTO copyDTO = FileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
+        CopyDTO copyDTO = fileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
 
         //then
         assertThat(copyDTO.fileType()).isEqualTo(INSTANCE);
@@ -130,7 +132,7 @@ class FileUtilTest {
         Files files = filesService.uploadFile(multipartFile, "topic");
 
         //when
-        String encoded = FileUtil.encodedImage(files);
+        String encoded = fileUtil.encodedImage(files);
 
         //then
         log.info(encoded);

@@ -4,6 +4,7 @@ import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
@@ -35,7 +36,7 @@ public class FilesController {
             @RequestPart(value = "files") MultipartFile multipartFile,
             @RequestPart(value = "type") String type) throws IOException {
 
-        Files files = filesService.uploadFile(multipartFile, type);
+        Files files = filesService.uploadFile(multipartFile, FileType.INSTANCE);
         FileResponse fileResponse = FileResponse.createExistFile(files);
 
         return ResponseEntity.ok().body(

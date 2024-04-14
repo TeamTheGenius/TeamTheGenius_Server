@@ -1,6 +1,7 @@
 package com.genius.gitget.global.util.config;
 
 import com.genius.gitget.global.file.service.FileManager;
+import com.genius.gitget.global.file.service.FileUtil;
 import com.genius.gitget.global.file.service.LocalFileManager;
 import com.genius.gitget.global.file.service.S3FileManager;
 import com.genius.gitget.global.util.formatter.LocalDateFormatter;
@@ -19,13 +20,18 @@ public class AppConfig {
     private final Environment env;
 
     @Bean
+    public FileUtil fileUtil() {
+        return new FileUtil();
+    }
+
+    @Bean
     public FileManager fileManager() {
         final String fileMode = env.getProperty("file.mode");
         final String UPLOAD_PATH = env.getProperty("file.upload.path");
         assert fileMode != null;
 
         if (fileMode.equals("local")) {
-            return new LocalFileManager(UPLOAD_PATH);
+            return new LocalFileManager(fileUtil(), UPLOAD_PATH);
         }
         return new S3FileManager();
     }

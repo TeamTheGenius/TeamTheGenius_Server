@@ -101,7 +101,8 @@ public class ProfileService {
 
         if (multipartFile != null) {
             if (findUser.getFiles().isEmpty()) {
-                Files uploadedFile = filesService.uploadFile(multipartFile, type);
+                FileType fileType = FileType.findType(type);
+                Files uploadedFile = filesService.uploadFile(multipartFile, fileType);
                 findUser.setFiles(uploadedFile);
             } else {
                 filesService.updateFile(findUser.getFiles().get().getId(), multipartFile);

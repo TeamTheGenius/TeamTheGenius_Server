@@ -6,6 +6,7 @@ import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.dto.TopicPagingResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -51,11 +52,8 @@ public class TopicService {
     // 토픽 생성 요청
     @Transactional
     public Long createTopic(TopicCreateRequest topicCreateRequest, MultipartFile multipartFile, String type) {
-        System.out.println("토픽 생성 요청");
-        System.out.println(topicCreateRequest.title());
-        System.out.println(multipartFile.getOriginalFilename());
-        System.out.println(type);
-        Files uploadedFile = filesService.uploadFile(multipartFile, type);
+        FileType fileType = FileType.findType(type);
+        Files uploadedFile = filesService.uploadFile(multipartFile, fileType);
 
         Topic topic = Topic.builder()
                 .title(topicCreateRequest.title())

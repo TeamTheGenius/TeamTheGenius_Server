@@ -11,6 +11,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.dto.AuthResponse;
@@ -65,7 +66,7 @@ public class UserService {
                 interest);
         updateRole(user);
 
-        Files files = filesService.uploadFile(multipartFile, "profile");
+        Files files = filesService.uploadFile(multipartFile, FileType.PROFILE);
         user.setFiles(files);
 
         return user.getId();

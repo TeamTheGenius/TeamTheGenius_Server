@@ -129,7 +129,7 @@ class FileUtilTest {
     public void should_getEncodedFiles() {
         //given
         MultipartFile multipartFile = FileTestUtil.getMultipartFile("filename");
-        Files files = filesService.uploadFile(multipartFile, "topic");
+        Files files = filesService.uploadFile(multipartFile, TOPIC);
 
         //when
         String encoded = fileUtil.encodedImage(files);

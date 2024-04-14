@@ -21,6 +21,7 @@ import com.genius.gitget.challenge.likes.service.LikesService;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.constants.ProviderInfo;
@@ -229,7 +230,7 @@ public class LikesControllerTest {
 
     private Topic getSavedTopic() {
         MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-        Files files = filesService.uploadFile(filename, "topic");
+        Files files = filesService.uploadFile(filename, FileType.TOPIC);
 
         Topic topic = topicRepository.save(
                 Topic.builder()

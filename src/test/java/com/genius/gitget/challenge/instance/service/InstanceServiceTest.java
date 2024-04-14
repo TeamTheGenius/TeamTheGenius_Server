@@ -206,52 +206,6 @@ public class InstanceServiceTest {
         });
     }
 
-    @Nested
-    public class 인스턴스_삭제할_때 {
-        private Topic topic;
-        private Instance instance1, instance2, instance3;
-
-        @BeforeEach
-        public void setup() {
-            topic = getSavedTopic("1일 1공부", "BE, ML");
-            instance1 = getSavedInstance("1일 1공부", "BE, ML", 100);
-            instance2 = getSavedInstance("1일 3공부", "BE, ML", 100);
-            instance3 = getSavedInstance("1일 3공부", "BE, ML", 100);
-            instance1.setTopic(topic);
-            instance2.setTopic(topic);
-        }
-
-        @Test
-        public void 해당_아이디가_존재한다면_삭제할_수_있다() {
-            Long id = instance1.getId();
-            instanceService.deleteInstance(id);
-
-            assertThrows(BusinessException.class, () -> {
-                instanceService.getInstanceById(id);
-            });
-        }
-
-        @Test
-        public void 해당_아이디가_존재하지_않는다면_삭제할_수_없다() {
-            Long id = instance3.getId() + 1L;
-            assertThrows(BusinessException.class, () -> {
-                instanceService.deleteInstance(id);
-            });
-        }
-
-        @Test
-        public void 해당_인스턴스에_파일이_존재한다면_같이_삭제한다() {
-            MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-            Files files1 = filesService.uploadFile(filename, "instance");
-
-            instance1.setFiles(files1);
-            instanceRepository.save(instance1);
-
-            instanceService.deleteInstance(instance1.getId());
-        }
-    }
-
-
     private Topic getSavedTopic(String title, String tags) {
         Topic topic = topicRepository.save(
                 Topic.builder()
@@ -304,5 +258,50 @@ public class InstanceServiceTest {
                         .fileType(fileType)
                         .build()
         );
+    }
+
+    @Nested
+    public class 인스턴스_삭제할_때 {
+        private Topic topic;
+        private Instance instance1, instance2, instance3;
+
+        @BeforeEach
+        public void setup() {
+            topic = getSavedTopic("1일 1공부", "BE, ML");
+            instance1 = getSavedInstance("1일 1공부", "BE, ML", 100);
+            instance2 = getSavedInstance("1일 3공부", "BE, ML", 100);
+            instance3 = getSavedInstance("1일 3공부", "BE, ML", 100);
+            instance1.setTopic(topic);
+            instance2.setTopic(topic);
+        }
+
+        @Test
+        public void 해당_아이디가_존재한다면_삭제할_수_있다() {
+            Long id = instance1.getId();
+            instanceService.deleteInstance(id);
+
+            assertThrows(BusinessException.class, () -> {
+                instanceService.getInstanceById(id);
+            });
+        }
+
+        @Test
+        public void 해당_아이디가_존재하지_않는다면_삭제할_수_없다() {
+            Long id = instance3.getId() + 1L;
+            assertThrows(BusinessException.class, () -> {
+                instanceService.deleteInstance(id);
+            });
+        }
+
+        @Test
+        public void 해당_인스턴스에_파일이_존재한다면_같이_삭제한다() {
+            MultipartFile filename = FileTestUtil.getMultipartFile("sky");
+            Files files1 = filesService.uploadFile(filename, FileType.INSTANCE);
+
+            instance1.setFiles(files1);
+            instanceRepository.save(instance1);
+
+            instanceService.deleteInstance(instance1.getId());
+        }
     }
 }

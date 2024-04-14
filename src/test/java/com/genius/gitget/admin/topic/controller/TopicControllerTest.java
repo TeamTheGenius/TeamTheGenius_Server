@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.user.domain.Role;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.util.TokenTestUtil;
@@ -117,7 +118,7 @@ public class TopicControllerTest {
 
     private Topic getSavedTopic() {
         MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-        Files files = filesService.uploadFile(filename, "topic");
+        Files files = filesService.uploadFile(filename, FileType.TOPIC);
 
         Topic topic = topicRepository.save(
                 Topic.builder()

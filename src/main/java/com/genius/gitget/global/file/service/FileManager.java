@@ -1,10 +1,16 @@
 package com.genius.gitget.global.file.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_ENCODED;
+
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
-import com.genius.gitget.global.file.dto.CopyDTO;
+import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
-import com.genius.gitget.global.file.dto.UploadDTO;
+import com.genius.gitget.global.util.exception.BusinessException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +18,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Transactional(readOnly = true)
 public interface FileManager {
-    String getEncodedImage(Files files);
+
+    /**
+     * Files 객체를 전달하여 저장했던 이미지를 base64로 encode한 결과물(문자열) 반환
+     *
+     * @param files 찾고자하는 이미지 정보를 담고 있는 Files 객체
+     * @return 이미지를 base64로 Encode한 결과를 반환
+     */
+    UrlResource download(Files files);
 
     /**
      * 전달한 파일 저장 후, Files 객체 형성에 필요한 정보를 담은 객체 반환
@@ -21,9 +34,16 @@ public interface FileManager {
      * @param fileType      저장하고자하는 파일의 종류 (Topic, Instance, Profile 중 1)
      * @return Files 객체 생성에 필요한 정보(UploadDTO) 반환
      */
-    UploadDTO upload(MultipartFile multipartFile, FileType fileType);
+    FileDTO upload(MultipartFile multipartFile, FileType fileType);
 
-    CopyDTO copy(Files files, FileType fileType);
+    /**
+     * 기존에 저장소에 저장되어 있던 파일을
+     *
+     * @param files    복사하고자하는 파일의 정보를 담고 있는 Files 객체
+     * @param fileType 복사해서 적용하고 싶은 대상의 파일 타입(TOPIC/INSTANCE/PROFILE 중 택 1)
+     * @return Files 객체 생성에 필요한 정보(UploadDTO) 반환
+     */
+    FileDTO copy(Files files, FileType fileType);
 
     /**
      * @param files         대체 하고자하는 대상 객체
@@ -39,4 +59,13 @@ public interface FileManager {
      * @throws BusinessException 삭제에 실패했을 때 발생
      */
     void deleteInStorage(Files files);
+
+    default String encodeImage(UrlResource urlResource) {
+        try {
+            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
+            return new String(encode, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new BusinessException(IMAGE_NOT_ENCODED);
+        }
+    }
 }

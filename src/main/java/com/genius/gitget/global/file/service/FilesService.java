@@ -4,15 +4,15 @@ import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
-import com.genius.gitget.global.file.dto.CopyDTO;
+import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.dto.UpdateDTO;
-import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,53 +20,43 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class FilesService {
-    private final String UPLOAD_PATH;
     private final FileManager fileManager;
     private final FilesRepository filesRepository;
 
-    public FilesService(@Value("${file.upload.path}") String UPLOAD_PATH, FileManager fileManager,
-                        FilesRepository filesRepository) {
-        this.UPLOAD_PATH = UPLOAD_PATH;
-        this.fileManager = fileManager;
-        this.filesRepository = filesRepository;
-    }
 
-
-    // TODO: instance 대상으로 사용하는 부분
-    // instance 생성 요청을 했을 때, 전달받은 MultipartFile이 없는 경우 토픽의 MultipartFile을 사용해야 함
-    @Transactional
-    public Files uploadFile(Optional<Files> optionalFiles, MultipartFile receivedFile, FileType fileType) {
-        if (receivedFile != null) {
-            return uploadFile(receivedFile, fileType);
+    public String getEncodedImage(Optional<Files> optionalFiles) {
+        if (optionalFiles.isEmpty()) {
+            return "none";
         }
 
-        Files files = optionalFiles.orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
-        CopyDTO copyDTO = fileManager.copy(files, FileType.INSTANCE);
+        Files files = optionalFiles.get();
 
-        //REFACTOR: 정적 팩토리 메서드로 처리하면 깔끔할 듯!
-        Files copyFiles = Files.builder()
-                .originalFilename(copyDTO.originalFilename())
-                .savedFilename(copyDTO.savedFilename())
-                .fileType(copyDTO.fileType())
-                .fileURI(copyDTO.fileURI())
-                .build();
-        
-        return filesRepository.save(copyFiles);
+        UrlResource urlResource = fileManager.download(files);
+        return fileManager.encodeImage(urlResource);
     }
 
     @Transactional
     public Files uploadFile(MultipartFile multipartFile, FileType fileType) {
-        UploadDTO uploadDTO = fileManager.upload(multipartFile, fileType);
+        FileDTO fileDTO = fileManager.upload(multipartFile, fileType);
 
         Files file = Files.builder()
-                .originalFilename(uploadDTO.originalFilename())
-                .savedFilename(uploadDTO.savedFilename())
-                .fileType(uploadDTO.fileType())
-                .fileURI(uploadDTO.fileURI())
+                .originalFilename(fileDTO.originalFilename())
+                .savedFilename(fileDTO.savedFilename())
+                .fileType(fileDTO.fileType())
+                .fileURI(fileDTO.fileURI())
                 .build();
 
         return filesRepository.save(file);
+    }
+
+    @Transactional
+    public Files copyFile(Files files, FileType fileType) {
+        FileDTO fileDTO = fileManager.copy(files, fileType);
+
+        Files copyFiles = Files.create(fileDTO);
+        return filesRepository.save(copyFiles);
     }
 
     @Transactional

@@ -33,7 +33,7 @@ public class AppConfig {
         if (fileMode.equals("local")) {
             return new LocalFileManager(fileUtil(), UPLOAD_PATH);
         }
-        return new S3FileManager();
+        return new S3FileManager(fileUtil());
     }
 
     @Bean

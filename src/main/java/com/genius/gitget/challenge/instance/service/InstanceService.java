@@ -47,7 +47,13 @@ public class InstanceService {
 
         // 파일 업로드
         FileType fileType = FileType.findType(type);
-        Files uploadedFile = filesService.uploadFile(topic.getFiles(), multipartFile, fileType);
+        Files uploadedFile;
+        if (multipartFile != null) {
+            uploadedFile = filesService.uploadFile(multipartFile, fileType);
+        } else {
+            Files files = topic.getFiles().get();
+            uploadedFile = filesService.copyFile(topic.getFiles().get(), fileType);
+        }
 
         // 인스턴스 생성 일자 검증
         validatePeriod(instanceCreateRequest, currentDate);

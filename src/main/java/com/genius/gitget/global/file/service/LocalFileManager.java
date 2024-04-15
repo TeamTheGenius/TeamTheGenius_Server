@@ -3,19 +3,17 @@ package com.genius.gitget.global.file.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_COPIED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_SAVED;
-import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_ENCODED;
 
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.CopyDTO;
+import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
-import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.net.MalformedURLException;
 import java.nio.file.StandardCopyOption;
-import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,33 +28,30 @@ public class LocalFileManager implements FileManager {
         this.UPLOAD_PATH = UPLOAD_PATH;
     }
 
-    @Override
-    public String getEncodedImage(Files files) {
-        try {
-            UrlResource urlResource = new UrlResource("file:" + files.getFileURI());
-
-            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
-            return new String(encode, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new BusinessException(IMAGE_NOT_ENCODED);
-        }
-    }
-
 
     @Override
-    public UploadDTO upload(MultipartFile multipartFile, FileType fileType) {
+    public FileDTO upload(MultipartFile multipartFile, FileType fileType) {
         fileUtil.validateFile(multipartFile);
-        UploadDTO uploadDTO = fileUtil.getUploadInfo(multipartFile, fileType, UPLOAD_PATH);
+        FileDTO fileDTO = fileUtil.getFileDTO(multipartFile, fileType, UPLOAD_PATH);
 
         try {
-            File file = new File(uploadDTO.fileURI());
-            fileUtil.createPath(uploadDTO.fileURI());
+            File file = new File(fileDTO.fileURI());
+            fileUtil.createPath(fileDTO.fileURI());
             multipartFile.transferTo(file);
         } catch (IOException e) {
             throw new BusinessException(FILE_NOT_SAVED);
         }
 
-        return uploadDTO;
+        return fileDTO;
+    }
+
+    @Override
+    public UrlResource download(Files files) {
+        try {
+            return new UrlResource("file:" + files.getFileURI());
+        } catch (MalformedURLException e) {
+            throw new BusinessException(e);
+        }
     }
 
     /**
@@ -66,7 +61,7 @@ public class LocalFileManager implements FileManager {
      * 3. 저장한 파일에 관련된 값 반환
      */
     @Override
-    public CopyDTO copy(Files files, FileType fileType) {
+    public FileDTO copy(Files files, FileType fileType) {
         CopyDTO copyDTO = fileUtil.getCopyInfo(files, fileType, UPLOAD_PATH);
         fileUtil.createPath(copyDTO.folderURI());
 
@@ -79,7 +74,12 @@ public class LocalFileManager implements FileManager {
         } catch (IOException e) {
             throw new BusinessException(FILE_NOT_COPIED);
         }
-        return copyDTO;
+        return FileDTO.builder()
+                .fileType(fileType)
+                .originalFilename(copyDTO.originalFilename())
+                .savedFilename(copyDTO.savedFilename())
+                .fileURI(copyDTO.fileURI())
+                .build();
     }
 
 
@@ -92,9 +92,9 @@ public class LocalFileManager implements FileManager {
     @Override
     public UpdateDTO update(Files files, MultipartFile multipartFile) {
         deleteInStorage(files);
-        UploadDTO uploadDTO = upload(multipartFile, files.getFileType());
+        FileDTO fileDTO = upload(multipartFile, files.getFileType());
 
-        return UpdateDTO.of(uploadDTO);
+        return UpdateDTO.of(fileDTO);
     }
 
     @Override

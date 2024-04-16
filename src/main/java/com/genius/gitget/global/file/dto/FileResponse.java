@@ -16,8 +16,11 @@ public record FileResponse(
     }
 
     public static FileResponse createExistFile(Files files) {
-        //TODO: FileUtil.encodedImage()의 내용이 로컬 저장소 구현에 종속되어 있음. 수정 필요
         return new FileResponse(files.getId(), FileUtil.encodedImage(files));
+    }
+
+    public static FileResponse createExistFile(Long filesId, String encodedFile) {
+        return new FileResponse(filesId, encodedFile);
     }
 
     public static FileResponse createNotExistFile() {

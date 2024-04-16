@@ -245,7 +245,7 @@ public class CertificationService {
 
     public InstancePreviewResponse getInstancePreview(Long instanceId) {
         Instance instance = instanceProvider.findById(instanceId);
-        FileResponse fileResponse = filesService.getEncodedFile(instance.getFiles());
+        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
         return InstancePreviewResponse.createByEntity(instance, fileResponse);
     }
 

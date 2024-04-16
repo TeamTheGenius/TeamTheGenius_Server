@@ -12,7 +12,6 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,17 +24,6 @@ public class FilesService {
     private final FileManager fileManager;
     private final FilesRepository filesRepository;
 
-
-    public String getEncodedImage(Optional<Files> optionalFiles) {
-        if (optionalFiles.isEmpty()) {
-            return "none";
-        }
-
-        Files files = optionalFiles.get();
-
-        UrlResource urlResource = fileManager.download(files);
-        return fileManager.encodeImage(urlResource);
-    }
 
     @Transactional
     public Files uploadFile(MultipartFile multipartFile, FileType fileType) {
@@ -87,17 +75,17 @@ public class FilesService {
         filesRepository.delete(files);
     }
 
-    public FileResponse getEncodedFile(Long fileId) {
-        Optional<Files> optionalFiles = filesRepository.findById(fileId);
-        return optionalFiles
-                .map(FileResponse::createExistFile)
-                .orElseGet(FileResponse::createNotExistFile);
-
+    public Files findById(Long fileId) {
+        return filesRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
     }
 
-    public FileResponse getEncodedFile(Optional<Files> optionalFiles) {
+    public FileResponse convertToFileResponse(Optional<Files> optionalFiles) {
         return optionalFiles
-                .map(FileResponse::createExistFile)
+                .map(files -> {
+                    String encodedImage = fileManager.getEncodedImage(files);
+                    return FileResponse.createExistFile(files.getId(), encodedImage);
+                })
                 .orElseGet(FileResponse::createNotExistFile);
     }
 }

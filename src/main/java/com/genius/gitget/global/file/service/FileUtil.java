@@ -35,15 +35,6 @@ public class FileUtil {
         }
     }
 
-    public static String getEncodedImage(UrlResource urlResource) {
-        try {
-            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
-            return new String(encode, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new BusinessException(IMAGE_NOT_ENCODED);
-        }
-    }
-
     public FileDTO getFileDTO(MultipartFile file, FileType fileType, final String UPLOAD_PATH) {
         String originalFilename = file.getOriginalFilename();
         String savedFilename = getSavedFilename(originalFilename);

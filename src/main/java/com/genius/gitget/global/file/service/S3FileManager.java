@@ -5,7 +5,6 @@ import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -20,8 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class S3FileManager implements FileManager {
     private final FileUtil fileUtil;
 
+
     @Override
-    public UrlResource download(Files files) {
+    public String getEncodedImage(Files files) {
         return null;
     }
 

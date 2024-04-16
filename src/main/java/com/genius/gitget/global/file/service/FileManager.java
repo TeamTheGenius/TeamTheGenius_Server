@@ -1,16 +1,10 @@
 package com.genius.gitget.global.file.service;
 
-import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_ENCODED;
-
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,12 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FileManager {
 
     /**
-     * Files 객체를 전달하여 저장했던 이미지를 base64로 encode한 결과물(문자열) 반환
+     * Files 내에 저장된 값들을 통해 UrlResource 등으로 다운받은 후, base64로 인코딩한 결과 반환
      *
-     * @param files 찾고자하는 이미지 정보를 담고 있는 Files 객체
-     * @return 이미지를 base64로 Encode한 결과를 반환
+     * @param files 얻기 원하는 파일의 정보를 담고 있는 Files 객체
+     * @return base64로 encode한 결과 값(문자열)
      */
-    UrlResource download(Files files);
+    String getEncodedImage(Files files);
 
     /**
      * 전달한 파일 저장 후, Files 객체 형성에 필요한 정보를 담은 객체 반환
@@ -61,17 +55,4 @@ public interface FileManager {
      * @throws BusinessException 삭제에 실패했을 때 발생
      */
     void deleteInStorage(Files files);
-
-    /**
-     * @param urlResource 인코딩 할 객체
-     * @return base64로 인코딩한 문자열
-     */
-    default String encodeImage(UrlResource urlResource) {
-        try {
-            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
-            return new String(encode, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new BusinessException(IMAGE_NOT_ENCODED);
-        }
-    }
 }

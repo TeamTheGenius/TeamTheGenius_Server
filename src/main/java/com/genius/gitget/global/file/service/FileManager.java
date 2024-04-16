@@ -37,7 +37,7 @@ public interface FileManager {
     FileDTO upload(MultipartFile multipartFile, FileType fileType);
 
     /**
-     * 기존에 저장소에 저장되어 있던 파일을
+     * 기존에 저장소에 저장되어 있던 파일을 특정 타입에 복사 후, Files 객체 생성에 필요한 정보들을 반환
      *
      * @param files    복사하고자하는 파일의 정보를 담고 있는 Files 객체
      * @param fileType 복사해서 적용하고 싶은 대상의 파일 타입(TOPIC/INSTANCE/PROFILE 중 택 1)
@@ -46,6 +46,8 @@ public interface FileManager {
     FileDTO copy(Files files, FileType fileType);
 
     /**
+     * Files에 해당하는 이미지를 찾아서 삭제 및 새로운 이미지 저장 후, Files 내용 갱신에 필요한 정보들을 반환
+     *
      * @param files         대체 하고자하는 대상 객체
      * @param multipartFile 저장하고자하는 파일
      * @return Files 내용 갱신에 필요한 정보(UpdateDTO) 반환
@@ -60,6 +62,10 @@ public interface FileManager {
      */
     void deleteInStorage(Files files);
 
+    /**
+     * @param urlResource 인코딩 할 객체
+     * @return base64로 인코딩한 문자열
+     */
     default String encodeImage(UrlResource urlResource) {
         try {
             byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());

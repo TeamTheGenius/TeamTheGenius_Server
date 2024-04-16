@@ -28,7 +28,6 @@ public class LocalFileManager implements FileManager {
         this.UPLOAD_PATH = UPLOAD_PATH;
     }
 
-
     @Override
     public FileDTO upload(MultipartFile multipartFile, FileType fileType) {
         fileUtil.validateFile(multipartFile);
@@ -36,7 +35,7 @@ public class LocalFileManager implements FileManager {
 
         try {
             File file = new File(fileDTO.fileURI());
-            fileUtil.createPath(fileDTO.fileURI());
+            createPath(fileDTO.fileURI());
             multipartFile.transferTo(file);
         } catch (IOException e) {
             throw new BusinessException(FILE_NOT_SAVED);
@@ -54,16 +53,10 @@ public class LocalFileManager implements FileManager {
         }
     }
 
-    /**
-     * 복사하는 과정 -> topic에서 instance로 복사하고 싶을 수도 있음
-     * 1. Files에 기존에 있던 파일을 찾고, savedFilename 및 fileURI 재발급
-     * 2. 저장소에 저장
-     * 3. 저장한 파일에 관련된 값 반환
-     */
     @Override
     public FileDTO copy(Files files, FileType fileType) {
         CopyDTO copyDTO = fileUtil.getCopyInfo(files, fileType, UPLOAD_PATH);
-        fileUtil.createPath(copyDTO.folderURI());
+        createPath(copyDTO.folderURI());
 
         File originFile = new File(files.getFileURI());
         File copyFile = new File(copyDTO.fileURI());
@@ -82,13 +75,6 @@ public class LocalFileManager implements FileManager {
                 .build();
     }
 
-
-    /**
-     * Update(덮어쓰기)하는 과정
-     * 1. Files를 통해 기존에 있던 파일을 찾아서 삭제
-     * 2. MultipartFile을 통해 업로드 진행
-     * 3. 업로드 된 후, 갱신에 필요한 정보 전달
-     */
     @Override
     public UpdateDTO update(Files files, MultipartFile multipartFile) {
         deleteInStorage(files);
@@ -103,6 +89,13 @@ public class LocalFileManager implements FileManager {
         File targetFile = new File(fileURI);
         if (!targetFile.delete()) {
             throw new BusinessException(FILE_NOT_DELETED);
+        }
+    }
+
+    private void createPath(String uri) {
+        File file = new File(uri);
+        if (!file.exists()) {
+            file.mkdirs();
         }
     }
 }

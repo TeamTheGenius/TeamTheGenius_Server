@@ -9,7 +9,6 @@ import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.CopyDTO;
 import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -94,12 +93,5 @@ public class FileUtil {
     private String extractExtension(String filename) {
         int index = filename.lastIndexOf(".");
         return filename.substring(index + 1).toLowerCase();
-    }
-
-    public void createPath(String uri) {
-        File file = new File(uri);
-        if (!file.exists()) {
-            file.mkdirs();
-        }
     }
 }

@@ -2,6 +2,7 @@ package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 
+import com.genius.gitget.global.file.domain.FileHolder;
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileDTO;
@@ -35,7 +36,20 @@ public class FilesService {
                 .fileType(fileDTO.fileType())
                 .fileURI(fileDTO.fileURI())
                 .build();
+        return filesRepository.save(file);
+    }
 
+    @Transactional
+    public Files uploadFile(FileHolder fileHolder, MultipartFile multipartFile, FileType fileType) {
+        FileDTO fileDTO = fileManager.upload(multipartFile, fileType);
+
+        Files file = Files.builder()
+                .originalFilename(fileDTO.originalFilename())
+                .savedFilename(fileDTO.savedFilename())
+                .fileType(fileDTO.fileType())
+                .fileURI(fileDTO.fileURI())
+                .build();
+        fileHolder.updateRelation(file);
         return filesRepository.save(file);
     }
 

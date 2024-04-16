@@ -53,7 +53,6 @@ public class TopicService {
     @Transactional
     public Long createTopic(TopicCreateRequest topicCreateRequest, MultipartFile multipartFile, String type) {
         FileType fileType = FileType.findType(type);
-        Files uploadedFile = filesService.uploadFile(multipartFile, fileType);
 
         Topic topic = Topic.builder()
                 .title(topicCreateRequest.title())
@@ -63,8 +62,7 @@ public class TopicService {
                 .notice(topicCreateRequest.notice())
                 .build();
 
-        topic.setFiles(uploadedFile);
-
+        filesService.uploadFile(topic, multipartFile, fileType);
         Topic savedTopic = topicRepository.save(topic);
 
         return savedTopic.getId();

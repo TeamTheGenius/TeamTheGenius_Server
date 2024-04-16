@@ -1,6 +1,7 @@
 package com.genius.gitget.admin.topic.domain;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.global.file.domain.FileHolder;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import jakarta.persistence.CascadeType;
@@ -26,7 +27,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "topic")
-public class Topic extends BaseTimeEntity {
+public class Topic extends BaseTimeEntity implements FileHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "topic_id")
@@ -78,6 +79,11 @@ public class Topic extends BaseTimeEntity {
     }
 
     public void setFiles(Files files) {
+        this.files = files;
+    }
+
+    @Override
+    public void updateRelation(Files files) {
         this.files = files;
     }
 }

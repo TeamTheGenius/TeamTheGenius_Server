@@ -45,16 +45,6 @@ public class InstanceService {
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
 
-        // 파일 업로드
-        FileType fileType = FileType.findType(type);
-        Files uploadedFile;
-        if (multipartFile != null) {
-            uploadedFile = filesService.uploadFile(multipartFile, fileType);
-        } else {
-            Files files = topic.getFiles().get();
-            uploadedFile = filesService.copyFile(topic.getFiles().get(), fileType);
-        }
-
         // 인스턴스 생성 일자 검증
         validatePeriod(instanceCreateRequest, currentDate);
 
@@ -65,6 +55,16 @@ public class InstanceService {
         // from dto to entity 변환 및 uuid 설정
         Instance instance = Instance.createByRequest(instanceCreateRequest);
         instance.setInstanceUUID(uuid);
+
+        // 파일 업로드
+        FileType fileType = FileType.findType(type);
+        Files uploadedFile;
+        if (multipartFile != null) {
+            uploadedFile = filesService.uploadFile(instance, multipartFile, fileType);
+        } else {
+            Files files = topic.getFiles().get();
+            uploadedFile = filesService.copyFile(topic.getFiles().get(), fileType);
+        }
 
         // 연관 관계 설정
         instance.setTopic(topic);

@@ -9,9 +9,11 @@ import com.genius.gitget.global.file.service.FileManager;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,11 +32,26 @@ public class FileTestController {
     private final FilesService filesService;
     private final FileManager fileManager;
 
+
+    @GetMapping("/{fileId}")
+    public ResponseEntity<SingleResponse<FileResponse>> download(
+            @PathVariable Long fileId
+    ) {
+        Files files = filesService.findById(fileId);
+        FileResponse fileResponse = filesService.convertToFileResponse(Optional.ofNullable(files));
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), fileResponse)
+        );
+    }
+
     @PostMapping
     public ResponseEntity<SingleResponse<FileResponse>> upload(
-            @RequestParam("files") MultipartFile multipartFile
+            @RequestParam("files") MultipartFile multipartFile,
+            @RequestParam("type") String type
     ) {
-        Files files = filesService.uploadFile(multipartFile, FileType.TOPIC);
+        FileType fileType = FileType.findType(type);
+        Files files = filesService.uploadFile(multipartFile, fileType);
         String encodedImage = fileManager.getEncodedImage(files);
         FileResponse fileResponse = FileResponse.createExistFile(files.getId(), encodedImage);
 

@@ -9,10 +9,10 @@ TARGET_PORT=0
 echo "> Current port of running WAS is ${CURRENT_PORT}."
 
 # 현재 포트가 8081이면 새로 WAS를 띄울 타겟 포트는 8082, 반대라면 8081
-if [ ${CURRENT_PORT} -eq 8081 ]; then
-  TARGET_PORT=8082
-elif [ ${CURRENT_PORT} -eq 8082 ]; then
+if [ ${CURRENT_PORT} -eq 8080 ]; then
   TARGET_PORT=8081
+elif [ ${CURRENT_PORT} -eq 8081 ]; then
+  TARGET_PORT=8080
 else
   echo "> No WAS is connected to nginx"
 fi

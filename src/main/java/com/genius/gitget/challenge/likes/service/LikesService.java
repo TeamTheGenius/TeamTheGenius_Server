@@ -9,6 +9,7 @@ import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 public class LikesService {
+    private final FilesService filesService;
     private final UserRepository userRepository;
     private final InstanceRepository instanceRepository;
     private final LikesRepository likesRepository;
@@ -43,12 +45,14 @@ public class LikesService {
 
         for (Likes like : likes) {
             Instance instance = like.getInstance();
+            FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+
             UserLikesResponse userLikesResponse = UserLikesResponse.builder()
                     .likesId(like.getId())
                     .instanceId(instance.getId())
                     .title(instance.getTitle())
                     .pointPerPerson(instance.getPointPerPerson())
-                    .fileResponse(FileResponse.create(instance.getFiles()))
+                    .fileResponse(fileResponse)
                     .build();
 
             userLikesResponses.add(userLikesResponse);
@@ -64,7 +68,6 @@ public class LikesService {
         User findUser = null;
 
         for (User userObject : userList) {
-            System.out.println("!!!!!!!!!" + userObject.getIdentifier() + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             if (userObject.getIdentifier().equals(identifier)) {
                 findUser = userObject;
             }
@@ -84,16 +87,6 @@ public class LikesService {
 
         likesRepository.deleteById(findLikes.getId());
     }
-
-//    @Transactional
-//    public void deleteLikesLazy(User user, Long likesId) {
-//        try {
-//            likesRepository.deleteById(likesId);
-//        } catch (Exception e) {
-//            e.getStackTrace();
-//        }
-//    }
-
 
     private List<User> verifyUser(User user) {
         return userRepository.findAllByIdentifier(user.getIdentifier());

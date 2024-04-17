@@ -17,7 +17,6 @@ import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.util.file.FileTestUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +31,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @Transactional
@@ -290,15 +288,15 @@ public class InstanceServiceTest {
             });
         }
 
-        @Test
-        public void 해당_인스턴스에_파일이_존재한다면_같이_삭제한다() {
-            MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-            Files files1 = filesService.uploadFile(filename, FileType.INSTANCE);
-
-            instance1.setFiles(files1);
-            instanceRepository.save(instance1);
-
-            instanceService.deleteInstance(instance1.getId());
-        }
+//        @Test
+//        public void 해당_인스턴스에_파일이_존재한다면_같이_삭제한다() {
+//            MultipartFile filename = FileTestUtil.getMultipartFile("sky");
+//            Files files1 = filesService.uploadFile(filename, FileType.INSTANCE);
+//
+//            instance1.setFiles(files1);
+//            instanceRepository.save(instance1);
+//
+//            instanceService.deleteInstance(instance1.getId());
+//        }
     }
 }

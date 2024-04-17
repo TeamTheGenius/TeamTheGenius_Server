@@ -46,5 +46,5 @@ jobs:
         shell: bash
 
       - name: Build and Test
-        run: ./gradlew build test
+        run: ./gradlew clean build test
 

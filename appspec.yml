@@ -17,12 +17,12 @@ permissions:
 # CodeDeploy 배포 단계에서 실행할 명령어를 지정 (차례대로 스크립트들이 실행)
 hooks:
   ApplicationStart:
-    - location: run_new_was.sh
+    - location: scripts/run_new_was.sh
       timeout: 60
       runas: ubuntu
-    - location: health_check.sh
+    - location: scripts/health_check.sh
       timeout: 60
       runas: ubuntu
-    - location: switch.sh
+    - location: scripts/switch.sh
       timeout: 60
       runas: ubuntu

@@ -118,6 +118,17 @@ public class FilesService {
         filesRepository.delete(files);
     }
 
+    @Transactional
+    public void deleteFile(Optional<Files> optionalFiles) {
+        if (optionalFiles.isEmpty()) {
+            return;
+        }
+        Files files = optionalFiles.get();
+
+        fileManager.deleteInStorage(files);
+        filesRepository.delete(files);
+    }
+
     public Files findById(Long fileId) {
         return filesRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));

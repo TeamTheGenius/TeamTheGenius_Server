@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,15 +55,15 @@ public class ProfileController {
 
     // 마이페이지 - 회원 정보 수정
     @PostMapping("/information")
-    public ResponseEntity<CommonResponse> updateUserInformation(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                                @RequestPart(value = "data") UserInformationUpdateRequest userInformationUpdateRequest,
-                                                                @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-                                                                @RequestPart(value = "type") String type) {
-        profileService.updateUserInformation(userPrincipal.getUser(), userInformationUpdateRequest, multipartFile,
-                type);
+    public ResponseEntity<SingleResponse<Long>> updateUserInformation(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody UserInformationUpdateRequest userInformationUpdateRequest) {
 
-        return ResponseEntity.ok()
-                .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
+        Long userId = profileService.updateUserInformation(userPrincipal.getUser(), userInformationUpdateRequest);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), userId)
+        );
     }
 
     // 마이페이지 - 관심사 조회

@@ -113,7 +113,7 @@ public class ProfileServiceTest {
                 UserInformationUpdateRequest.builder()
                         .nickname("수정된 nickname")
                         .information("수정된 information")
-                        .build(), null, "profile");
+                        .build());
 
         User user = userRepository.findByIdentifier(user1.getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));

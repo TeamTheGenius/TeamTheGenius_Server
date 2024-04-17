@@ -11,9 +11,7 @@ import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.global.file.domain.FileType;
-import com.genius.gitget.global.file.domain.Files;
-import com.genius.gitget.global.file.repository.FilesRepository;
+import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
@@ -33,7 +31,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -41,14 +38,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional(readOnly = true)
 public class ProfileService {
     private final UserRepository userRepository;
-    private final FilesRepository filesRepository;
     private final FilesService filesService;
     private final SignoutRepository signoutRepository;
     private final OrdersProvider ordersProvider;
-
-    private static boolean isProfileFileType(Files files) {
-        return files != null && files.getFileType().equals(FileType.PROFILE);
-    }
 
     // 포인트 조회
     public UserPointResponse getUserPoint(User user) {
@@ -62,12 +54,9 @@ public class ProfileService {
     public UserInformationResponse getUserInformation(Long userId) {
         User findUser = getUserById(userId);
         Long frameId = ordersProvider.getUsingFrameItem(userId).getId();
-        Files files = getFiles(findUser);
-        if (isProfileFileType(files)) {
-            return UserInformationResponse.createByEntity(findUser, frameId, files);
-        } else {
-            return UserInformationResponse.createByEntity(findUser, frameId, null);
-        }
+
+        FileResponse fileResponse = filesService.convertToFileResponse(findUser.getFiles());
+        return UserInformationResponse.createByEntity(findUser, frameId, fileResponse);
     }
 
     // 마이페이지 - 사용자 정보 상세 조회
@@ -82,40 +71,30 @@ public class ProfileService {
                 participantCount = (joinResult == SUCCESS) ? participantCount + 1 : participantCount - 1;
             }
         }
-        Files files = getFiles(findUser);
-        if (isProfileFileType(files)) {
-            return UserDetailsInformationResponse.createByEntity(findUser, files, participantCount);
-        } else {
-            return UserDetailsInformationResponse.createByEntity(findUser, null, participantCount);
-        }
+        FileResponse fileResponse = filesService.convertToFileResponse(findUser.getFiles());
+        return UserDetailsInformationResponse.createByEntity(findUser, participantCount, fileResponse);
     }
 
     // 마이페이지 - 사용자 정보 수정
     @Transactional
-    public void updateUserInformation(User user, UserInformationUpdateRequest userInformationUpdateRequest,
-                                      MultipartFile multipartFile, String type) {
+    public Long updateUserInformation(User user, UserInformationUpdateRequest userInformationUpdateRequest) {
         User findUser = getUserByIdentifier(user.getIdentifier());
         findUser.updateUserInformation(
                 userInformationUpdateRequest.getNickname(),
                 userInformationUpdateRequest.getInformation());
 
-        if (multipartFile != null) {
-            if (findUser.getFiles().isEmpty()) {
-                FileType fileType = FileType.findType(type);
-                Files uploadedFile = filesService.uploadFile(findUser, multipartFile, fileType);
-                findUser.setFiles(uploadedFile);
-            } else {
-                filesService.updateFile(findUser.getFiles().get().getId(), multipartFile);
-            }
-        }
-        userRepository.save(findUser);
+        User updatedUser = userRepository.save(findUser);
+        return updatedUser.getId();
     }
 
     // 마이페이지 - 회원 탈퇴
     @Transactional
     public void deleteUserInformation(User user, String reason) {
         User findUser = getUserByIdentifier(user.getIdentifier());
+
+        filesService.deleteFile(findUser.getFiles());
         findUser.setFiles(null);
+
         findUser.deleteLikesList();
         userRepository.deleteById(findUser.getId());
         signoutRepository.save(
@@ -190,14 +169,6 @@ public class ProfileService {
     private User getUserByIdentifier(String identifier) {
         return userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    private Files getFiles(User findUser) {
-        if (findUser.getFiles().isPresent()) {
-            return filesRepository.findById(findUser.getFiles().get().getId()).orElse(null);
-        } else {
-            return null;
-        }
     }
 
     private User getUserById(Long userId) {

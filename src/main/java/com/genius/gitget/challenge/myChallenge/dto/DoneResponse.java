@@ -40,7 +40,7 @@ public class DoneResponse extends ItemUseResponse {
 
     public static DoneResponse createNotRewarded(Instance instance,
                                                  Participant participant,
-                                                 int numOfPointItem) {
+                                                 int numOfPointItem, FileResponse fileResponse) {
         return DoneResponse.builder()
                 .title(instance.getTitle())
                 .instanceId(instance.getId())
@@ -48,12 +48,12 @@ public class DoneResponse extends ItemUseResponse {
                 .joinResult(participant.getJoinResult())
                 .canGetReward(canGetReward(participant))
                 .numOfPointItem(numOfPointItem)
-                .fileResponse(FileResponse.create(instance.getFiles()))
+                .fileResponse(fileResponse)
                 .build();
     }
 
     public static DoneResponse createRewarded(Instance instance, Participant participant,
-                                              double achievementRate) {
+                                              double achievementRate, FileResponse fileResponse) {
         return DoneResponse.builder()
                 .title(instance.getTitle())
                 .instanceId(instance.getId())
@@ -62,7 +62,7 @@ public class DoneResponse extends ItemUseResponse {
                 .canGetReward(false)
                 .rewardedPoints(participant.getRewardPoints())
                 .achievementRate(achievementRate)
-                .fileResponse(FileResponse.create(instance.getFiles()))
+                .fileResponse(fileResponse)
                 .build();
     }
 

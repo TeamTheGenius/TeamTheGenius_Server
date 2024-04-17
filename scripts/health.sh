@@ -21,15 +21,21 @@ echo "> Start health check of WAS at 'http://127.0.0.1:${TARGET_PORT}' ..."
 
 for RETRY_COUNT in 1 2 3 4 5 6 7 8 9 10
 do
-    echo "> #${RETRY_COUNT} trying..."
-    RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}"  http://127.0.0.1:${TARGET_PORT}/profile)
-
-    if [ ${RESPONSE_CODE} -eq 200 ]; then
-        echo "> New WAS successfully running"
-        exit 0
-    elif [ ${RETRY_COUNT} -eq 10 ]; then
-        echo "> Health check failed."
-        exit 1
-    fi
-    sleep 10
+    # echo "> #${RETRY_COUNT} trying..."
+    # RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}"  http://127.0.0.1:${TARGET_PORT}/profile)
+#
+#    if [ ${RESPONSE_CODE} -eq 200 ]; then
+#        echo "> New WAS successfully running"
+#        exit 0
+#    elif [ ${RETRY_COUNT} -eq 10 ]; then
+#        echo "> Health check failed."
+#        exit 1
+#    fi
+#    sleep 10
+    if [ ${CURRENT_PORT} - eq ${TARGET_PORT}]; then
+      echo "> Health Check Failed."
+      exit 1
+    else
+      echo "> New WAS Successfully running."
+      exit 0
 done

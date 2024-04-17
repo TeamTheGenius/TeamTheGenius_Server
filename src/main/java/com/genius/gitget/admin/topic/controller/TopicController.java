@@ -9,7 +9,6 @@ import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,7 +44,7 @@ public class TopicController {
 
     // 토픽 상세 정보 요청
     @GetMapping("/{id}")
-    public ResponseEntity<SingleResponse<TopicDetailResponse>> getTopicById(@PathVariable Long id) throws IOException {
+    public ResponseEntity<SingleResponse<TopicDetailResponse>> getTopicById(@PathVariable Long id) {
         TopicDetailResponse topicDetail = topicService.getTopicById(id);
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), topicDetail)

@@ -6,10 +6,10 @@ import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.dto.TopicPagingResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,17 +32,16 @@ public class TopicService {
     }
 
     private TopicPagingResponse mapToTopicPagingResponse(Topic topic) {
-        try {
-            return TopicPagingResponse.createByEntity(topic, topic.getFiles());
-        } catch (IOException e) {
-            throw new BusinessException(e);
-        }
+        FileResponse fileResponse = filesService.convertToFileResponse(topic.getFiles());
+        return TopicPagingResponse.createByEntity(topic, fileResponse);
     }
 
     // 토픽 상세정보 요청
-    public TopicDetailResponse getTopicById(Long id) throws IOException {
-        Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
-        return TopicDetailResponse.createByEntity(topic, topic.getFiles());
+    public TopicDetailResponse getTopicById(Long id) {
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
+        FileResponse fileResponse = filesService.convertToFileResponse(topic.getFiles());
+        return TopicDetailResponse.createByEntity(topic, fileResponse);
     }
 
     // 토픽 생성 요청

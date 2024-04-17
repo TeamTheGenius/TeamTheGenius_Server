@@ -2,9 +2,9 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "production" ] ## 나중에 production으로 변경하기
-    # pull_request:
-    # branches: [ "production" ]
+    branches: [ "production", "chore/156-release-test" ] ## 나중에 production으로 변경하기
+  pull_request:
+    branches: [ "production", "chore/156-release-test" ]
 
 env:
   AWS_REGION: ap-northeast-2

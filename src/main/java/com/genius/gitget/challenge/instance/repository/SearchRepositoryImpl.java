@@ -1,7 +1,6 @@
 package com.genius.gitget.challenge.instance.repository;
 
 import static com.genius.gitget.challenge.instance.domain.QInstance.instance;
-import static com.genius.gitget.global.file.domain.QFiles.files;
 
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
@@ -37,11 +36,8 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
         List<InstanceSearchResponse> content = queryFactory
                 .select(new QInstanceSearchResponse(
                         instance.topic.id, instance.id, instance.title, instance.pointPerPerson,
-                        instance.participantCount,
-                        instance.files))
+                        instance.participantCount))
                 .from(instance)
-                .leftJoin(instance.files, files)
-                .on(instance.files.id.eq(files.id))
                 .where(builder)
                 .orderBy(instance.startedDate.desc())
                 .offset(pageable.getOffset())
@@ -51,7 +47,6 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
         JPAQuery<Long> countQuery = queryFactory
                 .select(instance.count())
                 .from(instance)
-                .leftJoin(instance.files, files)
                 .where(builder);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);

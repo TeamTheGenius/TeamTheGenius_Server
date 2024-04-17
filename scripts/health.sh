@@ -38,4 +38,5 @@ do
     else
       echo "> New WAS Successfully running."
       exit 0
+    fi
 done

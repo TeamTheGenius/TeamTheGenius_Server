@@ -37,6 +37,7 @@ jobs:
           touch ./application.yml
           touch ./application-common.yml
           touch ./application-prod.yml
+          
           echo "${{ secrets.APPLICATION }}" > ./application.yml
           echo "${{ secrets.COMMON }}" > ./application-common.yml
           echo "${{ secrets.PROD }}" > ./application-prod.yml

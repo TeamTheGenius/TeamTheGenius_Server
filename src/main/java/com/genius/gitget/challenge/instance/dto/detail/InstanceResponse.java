@@ -26,7 +26,8 @@ public record InstanceResponse(
         FileResponse fileResponse
 ) {
 
-    public static InstanceResponse createByEntity(Instance instance, LikesInfo likesInfo, JoinStatus joinStatus) {
+    public static InstanceResponse createByEntity(Instance instance, LikesInfo likesInfo,
+                                                  JoinStatus joinStatus, FileResponse fileResponse) {
         LocalDate startedLocalDate = instance.getStartedDate().toLocalDate();
         LocalDate completedLocalDate = instance.getCompletedDate().toLocalDate();
         return InstanceResponse.builder()
@@ -43,7 +44,7 @@ public record InstanceResponse(
                 .certificationMethod(instance.getCertificationMethod())
                 .joinStatus(joinStatus)
                 .likesInfo(likesInfo)
-                .fileResponse(FileResponse.create(instance.getFiles()))
+                .fileResponse(fileResponse)
                 .build();
     }
 }

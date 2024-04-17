@@ -13,10 +13,10 @@ import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -76,7 +76,8 @@ public class InstanceService {
 
     // 특정 토픽에 대한 리스트 조회
     public Page<InstancePagingResponse> getAllInstancesOfSpecificTopic(Pageable pageable, Long id) {
-        Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         Page<Instance> instancesByTopicId = instanceRepository.findInstancesByTopicId(pageable, topic.getId());
         return instancesByTopicId.map(this::mapToInstancePagingResponse);
     }
@@ -86,7 +87,8 @@ public class InstanceService {
     public InstanceDetailResponse getInstanceById(Long id) {
         Instance instanceDetails = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
-        return InstanceDetailResponse.createByEntity(instanceDetails, instanceDetails.getFiles());
+        FileResponse fileResponse = filesService.convertToFileResponse(instanceDetails.getFiles());
+        return InstanceDetailResponse.createByEntity(instanceDetails, fileResponse);
     }
 
 
@@ -123,10 +125,7 @@ public class InstanceService {
     }
 
     private InstancePagingResponse mapToInstancePagingResponse(Instance instance) {
-        try {
-            return InstancePagingResponse.createByEntity(instance, instance.getFiles());
-        } catch (IOException e) {
-            throw new BusinessException(e);
-        }
+        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        return InstancePagingResponse.createByEntity(instance, fileResponse);
     }
 }

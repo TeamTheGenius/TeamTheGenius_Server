@@ -6,7 +6,6 @@ import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.util.file.FileTestUtil;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -74,7 +73,7 @@ public class TopicServiceTest {
                 .pointPerPerson(topic.getPointPerPerson())
                 .notice(topic.getNotice()).build();
 
-        topicService.updateTopic(savedTopicId, topicUpdateRequest, FileTestUtil.getMultipartFile("name"), fileType);
+        topicService.updateTopic(savedTopicId, topicUpdateRequest);
 
         //then
         Optional<Topic> findTopic = topicRepository.findById(savedTopicId);

@@ -110,8 +110,7 @@ public class InstanceServiceTest {
                 .build();
 
         //when
-        Long updatedInstanceId = instanceService.updateInstance(savedInstanceId, instanceUpdateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType);
+        Long updatedInstanceId = instanceService.updateInstance(savedInstanceId, instanceUpdateRequest);
 
         //then
         Optional<Instance> byId = instanceRepository.findById(updatedInstanceId);

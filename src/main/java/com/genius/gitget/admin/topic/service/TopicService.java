@@ -6,19 +6,16 @@ import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.dto.TopicPagingResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.IOException;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -66,13 +63,9 @@ public class TopicService {
 
     // 토픽 업데이트 요청
     @Transactional
-    public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest, MultipartFile multipartFile, String type) {
-        Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
-
-        Optional<Files> findTopicFile = topic.getFiles();
-        Long findTopicFileId = findTopicFile.get().getId();
-
-        filesService.updateFile(findTopicFileId, multipartFile);
+    public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest) {
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
 
         // 서버에서 한번 더 검사
         boolean hasInstance = !topic.getInstanceList().isEmpty();

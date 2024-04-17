@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -68,10 +66,8 @@ public class TopicController {
     // 토픽 수정 요청
     @PatchMapping("/{id}")
     public ResponseEntity<CommonResponse> updateTopic(@PathVariable Long id,
-                                                      @RequestPart(value = "data") TopicUpdateRequest topicUpdateRequest,
-                                                      @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-                                                      @RequestPart(value = "type") String type) {
-        topicService.updateTopic(id, topicUpdateRequest, multipartFile, type);
+                                                      @RequestBody TopicUpdateRequest topicUpdateRequest) {
+        topicService.updateTopic(id, topicUpdateRequest);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
         );

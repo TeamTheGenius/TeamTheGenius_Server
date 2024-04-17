@@ -24,9 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -83,14 +81,12 @@ public class InstanceController {
 
     // 인스턴스 수정
     @PatchMapping("/instance/{id}")
-    public ResponseEntity<CommonResponse> updateInstance(@PathVariable Long id,
-                                                         @RequestPart(value = "data") InstanceUpdateRequest instanceUpdateRequest,
-                                                         @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-                                                         @RequestPart(value = "type") String type) {
+    public ResponseEntity<SingleResponse<Long>> updateInstance(@PathVariable Long id,
+                                                               @RequestBody InstanceUpdateRequest instanceUpdateRequest) {
 
-        instanceService.updateInstance(id, instanceUpdateRequest, multipartFile, type);
+        Long instanceId = instanceService.updateInstance(id, instanceUpdateRequest);
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
+                new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), instanceId)
         );
     }
 

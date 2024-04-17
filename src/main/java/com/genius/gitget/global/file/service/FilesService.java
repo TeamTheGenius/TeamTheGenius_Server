@@ -62,7 +62,7 @@ public class FilesService {
 
         Files instanceFiles = copyFile(topicFiles, FileType.INSTANCE);
         instance.setFiles(instanceFiles);
-        
+
         return instanceFiles;
     }
 
@@ -79,6 +79,18 @@ public class FilesService {
         Files files = filesRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
+        if (multipartFile == null) {
+            return files;
+        }
+
+        UpdateDTO updateDTO = fileManager.update(files, multipartFile);
+        files.updateFiles(updateDTO);
+        return files;
+    }
+
+    @Transactional
+    public Files updateFile(Optional<Files> optionalFiles, MultipartFile multipartFile) {
+        Files files = optionalFiles.orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
         if (multipartFile == null) {
             return files;
         }

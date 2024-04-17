@@ -18,14 +18,12 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -111,14 +109,9 @@ public class InstanceService {
 
     // 인스턴스 수정
     @Transactional
-    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest, MultipartFile multipartFile,
-                               String type) {
+    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest) {
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
-
-        Optional<Files> findInstanceFile = existingInstance.getFiles();
-        Long findInstanceFileId = findInstanceFile.get().getId();
-        filesService.updateFile(findInstanceFileId, multipartFile);
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(),
                 instanceUpdateRequest.pointPerPerson(), instanceUpdateRequest.startedAt(),

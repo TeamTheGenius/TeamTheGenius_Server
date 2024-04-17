@@ -1,6 +1,7 @@
 package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.MULTIPART_FILE_NOT_EXIST;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.domain.FileHolder;
@@ -42,6 +43,9 @@ public class FilesService {
 
     @Transactional
     public Files uploadFile(FileHolder fileHolder, MultipartFile multipartFile, FileType fileType) {
+        if (multipartFile == null) {
+            throw new BusinessException(MULTIPART_FILE_NOT_EXIST);
+        }
         FileDTO fileDTO = fileManager.upload(multipartFile, fileType);
 
         Files file = Files.builder()

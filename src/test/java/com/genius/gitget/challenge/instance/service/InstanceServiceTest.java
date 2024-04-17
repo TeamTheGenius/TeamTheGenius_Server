@@ -287,16 +287,5 @@ public class InstanceServiceTest {
                 instanceService.deleteInstance(id);
             });
         }
-
-//        @Test
-//        public void 해당_인스턴스에_파일이_존재한다면_같이_삭제한다() {
-//            MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-//            Files files1 = filesService.uploadFile(filename, FileType.INSTANCE);
-//
-//            instance1.setFiles(files1);
-//            instanceRepository.save(instance1);
-//
-//            instanceService.deleteInstance(instance1.getId());
-//        }
     }
 }

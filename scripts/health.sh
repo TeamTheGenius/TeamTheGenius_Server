@@ -32,7 +32,7 @@ do
 #        exit 1
 #    fi
 #    sleep 10
-    if [ ${CURRENT_PORT} - eq ${TARGET_PORT}]; then
+    if [ ${CURRENT_PORT} -eq ${TARGET_PORT} ]; then
       echo "> Health Check Failed."
       exit 1
     else

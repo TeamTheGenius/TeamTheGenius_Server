@@ -11,7 +11,6 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -23,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -55,7 +53,7 @@ public class UserService {
     }
 
     @Transactional
-    public Long signup(SignupRequest requestUser, MultipartFile multipartFile) {
+    public Long signup(SignupRequest requestUser) {
         User user = findUserByIdentifier(requestUser.identifier());
         isAlreadyRegistered(user);
 
@@ -64,8 +62,6 @@ public class UserService {
                 requestUser.information(),
                 interest);
         updateRole(user);
-
-        filesService.uploadFile(user, multipartFile, FileType.PROFILE);
 
         return user.getId();
     }

@@ -116,14 +116,17 @@ public class User extends BaseTimeEntity implements FileHolder {
         return this.point;
     }
 
+    @Override
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
     }
 
-    //=== 연관관계 편의 메서드 ===//
+    @Override
     public void setFiles(Files files) {
         this.files = files;
     }
+
+    //=== 연관관계 편의 메서드 ===//
 
     public void updateUser(String nickname, String information, String tags) {
         this.nickname = nickname;
@@ -131,16 +134,7 @@ public class User extends BaseTimeEntity implements FileHolder {
         this.tags = tags;
     }
 
-    public void setPoint(Long point) {
-        this.point += point;
-    }
-
     public void deleteLikesList() {
         this.likesList.clear();
-    }
-
-    @Override
-    public void updateRelation(Files files) {
-        this.files = files;
     }
 }

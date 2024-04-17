@@ -12,7 +12,6 @@ import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -39,7 +38,6 @@ public class InstanceService {
     // 인스턴스 생성
     @Transactional
     public Long createInstance(InstanceCreateRequest instanceCreateRequest,
-                               MultipartFile multipartFile, String type,
                                LocalDate currentDate) {
         // 토픽 조회
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
@@ -56,19 +54,8 @@ public class InstanceService {
         Instance instance = Instance.createByRequest(instanceCreateRequest);
         instance.setInstanceUUID(uuid);
 
-        // 파일 업로드
-        FileType fileType = FileType.findType(type);
-        Files uploadedFile;
-        if (multipartFile != null) {
-            uploadedFile = filesService.uploadFile(instance, multipartFile, fileType);
-        } else {
-            Files files = topic.getFiles().get();
-            uploadedFile = filesService.copyFile(topic.getFiles().get(), fileType);
-        }
-
         // 연관 관계 설정
         instance.setTopic(topic);
-        instance.setFiles(uploadedFile);
 
         return instanceRepository.save(instance).getId();
     }

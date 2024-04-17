@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,13 +72,12 @@ public class InstanceController {
 
     // 인스턴스 생성
     @PostMapping("/instance")
-    public ResponseEntity<CommonResponse> createInstance(
-            @RequestPart(value = "data") InstanceCreateRequest instanceCreateRequest,
-            @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-            @RequestPart(value = "type", required = false) String type) {
-        instanceService.createInstance(instanceCreateRequest, multipartFile, type, LocalDate.now());
+    public ResponseEntity<SingleResponse<Long>> createInstance(
+            @RequestBody InstanceCreateRequest instanceCreateRequest) {
+        Long instanceId = instanceService.createInstance(instanceCreateRequest, LocalDate.now());
+
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage())
+                new SingleResponse<>(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage(), instanceId)
         );
     }
 

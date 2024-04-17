@@ -1,5 +1,9 @@
 package com.genius.gitget.global.file.domain;
 
+import java.util.Optional;
+
 public interface FileHolder {
-    void updateRelation(Files files);
+    Optional<Files> getFiles();
+
+    void setFiles(Files files);
 }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -55,13 +56,12 @@ public class TopicController {
 
     // 토픽 생성 요청
     @PostMapping
-    public ResponseEntity<CommonResponse> createTopic(
-            @RequestPart(value = "data") TopicCreateRequest topicCreateRequest,
-            @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-            @RequestPart(value = "type") String type) {
-        topicService.createTopic(topicCreateRequest, multipartFile, type);
+    public ResponseEntity<SingleResponse<Long>> createTopic(
+            @RequestBody TopicCreateRequest topicCreateRequest) {
+        Long topicId = topicService.createTopic(topicCreateRequest);
+
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage())
+                new SingleResponse<>(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage(), topicId)
         );
     }
 

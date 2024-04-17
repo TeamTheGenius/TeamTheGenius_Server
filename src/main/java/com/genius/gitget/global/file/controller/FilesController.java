@@ -31,14 +31,20 @@ public class FilesController {
     @PostMapping("/{id}")
     public ResponseEntity<SingleResponse<FileResponse>> uploadFile(
             @PathVariable Long id,
-            @RequestParam String type,
-            @RequestParam MultipartFile multipartFile
+            @RequestParam("type") String type,
+            @RequestParam(value = "files", required = false) MultipartFile multipartFile
     ) {
         FileType fileType = FileType.findType(type);
         FileHolder fileHolder = finder.findByInfo(id, fileType);
-        Files files = filesService.uploadFile(fileHolder, multipartFile, fileType);
+        Files files;
 
-        FileResponse fileResponse = filesService.convertToFileResponse(Optional.of(files));
+        if (multipartFile == null && fileType == FileType.INSTANCE) {
+            files = filesService.copyTopicToInstance(fileHolder);
+        } else {
+            files = filesService.uploadFile(fileHolder, multipartFile, fileType);
+        }
+
+        FileResponse fileResponse = filesService.convertToFileResponse(Optional.ofNullable(files));
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), fileResponse)

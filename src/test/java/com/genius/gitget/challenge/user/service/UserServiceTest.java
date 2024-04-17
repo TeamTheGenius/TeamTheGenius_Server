@@ -9,8 +9,6 @@ import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.global.file.domain.FileType;
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -60,12 +58,11 @@ class UserServiceTest {
                 .information("information")
                 .interest(List.of("관심사1", "관심사2"))
                 .build();
-        MultipartFile multipartFile = FileTestUtil.getMultipartFile("profile");
 
         //when
         User user = userService.findUserByIdentifier(identifier);
 
-        Long signupUserId = userService.signup(signupRequest, multipartFile);
+        Long signupUserId = userService.signup(signupRequest);
         User foundUser = userService.findUserById(signupUserId);
 
         //then
@@ -75,10 +72,6 @@ class UserServiceTest {
         assertThat(user.getInformation()).isEqualTo(foundUser.getInformation());
         assertThat(user.getTags()).isEqualTo(foundUser.getTags());
         assertThat(user.getRole()).isEqualTo(Role.USER);
-
-        Files files = user.getFiles().get();
-        assertThat(files.getFileType()).isEqualTo(FileType.PROFILE);
-        assertThat(files.getOriginalFilename()).contains(multipartFile.getOriginalFilename());
     }
 
     @Test
@@ -96,7 +89,7 @@ class UserServiceTest {
         MultipartFile multipartFile = FileTestUtil.getMultipartFile("profile");
 
         //when
-        Long signupUserId = userService.signup(signupRequest, multipartFile);
+        Long signupUserId = userService.signup(signupRequest);
         User signupUser = userService.findUserById(signupUserId);
 
         //then
@@ -119,10 +112,10 @@ class UserServiceTest {
 
         //when
         User user = userService.findUserByIdentifier(identifier);
-        Long signupUserId = userService.signup(signupRequest, multipartFile);
+        Long signupUserId = userService.signup(signupRequest);
 
         //then
-        assertThatThrownBy(() -> userService.signup(signupRequest, multipartFile))
+        assertThatThrownBy(() -> userService.signup(signupRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_REGISTERED.getMessage());
     }

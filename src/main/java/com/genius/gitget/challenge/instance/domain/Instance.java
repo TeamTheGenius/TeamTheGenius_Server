@@ -158,13 +158,12 @@ public class Instance implements FileHolder {
         return this.likesList.size();
     }
 
-    /*
-     * 파일 조회
-     * */
+    @Override
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
     }
 
+    @Override
     public void setFiles(Files files) {
         this.files = files;
     }
@@ -194,10 +193,5 @@ public class Instance implements FileHolder {
     public String getPrTemplate(LocalDate currentDate) {
         String today = currentDate.toString().replace("-", "");
         return "GITGET-" + instanceUUID + "-" + today;
-    }
-
-    @Override
-    public void updateRelation(Files files) {
-        this.files = files;
     }
 }

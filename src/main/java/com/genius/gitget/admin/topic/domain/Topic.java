@@ -74,16 +74,13 @@ public class Topic extends BaseTimeEntity implements FileHolder {
         this.pointPerPerson = pointPerPerson;
     }
 
+    @Override
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
     }
 
-    public void setFiles(Files files) {
-        this.files = files;
-    }
-
     @Override
-    public void updateRelation(Files files) {
+    public void setFiles(Files files) {
         this.files = files;
     }
 }

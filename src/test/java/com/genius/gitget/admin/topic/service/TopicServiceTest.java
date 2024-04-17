@@ -51,8 +51,7 @@ public class TopicServiceTest {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
 
-        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
-                "topic");
+        Long savedTopicId = topicService.createTopic(topicCreateRequest);
 
         //when
         TopicDetailResponse topicById = topicService.getTopicById(savedTopicId);
@@ -65,8 +64,7 @@ public class TopicServiceTest {
     public void 토픽_수정() throws Exception {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
-        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
-                "topic");
+        Long savedTopicId = topicService.createTopic(topicCreateRequest);
 
         //when
         TopicUpdateRequest topicUpdateRequest = TopicUpdateRequest.builder()
@@ -88,8 +86,7 @@ public class TopicServiceTest {
     public void 토픽_삭제() throws Exception {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
-        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
-                fileType);
+        Long savedTopicId = topicService.createTopic(topicCreateRequest);
 
         //when
         topicService.deleteTopic(savedTopicId);

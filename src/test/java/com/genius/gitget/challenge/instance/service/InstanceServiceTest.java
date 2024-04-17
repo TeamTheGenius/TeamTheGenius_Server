@@ -51,6 +51,7 @@ public class InstanceServiceTest {
 
     private Instance instance, instance1, instance2;
     private Topic topic;
+    private Files topicFiles;
     private String fileType;
 
     @BeforeEach
@@ -83,8 +84,7 @@ public class InstanceServiceTest {
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
 
         //when
-        instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
+        instanceService.createInstance(instanceCreateRequest, currentDate);
 
         //then
         List<Instance> all = instanceRepository.findAll();
@@ -99,8 +99,7 @@ public class InstanceServiceTest {
         Topic savedTopic = topicRepository.save(topic);
 
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
-        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
+        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest, currentDate);
 
         InstanceUpdateRequest instanceUpdateRequest = InstanceUpdateRequest.builder()
                 .topicId(savedTopic.getId())
@@ -126,8 +125,7 @@ public class InstanceServiceTest {
         Topic savedTopic = topicRepository.save(topic);
 
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
-        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
+        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest, currentDate);
 
         //when
         InstanceDetailResponse instanceById = instanceService.getInstanceById(savedInstanceId);

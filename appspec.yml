@@ -1,5 +1,4 @@
-
-version: 0.0 # CodeDeploy Version. 
+version: 0.0 # CodeDeploy Version.
 
 os: linux # 배포할 서버의 운영체제
 
@@ -17,15 +16,13 @@ permissions:
 
 # CodeDeploy 배포 단계에서 실행할 명령어를 지정 (차례대로 스크립트들이 실행)
 hooks:
-  AfterInstall :
-    - location: scripts/stop.sh # Nginx와 연결되어 있지 않은 스프링부트 종료 
-      timeout: 60
-      runas: ubuntu
   ApplicationStart:
-    - location: scripts/start.sh # Nginx와 연결되어 있지 않은 port로 새 버전의 스프링부트 시작
+    - location: scripts/run_new_was.sh
       timeout: 60
       runas: ubuntu
-  ValidateService:
-    - location: scripts/health.sh # 새 스프링부트가 정상적으로 실행됐는지 확인
+    - location: scripts/health_check.sh
+      timeout: 60
+      runas: ubuntu
+    - location: scripts/switch.sh
       timeout: 60
       runas: ubuntu

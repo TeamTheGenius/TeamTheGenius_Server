@@ -177,8 +177,10 @@ public class CertificationService {
                     return passed;
                 });
 
-        return ActivatedResponse.create(instance, certification.getCertificationStatus(), 0,
-                participant.getRepositoryName());
+        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        //TODO: pass 했기 때문에 pass item이 필요없어 numOfPassItem을 0으로 전달하는 것 같음. but, 가독성이 떨어지기 때문에 수정 필요
+        return ActivatedResponse.create(instance, certification.getCertificationStatus(),
+                0, participant.getRepositoryName(), fileResponse);
     }
 
     private void validatePassCondition(Optional<Certification> optional) {

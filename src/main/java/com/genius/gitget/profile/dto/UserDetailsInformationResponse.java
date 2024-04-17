@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class UserDetailsInformationResponse {
+    private Long userId;
     private String identifier;
     private String nickname;
     private String information;
@@ -15,8 +16,9 @@ public class UserDetailsInformationResponse {
     private FileResponse fileResponse;
 
     @Builder
-    public UserDetailsInformationResponse(String identifier, String nickname, String information,
+    public UserDetailsInformationResponse(Long userId, String identifier, String nickname, String information,
                                           Long point, int progressBar, FileResponse fileResponse) {
+        this.userId = userId;
         this.identifier = identifier;
         this.nickname = nickname;
         this.information = information;
@@ -28,6 +30,7 @@ public class UserDetailsInformationResponse {
     public static UserDetailsInformationResponse createByEntity(User findUser, int participantCount,
                                                                 FileResponse fileResponse) {
         return UserDetailsInformationResponse.builder()
+                .userId(findUser.getId())
                 .identifier(findUser.getIdentifier())
                 .nickname(findUser.getNickname())
                 .information(findUser.getInformation())

@@ -11,6 +11,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -103,6 +104,8 @@ public class UserService {
 
     public UserProfileInfo getUserProfileInfo(User user) {
         Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
-        return UserProfileInfo.createByEntity(user, frameId);
+        FileResponse fileResponse = filesService.convertToFileResponse(user.getFiles());
+
+        return UserProfileInfo.createByEntity(user, frameId, fileResponse);
     }
 }

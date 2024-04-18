@@ -195,7 +195,6 @@ public class InstanceSearchRepositoryTest {
                         .pointPerPerson(instance.getPointPerPerson())
                         .startedAt(instance.getStartedDate())
                         .completedAt(instance.getCompletedDate()).build(),
-                FileTestUtil.getMultipartFile("name"), "instance",
                 instance.getStartedDate().minusDays(3).toLocalDate());
     }
 }

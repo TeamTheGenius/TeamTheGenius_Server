@@ -13,8 +13,8 @@ public class UserLikesResponse {
     private FileResponse fileResponse;
 
     @Builder
-    public UserLikesResponse(Long likesId, Long instanceId, String title, int pointPerPerson,
-                             FileResponse fileResponse) {
+    public UserLikesResponse(Long likesId, Long instanceId, String title,
+                             int pointPerPerson, FileResponse fileResponse) {
         this.likesId = likesId;
         this.instanceId = instanceId;
         this.title = title;

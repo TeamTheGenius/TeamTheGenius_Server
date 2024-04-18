@@ -92,11 +92,11 @@ public class CertificationController {
             @PathVariable Long instanceId
     ) {
         Participant participant = participantProvider.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
-        WeekResponse weekCertification = certificationService.getMyWeekCertifications(
+        WeekResponse weekResponse = certificationService.getMyWeekCertifications(
                 participant.getId(), LocalDate.now());
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekCertification)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekResponse)
         );
     }
 

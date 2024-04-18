@@ -9,7 +9,6 @@ import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.repository.SearchRepository;
-import com.genius.gitget.util.file.FileTestUtil;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
@@ -91,7 +90,6 @@ public class InstanceSearchServiceTest {
                         .pointPerPerson(instance.getPointPerPerson())
                         .startedAt(instance.getStartedDate())
                         .completedAt(instance.getCompletedDate()).build(),
-                FileTestUtil.getMultipartFile("name"), "instance",
                 instance.getCompletedDate().minusDays(3).toLocalDate());
     }
 }

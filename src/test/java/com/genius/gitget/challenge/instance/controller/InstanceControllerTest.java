@@ -14,6 +14,7 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.domain.Role;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.util.TokenTestUtil;
@@ -35,21 +36,19 @@ import org.springframework.web.multipart.MultipartFile;
 @SpringBootTest
 @Transactional
 public class InstanceControllerTest {
+    private static Topic savedTopic1, savedTopic2;
+    private static Instance savedInstance1, savedInstance2;
     MockMvc mockMvc;
     @Autowired
     WebApplicationContext context;
     @Autowired
     TokenTestUtil tokenTestUtil;
-
     @Autowired
     TopicRepository topicRepository;
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
     FilesService filesService;
-
-    private static Topic savedTopic1, savedTopic2;
-    private static Instance savedInstance1, savedInstance2;
 
     @BeforeEach
     public void setup() {
@@ -147,7 +146,7 @@ public class InstanceControllerTest {
 
     private Topic getSavedTopic() {
         MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-        Files files = filesService.uploadFile(filename, "topic");
+        Files files = filesService.uploadFile(filename, FileType.TOPIC);
 
         Topic topic = topicRepository.save(
                 Topic.builder()

@@ -9,7 +9,7 @@ public record UserProfileInfo(
         Long frameId,
         FileResponse fileResponse
 ) {
-    public static UserProfileInfo createByEntity(User user, Long frameId) {
-        return new UserProfileInfo(user.getId(), user.getNickname(), frameId, FileResponse.create(user.getFiles()));
+    public static UserProfileInfo createByEntity(User user, Long frameId, FileResponse fileResponse) {
+        return new UserProfileInfo(user.getId(), user.getNickname(), frameId, fileResponse);
     }
 }

@@ -1,10 +1,8 @@
 package com.genius.gitget.challenge.instance.dto.crud;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import java.time.LocalDateTime;
-import java.util.Optional;
 import lombok.Builder;
 
 @Builder
@@ -13,7 +11,7 @@ public record InstanceDetailResponse(Long topicId, Long instanceId, String title
                                      String tags, String notice, LocalDateTime startedAt, LocalDateTime completedAt,
                                      String certificationMethod,
                                      FileResponse fileResponse) {
-    public static InstanceDetailResponse createByEntity(Instance instance, Optional<Files> files) {
+    public static InstanceDetailResponse createByEntity(Instance instance, FileResponse fileResponse) {
         return InstanceDetailResponse.builder()
                 .topicId(instance.getTopic().getId())
                 .instanceId(instance.getId())
@@ -25,7 +23,7 @@ public record InstanceDetailResponse(Long topicId, Long instanceId, String title
                 .startedAt(instance.getStartedDate())
                 .completedAt(instance.getCompletedDate())
                 .certificationMethod(instance.getCertificationMethod())
-                .fileResponse(FileResponse.create(files))
+                .fileResponse(fileResponse)
                 .build();
     }
 }

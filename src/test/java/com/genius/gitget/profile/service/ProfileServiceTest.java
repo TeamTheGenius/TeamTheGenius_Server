@@ -113,7 +113,7 @@ public class ProfileServiceTest {
                 UserInformationUpdateRequest.builder()
                         .nickname("수정된 nickname")
                         .information("수정된 information")
-                        .build(), null, "profile");
+                        .build());
 
         User user = userRepository.findByIdentifier(user1.getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
@@ -159,7 +159,7 @@ public class ProfileServiceTest {
     void 유저_포인트_조회() {
         User user = userRepository.findByIdentifier(user1.getIdentifier())
                 .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        user.setPoint(1500L);
+        user.updatePoints(1500L);
         userRepository.save(user);
         UserPointResponse userPoint = profileService.getUserPoint(user1);
         Assertions.assertThat(userPoint.getPoint()).isEqualTo(1500);

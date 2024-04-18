@@ -6,7 +6,6 @@ import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.util.file.FileTestUtil;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -51,8 +50,7 @@ public class TopicServiceTest {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
 
-        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
-                "topic");
+        Long savedTopicId = topicService.createTopic(topicCreateRequest);
 
         //when
         TopicDetailResponse topicById = topicService.getTopicById(savedTopicId);
@@ -65,8 +63,7 @@ public class TopicServiceTest {
     public void 토픽_수정() throws Exception {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
-        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
-                "topic");
+        Long savedTopicId = topicService.createTopic(topicCreateRequest);
 
         //when
         TopicUpdateRequest topicUpdateRequest = TopicUpdateRequest.builder()
@@ -76,7 +73,7 @@ public class TopicServiceTest {
                 .pointPerPerson(topic.getPointPerPerson())
                 .notice(topic.getNotice()).build();
 
-        topicService.updateTopic(savedTopicId, topicUpdateRequest, FileTestUtil.getMultipartFile("name"), fileType);
+        topicService.updateTopic(savedTopicId, topicUpdateRequest);
 
         //then
         Optional<Topic> findTopic = topicRepository.findById(savedTopicId);
@@ -88,8 +85,7 @@ public class TopicServiceTest {
     public void 토픽_삭제() throws Exception {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
-        Long savedTopicId = topicService.createTopic(topicCreateRequest, FileTestUtil.getMultipartFile("name"),
-                fileType);
+        Long savedTopicId = topicService.createTopic(topicCreateRequest);
 
         //when
         topicService.deleteTopic(savedTopicId);

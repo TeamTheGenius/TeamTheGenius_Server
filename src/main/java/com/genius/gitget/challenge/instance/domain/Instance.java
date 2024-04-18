@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.global.file.domain.FileHolder;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
@@ -40,7 +41,7 @@ import org.hibernate.annotations.DynamicInsert;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
 @Table(name = "instance")
-public class Instance {
+public class Instance implements FileHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "instance_id")
@@ -157,13 +158,12 @@ public class Instance {
         return this.likesList.size();
     }
 
-    /*
-     * 파일 조회
-     * */
+    @Override
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
     }
 
+    @Override
     public void setFiles(Files files) {
         this.files = files;
     }

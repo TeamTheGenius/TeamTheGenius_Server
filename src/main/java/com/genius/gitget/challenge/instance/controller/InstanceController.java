@@ -1,11 +1,14 @@
 package com.genius.gitget.challenge.instance.controller;
 
+import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
+import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
+
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
+import com.genius.gitget.challenge.instance.dto.crud.InstanceIndexResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.service.InstanceService;
-import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -22,10 +25,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -40,7 +42,7 @@ public class InstanceController {
         Page<InstancePagingResponse> instances = instanceService.getAllInstances(pageable);
 
         return ResponseEntity.ok().body(
-                new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), instances)
+                new PagingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), instances)
         );
     }
 
@@ -54,7 +56,7 @@ public class InstanceController {
                 pageRequest, id);
 
         return ResponseEntity.ok().body(
-                new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                new PagingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         allInstancesOfSpecificTopic)
         );
     }
@@ -65,32 +67,32 @@ public class InstanceController {
     public ResponseEntity<SingleResponse<InstanceDetailResponse>> getInstanceById(@PathVariable Long id) {
         InstanceDetailResponse instanceDetails = instanceService.getInstanceById(id);
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), instanceDetails)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), instanceDetails)
         );
     }
 
     // 인스턴스 생성
     @PostMapping("/instance")
-    public ResponseEntity<CommonResponse> createInstance(
-            @RequestPart(value = "data") InstanceCreateRequest instanceCreateRequest,
-            @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-            @RequestPart(value = "type", required = false) String type) {
-        instanceService.createInstance(instanceCreateRequest, multipartFile, type, LocalDate.now());
+    public ResponseEntity<SingleResponse<InstanceIndexResponse>> createInstance(
+            @RequestBody InstanceCreateRequest instanceCreateRequest) {
+        Long instanceId = instanceService.createInstance(instanceCreateRequest, LocalDate.now());
+        InstanceIndexResponse instanceIndexResponse = new InstanceIndexResponse(instanceId);
+
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage())
+                new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), instanceIndexResponse)
         );
     }
 
     // 인스턴스 수정
     @PatchMapping("/instance/{id}")
-    public ResponseEntity<CommonResponse> updateInstance(@PathVariable Long id,
-                                                         @RequestPart(value = "data") InstanceUpdateRequest instanceUpdateRequest,
-                                                         @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-                                                         @RequestPart(value = "type") String type) {
+    public ResponseEntity<SingleResponse<InstanceIndexResponse>> updateInstance(
+            @PathVariable Long id,
+            @RequestBody InstanceUpdateRequest instanceUpdateRequest) {
 
-        instanceService.updateInstance(id, instanceUpdateRequest, multipartFile, type);
+        Long instanceId = instanceService.updateInstance(id, instanceUpdateRequest);
+        InstanceIndexResponse instanceIndexResponse = new InstanceIndexResponse(instanceId);
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), instanceIndexResponse)
         );
     }
 
@@ -99,7 +101,7 @@ public class InstanceController {
     public ResponseEntity<CommonResponse> deleteInstance(@PathVariable Long id) {
         instanceService.deleteInstance(id);
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
+                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
         );
     }
 }

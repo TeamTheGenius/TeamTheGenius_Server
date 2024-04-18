@@ -22,7 +22,7 @@ public class ActivatedResponse extends ItemUseResponse {
 
     @Builder
     public ActivatedResponse(Long instanceId, String title, int pointPerPerson, String repository,
-                             String certificateStatus, Long itemId,
+                             String certificateStatus,
                              int numOfPassItem, boolean canUsePassItem, FileResponse fileResponse) {
         this.instanceId = instanceId;
         this.title = title;
@@ -35,7 +35,7 @@ public class ActivatedResponse extends ItemUseResponse {
     }
 
     public static ActivatedResponse create(Instance instance, CertificateStatus certificateStatus,
-                                           int numOfPassItem, String repository) {
+                                           int numOfPassItem, String repository, FileResponse fileResponse) {
         boolean canUseItem = checkItemCondition(certificateStatus, numOfPassItem);
 
         return ActivatedResponse.builder()
@@ -46,7 +46,7 @@ public class ActivatedResponse extends ItemUseResponse {
                 .certificateStatus(certificateStatus.getTag())
                 .canUsePassItem(canUseItem)
                 .numOfPassItem(canUseItem ? numOfPassItem : 0)
-                .fileResponse(FileResponse.create(instance.getFiles()))
+                .fileResponse(fileResponse)
                 .build();
     }
 

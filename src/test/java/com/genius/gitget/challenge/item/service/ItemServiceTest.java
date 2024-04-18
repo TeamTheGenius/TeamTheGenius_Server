@@ -67,42 +67,6 @@ class ItemServiceTest {
     @Autowired
     private CertificationRepository certificationRepository;
 
-    @Nested
-    class 유저_포인트가_충분할_때 {
-
-        @ParameterizedTest
-        @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
-        public void 아이템을_구매할_수_있다_1(ItemCategory itemCategory) {
-            User user = getSavedUser();
-            Item item = getSavedItem(itemCategory);
-            getSavedOrder(user, item, itemCategory, 0);
-            user.setPoint(1000L);
-
-            ItemResponse itemResponse = itemService.orderItem(user, item.getId());
-
-            assertThat(itemResponse.getItemCategory()).isEqualTo(itemCategory);
-        }
-
-        @ParameterizedTest
-        @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
-        public void 아이템을_구매할_수_있다_2(ItemCategory itemCategory) {
-            User user = getSavedUser();
-            Item item = getSavedItem(itemCategory);
-            getSavedOrder(user, item, itemCategory, 0);
-            user.setPoint(1000L);
-
-            ItemResponse itemResponse1 = itemService.orderItem(user, item.getId());
-
-            assertThat(user.getPoint()).isEqualTo(900L);
-            assertThat(itemResponse1.getCount()).isEqualTo(1);
-
-            ItemResponse itemResponse2 = itemService.orderItem(user, item.getId());
-
-            assertThat(user.getPoint()).isEqualTo(800L);
-            assertThat(itemResponse2.getCount()).isEqualTo(2);
-        }
-    }
-
     @Test
     @DisplayName("데이터베이스에 저장되어 있는 모든 아이템 정보들을 받아올 수 있다.")
     public void should_getAllItems_when_itemsSaved() {
@@ -489,7 +453,6 @@ class ItemServiceTest {
         assertThat(profileResponses.size()).isEqualTo(0);
     }
 
-
     private User getSavedUser() {
         return userRepository.save(
                 User.builder()
@@ -550,7 +513,6 @@ class ItemServiceTest {
         return participant;
     }
 
-
     private Certification getSavedCertification(CertificateStatus status, LocalDate certificatedAt,
                                                 Participant participant) {
         int attempt = DateUtil.getAttemptCount(participant.getStartedDate(), certificatedAt);
@@ -562,5 +524,41 @@ class ItemServiceTest {
                 .build();
         certification.setParticipant(participant);
         return certificationRepository.save(certification);
+    }
+
+    @Nested
+    class 유저_포인트가_충분할_때 {
+
+        @ParameterizedTest
+        @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
+        public void 아이템을_구매할_수_있다_1(ItemCategory itemCategory) {
+            User user = getSavedUser();
+            Item item = getSavedItem(itemCategory);
+            getSavedOrder(user, item, itemCategory, 0);
+            user.updatePoints(1000L);
+
+            ItemResponse itemResponse = itemService.orderItem(user, item.getId());
+
+            assertThat(itemResponse.getItemCategory()).isEqualTo(itemCategory);
+        }
+
+        @ParameterizedTest
+        @EnumSource(mode = Mode.EXCLUDE, names = {"PROFILE_FRAME"})
+        public void 아이템을_구매할_수_있다_2(ItemCategory itemCategory) {
+            User user = getSavedUser();
+            Item item = getSavedItem(itemCategory);
+            getSavedOrder(user, item, itemCategory, 0);
+            user.updatePoints(1000L);
+
+            ItemResponse itemResponse1 = itemService.orderItem(user, item.getId());
+
+            assertThat(user.getPoint()).isEqualTo(900L);
+            assertThat(itemResponse1.getCount()).isEqualTo(1);
+
+            ItemResponse itemResponse2 = itemService.orderItem(user, item.getId());
+
+            assertThat(user.getPoint()).isEqualTo(800L);
+            assertThat(itemResponse2.getCount()).isEqualTo(2);
+        }
     }
 }

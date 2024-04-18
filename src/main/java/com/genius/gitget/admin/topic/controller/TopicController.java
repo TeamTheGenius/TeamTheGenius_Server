@@ -1,11 +1,14 @@
 package com.genius.gitget.admin.topic.controller;
 
+import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
+import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
+
 import com.genius.gitget.admin.topic.dto.TopicCreateRequest;
 import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
+import com.genius.gitget.admin.topic.dto.TopicIndexResponse;
 import com.genius.gitget.admin.topic.dto.TopicPagingResponse;
 import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.admin.topic.service.TopicService;
-import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -38,7 +41,7 @@ public class TopicController {
         Page<TopicPagingResponse> allTopics = topicService.getAllTopics(pageable);
 
         return ResponseEntity.ok().body(
-                new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), allTopics)
+                new PagingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), allTopics)
         );
     }
 
@@ -47,28 +50,33 @@ public class TopicController {
     public ResponseEntity<SingleResponse<TopicDetailResponse>> getTopicById(@PathVariable Long id) {
         TopicDetailResponse topicDetail = topicService.getTopicById(id);
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), topicDetail)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), topicDetail)
         );
     }
 
     // 토픽 생성 요청
     @PostMapping
-    public ResponseEntity<SingleResponse<Long>> createTopic(
+    public ResponseEntity<SingleResponse<TopicIndexResponse>> createTopic(
             @RequestBody TopicCreateRequest topicCreateRequest) {
         Long topicId = topicService.createTopic(topicCreateRequest);
+        TopicIndexResponse topicUpdateResponse = new TopicIndexResponse(topicId);
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SuccessCode.CREATED.getStatus(), SuccessCode.CREATED.getMessage(), topicId)
+                new SingleResponse<>(
+                        CREATED.getStatus(), CREATED.getMessage(), topicUpdateResponse)
         );
     }
 
     // 토픽 수정 요청
     @PatchMapping("/{id}")
-    public ResponseEntity<CommonResponse> updateTopic(@PathVariable Long id,
-                                                      @RequestBody TopicUpdateRequest topicUpdateRequest) {
-        topicService.updateTopic(id, topicUpdateRequest);
+    public ResponseEntity<SingleResponse<TopicIndexResponse>> updateTopic(
+            @PathVariable Long id,
+            @RequestBody TopicUpdateRequest topicUpdateRequest) {
+        Long topicId = topicService.updateTopic(id, topicUpdateRequest);
+        TopicIndexResponse topicUpdateResponse = new TopicIndexResponse(topicId);
+
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), topicUpdateResponse)
         );
     }
 
@@ -77,7 +85,7 @@ public class TopicController {
     public ResponseEntity<CommonResponse> deleteTopic(@PathVariable Long id) {
         topicService.deleteTopic(id);
         return ResponseEntity.ok().body(
-                new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
+                new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
         );
     }
 }

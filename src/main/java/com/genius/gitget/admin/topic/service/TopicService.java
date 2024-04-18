@@ -62,7 +62,7 @@ public class TopicService {
 
     // 토픽 업데이트 요청
     @Transactional
-    public void updateTopic(Long id, TopicUpdateRequest topicUpdateRequest) {
+    public Long updateTopic(Long id, TopicUpdateRequest topicUpdateRequest) {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
 
@@ -74,7 +74,7 @@ public class TopicService {
             topic.updateNotExistInstance(topicUpdateRequest.title(), topicUpdateRequest.description(),
                     topicUpdateRequest.tags(), topicUpdateRequest.notice(), topicUpdateRequest.pointPerPerson());
         }
-        topicRepository.save(topic);
+        return topicRepository.save(topic).getId();
     }
 
     // 토픽 삭제 요청

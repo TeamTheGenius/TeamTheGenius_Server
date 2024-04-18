@@ -34,11 +34,12 @@ public class UserController {
     @PostMapping("/auth/signup")
     public ResponseEntity<SingleResponse<SignupResponse>> signup(
             @RequestBody SignupRequest signupRequest) {
-        Long signupUserId = userService.signup(signupRequest);
-        String identifier = userService.findUserById(signupUserId).getIdentifier();
+        Long userId = userService.signup(signupRequest);
+        String identifier = userService.findUserById(userId).getIdentifier();
+        SignupResponse signupResponse = new SignupResponse(userId, identifier);
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), new SignupResponse(identifier))
+                new SingleResponse<>(CREATED.getStatus(), CREATED.getMessage(), signupResponse)
         );
     }
 }

@@ -2,9 +2,9 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "production", "chore/156-release-test" ] ## 나중에 production으로 변경하기
-  pull_request:
-    branches: [ "production", "chore/156-release-test" ]
+    branches: [ "production" ]
+#  pull_request:
+#    branches: [ "production"]
 
 env:
   AWS_REGION: ap-northeast-2
@@ -79,6 +79,8 @@ jobs:
 
 
       - name: Code Deploy (EC2에 배포)
-        run: aws deploy create-deployment --application-name GitGet-Application-HEY --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name GitGet-CICD-group-hey --s3-location bucket=$AWS_S3_BUCKET,key=$GITHUB_SHA.zip,bundleType=zip
-
-
+        run: aws deploy create-deployment \
+             --application-name ${{ env.AWS_CODE_DEPLOY_APPLICATION }} \
+             --deployment-config-name CodeDeployDefault.AllAtOnce \
+             --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} \
+             --s3-location bucket=$AWS_S3_BUCKET,key=$GITHUB_SHA.zip,bundleType=zip

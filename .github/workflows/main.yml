@@ -2,9 +2,9 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "production" ] ## 나중에 production으로 변경하기
-  # pull_request:
-    # branches: [ "production" ]
+    branches: [ "production" ]
+#  pull_request:
+#    branches: [ "production"]
 
 env:
   AWS_REGION: ap-northeast-2
@@ -19,8 +19,8 @@ jobs:
       contents: read
       packages: write
     steps:
-      # Actions 
-      - name : Checkout
+      # Actions
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -29,7 +29,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 프로젝트 내 yml 파일 실행 
+      # 프로젝트 내 yml 파일 실행
       - name: make application.yml
         run: |
           mkdir -p ./src/main/resources
@@ -37,6 +37,7 @@ jobs:
           touch ./application.yml
           touch ./application-common.yml
           touch ./application-prod.yml
+          
           echo "${{ secrets.APPLICATION }}" > ./application.yml
           echo "${{ secrets.COMMON }}" > ./application-common.yml
           echo "${{ secrets.PROD }}" > ./application-prod.yml
@@ -50,7 +51,7 @@ jobs:
           echo "${{ secrets.APPLICATION_TEST }}" > ./application.yml
           echo "${{ secrets.TEST }}" > ./application-test.yml
 
-      
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
@@ -83,6 +84,3 @@ jobs:
              --deployment-config-name CodeDeployDefault.AllAtOnce \
              --deployment-group-name ${{ env.AWS_CODE_DEPLOY_GROUP }} \
              --s3-location bucket=$AWS_S3_BUCKET,key=$GITHUB_SHA.zip,bundleType=zip
-
-
-

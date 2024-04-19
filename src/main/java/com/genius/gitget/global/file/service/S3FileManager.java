@@ -1,46 +1,91 @@
 package com.genius.gitget.global.file.service;
 
+import com.amazonaws.SdkClientException;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.CopyDTO;
 import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
-import lombok.RequiredArgsConstructor;
+import com.genius.gitget.global.util.exception.BusinessException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * !!!이 클래스의 모든 주석은 삭제해도 무방합니다!!!
- * <p>
- * S3 bucket에 이미지를 업로드하는 코드를 구현하는 곳
- * 파일 시스템 구조 확장에 참고한 링크
- * https://chb2005.tistory.com/200#3.5.%20%ED%8C%8C%EC%9D%BC%20%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C%20%EA%B5%AC%ED%98%84
- * https://docs.aws.amazon.com/ko_kr/sdk-for-java/v1/developer-guide/examples-s3-objects.html#upload-object
- */
-@RequiredArgsConstructor
 public class S3FileManager implements FileManager {
+    private final AmazonS3 amazonS3;
     private final FileUtil fileUtil;
+    private final String bucket;
 
+    public S3FileManager(AmazonS3 amazonS3, FileUtil fileUtil, String bucket) {
+        this.amazonS3 = amazonS3;
+        this.fileUtil = fileUtil;
+        this.bucket = bucket;
+    }
 
     @Override
     public String getEncodedImage(Files files) {
-        return null;
+        try {
+            UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucket, files.getFileURI()));
+            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
+            return new String(encode, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
     }
 
     @Override
     public FileDTO upload(MultipartFile multipartFile, FileType fileType) {
-        return null;
+        try {
+            fileUtil.validateFile(multipartFile);
+            FileDTO fileDTO = fileUtil.getFileDTO(multipartFile, fileType, "");
+
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            objectMetadata.setContentLength(multipartFile.getSize());
+            objectMetadata.setContentType(multipartFile.getContentType());
+
+            amazonS3.putObject(bucket, fileDTO.fileURI(), multipartFile.getInputStream(), objectMetadata);
+            return fileDTO;
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
     }
 
     @Override
     public FileDTO copy(Files files, FileType fileType) {
-        return null;
+        CopyDTO copyDTO = fileUtil.getCopyInfo(files, fileType, "");
+
+        CopyObjectRequest copyObjectRequest = new CopyObjectRequest(
+                bucket, files.getFileURI(),
+                bucket, copyDTO.fileURI()
+        );
+        amazonS3.copyObject(copyObjectRequest);
+        return FileDTO.builder()
+                .fileType(fileType)
+                .originalFilename(copyDTO.originalFilename())
+                .savedFilename(copyDTO.savedFilename())
+                .fileURI(copyDTO.fileURI())
+                .build();
     }
 
     @Override
     public UpdateDTO update(Files files, MultipartFile multipartFile) {
-        return null;
+        deleteInStorage(files);
+        FileDTO fileDTO = upload(multipartFile, files.getFileType());
+
+        return UpdateDTO.of(fileDTO);
     }
 
     @Override
     public void deleteInStorage(Files files) {
+        try {
+            amazonS3.deleteObject(bucket, files.getFileURI());
+        } catch (SdkClientException e) {
+            throw new BusinessException(e);
+        }
     }
 }

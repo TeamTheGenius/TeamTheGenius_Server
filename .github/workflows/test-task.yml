@@ -2,9 +2,9 @@ name: Build test about test codes
 
 on:
   push:
-    branches: [ "refactor/162-file-system-structure" ] ## 테스트하고자하는 브랜치 작성
-  pull_request:
-    branches: [ "refactor/162-file-system-structure" ]
+    branches: [ "feat/161-aws-s3-image" ] ## 테스트하고자하는 브랜치 작성
+#  pull_request:
+#    branches: [ "refactor/162-file-system-structure" ]
 
 jobs:
   deploy:

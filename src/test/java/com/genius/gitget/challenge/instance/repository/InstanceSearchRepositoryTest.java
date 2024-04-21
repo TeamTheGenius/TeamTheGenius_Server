@@ -8,7 +8,6 @@ import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
-import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;
 import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.util.file.FileTestUtil;
@@ -109,9 +108,9 @@ public class InstanceSearchRepositoryTest {
     public void 검색_조건_없이_테스트() throws Exception {
         for (int i = 0; i < 5; i++) {
             PageRequest pageRequest = PageRequest.of(i, 2);
-            Page<InstanceSearchResponse> result = searchRepository.search(null, null, pageRequest);
-            for (InstanceSearchResponse instanceSearchResponse : result) {
-                System.out.println("instanceSearchResponse = " + instanceSearchResponse.getInstanceId());
+            Page<Instance> result = searchRepository.search(null, null, pageRequest);
+            for (Instance instance : result) {
+                System.out.println("instanceSearchResponse = " + instance.getId());
             }
             System.out.println("========== " + i + 1 + " 번째 끝 =========");
         }
@@ -120,10 +119,10 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_제목으로_검색_테스트() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.search(null, "2", pageRequest);
+        Page<Instance> result = searchRepository.search(null, "2", pageRequest);
         int cnt = 0;
-        for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) {
+        for (Instance instance : result) {
+            if (instance != null) {
                 cnt++;
             }
         }
@@ -134,10 +133,10 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_현황으로_검색_테스트() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.search(PREACTIVITY, null, pageRequest);
+        Page<Instance> result = searchRepository.search(PREACTIVITY, null, pageRequest);
         int cnt = 0;
-        for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) {
+        for (Instance instance : result) {
+            if (instance != null) {
                 cnt++;
             }
         }
@@ -147,10 +146,10 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_현황으로_검색_테스트2() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.search(DONE, null, pageRequest);
+        Page<Instance> result = searchRepository.search(DONE, null, pageRequest);
         int cnt = 0;
-        for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) {
+        for (Instance instance : result) {
+            if (instance != null) {
                 cnt++;
             }
         }
@@ -160,10 +159,10 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_현황으로_검색_테스트3() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.search(ACTIVITY, null, pageRequest);
+        Page<Instance> result = searchRepository.search(ACTIVITY, null, pageRequest);
         int cnt = 0;
-        for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) {
+        for (Instance instance : result) {
+            if (instance != null) {
                 cnt++;
             }
         }
@@ -173,10 +172,10 @@ public class InstanceSearchRepositoryTest {
     @Test
     public void 챌린지_현황과_챌린지_제목으로_검색_테스트() throws Exception {
         PageRequest pageRequest = PageRequest.of(0, 10);
-        Page<InstanceSearchResponse> result = searchRepository.search(PREACTIVITY, "3", pageRequest);
+        Page<Instance> result = searchRepository.search(PREACTIVITY, "3", pageRequest);
         int cnt = 0;
-        for (InstanceSearchResponse instanceSearchResponse : result) {
-            if (instanceSearchResponse != null) {
+        for (Instance instance : result) {
+            if (instance != null) {
                 cnt++;
             }
         }

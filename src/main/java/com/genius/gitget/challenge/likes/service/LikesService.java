@@ -57,8 +57,10 @@ public class LikesService {
 
             userLikesResponses.add(userLikesResponse);
         }
-
-        return new PageImpl<>(userLikesResponses, pageable, userLikesResponses.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), userLikesResponses.size());
+        log.info("페이징" + start + " " + end);
+        return new PageImpl<>(userLikesResponses.subList(start, end), pageable, userLikesResponses.size());
     }
 
     @Transactional

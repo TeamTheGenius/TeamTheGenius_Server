@@ -14,12 +14,9 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.domain.Role;
-import com.genius.gitget.global.file.domain.FileType;
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;
-import com.genius.gitget.util.file.FileTestUtil;
 import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +28,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @Transactional
@@ -145,9 +141,6 @@ public class InstanceControllerTest {
 
 
     private Topic getSavedTopic() {
-        MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-        Files files = filesService.uploadFile(filename, FileType.TOPIC);
-
         Topic topic = topicRepository.save(
                 Topic.builder()
                         .title("title")
@@ -157,8 +150,6 @@ public class InstanceControllerTest {
                         .pointPerPerson(100)
                         .build()
         );
-        topic.setFiles(files);
-
         return topic;
     }
 

@@ -2,9 +2,8 @@ package com.genius.gitget.challenge.instance.repository;
 
 import static com.genius.gitget.challenge.instance.domain.QInstance.instance;
 
+import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.dto.search.QInstanceSearchResponse;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,7 +22,7 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
     }
 
     @Override
-    public Page<InstanceSearchResponse> search(Progress progressCond, String titleCond, Pageable pageable) {
+    public Page<Instance> search(Progress progressCond, String titleCond, Pageable pageable) {
         BooleanBuilder builder = new BooleanBuilder();
 
         if (progressCond != null) {
@@ -33,11 +32,8 @@ public class SearchRepositoryImpl implements SearchRepositoryCustom {
             builder.and(instance.title.contains(titleCond));
         }
 
-        List<InstanceSearchResponse> content = queryFactory
-                .select(new QInstanceSearchResponse(
-                        instance.topic.id, instance.id, instance.title, instance.pointPerPerson,
-                        instance.participantCount))
-                .from(instance)
+        List<Instance> content = queryFactory
+                .selectFrom(instance)
                 .where(builder)
                 .orderBy(instance.startedDate.desc())
                 .offset(pageable.getOffset())

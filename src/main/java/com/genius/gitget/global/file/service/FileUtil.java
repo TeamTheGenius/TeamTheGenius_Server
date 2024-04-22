@@ -1,7 +1,6 @@
 package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
-import static com.genius.gitget.global.util.exception.ErrorCode.IMAGE_NOT_ENCODED;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 
 import com.genius.gitget.global.file.domain.FileType;
@@ -9,13 +8,9 @@ import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.CopyDTO;
 import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,17 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileUtil {
     private final List<String> validExtensions = List.of("jpg", "jpeg", "png", "gif");
 
-    public static String encodedImage(Files files) {
-        try {
-            //TODO: local 환경에 종속된 메서드이므로 종속되지 않게 수정 필요
-            UrlResource urlResource = new UrlResource("file:" + files.getFileURI());
-
-            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
-            return new String(encode, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new BusinessException(IMAGE_NOT_ENCODED);
-        }
-    }
 
     public FileDTO getFileDTO(MultipartFile file, FileType fileType, final String UPLOAD_PATH) {
         String originalFilename = file.getOriginalFilename();

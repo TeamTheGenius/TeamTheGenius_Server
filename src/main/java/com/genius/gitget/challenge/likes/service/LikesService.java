@@ -12,7 +12,9 @@ import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +43,8 @@ public class LikesService {
                 likes = userObject.getLikesList();
             }
         }
-        List<UserLikesResponse> userLikesResponses = new ArrayList<>();
 
+        Deque<UserLikesResponse> userLikesResponses = new ArrayDeque<>();
         for (Likes like : likes) {
             Instance instance = like.getInstance();
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
@@ -55,10 +57,13 @@ public class LikesService {
                     .fileResponse(fileResponse)
                     .build();
 
-            userLikesResponses.add(userLikesResponse);
+            userLikesResponses.addFirst(userLikesResponse);
         }
 
-        return new PageImpl<>(userLikesResponses, pageable, userLikesResponses.size());
+        int start = (int) pageable.getOffset();
+        int end = Math.min((start + pageable.getPageSize()), userLikesResponses.size());
+        return new PageImpl<>(userLikesResponses.stream().toList().subList(start, end), pageable,
+                userLikesResponses.size());
     }
 
     @Transactional

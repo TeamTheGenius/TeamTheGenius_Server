@@ -132,14 +132,14 @@ class LikesServiceTest {
                     + likesResponse.getPointPerPerson());
         }
         assertThat(likesResponses.getContent().size()).isEqualTo(3);
-        assertThat(likesResponses.getContent().get(0).getTitle()).isEqualTo("1일 1커밋");
-        assertThat(likesResponses.getContent().get(0).getPointPerPerson()).isEqualTo(100);
+        assertThat(likesResponses.getContent().get(2).getTitle()).isEqualTo("1일 1커밋");
+        assertThat(likesResponses.getContent().get(2).getPointPerPerson()).isEqualTo(100);
 
         assertThat(likesResponses.getContent().get(1).getTitle()).isEqualTo("1일 1커밋");
         assertThat(likesResponses.getContent().get(1).getPointPerPerson()).isEqualTo(150);
 
-        assertThat(likesResponses.getContent().get(2).getTitle()).isEqualTo("1일 1알고리즘");
-        assertThat(likesResponses.getContent().get(2).getPointPerPerson()).isEqualTo(200);
+        assertThat(likesResponses.getContent().get(0).getTitle()).isEqualTo("1일 1알고리즘");
+        assertThat(likesResponses.getContent().get(0).getPointPerPerson()).isEqualTo(200);
     }
 
 

@@ -1,17 +1,13 @@
-name: Run gradlew clean test
+name: Run gradlew clean test when PR
 
 on:
-  push:
-    branches: [ "feat/161-aws-s3-image" ] ## 테스트하고자하는 브랜치 작성
-#  pull_request:
-#    branches: [ "feat/161-aws-s3-image" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
 
@@ -48,3 +44,9 @@ jobs:
       - name: Build and Test
         run: ./gradlew clean test
 
+      # Test 후 Report 생성
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          junit_files: '**/build/test-results/test/TEST-*.xml'

@@ -57,7 +57,7 @@ public class LikesService {
                     .fileResponse(fileResponse)
                     .build();
 
-            userLikesResponses.addFirst(userLikesResponse);
+            userLikesResponses.add(userLikesResponse);
         }
 
         int start = (int) pageable.getOffset();

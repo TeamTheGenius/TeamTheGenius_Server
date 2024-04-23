@@ -22,7 +22,7 @@ os: linux # 배포할 서버의 운영체제
 
 files:
   - source: / # CodeDeploy에서 전달해 준 파일 중 destination으로 이동시킬 대상을 지정 (루트 경로 : 전체 파일)
-    destination: /home/ubuntu/app # source에서 지정된 파일을 받을 위치
+    destination: /home/ubuntu/app/libs/ # source에서 지정된 파일을 받을 위치
     overwrite: yes # 기존 파일들을 덮어 쓰기
 
 # CodeDeploy에서 EC2로 넘겨준 파일들을 모두 ec2-user 권한 부여.

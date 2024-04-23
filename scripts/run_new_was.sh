@@ -24,8 +24,8 @@ if [ ! -z ${TARGET_PID} ]; then
   echo "> Kill WAS running at ${TARGET_PORT}."
   sudo kill ${TARGET_PID}
 fi
-
-nohup java -jar -Dserver.port=${TARGET_PORT} /home/ubuntu/app/build/libs/*.jar > /home/ubuntu/nohup.out 2>&1 &
+# -Dserver.port=${TARGET_PORT}
+nohup java -jar /home/ubuntu/app/build/libs/*.jar > /home/ubuntu/nohup.out 2>&1 &
 echo "> Now new WAS runs at ${TARGET_PORT}."
 exit 0
 lsof

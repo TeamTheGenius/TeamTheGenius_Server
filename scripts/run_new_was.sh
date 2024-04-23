@@ -26,5 +26,6 @@ if [ ! -z ${TARGET_PID} ]; then
 fi
 
 nohup java -jar -Dserver.port=${TARGET_PORT} /home/ubuntu/app/build/libs/*.jar > /home/ubuntu/nohup.out 2>&1 &
-echo "> Now new WAS runs at ${TARGET_PORT}. "
+echo "> Now new WAS runs at ${TARGET_PORT}."
 exit 0
+lsof

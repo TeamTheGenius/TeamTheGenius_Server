@@ -1,20 +1,20 @@
 package com.genius.gitget.global.file.service;
 
-import static com.genius.gitget.global.file.domain.FileType.INSTANCE;
-import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.MULTIPART_FILE_NOT_EXIST;
 
+import com.genius.gitget.challenge.instance.domain.Instance;
+import com.genius.gitget.global.file.domain.FileHolder;
+import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
-import com.genius.gitget.global.file.dto.CopyDTO;
+import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.dto.UpdateDTO;
-import com.genius.gitget.global.file.dto.UploadDTO;
 import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
-import java.io.File;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,65 +22,84 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class FilesService {
-    private final String UPLOAD_PATH;
+    private final FileManager fileManager;
     private final FilesRepository filesRepository;
 
-    public FilesService(@Value("${file.upload.path}") String UPLOAD_PATH, FilesRepository filesRepository) {
-        this.UPLOAD_PATH = UPLOAD_PATH;
-        this.filesRepository = filesRepository;
-    }
 
     @Transactional
-    public Files uploadFile(Optional<Files> optionalFiles, MultipartFile receivedFile, String typeStr) {
-        if (receivedFile != null) {
-            return uploadFile(receivedFile, typeStr);
-        }
-
-        Files files = optionalFiles.orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
-        CopyDTO copyDTO = FileUtil.getCopyInfo(files, INSTANCE, UPLOAD_PATH);
-        //REFACTOR: 정적 팩토리 메서드로 처리하면 깔끔할 듯!
-        Files copyFiles = Files.builder()
-                .originalFilename(copyDTO.originalFilename())
-                .savedFilename(copyDTO.savedFilename())
-                .fileType(copyDTO.fileType())
-                .fileURI(copyDTO.fileURI())
-                .build();
-
-        FileUtil.copyImage(files.getFileURI(), copyDTO);
-
-        return filesRepository.save(copyFiles);
-    }
-
-    @Transactional
-    public Files uploadFile(MultipartFile receivedFile, String typeStr) {
-        FileUtil.validateFile(receivedFile);
-        UploadDTO uploadDTO = FileUtil.getUploadInfo(receivedFile, typeStr, UPLOAD_PATH);
-        FileUtil.saveFile(receivedFile, uploadDTO.fileURI());
+    public Files uploadFile(MultipartFile multipartFile, FileType fileType) {
+        FileDTO fileDTO = fileManager.upload(multipartFile, fileType);
 
         Files file = Files.builder()
-                .originalFilename(uploadDTO.originalFilename())
-                .savedFilename(uploadDTO.savedFilename())
-                .fileType(uploadDTO.fileType())
-                .fileURI(uploadDTO.fileURI())
+                .originalFilename(fileDTO.originalFilename())
+                .savedFilename(fileDTO.savedFilename())
+                .fileType(fileDTO.fileType())
+                .fileURI(fileDTO.fileURI())
                 .build();
-
         return filesRepository.save(file);
     }
 
     @Transactional
-    public Files updateFile(Long fileId, MultipartFile file) {
+    public Files uploadFile(FileHolder fileHolder, MultipartFile multipartFile, FileType fileType) {
+        if (multipartFile == null) {
+            throw new BusinessException(MULTIPART_FILE_NOT_EXIST);
+        }
+        FileDTO fileDTO = fileManager.upload(multipartFile, fileType);
+
+        Files file = Files.builder()
+                .originalFilename(fileDTO.originalFilename())
+                .savedFilename(fileDTO.savedFilename())
+                .fileType(fileDTO.fileType())
+                .fileURI(fileDTO.fileURI())
+                .build();
+        fileHolder.setFiles(file);
+        return filesRepository.save(file);
+    }
+
+    @Transactional
+    public Files copyTopicToInstance(FileHolder fileHolder) {
+        Instance instance = (Instance) fileHolder;
+        Files topicFiles = instance.getTopic().getFiles()
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
+
+        Files instanceFiles = copyFile(topicFiles, FileType.INSTANCE);
+        instance.setFiles(instanceFiles);
+
+        return instanceFiles;
+    }
+
+    @Transactional
+    public Files copyFile(Files files, FileType fileType) {
+        FileDTO fileDTO = fileManager.copy(files, fileType);
+
+        Files copyFiles = Files.create(fileDTO);
+        return filesRepository.save(copyFiles);
+    }
+
+    @Transactional
+    public Files updateFile(Long fileId, MultipartFile multipartFile) {
         Files files = filesRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
-        if (file == null) {
+        if (multipartFile == null) {
             return files;
         }
 
-        deleteFilesInStorage(files);
+        UpdateDTO updateDTO = fileManager.update(files, multipartFile);
+        files.updateFiles(updateDTO);
+        return files;
+    }
 
-        UpdateDTO updateDTO = FileUtil.getUpdateInfo(file, files.getFileType(), UPLOAD_PATH);
-        FileUtil.saveFile(file, updateDTO.fileURI());
+    @Transactional
+    public Files updateFile(Optional<Files> optionalFiles, MultipartFile multipartFile) {
+        Files files = optionalFiles.orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
+        if (multipartFile == null) {
+            return files;
+        }
+
+        UpdateDTO updateDTO = fileManager.update(files, multipartFile);
         files.updateFiles(updateDTO);
         return files;
     }
@@ -95,29 +114,32 @@ public class FilesService {
         Files files = filesRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
-        deleteFilesInStorage(files);
+        fileManager.deleteInStorage(files);
         filesRepository.delete(files);
     }
 
-    private void deleteFilesInStorage(Files files) {
-        String fileURI = files.getFileURI();
-        File targetFile = new File(fileURI);
-        if (!targetFile.delete()) {
-            throw new BusinessException(FILE_NOT_DELETED);
+    @Transactional
+    public void deleteFile(Optional<Files> optionalFiles) {
+        if (optionalFiles.isEmpty()) {
+            return;
         }
+        Files files = optionalFiles.get();
+
+        fileManager.deleteInStorage(files);
+        filesRepository.delete(files);
     }
 
-    public FileResponse getEncodedFile(Long fileId) {
-        Optional<Files> optionalFiles = filesRepository.findById(fileId);
-        return optionalFiles
-                .map(FileResponse::createExistFile)
-                .orElseGet(FileResponse::createNotExistFile);
-
+    public Files findById(Long fileId) {
+        return filesRepository.findById(fileId)
+                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
     }
 
-    public FileResponse getEncodedFile(Optional<Files> optionalFiles) {
+    public FileResponse convertToFileResponse(Optional<Files> optionalFiles) {
         return optionalFiles
-                .map(FileResponse::createExistFile)
+                .map(files -> {
+                    String encodedImage = fileManager.getEncodedImage(files);
+                    return FileResponse.createExistFile(files.getId(), encodedImage);
+                })
                 .orElseGet(FileResponse::createNotExistFile);
     }
 }

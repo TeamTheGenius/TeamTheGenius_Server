@@ -1,5 +1,6 @@
 package com.genius.gitget.global.file.domain;
 
+import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
 import jakarta.persistence.Column;
@@ -38,6 +39,15 @@ public class Files extends BaseTimeEntity {
         this.originalFilename = originalFilename;
         this.savedFilename = savedFilename;
         this.fileURI = fileURI;
+    }
+
+    public static Files create(FileDTO fileDTO) {
+        return Files.builder()
+                .originalFilename(fileDTO.originalFilename())
+                .savedFilename(fileDTO.savedFilename())
+                .fileType(fileDTO.fileType())
+                .fileURI(fileDTO.fileURI())
+                .build();
     }
 
     //== 비지니스 로직 ==//

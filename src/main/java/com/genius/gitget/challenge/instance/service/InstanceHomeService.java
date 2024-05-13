@@ -6,8 +6,8 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.global.util.exception.BusinessException;
-import java.io.IOException;
+import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.global.file.service.FilesService;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class InstanceHomeService {
+    private final FilesService filesService;
     private final InstanceRepository instanceRepository;
 
     public Slice<HomeInstanceResponse> getRecommendations(User user, Pageable pageable) {
@@ -40,10 +41,7 @@ public class InstanceHomeService {
     }
 
     private HomeInstanceResponse mapToHomeInstanceResponse(Instance instance) {
-        try {
-            return HomeInstanceResponse.createByEntity(instance, instance.getFiles());
-        } catch (IOException e) {
-            throw new BusinessException(e);
-        }
+        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        return HomeInstanceResponse.createByEntity(instance, fileResponse);
     }
 }

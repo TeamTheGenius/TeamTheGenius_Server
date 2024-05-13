@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.config;
+package com.genius.gitget.global.util.config;
 
 import com.genius.gitget.challenge.instance.service.StringToEnum;
 import org.springframework.context.annotation.Configuration;

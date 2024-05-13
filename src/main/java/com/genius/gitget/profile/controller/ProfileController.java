@@ -1,11 +1,13 @@
 package com.genius.gitget.profile.controller;
 
+import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
+
 import com.genius.gitget.global.security.domain.UserPrincipal;
-import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
+import com.genius.gitget.profile.dto.UserIndexResponse;
 import com.genius.gitget.profile.dto.UserInformationRequest;
 import com.genius.gitget.profile.dto.UserInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
@@ -22,9 +24,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +39,7 @@ public class ProfileController {
         UserDetailsInformationResponse userInformation = profileService.getUserDetailsInformation(
                 userPrincipal.getUser());
         return ResponseEntity.ok()
-                .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         userInformation)
                 );
     }
@@ -50,22 +50,23 @@ public class ProfileController {
             @RequestBody UserInformationRequest userInformationRequest) {
         UserInformationResponse userInformation = profileService.getUserInformation(userInformationRequest.getUserId());
         return ResponseEntity.ok()
-                .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         userInformation)
                 );
     }
 
     // 마이페이지 - 회원 정보 수정
     @PostMapping("/information")
-    public ResponseEntity<CommonResponse> updateUserInformation(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                                @RequestPart(value = "data") UserInformationUpdateRequest userInformationUpdateRequest,
-                                                                @RequestPart(value = "files", required = false) MultipartFile multipartFile,
-                                                                @RequestPart(value = "type") String type) {
-        profileService.updateUserInformation(userPrincipal.getUser(), userInformationUpdateRequest, multipartFile,
-                type);
+    public ResponseEntity<SingleResponse<UserIndexResponse>> updateUserInformation(
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @RequestBody UserInformationUpdateRequest userInformationUpdateRequest) {
 
-        return ResponseEntity.ok()
-                .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
+        Long userId = profileService.updateUserInformation(userPrincipal.getUser(), userInformationUpdateRequest);
+        UserIndexResponse userIndexResponse = new UserIndexResponse(userId);
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), userIndexResponse)
+        );
     }
 
     // 마이페이지 - 관심사 조회
@@ -75,7 +76,7 @@ public class ProfileController {
         UserInterestResponse userInterest = profileService.getUserInterest(userPrincipal.getUser());
 
         return ResponseEntity.ok()
-                .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         userInterest));
     }
 
@@ -87,7 +88,7 @@ public class ProfileController {
         profileService.updateUserTags(userPrincipal.getUser(), userInterestUpdateRequest);
 
         return ResponseEntity.ok()
-                .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
+                .body(new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage()));
     }
 
 
@@ -98,7 +99,7 @@ public class ProfileController {
         UserChallengeResultResponse userChallengeResult = profileService.getUserChallengeResult(
                 userPrincipal.getUser());
         return ResponseEntity.ok()
-                .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         userChallengeResult));
     }
 
@@ -110,7 +111,7 @@ public class ProfileController {
         profileService.deleteUserInformation(userPrincipal.getUser(), userSignoutRequest.getReason());
 
         return ResponseEntity.ok()
-                .body(new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage()));
+                .body(new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage()));
     }
 
 
@@ -121,7 +122,7 @@ public class ProfileController {
         UserPointResponse userPoint = profileService.getUserPoint(userPrincipal.getUser());
 
         return ResponseEntity.ok()
-                .body(new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(),
+                .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         userPoint));
     }
 }

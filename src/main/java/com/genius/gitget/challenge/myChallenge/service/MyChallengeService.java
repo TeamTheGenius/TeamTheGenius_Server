@@ -1,11 +1,11 @@
 package com.genius.gitget.challenge.myChallenge.service;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
-import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PASSER;
-import static com.genius.gitget.store.item.domain.ItemCategory.POINT_MULTIPLIER;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.NO;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.YES;
+import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PASSER;
+import static com.genius.gitget.store.item.domain.ItemCategory.POINT_MULTIPLIER;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
@@ -13,9 +13,6 @@ import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.store.item.domain.Item;
-import com.genius.gitget.store.item.service.ItemProvider;
-import com.genius.gitget.store.item.service.OrdersProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
@@ -25,8 +22,12 @@ import com.genius.gitget.challenge.participant.service.ParticipantProvider;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.store.item.domain.Item;
+import com.genius.gitget.store.item.service.ItemProvider;
+import com.genius.gitget.store.item.service.OrdersProvider;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MyChallengeService {
     private final UserService userService;
+    private final FilesService filesService;
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
     private final ItemProvider itemProvider;
@@ -51,6 +53,7 @@ public class MyChallengeService {
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
+            FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
 
             PreActivityResponse preActivityResponse = PreActivityResponse.builder()
                     .instanceId(instance.getId())
@@ -58,7 +61,7 @@ public class MyChallengeService {
                     .participantCount(instance.getParticipantCount())
                     .pointPerPerson(instance.getPointPerPerson())
                     .remainDays(DateUtil.getRemainDaysToStart(participant.getStartedDate(), targetDate))
-                    .fileResponse(FileResponse.create(instance.getFiles()))
+                    .fileResponse(fileResponse)
                     .build();
             preActivity.add(preActivityResponse);
         }
@@ -72,12 +75,14 @@ public class MyChallengeService {
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
+            FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
 
             // 포인트를 아직 수령하지 않았을 때
             if (participant.getRewardStatus() == NO) {
                 Item item = itemProvider.findAllByCategory(POINT_MULTIPLIER).get(0);
                 int numOfPassItem = ordersProvider.countNumOfItem(user, item.getId());
-                DoneResponse doneResponse = DoneResponse.createNotRewarded(instance, participant, numOfPassItem);
+                DoneResponse doneResponse = DoneResponse.createNotRewarded(
+                        instance, participant, numOfPassItem, fileResponse);
                 doneResponse.setItemId(item.getId());
                 done.add(doneResponse);
                 continue;
@@ -85,7 +90,8 @@ public class MyChallengeService {
 
             // 포인트를 수령했을 때
             double achievementRate = getAchievementRate(instance, participant.getId(), targetDate);
-            DoneResponse doneResponse = DoneResponse.createRewarded(instance, participant, achievementRate);
+            DoneResponse doneResponse = DoneResponse.createRewarded(
+                    instance, participant, achievementRate, fileResponse);
             done.add(doneResponse);
         }
 
@@ -107,6 +113,7 @@ public class MyChallengeService {
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
+            FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
             Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
                     .orElse(getDummyCertification());
 
@@ -116,7 +123,7 @@ public class MyChallengeService {
 
             ActivatedResponse activatedResponse = ActivatedResponse.create(
                     instance, certification.getCertificationStatus(),
-                    numOfPassItem, participant.getRepositoryName()
+                    numOfPassItem, participant.getRepositoryName(), fileResponse
             );
             activatedResponse.setItemId(item.getId());
             activated.add(activatedResponse);
@@ -139,6 +146,8 @@ public class MyChallengeService {
         Participant participant = participantProvider.findByJoinInfo(user.getId(), rewardRequest.instanceId());
         Instance instance = participant.getInstance();
 
+        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+
         validRewardCondition(participant);
 
         int rewardPoints = instance.getPointPerPerson();
@@ -150,7 +159,7 @@ public class MyChallengeService {
         double achievementRate = getAchievementRate(instance, participant.getId(), rewardRequest.targetDate());
 
         participant.getRewards(rewardPoints);
-        return DoneResponse.createRewarded(instance, participant, achievementRate);
+        return DoneResponse.createRewarded(instance, participant, achievementRate, fileResponse);
     }
 
     private void validRewardCondition(Participant participant) {

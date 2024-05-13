@@ -17,7 +17,6 @@ import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.repository.FilesRepository;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.util.file.FileTestUtil;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,7 +31,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest
 @Transactional
@@ -51,6 +49,7 @@ public class InstanceServiceTest {
 
     private Instance instance, instance1, instance2;
     private Topic topic;
+    private Files topicFiles;
     private String fileType;
 
     @BeforeEach
@@ -83,8 +82,7 @@ public class InstanceServiceTest {
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
 
         //when
-        instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
+        instanceService.createInstance(instanceCreateRequest, currentDate);
 
         //then
         List<Instance> all = instanceRepository.findAll();
@@ -99,8 +97,7 @@ public class InstanceServiceTest {
         Topic savedTopic = topicRepository.save(topic);
 
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
-        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
+        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest, currentDate);
 
         InstanceUpdateRequest instanceUpdateRequest = InstanceUpdateRequest.builder()
                 .topicId(savedTopic.getId())
@@ -111,8 +108,7 @@ public class InstanceServiceTest {
                 .build();
 
         //when
-        Long updatedInstanceId = instanceService.updateInstance(savedInstanceId, instanceUpdateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType);
+        Long updatedInstanceId = instanceService.updateInstance(savedInstanceId, instanceUpdateRequest);
 
         //then
         Optional<Instance> byId = instanceRepository.findById(updatedInstanceId);
@@ -126,8 +122,7 @@ public class InstanceServiceTest {
         Topic savedTopic = topicRepository.save(topic);
 
         InstanceCreateRequest instanceCreateRequest = getInstanceCreateRequest(savedTopic, instance);
-        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest,
-                FileTestUtil.getMultipartFile("name"), fileType, currentDate);
+        Long savedInstanceId = instanceService.createInstance(instanceCreateRequest, currentDate);
 
         //when
         InstanceDetailResponse instanceById = instanceService.getInstanceById(savedInstanceId);
@@ -206,52 +201,6 @@ public class InstanceServiceTest {
         });
     }
 
-    @Nested
-    public class 인스턴스_삭제할_때 {
-        private Topic topic;
-        private Instance instance1, instance2, instance3;
-
-        @BeforeEach
-        public void setup() {
-            topic = getSavedTopic("1일 1공부", "BE, ML");
-            instance1 = getSavedInstance("1일 1공부", "BE, ML", 100);
-            instance2 = getSavedInstance("1일 3공부", "BE, ML", 100);
-            instance3 = getSavedInstance("1일 3공부", "BE, ML", 100);
-            instance1.setTopic(topic);
-            instance2.setTopic(topic);
-        }
-
-        @Test
-        public void 해당_아이디가_존재한다면_삭제할_수_있다() {
-            Long id = instance1.getId();
-            instanceService.deleteInstance(id);
-
-            assertThrows(BusinessException.class, () -> {
-                instanceService.getInstanceById(id);
-            });
-        }
-
-        @Test
-        public void 해당_아이디가_존재하지_않는다면_삭제할_수_없다() {
-            Long id = instance3.getId() + 1L;
-            assertThrows(BusinessException.class, () -> {
-                instanceService.deleteInstance(id);
-            });
-        }
-
-        @Test
-        public void 해당_인스턴스에_파일이_존재한다면_같이_삭제한다() {
-            MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-            Files files1 = filesService.uploadFile(filename, "instance");
-
-            instance1.setFiles(files1);
-            instanceRepository.save(instance1);
-
-            instanceService.deleteInstance(instance1.getId());
-        }
-    }
-
-
     private Topic getSavedTopic(String title, String tags) {
         Topic topic = topicRepository.save(
                 Topic.builder()
@@ -304,5 +253,39 @@ public class InstanceServiceTest {
                         .fileType(fileType)
                         .build()
         );
+    }
+
+    @Nested
+    public class 인스턴스_삭제할_때 {
+        private Topic topic;
+        private Instance instance1, instance2, instance3;
+
+        @BeforeEach
+        public void setup() {
+            topic = getSavedTopic("1일 1공부", "BE, ML");
+            instance1 = getSavedInstance("1일 1공부", "BE, ML", 100);
+            instance2 = getSavedInstance("1일 3공부", "BE, ML", 100);
+            instance3 = getSavedInstance("1일 3공부", "BE, ML", 100);
+            instance1.setTopic(topic);
+            instance2.setTopic(topic);
+        }
+
+        @Test
+        public void 해당_아이디가_존재한다면_삭제할_수_있다() {
+            Long id = instance1.getId();
+            instanceService.deleteInstance(id);
+
+            assertThrows(BusinessException.class, () -> {
+                instanceService.getInstanceById(id);
+            });
+        }
+
+        @Test
+        public void 해당_아이디가_존재하지_않는다면_삭제할_수_없다() {
+            Long id = instance3.getId() + 1L;
+            assertThrows(BusinessException.class, () -> {
+                instanceService.deleteInstance(id);
+            });
+        }
     }
 }

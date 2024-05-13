@@ -33,8 +33,9 @@ public class LikesController {
 
     // 좋아요 목록 조회
     @GetMapping("/likes")
-    public ResponseEntity<PagingResponse<UserLikesResponse>> getLikesListOfUser(Pageable pageable,
-                                                                                @AuthenticationPrincipal UserPrincipal userPrincipal) {
+    public ResponseEntity<PagingResponse<UserLikesResponse>> getLikesListOfUser(
+            Pageable pageable,
+            @AuthenticationPrincipal UserPrincipal userPrincipal) {
 
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
         Page<UserLikesResponse> likesResponses = likesService.getLikesList(userPrincipal.getUser(), pageRequest);

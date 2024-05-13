@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.gitget.global.security.domain.Token;
 import com.genius.gitget.global.security.repository.TokenRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ class TokenServiceTest {
 
     @Autowired
     private TokenRepository tokenRepository;
+
+    @AfterEach
+    void clearMongo() {
+        tokenRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("특정 리프레시 토큰을 identifier를 통해 DB에서 값을 조회할 수 있어야 한다.")

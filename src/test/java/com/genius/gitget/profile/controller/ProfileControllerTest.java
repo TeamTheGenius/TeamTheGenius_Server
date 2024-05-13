@@ -19,12 +19,10 @@ import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;
-import com.genius.gitget.util.file.FileTestUtil;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +40,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.multipart.MultipartFile;
 
 
 @SpringBootTest
@@ -277,9 +274,6 @@ public class ProfileControllerTest {
     }
 
     private Topic getSavedTopic() {
-        MultipartFile filename = FileTestUtil.getMultipartFile("sky");
-        Files files = filesService.uploadFile(filename, "topic");
-
         Topic topic = topicRepository.save(
                 Topic.builder()
                         .title("title")
@@ -289,7 +283,6 @@ public class ProfileControllerTest {
                         .pointPerPerson(100)
                         .build()
         );
-        topic.setFiles(files);
 
         return topic;
     }

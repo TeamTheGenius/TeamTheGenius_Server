@@ -43,6 +43,7 @@ public enum ErrorCode {
 
     JWT_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "Cookie에 토큰이 존재하지 않습니다."),
 
+    MULTIPART_FILE_NOT_EXIST(HttpStatus.BAD_REQUEST, "MultipartFile이 전달되지 않았습니다."),
     FILE_NOT_EXIST(HttpStatus.BAD_REQUEST, "해당 파일(이미지)이 존재하지 않습니다."),
     NOT_SUPPORTED_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 확장자입니다."),
     NOT_SUPPORTED_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 타입입니다."),
@@ -50,6 +51,7 @@ public enum ErrorCode {
     FILE_NOT_SAVED(HttpStatus.BAD_REQUEST, "파일(이미지)가 정상적으로 저장되지 않았습니다."),
     FILE_NOT_COPIED(HttpStatus.BAD_REQUEST, "파일(이미지)가 정상적으로 복사되지 않았습니다."),
     IMAGE_NOT_ENCODED(HttpStatus.BAD_REQUEST, "이미지를 인코딩하는 과정에서 오류가 발생했습니다."),
+    FILE_MAX_SIZE_EXCEED(HttpStatus.BAD_REQUEST, "파일(이미지)의 크기가 최대 용량을 초과했습니다."),
 
     GITHUB_CONNECTION_FAILED(HttpStatus.BAD_REQUEST, "Github 연결이 실패했습니다."),
     GITHUB_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "저장된 Github Token을 찾을 수 없습니다."),

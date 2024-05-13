@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.user.domain;
 
 import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.participant.domain.Participant;
+import com.genius.gitget.global.file.domain.FileHolder;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
@@ -34,7 +35,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "users")
-public class User extends BaseTimeEntity {
+public class User extends BaseTimeEntity implements FileHolder {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -115,23 +116,22 @@ public class User extends BaseTimeEntity {
         return this.point;
     }
 
+    @Override
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);
     }
 
-    //=== 연관관계 편의 메서드 ===//
+    @Override
     public void setFiles(Files files) {
         this.files = files;
     }
+
+    //=== 연관관계 편의 메서드 ===//
 
     public void updateUser(String nickname, String information, String tags) {
         this.nickname = nickname;
         this.information = information;
         this.tags = tags;
-    }
-
-    public void setPoint(Long point) {
-        this.point += point;
     }
 
     public void deleteLikesList() {

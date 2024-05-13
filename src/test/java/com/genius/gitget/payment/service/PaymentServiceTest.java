@@ -87,7 +87,7 @@ public class PaymentServiceTest {
         User user = getSavedUser();
         Item item = getSavedItem(itemCategory);
         getSavedOrder(user, item, itemCategory, 0);
-        user.setPoint(1000L);
+        user.updatePoints(1000L);
 
         ItemResponse itemResponse = itemService.orderItem(user, item.getId());
         assertThat(itemResponse.getItemCategory()).isEqualTo(itemCategory);

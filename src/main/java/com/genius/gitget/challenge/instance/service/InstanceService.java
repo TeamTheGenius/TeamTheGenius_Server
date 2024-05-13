@@ -13,19 +13,17 @@ import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.global.file.domain.Files;
+import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -38,14 +36,10 @@ public class InstanceService {
     // 인스턴스 생성
     @Transactional
     public Long createInstance(InstanceCreateRequest instanceCreateRequest,
-                               MultipartFile multipartFile, String type,
                                LocalDate currentDate) {
         // 토픽 조회
         Topic topic = topicRepository.findById(instanceCreateRequest.topicId())
                 .orElseThrow(() -> new BusinessException(TOPIC_NOT_FOUND));
-
-        // 파일 업로드
-        Files uploadedFile = filesService.uploadFile(topic.getFiles(), multipartFile, type);
 
         // 인스턴스 생성 일자 검증
         validatePeriod(instanceCreateRequest, currentDate);
@@ -60,7 +54,6 @@ public class InstanceService {
 
         // 연관 관계 설정
         instance.setTopic(topic);
-        instance.setFiles(uploadedFile);
 
         return instanceRepository.save(instance).getId();
     }
@@ -83,7 +76,8 @@ public class InstanceService {
 
     // 특정 토픽에 대한 리스트 조회
     public Page<InstancePagingResponse> getAllInstancesOfSpecificTopic(Pageable pageable, Long id) {
-        Topic topic = topicRepository.findById(id).orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        Topic topic = topicRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
         Page<Instance> instancesByTopicId = instanceRepository.findInstancesByTopicId(pageable, topic.getId());
         return instancesByTopicId.map(this::mapToInstancePagingResponse);
     }
@@ -93,7 +87,8 @@ public class InstanceService {
     public InstanceDetailResponse getInstanceById(Long id) {
         Instance instanceDetails = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
-        return InstanceDetailResponse.createByEntity(instanceDetails, instanceDetails.getFiles());
+        FileResponse fileResponse = filesService.convertToFileResponse(instanceDetails.getFiles());
+        return InstanceDetailResponse.createByEntity(instanceDetails, fileResponse);
     }
 
 
@@ -116,14 +111,9 @@ public class InstanceService {
 
     // 인스턴스 수정
     @Transactional
-    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest, MultipartFile multipartFile,
-                               String type) {
+    public Long updateInstance(Long id, InstanceUpdateRequest instanceUpdateRequest) {
         Instance existingInstance = instanceRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(INSTANCE_NOT_FOUND));
-
-        Optional<Files> findInstanceFile = existingInstance.getFiles();
-        Long findInstanceFileId = findInstanceFile.get().getId();
-        filesService.updateFile(findInstanceFileId, multipartFile);
 
         existingInstance.updateInstance(instanceUpdateRequest.description(), instanceUpdateRequest.notice(),
                 instanceUpdateRequest.pointPerPerson(), instanceUpdateRequest.startedAt(),
@@ -135,10 +125,7 @@ public class InstanceService {
     }
 
     private InstancePagingResponse mapToInstancePagingResponse(Instance instance) {
-        try {
-            return InstancePagingResponse.createByEntity(instance, instance.getFiles());
-        } catch (IOException e) {
-            throw new BusinessException(e);
-        }
+        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        return InstancePagingResponse.createByEntity(instance, fileResponse);
     }
 }

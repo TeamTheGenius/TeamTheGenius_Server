@@ -1,40 +1,35 @@
 package com.genius.gitget.profile.dto;
 
 import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
-import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 public class UserInformationResponse {
+    private Long userId;
     private String identifier;
     private String nickname;
     private Long frameId;
     private FileResponse fileResponse;
 
     @Builder
-    public UserInformationResponse(String identifier, String nickname, Long frameId, Files files) {
+    public UserInformationResponse(Long userId, String identifier, String nickname, Long frameId,
+                                   FileResponse fileResponse) {
+        this.userId = userId;
         this.identifier = identifier;
         this.nickname = nickname;
         this.frameId = frameId;
-        this.fileResponse = convertToFileResponse(Optional.ofNullable(files));
+        this.fileResponse = fileResponse;
     }
 
-    public static UserInformationResponse createByEntity(User findUser, Long frameId, Files files) {
+    public static UserInformationResponse createByEntity(User findUser, Long frameId, FileResponse fileResponse) {
         return UserInformationResponse.builder()
+                .userId(findUser.getId())
                 .identifier(findUser.getIdentifier())
                 .nickname(findUser.getNickname())
                 .frameId(frameId)
-                .files(files)
+                .fileResponse(fileResponse)
                 .build();
-    }
-
-    private static FileResponse convertToFileResponse(Optional<Files> files) {
-        if (files.isEmpty()) {
-            return FileResponse.createNotExistFile();
-        }
-        return FileResponse.createExistFile(files.get());
     }
 }

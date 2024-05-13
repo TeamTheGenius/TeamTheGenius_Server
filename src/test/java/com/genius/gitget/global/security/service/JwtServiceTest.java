@@ -13,12 +13,14 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.global.security.repository.TokenRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;
 import jakarta.servlet.http.Cookie;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,11 +38,18 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles({"jwt"})
 class JwtServiceTest {
     @Autowired
+    private TokenRepository tokenRepository;
+    @Autowired
     private JwtService jwtService;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private TokenTestUtil tokenTestUtil;
+
+    @AfterEach
+    void clearMongo() {
+        tokenRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("사용자 정보를 받아서 access-token을 생성할 수 있다.")

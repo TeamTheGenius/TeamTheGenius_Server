@@ -2,7 +2,7 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "production", "deploy-test" ]
+    branches: [ "production" ]
   pull_request:
     branches: [ "production", "deploy-test" ]
 

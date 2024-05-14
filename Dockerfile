@@ -1,5 +1,5 @@
 # Start with a base image containing Java runtime.
-FROM java:17
+FROM openjdk:17
 
 # The application's jar file.
 ARG JAR_FILE=./build/libs

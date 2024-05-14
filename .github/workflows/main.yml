@@ -98,9 +98,9 @@ jobs:
 #          aws-region: ${{ env.AWS_REGION }}
 #          aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY_HEY }}
 #          aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY_HEY }}
-#
+
 #      - name: Upload to S3
 #        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$AWS_S3_BUCKET/$GITHUB_SHA.zip
-#
+
 #      - name: Code Deploy
 #        run: aws deploy create-deployment --application-name GitGet-Application-HEY --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name GitGet-CICD-group-hey --s3-location bucket=$AWS_S3_BUCKET,key=$GITHUB_SHA.zip,bundleType=zip

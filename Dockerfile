@@ -2,10 +2,10 @@
 FROM openjdk:17-jdk
 
 # The application's jar file.
-ARG JAR_FILE=./build/libs/gitget-0.0.1-SNAPSHOT.jar
+ARG JAR_FILE=./build/libs/GitGetApplication.jar
 
 # Add the application's jar to the container.
-COPY ${JAR_FILE} app.jar
+COPY ${JAR_FILE} App.jar
 
 # Run the jar file.
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "App.jar"]

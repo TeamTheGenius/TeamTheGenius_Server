@@ -57,12 +57,12 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-      - name: Build with Gradle # and Test
-        run: ./gradlew clean build -x test #./gradlew build test
+      - name: Build with Gradle
+        run: ./gradlew clean build
 
-      - name: Make zip file
-        run: zip -r ./$GITHUB_SHA.zip .
-        shell: bash
+      #      - name: Make zip file
+      #        run: zip -r ./$GITHUB_SHA.zip .
+      #        shell: bash
 
       - name: Docker meta
         id: docker_meta

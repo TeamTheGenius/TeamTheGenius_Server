@@ -12,7 +12,7 @@ env:
   AWS_S3_BUCKET: gitget-bucket-hey
   AWS_CODE_DEPLOY_APPLICATION: GitGet-Application-HEY
   AWS_CODE_DEPLOY_GROUP: GitGet-CICD-group-hey
-  DOCKER_HUB_REPOSITORY:
+  DOCKER_HUB_REPOSITORY: geniusgitget/gitget
 
 jobs:
   deploy:

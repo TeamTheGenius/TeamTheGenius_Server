@@ -51,32 +51,36 @@ jobs:
           echo "${{ secrets.APPLICATION_TEST }}" > ./application.yml
           echo "${{ secrets.TEST }}" > ./application-test.yml
 
-
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
         shell: bash
 
-
       - name: Build with Gradle # and Test
         run: ./gradlew clean build -x test #./gradlew build test
-
 
       - name: Make zip file
         run: zip -r ./$GITHUB_SHA.zip .
         shell: bash
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-      - name: Deliver to AWS S3 (AWS credential 설정)
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Access to AWS
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-region: ${{ env.AWS_REGION }}
           aws-access-key-id: ${{ secrets.CICD_ACCESS_KEY_HEY }}
           aws-secret-access-key: ${{ secrets.CICD_SECRET_KEY_HEY }}
-
-
+        # docker build -t devrank/backend-api:latest -f Dockerfile . --platform linux/x86_64
+        # docker push devrank/backend-api:latest
       - name: Upload to S3
         run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$AWS_S3_BUCKET/$GITHUB_SHA.zip
 
-
-      - name: Code Deploy (EC2에 배포)
+      - name: Code Deploy
         run: aws deploy create-deployment --application-name GitGet-Application-HEY --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name GitGet-CICD-group-hey --s3-location bucket=$AWS_S3_BUCKET,key=$GITHUB_SHA.zip,bundleType=zip

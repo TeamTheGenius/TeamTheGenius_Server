@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "production" ]
   pull_request:
-    branches: [ "production", "deploy-test" ]
+    branches: [ "production" ]
 
 env:
   AWS_REGION: ap-northeast-2
@@ -57,8 +57,8 @@ jobs:
         shell: bash
 
 
-      - name: Build with Gradle # and Test
-        run: ./gradlew clean build -x test #./gradlew build test
+      - name: Build with Gradle and Test
+        run: ./gradlew build test
 
 
       - name: Make zip file

@@ -15,7 +15,7 @@ env:
   DOCKER_HUB_REPOSITORY: geniusgitget/gitget
 
 jobs:
-  deploy:
+  backend-docker-build-and-push:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -91,6 +91,16 @@ jobs:
           push: true
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
+
+  backend-docker-pull-and-run:
+    runs-on: [ self-hosted, dev ]
+    if: ${{ needs.backend-docker-build-and-push.result == 'success' }}
+    needs: [ backend-docker-build-and-push ]
+    steps:
+      - name: Execute Deploy Script
+        run: |
+          sh /home/ubuntu/deploy.sh
+
 
 #      - name: Access to AWS
 #        uses: aws-actions/configure-aws-credentials@v1

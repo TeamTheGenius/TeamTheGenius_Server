@@ -43,7 +43,7 @@ Other - <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=sw
         <td align="center" width="130px">
             <a href="https://github.com/kimdozzi"><img height="100px" width="100px" src="https://avatars.githubusercontent.com/u/95005061?v=4"/></a>
             <br />
-            <img src="https://img.shields.io/badge/SSung023-181717?style=flat&logo=github&logoColor=white" />
+            <img src="https://img.shields.io/badge/kimdozzi-181717?style=flat&logo=github&logoColor=white" />
         </td>
       <tr height="50px">
         <td align="center">

@@ -1,9 +1,10 @@
-## GitGet
-## :raising_hand_man: Introduction
-IT 종사자를 위한 공부 습관 형성 서비스입니다. 
-(추가 소개글 또는 사진 필)
+![image](https://github.com/TeamTheGenius/TeamTheGenius_Server/assets/95005061/9e508d5c-ff0d-4e82-95d0-3e2d1d6217c4)
 
 </br>
+
+## :raising_hand_man: Introduction
+IT 종사자를 위한 공부 습관 형성 서비스입니다. 
+(추가 소개글 또는 사진 필요)
 
 ## :desktop_computer: Tech Stack 
 Framework - <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat&logo=Spring Boot&logoColor=white" /> <img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=Gradle&logoColor=white" />

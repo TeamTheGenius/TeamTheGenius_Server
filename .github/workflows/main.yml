@@ -2,7 +2,7 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "production" ]
+    branches: [ "production", "feat/177-aws-s3-issue" ]
   pull_request:
     branches: [ "production" ]
 
@@ -19,7 +19,6 @@ jobs:
       contents: read
       packages: write
     steps:
-      # Actions
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -29,7 +28,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      # 프로젝트 내 yml 파일 실행
       - name: make application.yml
         run: |
           mkdir -p ./src/main/resources

@@ -17,7 +17,8 @@ public interface FileManager {
      * Files 내에 저장된 값들을 통해 UrlResource 등으로 다운받은 후, base64로 인코딩한 결과 반환
      *
      * @param files 얻기 원하는 파일의 정보를 담고 있는 Files 객체
-     * @return base64로 encode한 결과 값(문자열)
+     * @return base64로 encode한 결과 값(문자열) 반환
+     * 파일을 받아오지 못한 경우에는 빈 문자열("") 반환
      */
     String getEncodedImage(Files files);
 

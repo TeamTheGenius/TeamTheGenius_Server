@@ -52,7 +52,8 @@ public class LocalFileManager implements FileManager {
             byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
             return new String(encode, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new BusinessException(e);
+            //TODO: 불러오는 중의 예외에 대해 Logging 추가하기
+            return "";
         }
     }
 

@@ -45,6 +45,7 @@ public enum ErrorCode {
 
     MULTIPART_FILE_NOT_EXIST(HttpStatus.BAD_REQUEST, "MultipartFile이 전달되지 않았습니다."),
     FILE_NOT_EXIST(HttpStatus.BAD_REQUEST, "해당 파일(이미지)이 존재하지 않습니다."),
+    INVALID_FILE_NAME(HttpStatus.BAD_REQUEST, "전달받은 파일(이미지)의 이름이 null이거나 빈 문자열입니다."),
     NOT_SUPPORTED_EXTENSION(HttpStatus.BAD_REQUEST, "지원하지 않는 확장자입니다."),
     NOT_SUPPORTED_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "지원하지 않는 이미지 타입입니다."),
     FILE_NOT_DELETED(HttpStatus.BAD_REQUEST, "파일(이미지)이 정상적으로 삭제되지 않았습니다."),

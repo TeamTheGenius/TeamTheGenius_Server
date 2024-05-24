@@ -2,7 +2,7 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "production", "feat/177-aws-s3-issue" ]
+    branches: [ "production" ]
   pull_request:
     branches: [ "production" ]
 

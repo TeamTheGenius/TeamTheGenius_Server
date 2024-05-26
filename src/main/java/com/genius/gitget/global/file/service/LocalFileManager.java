@@ -2,6 +2,7 @@ package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_COPIED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_SAVED;
 
 import com.genius.gitget.global.file.domain.FileType;
@@ -59,6 +60,8 @@ public class LocalFileManager implements FileManager {
 
     @Override
     public FileDTO copy(Files files, FileType fileType) {
+        validateFileExist(files);
+
         CopyDTO copyDTO = fileUtil.getCopyInfo(files, fileType, UPLOAD_PATH);
         createPath(copyDTO.folderURI());
 
@@ -93,6 +96,15 @@ public class LocalFileManager implements FileManager {
         File targetFile = new File(fileURI);
         if (!targetFile.delete()) {
             throw new BusinessException(FILE_NOT_DELETED);
+        }
+    }
+
+    @Override
+    public void validateFileExist(Files files) {
+        String fileURI = files.getFileURI();
+        File file = new File(fileURI);
+        if (!file.exists()) {
+            throw new BusinessException(FILE_NOT_EXIST);
         }
     }
 

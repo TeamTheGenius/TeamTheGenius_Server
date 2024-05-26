@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     TOPIC_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 토픽을 찾을 수 없습니다."),
     TOPIC_HAVE_INSTANCE(HttpStatus.BAD_REQUEST, "해당 토픽은 인스턴스를 가지고 있으므로 삭제할 수 없습니다."),
+    TOPIC_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "토픽 이미지가 존재하지 않습니다. 토픽 이미지를 설정해주세요."),
 
     INVALID_INSTANCE_DATE(HttpStatus.BAD_REQUEST, "인스턴스 생성/종료 일자는 현재 일자 이후여야 합니다."),
     INSTANCE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 인스턴스를 찾을 수 없습니다."),

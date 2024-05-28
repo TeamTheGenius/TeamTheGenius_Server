@@ -16,7 +16,6 @@ else
     exit 1
 fi
 
-
 echo "> Start health check of WAS at http://localhost:${TARGET_PORT}/api/auth/health-check ..."
 
 for RETRY_COUNT in 1 2 3 4 5 6 7 8 9 10

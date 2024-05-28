@@ -2,7 +2,7 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "production", "main", "feat/173-docker-deploy" ]
+    branches: [ "production", "main" ]
   pull_request:
     branches: [ "production", "main" ]
 

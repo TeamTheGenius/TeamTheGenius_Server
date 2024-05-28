@@ -2,7 +2,7 @@ name: Build and Deploy to EC2
 
 on:
   pull_request:
-    branches: [ "production", "main" ]
+    branches: [ "production" ]
 
 jobs:
   build-docker-image:

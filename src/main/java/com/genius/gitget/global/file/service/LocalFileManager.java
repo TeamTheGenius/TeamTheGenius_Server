@@ -2,6 +2,7 @@ package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_COPIED;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_DELETED;
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_SAVED;
 
 import com.genius.gitget.global.file.domain.FileType;
@@ -52,12 +53,15 @@ public class LocalFileManager implements FileManager {
             byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
             return new String(encode, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new BusinessException(e);
+            //TODO: 불러오는 중의 예외에 대해 Logging 추가하기
+            return "";
         }
     }
 
     @Override
     public FileDTO copy(Files files, FileType fileType) {
+        validateFileExist(files);
+
         CopyDTO copyDTO = fileUtil.getCopyInfo(files, fileType, UPLOAD_PATH);
         createPath(copyDTO.folderURI());
 
@@ -92,6 +96,15 @@ public class LocalFileManager implements FileManager {
         File targetFile = new File(fileURI);
         if (!targetFile.delete()) {
             throw new BusinessException(FILE_NOT_DELETED);
+        }
+    }
+
+    @Override
+    public void validateFileExist(Files files) {
+        String fileURI = files.getFileURI();
+        File file = new File(fileURI);
+        if (!file.exists()) {
+            throw new BusinessException(FILE_NOT_EXIST);
         }
     }
 

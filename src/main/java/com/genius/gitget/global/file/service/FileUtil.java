@@ -1,6 +1,6 @@
 package com.genius.gitget.global.file.service;
 
-import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_FILE_NAME;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 
 import com.genius.gitget.global.file.domain.FileType;
@@ -48,7 +48,7 @@ public class FileUtil {
         String originalFilename = file.getOriginalFilename();
 
         if (originalFilename == null || Objects.equals(originalFilename, "")) {
-            throw new BusinessException(FILE_NOT_EXIST);
+            throw new BusinessException(INVALID_FILE_NAME);
         }
 
         String extension = extractExtension(originalFilename);

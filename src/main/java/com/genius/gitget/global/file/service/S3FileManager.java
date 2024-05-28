@@ -1,5 +1,7 @@
 package com.genius.gitget.global.file.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+
 import com.amazonaws.SdkClientException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CopyObjectRequest;
@@ -34,7 +36,8 @@ public class S3FileManager implements FileManager {
             byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
             return new String(encode, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new BusinessException(e);
+            //TODO: 불러오는 중의 예외에 대해 Logging 추가하기
+            return "";
         }
     }
 
@@ -57,6 +60,8 @@ public class S3FileManager implements FileManager {
 
     @Override
     public FileDTO copy(Files files, FileType fileType) {
+        validateFileExist(files);
+        
         CopyDTO copyDTO = fileUtil.getCopyInfo(files, fileType, "");
 
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(
@@ -86,6 +91,13 @@ public class S3FileManager implements FileManager {
             amazonS3.deleteObject(bucket, files.getFileURI());
         } catch (SdkClientException e) {
             throw new BusinessException(e);
+        }
+    }
+
+    @Override
+    public void validateFileExist(Files files) {
+        if (!amazonS3.doesObjectExist(bucket, files.getFileURI())) {
+            throw new BusinessException(FILE_NOT_EXIST);
         }
     }
 }

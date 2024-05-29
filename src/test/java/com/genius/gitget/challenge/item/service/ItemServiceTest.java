@@ -113,7 +113,7 @@ class ItemServiceTest {
         ItemResponse itemResponse = itemService.orderItem(user, item.getId());
 
         //then
-        assertThat(itemResponse.getItemId()).isEqualTo(item.getId());
+        assertThat(itemResponse.getItemId()).isEqualTo(item.getIdentifier());
         assertThat(itemResponse.getName()).isEqualTo(item.getName());
         assertThat(itemResponse.getCost()).isEqualTo(item.getCost());
         assertThat(itemResponse.getCount()).isEqualTo(1);
@@ -416,7 +416,7 @@ class ItemServiceTest {
         ProfileResponse profileResponse = itemService.unmountFrame(user).get(0);
 
         //then
-        assertThat(profileResponse.getItemId()).isEqualTo(item.getId());
+        assertThat(profileResponse.getItemId()).isEqualTo(item.getIdentifier());
         assertThat(profileResponse.getCost()).isEqualTo(item.getCost());
         assertThat(profileResponse.getItemCategory()).isEqualTo(ItemCategory.PROFILE_FRAME);
         assertThat(profileResponse.getEquipStatus()).isEqualTo(EquipStatus.AVAILABLE.getTag());
@@ -466,6 +466,7 @@ class ItemServiceTest {
 
     private Item getSavedItem(ItemCategory itemCategory) {
         return itemRepository.save(Item.builder()
+                .identifier(10)
                 .itemCategory(itemCategory)
                 .cost(100)
                 .name(itemCategory.getName())

@@ -41,9 +41,11 @@ public class Item extends BaseTimeEntity {
     private String details;
 
     @Builder
-    public Item(String name, int cost, ItemCategory itemCategory, String details) {
+    public Item(String name, int cost, int identifier,
+                ItemCategory itemCategory, String details) {
         this.name = name;
         this.cost = cost;
+        this.identifier = identifier;
         this.itemCategory = itemCategory;
         this.details = details;
     }

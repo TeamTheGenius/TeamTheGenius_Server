@@ -158,32 +158,26 @@ class InstanceRepositoryTest {
 
 
     @Test
-    @DisplayName("인스턴스들 중, 사용자의 tag가 포함되어 있는 인스턴스들을 반환받을 수 있다.")
+    @DisplayName("인스턴스들 중, 사용자의 태그와 하나라도 겹친다면 추천 챌린지 결과로 반환받아야 한다.")
     public void should_returnInstances_containsUserTags() {
         //given
-        List<String> userTags = List.of("BE", "FE", "AI");
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Direction.DESC, "participantCount"));
+        String userTag = "BE";
 
         //when
-        getSavedInstance("title1", "BE", 10);
-        getSavedInstance("title2", "FE", 3);
+        getSavedInstance("title1", "BE,AI", 10);
+        getSavedInstance("title2", "FE,BE", 3);
         getSavedInstance("title3", "FE", 20);
-        Slice<Instance> suggestions = instanceRepository.findRecommendations(userTags, Progress.PREACTIVITY,
-                pageRequest);
+        List<Instance> recommendations = instanceRepository.findRecommendations(userTag, Progress.PREACTIVITY);
 
         //then
-        assertThat(suggestions.getContent().size()).isEqualTo(3);
-        assertThat(suggestions.getContent().get(0).getTitle()).isEqualTo("title3");
-        assertThat(suggestions.getContent().get(0).getTags()).isEqualTo("FE");
-        assertThat(suggestions.getContent().get(0).getParticipantCount()).isEqualTo(20);
+        assertThat(recommendations.size()).isEqualTo(2);
+        assertThat(recommendations.get(0).getTitle()).isEqualTo("title1");
+        assertThat(recommendations.get(0).getTags()).isEqualTo("BE,AI");
+        assertThat(recommendations.get(0).getParticipantCount()).isEqualTo(10);
 
-        assertThat(suggestions.getContent().get(1).getTitle()).isEqualTo("title1");
-        assertThat(suggestions.getContent().get(1).getTags()).isEqualTo("BE");
-        assertThat(suggestions.getContent().get(1).getParticipantCount()).isEqualTo(10);
-
-        assertThat(suggestions.getContent().get(2).getTitle()).isEqualTo("title2");
-        assertThat(suggestions.getContent().get(2).getTags()).isEqualTo("FE");
-        assertThat(suggestions.getContent().get(2).getParticipantCount()).isEqualTo(3);
+        assertThat(recommendations.get(1).getTitle()).isEqualTo("title2");
+        assertThat(recommendations.get(1).getTags()).isEqualTo("FE,BE");
+        assertThat(recommendations.get(1).getParticipantCount()).isEqualTo(3);
     }
 
     @Test

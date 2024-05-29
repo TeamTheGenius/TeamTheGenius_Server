@@ -18,5 +18,24 @@ FROM (SELECT 100                    AS cost,
              NULL,
              '아이템 사용 시, 챌린지 성공 보상을 2배로 획득할 수 있는 아이템입니다.',
              '챌린지 보상 획득 2배 아이템',
-             'POINT_MULTIPLIER') AS new_items
+             'POINT_MULTIPLIER'
+
+      UNION ALL
+      SELECT 5,
+             100,
+             '프로필을 꾸밀 수 있는 프레임입니다.',
+             '불태워라 프레임',
+             'PROFILE_FRAME'
+      UNION ALL
+      SELECT 6,
+             100,
+             '프로필을 꾸밀 수 있는 프레임입니다.',
+             '끈적이는 프레임',
+             'PROFILE_FRAME'
+      UNION ALL
+      SELECT 7,
+             100,
+             '프로필을 꾸밀 수 있는 프레임입니다.',
+             '무섭지롱 프레임',
+             'PROFILE_FRAME') AS new_items
 WHERE (SELECT COUNT(*) FROM item) < 3;

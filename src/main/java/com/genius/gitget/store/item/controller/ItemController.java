@@ -6,10 +6,12 @@ import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
+import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.dto.ItemResponse;
 import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
+import com.genius.gitget.store.item.service.ItemProvider;
 import com.genius.gitget.store.item.service.ItemService;
 import java.time.LocalDate;
 import java.util.List;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class ItemController {
     private final ItemService itemService;
+    private final ItemProvider itemProvider;
 
     @GetMapping("/items")
     public ResponseEntity<ListResponse<ItemResponse>> getItemList(
@@ -47,26 +50,28 @@ public class ItemController {
         );
     }
 
-    @PostMapping("/items/order/{itemId}")
+    @PostMapping("/items/order/{identifier}")
     public ResponseEntity<SingleResponse<ItemResponse>> purchaseItem(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long itemId
+            @PathVariable int identifier
     ) {
-        ItemResponse itemResponse = itemService.orderItem(userPrincipal.getUser(), itemId);
+        Item item = itemProvider.findByIdentifier(identifier);
+        ItemResponse itemResponse = itemService.orderItem(userPrincipal.getUser(), item.getId());
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponse)
         );
     }
 
-    @PostMapping("/items/use/{itemId}")
+    @PostMapping("/items/use/{identifier}")
     public ResponseEntity<CommonResponse> useItem(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
-            @PathVariable Long itemId,
+            @PathVariable int identifier,
             @RequestParam(required = false) Long instanceId
     ) {
-        ItemUseResponse itemUseResponse = itemService.useItem(userPrincipal.getUser(), itemId, instanceId,
-                LocalDate.now());
+        Item item = itemProvider.findByIdentifier(identifier);
+        ItemUseResponse itemUseResponse = itemService.useItem(userPrincipal.getUser(), item.getId(),
+                instanceId, LocalDate.now());
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemUseResponse)

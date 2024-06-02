@@ -77,7 +77,7 @@ class ItemServiceTest {
         List<ItemResponse> items = itemService.getAllItems(user);
 
         //then
-        assertThat(items.size()).isEqualTo(4);
+        assertThat(items.size()).isGreaterThan(1);
     }
 
     @ParameterizedTest

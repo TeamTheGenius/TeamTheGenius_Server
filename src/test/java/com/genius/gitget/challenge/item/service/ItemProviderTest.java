@@ -1,13 +1,14 @@
 package com.genius.gitget.challenge.item.service;
 
+import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PASSER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.repository.ItemRepository;
-import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.item.service.ItemProvider;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ class ItemProviderTest {
     @EnumSource(mode = Mode.INCLUDE, names = {"POINT_MULTIPLIER", "CERTIFICATION_PASSER"})
     public void should_findItems_when_passCategory(ItemCategory itemCategory) {
         //given
-        Item item = getSavedItem(itemCategory);
+        Item item = getSavedItem(10, itemCategory);
 
         //when
         List<Item> items = itemProvider.findAllByCategory(itemCategory);
@@ -49,7 +50,7 @@ class ItemProviderTest {
     @DisplayName("DB에 저장되어 있는 아이템을 식별자 PK를 통해 조회할 수 있다.")
     public void should_findItem_when_passPK() {
         //given
-        Item item = getSavedItem(ItemCategory.CERTIFICATION_PASSER);
+        Item item = getSavedItem(10, CERTIFICATION_PASSER);
 
         //when
         Item foundItem = itemProvider.findById(item.getId());
@@ -68,9 +69,25 @@ class ItemProviderTest {
                 .hasMessageContaining(ErrorCode.ITEM_NOT_FOUND.getMessage());
     }
 
-    private Item getSavedItem(ItemCategory itemCategory) {
+    @Test
+    @DisplayName("식별 전용 값인 identifier를 통해 아이템을 조회할 수 있다.")
+    public void should_findItem_by_identifier() {
+        //given
+        int identifier = 10;
+        Item item = getSavedItem(identifier, CERTIFICATION_PASSER);
+
+        //when
+        Item byIdentifier = itemProvider.findByIdentifier(identifier);
+
+        //then
+        assertThat(item.getId()).isEqualTo(byIdentifier.getId());
+        assertThat(byIdentifier.getItemCategory()).isEqualTo(CERTIFICATION_PASSER);
+    }
+
+    private Item getSavedItem(int identifier, ItemCategory itemCategory) {
         return itemRepository.save(
                 Item.builder()
+                        .identifier(identifier)
                         .cost(100)
                         .itemCategory(itemCategory)
                         .build()

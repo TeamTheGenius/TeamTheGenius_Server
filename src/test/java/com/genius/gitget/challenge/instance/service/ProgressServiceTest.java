@@ -66,6 +66,7 @@ class ProgressServiceTest {
     @DisplayName("PRE_ACTIVITY 인스턴스들 중, 특정 조건에 해당하는 인스턴스들을 ACTIVITY로 상태를 바꿀 수 있다.")
     public void should_updateToActivity_when_conditionMatches() {
         //given
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
         LocalDate startedDate = LocalDate.of(2024, 3, 1);
         LocalDate completedDate = LocalDate.of(2024, 3, 30);
         LocalDate currentDate = LocalDate.of(2024, 3, 6);
@@ -81,6 +82,7 @@ class ProgressServiceTest {
                 JoinRequest.builder()
                         .repository(targetRepo)
                         .instanceId(instance1.getId())
+                        .todayDate(todayDate)
                         .build()
         );
 

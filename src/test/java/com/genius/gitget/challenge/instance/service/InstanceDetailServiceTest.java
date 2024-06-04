@@ -26,6 +26,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
@@ -70,9 +71,11 @@ class InstanceDetailServiceTest {
         //given
         User savedUser = getSavedUser(githubId);
         Instance instance = getSavedInstance(Progress.PREACTIVITY);
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
         JoinRequest joinRequest = JoinRequest.builder()
                 .instanceId(instance.getId())
                 .repository(targetRepo)
+                .todayDate(todayDate)
                 .build();
 
         //when
@@ -107,9 +110,11 @@ class InstanceDetailServiceTest {
         //given
         User savedUser = getSavedUser(githubId);
         Instance savedInstance = getSavedInstance(progress);
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
         JoinRequest joinRequest = JoinRequest.builder()
                 .repository(targetRepo)
                 .instanceId(savedInstance.getId())
+                .todayDate(todayDate)
                 .build();
 
         //when & then
@@ -124,9 +129,11 @@ class InstanceDetailServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance(Progress.PREACTIVITY);
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
         JoinRequest joinRequest = JoinRequest.builder()
                 .repository(targetRepo)
                 .instanceId(instance.getId())
+                .todayDate(todayDate)
                 .build();
 
         //when
@@ -139,14 +146,36 @@ class InstanceDetailServiceTest {
     }
 
     @Test
+    @DisplayName("챌린지 시작 당일에 챌린지 참여 요청을 하면 예외가 발생한다")
+    public void should_throwException_when_joinAtStartedDate() {
+        //given
+        LocalDate today = LocalDate.of(2024, 1, 30);
+
+        User user = getSavedUser(githubId);
+        Instance instance = getSavedInstance(Progress.PREACTIVITY, today);
+        JoinRequest joinRequest = JoinRequest.builder()
+                .repository(targetRepo)
+                .instanceId(instance.getId())
+                .todayDate(today)
+                .build();
+
+        //when
+        assertThatThrownBy(() -> instanceDetailService.joinNewChallenge(user, joinRequest))
+                .isInstanceOf(BusinessException.class)
+                .hasMessageContaining(ErrorCode.CAN_NOT_JOIN_INSTANCE.getMessage());
+    }
+
+    @Test
     @DisplayName("아직 시작하지 않은 챌린지에 대해 취소 요청을 하면 ParticipantInfo가 삭제된다.")
     public void should_joinStatusIsNo_when_quitChallenge() {
         //given
         User savedUser = getSavedUser(githubId);
         Instance savedInstance = getSavedInstance(Progress.PREACTIVITY);
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
 
         //when
-        instanceDetailService.joinNewChallenge(savedUser, new JoinRequest(savedInstance.getId(), targetRepo));
+        instanceDetailService.joinNewChallenge(savedUser,
+                new JoinRequest(savedInstance.getId(), targetRepo, todayDate));
         JoinResponse joinResponse = instanceDetailService.quitChallenge(savedUser, savedInstance.getId());
 
         //then
@@ -162,9 +191,11 @@ class InstanceDetailServiceTest {
         //given
         User savedUser = getSavedUser(githubId);
         Instance savedInstance = getSavedInstance(Progress.PREACTIVITY);
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
         JoinRequest joinRequest = JoinRequest.builder()
                 .instanceId(savedInstance.getId())
                 .repository(targetRepo)
+                .todayDate(todayDate)
                 .build();
 
         //when
@@ -211,9 +242,11 @@ class InstanceDetailServiceTest {
         //given
         User savedUser = getSavedUser(githubId);
         Instance savedInstance = getSavedInstance(Progress.PREACTIVITY);
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
         JoinRequest joinRequest = JoinRequest.builder()
                 .instanceId(savedInstance.getId())
                 .repository(targetRepo)
+                .todayDate(todayDate)
                 .build();
 
         //when
@@ -232,9 +265,11 @@ class InstanceDetailServiceTest {
         //given
         User savedUser = getSavedUser(githubId);
         Instance savedInstance = getSavedInstance(Progress.PREACTIVITY, LocalDate.now().plusDays(2));
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
         JoinRequest joinRequest = JoinRequest.builder()
                 .instanceId(savedInstance.getId())
                 .repository(targetRepo)
+                .todayDate(todayDate)
                 .build();
 
         //when

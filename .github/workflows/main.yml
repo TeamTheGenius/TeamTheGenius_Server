@@ -2,7 +2,7 @@ name: Build and Deploy to EC2
 
 on:
   push:
-    branches: [ "production", "feat/194-deployment-automation" ] ## 나중에 production으로 변경하기
+    branches: [ "production" ]
   pull_request:
     branches: [ "production" ]
 

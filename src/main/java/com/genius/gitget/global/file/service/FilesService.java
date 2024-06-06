@@ -3,7 +3,6 @@ package com.genius.gitget.global.file.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
 import static com.genius.gitget.global.util.exception.ErrorCode.MULTIPART_FILE_NOT_EXIST;
 
-import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.domain.FileHolder;
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
@@ -56,18 +55,6 @@ public class FilesService {
                 .build();
         fileHolder.setFiles(file);
         return filesRepository.save(file);
-    }
-
-    @Transactional
-    public Files copyTopicToInstance(FileHolder fileHolder) {
-        Instance instance = (Instance) fileHolder;
-        Files topicFiles = instance.getTopic().getFiles()
-                .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
-
-        Files instanceFiles = copyFile(topicFiles, FileType.INSTANCE);
-        instance.setFiles(instanceFiles);
-
-        return instanceFiles;
     }
 
     @Transactional

@@ -40,12 +40,7 @@ public class FilesController {
         FileHolder fileHolder = finder.findByInfo(id, fileType);
         Files files;
 
-        if (multipartFile == null && fileType == FileType.INSTANCE) {
-            files = filesService.copyTopicToInstance(fileHolder);
-        } else {
-            files = filesService.uploadFile(fileHolder, multipartFile, fileType);
-        }
-
+        files = filesService.uploadFile(fileHolder, multipartFile, fileType);
         FileResponse fileResponse = filesService.convertToFileResponse(Optional.ofNullable(files));
 
         return ResponseEntity.ok().body(

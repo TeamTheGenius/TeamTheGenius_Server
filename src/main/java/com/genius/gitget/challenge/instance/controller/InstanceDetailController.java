@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.instance.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.JOIN_SUCCESS;
+import static com.genius.gitget.global.util.exception.SuccessCode.QUIT_SUCCESS;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
@@ -9,6 +10,7 @@ import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.service.InstanceDetailService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -51,6 +53,7 @@ public class InstanceDetailController {
         JoinRequest joinRequest = JoinRequest.builder()
                 .instanceId(instanceId)
                 .repository(repo)
+                .todayDate(LocalDate.now())
                 .build();
         JoinResponse joinResponse = instanceDetailService.joinNewChallenge(userPrincipal.getUser(), joinRequest);
 
@@ -67,7 +70,7 @@ public class InstanceDetailController {
         JoinResponse joinResponse = instanceDetailService.quitChallenge(userPrincipal.getUser(), instanceId);
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(JOIN_SUCCESS.getStatus(), JOIN_SUCCESS.getMessage(), joinResponse)
+                new SingleResponse<>(QUIT_SUCCESS.getStatus(), QUIT_SUCCESS.getMessage(), joinResponse)
         );
     }
 }

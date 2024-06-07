@@ -62,6 +62,7 @@ public enum ErrorCode {
     GITHUB_PR_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 레포지토리에 PR이 존재하지 않습니다."),
 
     CAN_NOT_JOIN_INSTANCE(HttpStatus.BAD_REQUEST, "해당 인스턴스에 참여할 수 없습니다."),
+    INVALID_JOIN_DATE(HttpStatus.BAD_REQUEST, "인스턴스 시작 당일에는 신규 참여할 수 없습니다."),
     CAN_NOT_QUIT_INSTANCE(HttpStatus.BAD_REQUEST, "해당 인스턴스의 참여를 취소할 수 없습니다."),
 
     PR_TEMPLATE_NOT_FOUND(HttpStatus.NOT_FOUND, "인증에 사용하는 PR의 내용에 PR Template가 포함되어야 합니다."),

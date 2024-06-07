@@ -60,7 +60,7 @@ public class InstanceDetailService {
             return LikesInfo.createExist(likes.getId(), instance.getLikesCount());
         }
 
-        return LikesInfo.createNotExist();
+        return LikesInfo.createNotExist(instance.getLikesCount());
     }
 
     @Transactional

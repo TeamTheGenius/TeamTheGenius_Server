@@ -51,7 +51,7 @@ jobs:
         run: chmod +x ./gradlew
         shell: bash
 
-      - name: Build and Test
+      - name: Build with Gradle and Test
         run: ./gradlew build test
 
       - name: Make zip file

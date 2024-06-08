@@ -20,6 +20,7 @@ import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.time.LocalDate;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,7 +60,7 @@ public class InstanceDetailService {
             return LikesInfo.createExist(likes.getId(), instance.getLikesCount());
         }
 
-        return LikesInfo.createNotExist();
+        return LikesInfo.createNotExist(instance.getLikesCount());
     }
 
     @Transactional
@@ -69,9 +70,9 @@ public class InstanceDetailService {
 
         String repository = joinRequest.repository();
 
-        if (!verifyGithub(persistUser, repository) || !canJoinChallenge(persistUser, instance)) {
-            throw new BusinessException(CAN_NOT_JOIN_INSTANCE);
-        }
+        validateJoinDate(instance, joinRequest.todayDate());
+        validateInstanceCondition(persistUser, instance);
+        validateGithub(persistUser, repository);
 
         instance.updateParticipantCount(1);
         Participant participant = Participant.createDefaultParticipant(repository);
@@ -79,17 +80,27 @@ public class InstanceDetailService {
         return JoinResponse.createJoinResponse(participantProvider.save(participant));
     }
 
-    private boolean canJoinChallenge(User user, Instance instance) {
-        boolean b = !participantProvider.hasParticipant(user.getId(), instance.getId());
-        return (instance.getProgress() == Progress.PREACTIVITY) &&
-                !participantProvider.hasParticipant(user.getId(), instance.getId());
+    private void validateJoinDate(Instance instance, LocalDate todayDate) {
+        LocalDate startedDate = instance.getStartedDate().toLocalDate();
+
+        if (todayDate.isBefore(startedDate)) {
+            return;
+        }
+        throw new BusinessException(CAN_NOT_JOIN_INSTANCE);
     }
 
-    private boolean verifyGithub(User user, String repository) {
+    private void validateInstanceCondition(User user, Instance instance) {
+        boolean isParticipated = participantProvider.hasParticipant(user.getId(), instance.getId());
+        if ((instance.getProgress() == Progress.PREACTIVITY) && !isParticipated) {
+            return;
+        }
+        throw new BusinessException(CAN_NOT_JOIN_INSTANCE);
+    }
+
+    private void validateGithub(User user, String repository) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
         String repositoryFullName = githubProvider.getRepoFullName(gitHub, repository);
         githubProvider.validateGithubRepository(gitHub, repositoryFullName);
-        return true;
     }
 
     @Transactional

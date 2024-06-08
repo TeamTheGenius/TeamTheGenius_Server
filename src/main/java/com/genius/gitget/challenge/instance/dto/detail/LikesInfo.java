@@ -17,11 +17,11 @@ public record LikesInfo(
                 .build();
     }
 
-    public static LikesInfo createNotExist() {
+    public static LikesInfo createNotExist(int likesCount) {
         return LikesInfo.builder()
                 .likesId(0L)
                 .isLiked(false)
-                .likesCount(0)
+                .likesCount(likesCount)
                 .build();
     }
 }

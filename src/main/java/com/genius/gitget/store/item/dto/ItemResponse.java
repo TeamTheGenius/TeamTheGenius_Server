@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 public class ItemResponse {
-    private Long itemId;
+    private int itemId;
     private ItemCategory itemCategory;
     private String name;
     private String details;
@@ -14,7 +14,7 @@ public class ItemResponse {
     private int count;
 
     protected ItemResponse(Item item, int count) {
-        this.itemId = item.getId();
+        this.itemId = item.getIdentifier();
         this.itemCategory = item.getItemCategory();
         this.name = item.getName();
         this.details = item.getDetails();

@@ -9,6 +9,6 @@ public record FileResponse(
     }
 
     public static FileResponse createNotExistFile() {
-        return new FileResponse(0L, "none");
+        return new FileResponse(0L, "");
     }
 }

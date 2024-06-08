@@ -1,28 +1,17 @@
-version: 0.0 # CodeDeploy Version.
-
-os: linux # 배포할 서버의 운영체제
+version: 0.0
+os: linux
 
 files:
-  - source: / # CodeDeploy에서 전달해 준 파일 중 destination으로 이동시킬 대상을 지정 (루트 경로 : 전체 파일)
-    destination: /home/ubuntu/app # source에서 지정된 파일을 받을 위치
-    overwrite: yes # 기존 파일들을 덮어 쓰기
+  - source: /
+    destination: /home/ubuntu/app
+    overwrite: yes
 
-# CodeDeploy에서 EC2로 넘겨준 파일들을 모두 ec2-user 권한 부여.
 permissions:
   - object: /
-    pattern: "**"
     owner: ubuntu
     group: ubuntu
 
-# CodeDeploy 배포 단계에서 실행할 명령어를 지정 (차례대로 스크립트들이 실행)
 hooks:
   ApplicationStart:
-    - location: scripts/run_new_was.sh
-      timeout: 180
-      runas: ubuntu
-    - location: scripts/health.sh
-      timeout: 180
-      runas: ubuntu
-    - location: scripts/switch.sh
-      timeout: 180
-      runas: ubuntu
+    - location: scripts/deploy.sh
+      timeout: 60

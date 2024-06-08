@@ -28,6 +28,9 @@ public class Item extends BaseTimeEntity {
     @OneToMany(mappedBy = "item")
     private List<Orders> ordersList = new ArrayList<>();
 
+    @Column(unique = true)
+    private int identifier;
+
     private String name;
 
     private int cost;
@@ -38,9 +41,11 @@ public class Item extends BaseTimeEntity {
     private String details;
 
     @Builder
-    public Item(String name, int cost, ItemCategory itemCategory, String details) {
+    public Item(String name, int cost, int identifier,
+                ItemCategory itemCategory, String details) {
         this.name = name;
         this.cost = cost;
+        this.identifier = identifier;
         this.itemCategory = itemCategory;
         this.details = details;
     }

@@ -2,7 +2,7 @@ package com.genius.gitget.global.file.service;
 
 import static com.genius.gitget.global.file.domain.FileType.INSTANCE;
 import static com.genius.gitget.global.file.domain.FileType.TOPIC;
-import static com.genius.gitget.global.util.exception.ErrorCode.FILE_NOT_EXIST;
+import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_FILE_NAME;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_SUPPORTED_EXTENSION;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,7 +46,7 @@ class FileUtilTest {
         //when&then
         assertThatThrownBy(() -> fileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(FILE_NOT_EXIST.getMessage());
+                .hasMessageContaining(INVALID_FILE_NAME.getMessage());
     }
 
     @Test
@@ -58,7 +58,7 @@ class FileUtilTest {
         //when&then
         assertThatThrownBy(() -> fileUtil.validateFile(multipartFile))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(FILE_NOT_EXIST.getMessage());
+                .hasMessageContaining(INVALID_FILE_NAME.getMessage());
     }
 
     @Test

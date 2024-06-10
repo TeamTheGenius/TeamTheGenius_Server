@@ -96,7 +96,7 @@ class GithubProviderTest {
     public void should_checkPR_when_validRepo() {
         //given
         GitHub gitHub = getGitHub();
-        LocalDate createdAt = LocalDate.of(2024, 2, 5);
+        LocalDate createdAt = LocalDate.of(2024, 6, 10);
 
         //when
         List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repository, createdAt);

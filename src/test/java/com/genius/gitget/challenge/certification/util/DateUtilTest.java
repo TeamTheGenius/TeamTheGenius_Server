@@ -2,8 +2,10 @@ package com.genius.gitget.challenge.certification.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -61,10 +63,27 @@ class DateUtilTest {
         Date date = new Date(1725000000000L);
 
         //when
-        LocalDate localDate = DateUtil.convertToLocalDate(date);
+        LocalDate localDate = DateUtil.convertToKST(date);
 
         //then
         assertThat(localDate).isEqualTo(LocalDate.of(2024, 8, 30));
+    }
+
+    @Test
+    @DisplayName("UTC 기준 15시 이후의 시간을 KST로 변환하면 다음 날로 인식이 되어야 한다.")
+    public void should_convertToKST() {
+        // 2024-06-09T23:35:12Z
+        LocalDateTime targetDateTime1 = LocalDateTime.of(2024, 6, 9, 15, 0);
+        LocalDateTime targetDateTime2 = LocalDateTime.of(2024, 6, 9, 23, 35);
+
+        Date date1 = Timestamp.valueOf(targetDateTime1);
+        Date date2 = Timestamp.valueOf(targetDateTime2);
+
+        LocalDate kst1 = DateUtil.convertToKST(date1);
+        LocalDate kst2 = DateUtil.convertToKST(date2);
+
+        assertThat(kst1).isEqualTo(LocalDate.of(2024, 6, 10));
+        assertThat(kst2).isEqualTo(LocalDate.of(2024, 6, 10));
     }
 
     @Test

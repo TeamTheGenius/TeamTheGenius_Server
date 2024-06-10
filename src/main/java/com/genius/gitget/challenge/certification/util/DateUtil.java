@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.certification.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -37,11 +38,10 @@ public final class DateUtil {
         return mondayOfWeek;
     }
 
-    public static LocalDate convertToLocalDate(Date date) {
-        return LocalDate.ofInstant(
-                date.toInstant(),
-                ZoneId.of("Asia/Seoul")
-        );
+    public static LocalDate convertToKST(Date date) {
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.of("Asia/Seoul"))
+                .plusHours(9)
+                .toLocalDate();
     }
 
     private static boolean isFirstWeek(LocalDate challengeStartDate, LocalDate currentDate) {

@@ -39,7 +39,7 @@ public final class DateUtil {
     }
 
     public static LocalDate convertToKST(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.of("Asia/Seoul"))
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
                 .plusHours(9)
                 .toLocalDate();
     }

@@ -39,7 +39,7 @@ public final class DateUtil {
     }
 
     public static LocalDate convertToKST(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"))
                 .plusHours(9)
                 .toLocalDate();
     }
@@ -47,7 +47,7 @@ public final class DateUtil {
     private static boolean isFirstWeek(LocalDate challengeStartDate, LocalDate currentDate) {
         LocalDate mondayOfWeek = challengeStartDate.minusDays(challengeStartDate.getDayOfWeek().ordinal());
         LocalDate sundayOfWeek = mondayOfWeek.plusDays(6);
-        
+
         if (currentDate.isAfter(mondayOfWeek.minusDays(1))
                 && currentDate.isBefore(sundayOfWeek.plusDays(1))) {
             return true;

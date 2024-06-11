@@ -60,8 +60,10 @@ class DateUtilTest {
     @DisplayName("0시부터 14시 59분까지의 Date를 전달했을 때 KST 기준의 LocalDate로 변환할 수 있다.")
     public void should_convertToLocalDate_when_passDate() {
         //given
+        //KST = UTC + 9:00
         LocalDateTime targetDateTime1 = LocalDateTime.of(2024, 6, 9, 0, 0);
         LocalDateTime targetDateTime2 = LocalDateTime.of(2024, 6, 9, 14, 59);
+
         Date date1 = Timestamp.valueOf(targetDateTime1);
         Date date2 = Timestamp.valueOf(targetDateTime2);
 

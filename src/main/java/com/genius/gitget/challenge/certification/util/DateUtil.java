@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class DateUtil {
 
     public static int getRemainDaysToStart(LocalDate startDate, LocalDate targetDate) {
@@ -39,7 +41,7 @@ public final class DateUtil {
     }
 
     public static LocalDate convertToKST(Date date) {
-        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.of("UTC"))
+        return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault())
                 .plusHours(9)
                 .toLocalDate();
     }

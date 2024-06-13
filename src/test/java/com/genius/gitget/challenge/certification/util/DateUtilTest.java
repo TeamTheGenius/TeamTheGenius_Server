@@ -61,15 +61,15 @@ class DateUtilTest {
     public void should_convertToLocalDate_when_passDate() {
         //given
         //KST = UTC + 9:00
-        LocalDateTime targetDateTime1 = LocalDateTime.of(2024, 6, 9, 0, 0);
-        LocalDateTime targetDateTime2 = LocalDateTime.of(2024, 6, 9, 14, 59);
+        LocalDateTime utcTime1 = LocalDateTime.of(2024, 6, 9, 0, 0);
+        LocalDateTime utcTime2 = LocalDateTime.of(2024, 6, 9, 14, 59);
 
-        Date date1 = Timestamp.valueOf(targetDateTime1);
-        Date date2 = Timestamp.valueOf(targetDateTime2);
+        Date utcDate1 = Timestamp.valueOf(utcTime1);
+        Date utcDate2 = Timestamp.valueOf(utcTime2);
 
         //when
-        LocalDate localDate1 = DateUtil.convertToKST(date1);
-        LocalDate localDate2 = DateUtil.convertToKST(date2);
+        LocalDate localDate1 = DateUtil.convertToKST(utcDate1);
+        LocalDate localDate2 = DateUtil.convertToKST(utcDate2);
 
         //then
         assertThat(localDate1).isEqualTo(LocalDate.of(2024, 6, 9));

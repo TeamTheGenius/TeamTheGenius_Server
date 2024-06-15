@@ -63,8 +63,7 @@ public class CertificationController {
             @RequestBody CertificationRequest certificationRequest
     ) {
         CertificationResponse certificationResponse = certificationService.updateCertification(
-                userPrincipal.getUser(),
-                new CertificationRequest(certificationRequest.instanceId(), LocalDate.now()));
+                userPrincipal.getUser(), certificationRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)

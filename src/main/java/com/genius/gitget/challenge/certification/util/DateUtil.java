@@ -37,7 +37,7 @@ public final class DateUtil {
         return mondayOfWeek;
     }
 
-    public static LocalDate convertToLocalDate(Date date) {
+    public static LocalDate convertToKST(Date date) {
         return LocalDate.ofInstant(
                 date.toInstant(),
                 ZoneId.of("Asia/Seoul")
@@ -47,7 +47,7 @@ public final class DateUtil {
     private static boolean isFirstWeek(LocalDate challengeStartDate, LocalDate currentDate) {
         LocalDate mondayOfWeek = challengeStartDate.minusDays(challengeStartDate.getDayOfWeek().ordinal());
         LocalDate sundayOfWeek = mondayOfWeek.plusDays(6);
-        
+
         if (currentDate.isAfter(mondayOfWeek.minusDays(1))
                 && currentDate.isBefore(sundayOfWeek.plusDays(1))) {
             return true;

@@ -1,10 +1,14 @@
 package com.genius.gitget.challenge.certification.util;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public final class DateUtil {
 
     public static int getRemainDaysToStart(LocalDate startDate, LocalDate targetDate) {
@@ -42,6 +46,20 @@ public final class DateUtil {
                 date.toInstant(),
                 ZoneId.of("Asia/Seoul")
         );
+    }
+
+    public static LocalDate convertToKST(LocalDateTime nowLocal) {
+        ZoneId systemZone = ZoneId.systemDefault();
+        ZoneId koreaZone = ZoneId.of("Asia/Seoul");
+
+        // 현재 시스템의 ZoneId를 이용하여 ZonedDateTime을 생성
+        ZonedDateTime nowZone = ZonedDateTime.of(nowLocal, systemZone);
+
+        // KST(Asia/Seoul)로 변환
+        ZonedDateTime koreaTime = nowZone.withZoneSameInstant(koreaZone);
+
+        // LocalDateTime으로 변환하여 반환
+        return koreaTime.toLocalDate();
     }
 
     private static boolean isFirstWeek(LocalDate challengeStartDate, LocalDate currentDate) {

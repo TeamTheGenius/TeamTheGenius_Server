@@ -9,6 +9,7 @@ import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
 import com.genius.gitget.challenge.certification.dto.TotalResponse;
 import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
@@ -20,6 +21,7 @@ import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.global.util.response.dto.SlicingResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -135,13 +137,14 @@ public class CertificationController {
             @PathVariable Long instanceId
     ) {
 
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         Instance instance = instanceProvider.findById(instanceId);
         Participant participant = participantProvider.findByJoinInfo(
                 userPrincipal.getUser().getId(),
                 instanceId);
 
         CertificationInformation certificationInformation = certificationService.getCertificationInformation(
-                instance, participant, LocalDate.now());
+                instance, participant, kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationInformation)

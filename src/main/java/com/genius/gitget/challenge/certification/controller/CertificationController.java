@@ -79,8 +79,7 @@ public class CertificationController {
     ) {
         User user = userPrincipal.getUser();
         ActivatedResponse activatedResponse = certificationService.passCertification(
-                user.getId(),
-                new CertificationRequest(certificationRequest.instanceId(), LocalDate.now()));
+                user.getId(), certificationRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), activatedResponse)
@@ -92,9 +91,9 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         Participant participant = participantProvider.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
-        WeekResponse weekResponse = certificationService.getMyWeekCertifications(
-                participant.getId(), LocalDate.now());
+        WeekResponse weekResponse = certificationService.getMyWeekCertifications(participant.getId(), kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekResponse)
@@ -107,9 +106,10 @@ public class CertificationController {
             @PathVariable Long instanceId,
             @PageableDefault Pageable pageable
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         User user = userPrincipal.getUser();
         Slice<WeekResponse> certifications = certificationService.getOthersWeekCertifications(
-                user.getId(), instanceId, LocalDate.now(), pageable);
+                user.getId(), instanceId, kstDate, pageable);
 
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certifications)
@@ -121,10 +121,11 @@ public class CertificationController {
             @PathVariable Long instanceId,
             @RequestParam Long userId
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         User user = userService.findUserById(userId);
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
         TotalResponse totalResponse = certificationService.getTotalCertification(
-                participant.getId(), LocalDate.now());
+                participant.getId(), kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), totalResponse)

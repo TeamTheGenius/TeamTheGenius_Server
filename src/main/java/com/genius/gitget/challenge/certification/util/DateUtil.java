@@ -48,6 +48,22 @@ public final class DateUtil {
         );
     }
 
+    public static LocalDateTime getKstLocalTime() {
+        ZoneId systemZone = ZoneId.systemDefault();
+        ZoneId koreaZone = ZoneId.of("Asia/Seoul");
+
+        // LocalDate.now()를 호출하여 LocalDateTime을 생성
+        LocalDateTime nowLocal = LocalDateTime.now();
+        // 현재 시스템의 ZoneId를 이용하여 ZonedDateTime을 생성
+        ZonedDateTime nowZone = ZonedDateTime.of(nowLocal, systemZone);
+
+        // KST(Asia/Seoul)로 변환
+        ZonedDateTime koreaTime = nowZone.withZoneSameInstant(koreaZone);
+
+        // LocalDateTime으로 변환하여 반환
+        return koreaTime.toLocalDateTime();
+    }
+
     public static LocalDate convertToKST(LocalDateTime nowLocal) {
         ZoneId systemZone = ZoneId.systemDefault();
         ZoneId koreaZone = ZoneId.of("Asia/Seoul");
@@ -58,7 +74,6 @@ public final class DateUtil {
         // KST(Asia/Seoul)로 변환
         ZonedDateTime koreaTime = nowZone.withZoneSameInstant(koreaZone);
 
-        // LocalDateTime으로 변환하여 반환
         return koreaTime.toLocalDate();
     }
 

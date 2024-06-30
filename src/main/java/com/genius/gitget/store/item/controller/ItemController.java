@@ -2,6 +2,7 @@ package com.genius.gitget.store.item.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
@@ -13,7 +14,7 @@ import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
 import com.genius.gitget.store.item.service.ItemProvider;
 import com.genius.gitget.store.item.service.ItemService;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -71,7 +72,7 @@ public class ItemController {
     ) {
         Item item = itemProvider.findByIdentifier(identifier);
         ItemUseResponse itemUseResponse = itemService.useItem(userPrincipal.getUser(), item.getId(),
-                instanceId, LocalDate.now());
+                instanceId, DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemUseResponse)

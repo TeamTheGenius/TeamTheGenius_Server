@@ -5,10 +5,11 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 import com.genius.gitget.challenge.certification.dto.github.GithubTokenRequest;
 import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
 import com.genius.gitget.challenge.certification.service.GithubService;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -56,7 +57,7 @@ public class GithubController {
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
         githubService.verifyGithubToken(userPrincipal.getUser());
-        
+
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
         );
@@ -82,7 +83,7 @@ public class GithubController {
     ) {
 
         List<PullRequestResponse> pullRequestResponses = githubService.verifyPullRequest(
-                userPrincipal.getUser(), repo, LocalDate.now()
+                userPrincipal.getUser(), repo, DateUtil.convertToKST(LocalDateTime.now())
         );
 
         return ResponseEntity.ok().body(

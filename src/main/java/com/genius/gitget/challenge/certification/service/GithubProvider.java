@@ -112,7 +112,7 @@ public class GithubProvider {
 
     private boolean isEqualToKST(GHPullRequest ghPullRequest, LocalDate targetDate) {
         try {
-            LocalDate kst = DateUtil.convertToLocalDate(ghPullRequest.getCreatedAt());
+            LocalDate kst = DateUtil.convertToKST(ghPullRequest.getCreatedAt());
             return kst.isEqual(targetDate);
         } catch (IOException e) {
             throw new BusinessException(e);

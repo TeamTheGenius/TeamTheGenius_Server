@@ -4,6 +4,7 @@ import static com.genius.gitget.global.util.exception.SuccessCode.JOIN_SUCCESS;
 import static com.genius.gitget.global.util.exception.SuccessCode.QUIT_SUCCESS;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
@@ -11,6 +12,7 @@ import com.genius.gitget.challenge.instance.service.InstanceDetailService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -50,10 +52,11 @@ public class InstanceDetailController {
             @PathVariable Long instanceId,
             @RequestParam String repo
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         JoinRequest joinRequest = JoinRequest.builder()
                 .instanceId(instanceId)
                 .repository(repo)
-                .todayDate(LocalDate.now())
+                .todayDate(kstDate)
                 .build();
         JoinResponse joinResponse = instanceDetailService.joinNewChallenge(userPrincipal.getUser(), joinRequest);
 

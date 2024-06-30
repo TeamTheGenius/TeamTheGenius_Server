@@ -8,7 +8,6 @@ import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
-import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,12 +64,9 @@ public class ParticipantProvider {
         return participantRepository.findAllJoinedByProgress(userId, progress);
     }
 
-    public boolean hasParticipant(Long userId, Long instanceId) {
-        return participantRepository.findByJoinInfo(userId, instanceId).isPresent();
+    public boolean hasJoinedParticipant(Long userId, Long instanceId) {
+        return participantRepository.findByJoinInfo(userId, instanceId)
+                .map(participant -> participant.getJoinStatus() != JoinStatus.NO)
+                .orElse(false);
     }
-
-    public LocalDate getInstanceStartDate(Long participantId) {
-        return getInstanceById(participantId).getStartedDate().toLocalDate();
-    }
-
 }

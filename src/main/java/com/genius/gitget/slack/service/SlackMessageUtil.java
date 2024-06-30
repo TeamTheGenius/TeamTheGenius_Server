@@ -4,6 +4,7 @@ import static com.slack.api.model.block.Blocks.divider;
 import static com.slack.api.model.block.Blocks.section;
 import static com.slack.api.model.block.composition.BlockCompositions.markdownText;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.slack.api.model.Attachment;
 import com.slack.api.model.block.LayoutBlock;
 import com.slack.api.model.block.composition.TextObject;
@@ -12,9 +13,15 @@ import java.util.List;
 
 public class SlackMessageUtil {
 
-    private static final String ERROR_MESSAGE = "*Error Message:*\n";
-    private static final String ERROR_STACK = "*Error Stack:*\n";
+    private static final String ERROR_TITLE = "*Exception 발생 시각:* ";
+    private static final String ERROR_MESSAGE = "*Exception Message:*\n";
+    private static final String ERROR_STACK = "*Exception Stack:*\n";
     private static final String FILTER_STRING = "gitget";
+
+
+    public static String createErrorTitle() {
+        return ERROR_TITLE + DateUtil.getKstLocalTime();
+    }
 
     public static List<Attachment> createAttachments(String color, List<LayoutBlock> data) {
         List<Attachment> attachments = new ArrayList<>();
@@ -44,7 +51,6 @@ public class SlackMessageUtil {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("```");
         for (StackTraceElement stack : stacks) {
-//            stringBuilder.append(stack.toString()).append("\n");
             if (stack.toString().contains(FILTER_STRING)) {
                 stringBuilder.append(stack).append("\n");
             }

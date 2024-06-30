@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class SlackServiceImpl implements SlackService {
-    private static final String PROD_ERROR_MESSAGE_TITLE = "*Exception 발생*";
     private static final String ATTACHMENTS_ERROR_COLOR = "#eb4034";
     @Value("${slack.token}")
     private String token;
@@ -41,6 +40,7 @@ public class SlackServiceImpl implements SlackService {
     @Override
     public void sendMessage(Exception exception) {
         try {
+            String errorTitle = SlackMessageUtil.createErrorTitle();
             List<LayoutBlock> layoutBlocks = SlackMessageUtil.createProdErrorMessage(exception);
             List<Attachment> attachments = SlackMessageUtil.createAttachments(ATTACHMENTS_ERROR_COLOR,
                     layoutBlocks);
@@ -49,7 +49,7 @@ public class SlackServiceImpl implements SlackService {
             ChatPostMessageRequest request = ChatPostMessageRequest.builder()
                     .channel(channel)
                     .attachments(attachments)
-                    .text(PROD_ERROR_MESSAGE_TITLE)
+                    .text(errorTitle)
                     .build();
 
             methods.chatPostMessage(request);

@@ -9,6 +9,7 @@ import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
 import com.genius.gitget.challenge.certification.dto.TotalResponse;
 import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.service.CertificationService;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
@@ -20,6 +21,7 @@ import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.global.util.response.dto.SlicingResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -63,8 +65,7 @@ public class CertificationController {
             @RequestBody CertificationRequest certificationRequest
     ) {
         CertificationResponse certificationResponse = certificationService.updateCertification(
-                userPrincipal.getUser(),
-                new CertificationRequest(certificationRequest.instanceId(), LocalDate.now()));
+                userPrincipal.getUser(), certificationRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
@@ -78,8 +79,7 @@ public class CertificationController {
     ) {
         User user = userPrincipal.getUser();
         ActivatedResponse activatedResponse = certificationService.passCertification(
-                user.getId(),
-                new CertificationRequest(certificationRequest.instanceId(), LocalDate.now()));
+                user.getId(), certificationRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), activatedResponse)
@@ -91,9 +91,9 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         Participant participant = participantProvider.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
-        WeekResponse weekResponse = certificationService.getMyWeekCertifications(
-                participant.getId(), LocalDate.now());
+        WeekResponse weekResponse = certificationService.getMyWeekCertifications(participant.getId(), kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekResponse)
@@ -106,9 +106,10 @@ public class CertificationController {
             @PathVariable Long instanceId,
             @PageableDefault Pageable pageable
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         User user = userPrincipal.getUser();
         Slice<WeekResponse> certifications = certificationService.getOthersWeekCertifications(
-                user.getId(), instanceId, LocalDate.now(), pageable);
+                user.getId(), instanceId, kstDate, pageable);
 
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certifications)
@@ -120,10 +121,11 @@ public class CertificationController {
             @PathVariable Long instanceId,
             @RequestParam Long userId
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         User user = userService.findUserById(userId);
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
         TotalResponse totalResponse = certificationService.getTotalCertification(
-                participant.getId(), LocalDate.now());
+                participant.getId(), kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), totalResponse)
@@ -136,13 +138,14 @@ public class CertificationController {
             @PathVariable Long instanceId
     ) {
 
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         Instance instance = instanceProvider.findById(instanceId);
         Participant participant = participantProvider.findByJoinInfo(
                 userPrincipal.getUser().getId(),
                 instanceId);
 
         CertificationInformation certificationInformation = certificationService.getCertificationInformation(
-                instance, participant, LocalDate.now());
+                instance, participant, kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationInformation)

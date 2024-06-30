@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.instance.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceIndexResponse;
@@ -13,6 +14,7 @@ import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -75,7 +77,8 @@ public class InstanceController {
     @PostMapping("/instance")
     public ResponseEntity<SingleResponse<InstanceIndexResponse>> createInstance(
             @RequestBody InstanceCreateRequest instanceCreateRequest) {
-        Long instanceId = instanceService.createInstance(instanceCreateRequest, LocalDate.now());
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
+        Long instanceId = instanceService.createInstance(instanceCreateRequest, kstDate);
         InstanceIndexResponse instanceIndexResponse = new InstanceIndexResponse(instanceId);
 
         return ResponseEntity.ok().body(

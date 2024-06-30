@@ -2,9 +2,11 @@ package com.genius.gitget.schedule.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.schedule.service.ProgressService;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +21,7 @@ public class ProgressController {
 
     @GetMapping("/challenges/update")
     public ResponseEntity<CommonResponse> updateProgress() {
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = DateUtil.convertToKST(LocalDateTime.now());
         scheduleService.updateToActivity(currentDate);
         scheduleService.updateToDone(currentDate);
 

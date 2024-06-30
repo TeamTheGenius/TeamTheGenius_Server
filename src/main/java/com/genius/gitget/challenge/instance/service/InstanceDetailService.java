@@ -46,7 +46,7 @@ public class InstanceDetailService {
         FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
         LikesInfo likesInfo = getLikesInfo(user.getId(), instance);
 
-        if (participantProvider.hasParticipant(user.getId(), instanceId)) {
+        if (participantProvider.hasJoinedParticipant(user.getId(), instanceId)) {
             return InstanceResponse.createByEntity(instance, likesInfo, JoinStatus.YES, fileResponse);
         }
 
@@ -90,7 +90,7 @@ public class InstanceDetailService {
     }
 
     private void validateInstanceCondition(User user, Instance instance) {
-        boolean isParticipated = participantProvider.hasParticipant(user.getId(), instance.getId());
+        boolean isParticipated = participantProvider.hasJoinedParticipant(user.getId(), instance.getId());
         if ((instance.getProgress() == Progress.PREACTIVITY) && !isParticipated) {
             return;
         }

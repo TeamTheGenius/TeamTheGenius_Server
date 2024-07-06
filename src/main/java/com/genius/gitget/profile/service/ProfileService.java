@@ -129,7 +129,7 @@ public class ProfileService {
                 .tags(interestList)
                 .build();
     }
-
+    
     // 마이페이지 - 챌린지 현황
     public UserChallengeResultResponse getUserChallengeResult(User user) {
         User findUser = getUserByIdentifier(user.getIdentifier());

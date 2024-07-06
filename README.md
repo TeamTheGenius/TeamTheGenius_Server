@@ -2,11 +2,11 @@
 
 </br>
 
-## :raising_hand_man: Introduction
+## :raising_hand_man: 프로젝트 소개
 IT 종사자를 위한 공부 습관 형성 서비스입니다. 
 (추가 소개글 또는 사진 필요)
 
-## :desktop_computer: Tech Stack 
+## :desktop_computer: 기술 스택
 Framework - <img src="https://img.shields.io/badge/Spring Boot-6DB33F?style=flat&logo=Spring Boot&logoColor=white" /> <img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=Gradle&logoColor=white" />
 
 ORM - <img src="https://img.shields.io/badge/Spring Boot JPA-6DB33F?style=flat&logo=Spring Boot&logoColor=white" />
@@ -24,16 +24,194 @@ Monitoring - <img src="https://img.shields.io/badge/Discord-5865F2?style=flat&lo
 Other - <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=swagger&logoColor=white" /> 
 
 
+## 주요 기능
 
-## Main Function
 
-## Dependency and Quick Start
 
-## Architecture
+## 개발 환경
+```
+Java : 17
+Spring Boot : 3.2.1
+build : gradle
+```
 
-## DataBase Schema
+## 다운로드 방법
 
-## Contributors
+```
+git clone https://github.com/TeamTheGenius/TeamTheGenius_Server.git
+```
+
+## 아키텍처
+```bash
+.
+├── main
+│   ├── java
+│   │   └── com
+│   │       └── genius
+│   │           └── gitget
+│   │               ├── admin
+│   │               │   ├── signout
+│   │               │   └── topic
+│   │               │       ├── controller
+│   │               │       ├── domain
+│   │               │       ├── dto
+│   │               │       ├── repository
+│   │               │       └── service
+│   │               ├── challenge
+│   │               │   ├── certification
+│   │               │   │   ├── controller
+│   │               │   │   ├── domain
+│   │               │   │   ├── dto
+│   │               │   │   │   └── github
+│   │               │   │   ├── repository
+│   │               │   │   ├── service
+│   │               │   │   └── util
+│   │               │   ├── instance
+│   │               │   │   ├── controller
+│   │               │   │   ├── domain
+│   │               │   │   ├── dto
+│   │               │   │   │   ├── crud
+│   │               │   │   │   ├── detail
+│   │               │   │   │   ├── home
+│   │               │   │   │   └── search
+│   │               │   │   ├── repository
+│   │               │   │   └── service
+│   │               │   ├── likes
+│   │               │   │   ├── controller
+│   │               │   │   ├── domain
+│   │               │   │   ├── dto
+│   │               │   │   ├── repository
+│   │               │   │   └── service
+│   │               │   ├── myChallenge
+│   │               │   │   ├── controller
+│   │               │   │   ├── dto
+│   │               │   │   └── service
+│   │               │   ├── participant
+│   │               │   │   ├── domain
+│   │               │   │   ├── repository
+│   │               │   │   └── service
+│   │               │   ├── report
+│   │               │   │   ├── controller
+│   │               │   │   ├── domain
+│   │               │   │   ├── dto
+│   │               │   │   ├── repository
+│   │               │   │   └── service
+│   │               │   └── user
+│   │               │       ├── controller
+│   │               │       ├── domain
+│   │               │       ├── dto
+│   │               │       ├── repository
+│   │               │       └── service
+│   │               ├── global
+│   │               │   ├── file
+│   │               │   │   ├── controller
+│   │               │   │   ├── domain
+│   │               │   │   ├── dto
+│   │               │   │   ├── repository
+│   │               │   │   └── service
+│   │               │   ├── security
+│   │               │   │   ├── config
+│   │               │   │   ├── constants
+│   │               │   │   ├── controller
+│   │               │   │   ├── domain
+│   │               │   │   ├── dto
+│   │               │   │   ├── filter
+│   │               │   │   ├── handler
+│   │               │   │   ├── info
+│   │               │   │   │   └── impl
+│   │               │   │   ├── repository
+│   │               │   │   └── service
+│   │               │   └── util
+│   │               │       ├── config
+│   │               │       ├── domain
+│   │               │       ├── exception
+│   │               │       ├── formatter
+│   │               │       └── response
+│   │               │           └── dto
+│   │               ├── profile
+│   │               │   ├── controller
+│   │               │   ├── dto
+│   │               │   └── service
+│   │               ├── schedule
+│   │               │   ├── controller
+│   │               │   └── service
+│   │               └── store
+│   │                   ├── item
+│   │                   │   ├── controller
+│   │                   │   ├── domain
+│   │                   │   ├── dto
+│   │                   │   ├── repository
+│   │                   │   └── service
+│   │                   └── payment
+│   │                       ├── config
+│   │                       ├── controller
+│   │                       ├── domain
+│   │                       ├── dto
+│   │                       ├── repository
+│   │                       └── service
+│   └── resources
+└── test
+    ├── java
+    │   └── com
+    │       └── genius
+    │           └── gitget
+    │               ├── admin
+    │               │   └── topic
+    │               │       ├── controller
+    │               │       ├── repository
+    │               │       └── service
+    │               ├── challenge
+    │               │   ├── certification
+    │               │   │   ├── controller
+    │               │   │   ├── repository
+    │               │   │   ├── service
+    │               │   │   └── util
+    │               │   ├── home
+    │               │   │   ├── controller
+    │               │   │   └── service
+    │               │   ├── instance
+    │               │   │   ├── controller
+    │               │   │   ├── repository
+    │               │   │   └── service
+    │               │   ├── item
+    │               │   │   └── service
+    │               │   ├── likes
+    │               │   │   ├── controller
+    │               │   │   └── service
+    │               │   ├── myChallenge
+    │               │   │   └── service
+    │               │   ├── participant
+    │               │   │   └── service
+    │               │   └── user
+    │               │       ├── controller
+    │               │       ├── domain
+    │               │       ├── repository
+    │               │       └── service
+    │               ├── global
+    │               │   ├── file
+    │               │   │   ├── domain
+    │               │   │   ├── repository
+    │               │   │   └── service
+    │               │   └── security
+    │               │       ├── config
+    │               │       ├── controller
+    │               │       └── service
+    │               ├── payment
+    │               │   ├── controller
+    │               │   └── service
+    │               ├── profile
+    │               │   ├── controller
+    │               │   └── service
+    │               └── util
+    │                   └── file
+    └── resources
+
+```
+
+## 데이터베이스 
+![image](https://github.com/kimdozzi/Java/assets/95005061/b8930f51-22b4-4574-b5f3-58ffd9bbac01)
+
+## 기여자
 <table>
     <tr height="140px">
         <td align="center" width="130px">
@@ -57,5 +235,6 @@ Other - <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=sw
         </td>
 </table>
 
-## Other .. (API문서 등)
 
+## 업데이트 내역
+...

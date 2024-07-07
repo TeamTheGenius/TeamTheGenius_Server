@@ -82,6 +82,11 @@ git clone https://github.com/TeamTheGenius/TeamTheGenius_Server.git
 
 <br> <br>
 
+## 배포 플로우
+![image](https://github.com/TeamTheGenius/TeamTheGenius_Server/assets/95005061/8612cb5b-67de-4bf6-ad4e-40a46cafdadc)
+
+<br><br>
+
 ## 데이터베이스 
 ![image](https://github.com/kimdozzi/Java/assets/95005061/b8930f51-22b4-4574-b5f3-58ffd9bbac01)
 

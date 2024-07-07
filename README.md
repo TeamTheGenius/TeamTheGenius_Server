@@ -80,9 +80,10 @@ git clone https://github.com/TeamTheGenius/TeamTheGenius_Server.git
 
 ![image](https://github.com/TeamTheGenius/TeamTheGenius_Server/assets/95005061/9e83841d-0709-4339-bd5e-9e8e29e731c4)
 
+<br> <br>
 
-
-
+## 데이터베이스 
+![image](https://github.com/kimdozzi/Java/assets/95005061/b8930f51-22b4-4574-b5f3-58ffd9bbac01)
 
 <br> <br>
 
@@ -252,11 +253,6 @@ git clone https://github.com/TeamTheGenius/TeamTheGenius_Server.git
     └── resources
 
 ```
-
-<br> <br>
-
-## 데이터베이스 
-![image](https://github.com/kimdozzi/Java/assets/95005061/b8930f51-22b4-4574-b5f3-58ffd9bbac01)
 
 <br> <br>
 

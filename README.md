@@ -24,9 +24,6 @@ Monitoring - <img src="https://img.shields.io/badge/Discord-5865F2?style=flat&lo
 Other - <img src="https://img.shields.io/badge/Swagger-85EA2D?style=flat&logo=swagger&logoColor=white" /> 
 
 
-## 주요 기능
-
-
 
 ## 개발 환경
 ```
@@ -40,6 +37,10 @@ build : gradle
 ```
 git clone https://github.com/TeamTheGenius/TeamTheGenius_Server.git
 ```
+
+## 화면 설계서 
+![image](https://github.com/TeamTheGenius/TeamTheGenius_Server/assets/95005061/52d8e894-14a7-40ad-b94c-3af1a03fedd9)
+
 
 ## 아키텍처
 ```bash
@@ -235,6 +236,3 @@ git clone https://github.com/TeamTheGenius/TeamTheGenius_Server.git
         </td>
 </table>
 
-
-## 업데이트 내역
-...

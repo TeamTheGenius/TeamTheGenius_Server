@@ -32,7 +32,7 @@ public class TopicFacadeImpl implements TopicFacade {
     public TopicDetailResponse findOne(Long id) {
         Topic topic = topicService.findOne(id);
         FileResponse fileResponse = filesService.convertToFileResponse(topic.getFiles());
-        return TopicDetailResponse.createByEntity(topic, fileResponse);
+        return TopicDetailResponse.of(topic, fileResponse);
     }
 
     @Override
@@ -62,6 +62,6 @@ public class TopicFacadeImpl implements TopicFacade {
 
     private TopicPagingResponse convertToTopicPagingResponseDto(Topic topic) {
         FileResponse fileResponse = filesService.convertToFileResponse(topic.getFiles());
-        return TopicPagingResponse.createByEntity(topic, fileResponse);
+        return TopicPagingResponse.of(topic, fileResponse);
     }
 }

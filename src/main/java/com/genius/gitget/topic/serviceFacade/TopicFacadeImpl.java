@@ -24,34 +24,34 @@ public class TopicFacadeImpl implements TopicFacade {
 
     @Override
     public Page<TopicPagingResponse> findTopics(Pageable pageable) {
-        Page<Topic> allTopicById = topicService.findTopics(pageable);
-        return allTopicById.map(this::convertToTopicPagingResponseDto);
+        Page<Topic> findTopics = topicService.findTopics(pageable);
+        return findTopics.map(this::convertToTopicPagingResponseDto);
     }
 
     @Override
     public TopicDetailResponse findOne(Long id) {
-        Topic topic = topicService.findOne(id);
-        FileResponse fileResponse = filesService.convertToFileResponse(topic.getFiles());
-        return TopicDetailResponse.of(topic, fileResponse);
+        Topic findTopic = topicService.findOne(id);
+        FileResponse fileResponse = filesService.convertToFileResponse(findTopic.getFiles());
+        return TopicDetailResponse.of(findTopic, fileResponse);
     }
 
     @Override
     public Long create(TopicCreateRequest topicCreateRequest) {
-        Topic byTopicCreateDto = topicService.createTopicByTopicCreateRequest(topicCreateRequest);
-        return topicService.create(byTopicCreateDto);
+        Topic topic = topicService.createTopicByTopicCreateRequest(topicCreateRequest);
+        return topicService.create(topic);
     }
 
     @Override
     public Long update(Long id, TopicUpdateRequest topicUpdateRequest) {
         Topic topic = topicService.findOne(id);
 
-        boolean hasInstance = !topic.getInstanceList().isEmpty();
-        if (hasInstance) {
+        if (!topic.getInstanceList().isEmpty()) {
             topic.updateExistInstance(topicUpdateRequest.description());
-        } else {
-            topic.updateNotExistInstance(topicUpdateRequest.title(), topicUpdateRequest.description(),
-                    topicUpdateRequest.tags(), topicUpdateRequest.notice(), topicUpdateRequest.pointPerPerson());
+            return topicService.create(topic);
         }
+
+        topic.updateNotExistInstance(topicUpdateRequest.title(), topicUpdateRequest.description(),
+                topicUpdateRequest.tags(), topicUpdateRequest.notice(), topicUpdateRequest.pointPerPerson());
         return topicService.create(topic);
     }
 

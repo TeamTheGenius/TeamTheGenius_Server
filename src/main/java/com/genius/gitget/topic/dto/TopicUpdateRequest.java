@@ -1,4 +1,4 @@
-package com.genius.gitget.admin.topic.dto;
+package com.genius.gitget.topic.dto;
 
 import lombok.Builder;
 

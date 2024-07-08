@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;

@@ -1,7 +1,7 @@
 package com.genius.gitget.challenge.instance.domain;
 
 
-import com.genius.gitget.admin.topic.domain.Topic;
+import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.likes.domain.Likes;

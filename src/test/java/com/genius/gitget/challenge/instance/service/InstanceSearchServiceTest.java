@@ -1,7 +1,7 @@
 package com.genius.gitget.challenge.instance.service;
 
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;

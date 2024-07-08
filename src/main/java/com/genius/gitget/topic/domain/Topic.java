@@ -1,4 +1,4 @@
-package com.genius.gitget.admin.topic.domain;
+package com.genius.gitget.topic.domain;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.domain.FileHolder;

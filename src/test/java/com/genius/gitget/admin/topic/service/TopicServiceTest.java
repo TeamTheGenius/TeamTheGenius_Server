@@ -1,11 +1,12 @@
 package com.genius.gitget.admin.topic.service;
 
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.dto.TopicCreateRequest;
-import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
-import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.dto.TopicCreateRequest;
+import com.genius.gitget.topic.dto.TopicDetailResponse;
+import com.genius.gitget.topic.dto.TopicUpdateRequest;
+import com.genius.gitget.topic.repository.TopicRepository;
+import com.genius.gitget.topic.service.TopicService;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -53,7 +54,7 @@ public class TopicServiceTest {
         Long savedTopicId = topicService.createTopic(topicCreateRequest);
 
         //when
-        TopicDetailResponse topicById = topicService.getTopicById(savedTopicId);
+        TopicDetailResponse topicById = topicService.getOneTopic(savedTopicId);
 
         //then
         Assertions.assertThat(topicById.title()).isEqualTo(topicCreateRequest.title());
@@ -92,7 +93,7 @@ public class TopicServiceTest {
 
         //then
         try {
-            topicService.getTopicById(savedTopicId);
+            topicService.getOneTopic(savedTopicId);
         } catch (BusinessException e) {
             org.junit.jupiter.api.Assertions.assertEquals("해당 토픽을 찾을 수 없습니다.", e.getMessage());
         }

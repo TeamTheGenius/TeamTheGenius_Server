@@ -5,8 +5,8 @@ import static com.genius.gitget.challenge.participant.domain.JoinResult.PROCESSI
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
 import static com.genius.gitget.challenge.participant.domain.JoinStatus.YES;
 
-import com.genius.gitget.admin.signout.Signout;
-import com.genius.gitget.admin.signout.SignoutRepository;
+import com.genius.gitget.signout.Signout;
+import com.genius.gitget.signout.SignoutRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.user.domain.User;

@@ -95,11 +95,9 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public boolean validateRefreshToken(String token, String identifier) {
         boolean isRefreshValid = jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == TokenStatus.AUTHENTICATED;
+        boolean isHijacked = tokenService.isRefreshHijacked(identifier, token);
 
-        Token storedToken = tokenService.findByIdentifier(identifier);
-        boolean isTokenMatched = storedToken.getToken().equals(token);
-
-        return isRefreshValid && isTokenMatched;
+        return isRefreshValid && !isHijacked;
     }
 
     @Override

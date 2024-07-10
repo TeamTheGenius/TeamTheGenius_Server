@@ -48,7 +48,7 @@ public class TopicRepositoryTest {
     }
 
     @Nested
-    @DisplayName("save 메소드는")
+    @DisplayName("save 메서드는")
     class Describe_save {
 
         @BeforeEach
@@ -75,7 +75,7 @@ public class TopicRepositoryTest {
 
 
     @Nested
-    @DisplayName("search 메소드는")
+    @DisplayName("search 메서드는")
     class Describe_search {
 
         @Nested
@@ -129,7 +129,7 @@ public class TopicRepositoryTest {
 
             @Test
             @DisplayName("생성된 인스턴스가 존재하면 description만 수정할 수 있고, 없다면 모든 항목을 수정할 수 있다.")
-            public void it_returns_2XX_if_the_obj_is_updated_successfully() {
+            public void it_returns_updated_obj() {
 
                 Topic topic = topicRepository.findById(topicA.getId()).orElse(null);
 

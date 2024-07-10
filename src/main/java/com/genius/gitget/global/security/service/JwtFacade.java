@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 
-public interface JwtService {
+public interface JwtFacade {
     String generateAccessToken(HttpServletResponse response, User user);
 
     String generateRefreshToken(HttpServletResponse response, User user);

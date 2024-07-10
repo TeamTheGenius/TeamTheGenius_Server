@@ -7,7 +7,7 @@ import com.genius.gitget.global.security.filter.JwtAuthenticationFilter;
 import com.genius.gitget.global.security.handler.OAuth2FailureHandler;
 import com.genius.gitget.global.security.handler.OAuth2SuccessHandler;
 import com.genius.gitget.global.security.service.CustomOAuth2UserService;
-import com.genius.gitget.global.security.service.JwtService;
+import com.genius.gitget.global.security.service.JwtFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +32,7 @@ public class SecurityConfig {
     private static final String PERMITTED_ROLES[] = {"USER", "ADMIN"};
     private final CustomCorsConfigurationSource customCorsConfigurationSource;
     private final CustomOAuth2UserService customOAuthService;
-    private final JwtService jwtService;
+    private final JwtFacade jwtFacade;
     private final UserService userService;
     private final OAuth2SuccessHandler successHandler;
     private final OAuth2FailureHandler failureHandler;
@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // JWT 검증 필터 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtService, userService),
+                .addFilterBefore(new JwtAuthenticationFilter(jwtFacade, userService),
                         UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class)
 

@@ -8,7 +8,7 @@ import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.security.dto.TokenRequest;
-import com.genius.gitget.global.security.service.JwtService;
+import com.genius.gitget.global.security.service.JwtFacade;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class AuthController {
     private final UserService userService;
-    private final JwtService jwtService;
+    private final JwtFacade jwtFacade;
 
     @PostMapping("/auth")
     public ResponseEntity<SingleResponse<AuthResponse>> generateToken(HttpServletResponse response,
@@ -39,8 +39,8 @@ public class AuthController {
             throw new BusinessException(NOT_AUTHENTICATED_USER);
         }
 
-        jwtService.generateAccessToken(response, user);
-        jwtService.generateRefreshToken(response, user);
+        jwtFacade.generateAccessToken(response, user);
+        jwtFacade.generateRefreshToken(response, user);
 
         AuthResponse authResponse = userService.getUserAuthInfo(user.getIdentifier());
 
@@ -53,7 +53,7 @@ public class AuthController {
     public ResponseEntity<CommonResponse> logout(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             HttpServletResponse response) {
-        jwtService.logout(response, userPrincipal.getUser().getIdentifier());
+        jwtFacade.logout(response, userPrincipal.getUser().getIdentifier());
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())

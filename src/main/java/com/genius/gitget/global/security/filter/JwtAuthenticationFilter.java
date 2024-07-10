@@ -5,7 +5,7 @@ import static com.genius.gitget.global.security.config.SecurityConfig.PERMITTED_
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.constants.JwtRule;
-import com.genius.gitget.global.security.service.JwtService;
+import com.genius.gitget.global.security.service.JwtFacade;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +19,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    private final JwtService jwtService;
+    private final JwtFacade jwtFacade;
     private final UserService userService;
 
     @Override
@@ -32,26 +32,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String accessToken = jwtService.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
-        if (jwtService.validateAccessToken(accessToken)) {
+        String accessToken = jwtFacade.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
+        if (jwtFacade.validateAccessToken(accessToken)) {
             setAuthenticationToContext(accessToken);
             filterChain.doFilter(request, response);
             return;
         }
 
-        String refreshToken = jwtService.resolveTokenFromCookie(request, JwtRule.REFRESH_PREFIX);
+        String refreshToken = jwtFacade.resolveTokenFromCookie(request, JwtRule.REFRESH_PREFIX);
         User user = findUserByRefreshToken(refreshToken);
 
-        if (jwtService.validateRefreshToken(refreshToken, user.getIdentifier())) {
-            String reissuedAccessToken = jwtService.generateAccessToken(response, user);
-            jwtService.generateRefreshToken(response, user);
+        if (jwtFacade.validateRefreshToken(refreshToken, user.getIdentifier())) {
+            String reissuedAccessToken = jwtFacade.generateAccessToken(response, user);
+            jwtFacade.generateRefreshToken(response, user);
 
             setAuthenticationToContext(reissuedAccessToken);
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwtService.logout(response, user.getIdentifier());
+        jwtFacade.logout(response, user.getIdentifier());
     }
 
     private boolean isPermittedURI(String requestURI) {
@@ -63,12 +63,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private User findUserByRefreshToken(String refreshToken) {
-        String identifier = jwtService.getIdentifierFromRefresh(refreshToken);
+        String identifier = jwtFacade.getIdentifierFromRefresh(refreshToken);
         return userService.findUserByIdentifier(identifier);
     }
 
     private void setAuthenticationToContext(String accessToken) {
-        Authentication authentication = jwtService.getAuthentication(accessToken);
+        Authentication authentication = jwtFacade.getAuthentication(accessToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

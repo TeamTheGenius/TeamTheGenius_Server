@@ -15,15 +15,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Base64;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@Service
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
+@Component
 public class JwtUtil {
 
     public TokenStatus getTokenStatus(String token, Key secretKey) {

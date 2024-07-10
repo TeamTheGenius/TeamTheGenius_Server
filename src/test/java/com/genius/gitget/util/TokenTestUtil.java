@@ -3,9 +3,9 @@ package com.genius.gitget.util;
 import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 
-import com.genius.gitget.global.security.domain.UserPrincipal;
-import com.genius.gitget.global.security.service.JwtService;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.global.security.service.JwtServiceImpl;
 import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class TokenTestUtil {
-    private final JwtService jwtService;
+    private final JwtServiceImpl jwtService;
 
     public Cookie createAccessCookie() {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()

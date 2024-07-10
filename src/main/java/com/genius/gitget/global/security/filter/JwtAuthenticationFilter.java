@@ -2,10 +2,10 @@ package com.genius.gitget.global.security.filter;
 
 import static com.genius.gitget.global.security.config.SecurityConfig.PERMITTED_URI;
 
-import com.genius.gitget.global.security.constants.JwtRule;
-import com.genius.gitget.global.security.service.JwtService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.security.constants.JwtRule;
+import com.genius.gitget.global.security.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        jwtService.logout(user, response);
+        jwtService.logout(response, user.getIdentifier());
     }
 
     private boolean isPermittedURI(String requestURI) {

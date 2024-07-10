@@ -36,11 +36,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Slf4j
 @ActiveProfiles({"jwt"})
-class JwtServiceTest {
+class JwtServiceImplTest {
     @Autowired
     private TokenRepository tokenRepository;
     @Autowired
-    private JwtService jwtService;
+    private JwtServiceImpl jwtService;
     @Autowired
     private UserRepository userRepository;
     @Autowired

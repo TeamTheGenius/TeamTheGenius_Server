@@ -38,7 +38,7 @@ class TokenServiceTest {
 
         //when
         Token savedToken = tokenRepository.save(token);
-        Token tokenByIdentifier = tokenService.findTokenByIdentifier(identifier);
+        Token tokenByIdentifier = tokenService.findByIdentifier(identifier);
 
         //then
         assertThat(savedToken.getIdentifier()).isEqualTo(tokenByIdentifier.getIdentifier());

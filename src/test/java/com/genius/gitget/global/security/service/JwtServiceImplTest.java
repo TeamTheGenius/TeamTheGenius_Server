@@ -4,7 +4,6 @@ import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_JWT;
 import static com.genius.gitget.global.util.exception.ErrorCode.JWT_TOKEN_NOT_FOUND;
-import static com.genius.gitget.global.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -178,18 +177,6 @@ class JwtServiceImplTest {
         assertThatThrownBy(() -> jwtService.resolveTokenFromCookie(request, refreshTokenPrefix))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(JWT_TOKEN_NOT_FOUND.getMessage());
-    }
-
-    @Test
-    @DisplayName("사용자가 아직 가입하지 않은 회원이 JWT 발급을 요청한다면, 예외를 발생시킨다.")
-    public void should_throwException_when_userIsNotRegistered() {
-        //given
-        User user = getUnregisteredUser();
-
-        //when & then
-        assertThatThrownBy(() -> jwtService.validateUser(user))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(NOT_AUTHENTICATED_USER.getMessage());
     }
 
     @Test

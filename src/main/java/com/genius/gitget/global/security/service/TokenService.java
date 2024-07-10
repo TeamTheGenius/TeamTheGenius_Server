@@ -16,15 +16,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class TokenService {
     private final TokenRepository tokenRepository;
 
-    public Token findTokenByIdentifier(String identifier) {
+    @Transactional
+    public String save(Token token) {
+        Token savedToken = tokenRepository.save(token);
+        return savedToken.getIdentifier();
+    }
+
+    public Token findByIdentifier(String identifier) {
         return tokenRepository.findById(identifier)
                 .orElseThrow(() -> new BusinessException(ErrorCode.JWT_TOKEN_NOT_FOUND));
     }
 
     public boolean isRefreshHijacked(String identifier, String refreshToken) {
-        Token token = findTokenByIdentifier(identifier);
+        Token token = findByIdentifier(identifier);
         return token.getToken().equals(refreshToken);
     }
 
-
+    public void deleteById(String identifier) {
+        tokenRepository.deleteById(identifier);
+    }
 }

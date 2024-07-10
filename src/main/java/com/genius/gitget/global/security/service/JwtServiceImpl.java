@@ -9,7 +9,6 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.constants.TokenStatus;
 import com.genius.gitget.global.security.domain.Token;
-import com.genius.gitget.global.security.repository.TokenRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import io.jsonwebtoken.Jwts;
@@ -31,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class JwtServiceImpl implements JwtService {
     private final CustomUserDetailsService customUserDetailsService;
-    private final TokenRepository tokenRepository;
+    private final TokenService tokenService;
     private final JwtGenerator jwtGenerator;
     private final JwtUtil jwtUtil;
 
@@ -41,14 +40,14 @@ public class JwtServiceImpl implements JwtService {
     private final long REFRESH_EXPIRATION;
 
     public JwtServiceImpl(CustomUserDetailsService customUserDetailsService,
-                          TokenRepository tokenRepository,
+                          TokenService tokenService,
                           JwtGenerator jwtGenerator, JwtUtil jwtUtil,
                           @Value("${jwt.access-secret}") String ACCESS_SECRET_KEY,
                           @Value("${jwt.refresh-secret}") String REFRESH_SECRET_KEY,
                           @Value("${jwt.access-expiration}") long ACCESS_EXPIRATION,
                           @Value("${jwt.refresh-expiration}") long REFRESH_EXPIRATION) {
         this.customUserDetailsService = customUserDetailsService;
-        this.tokenRepository = tokenRepository;
+        this.tokenService = tokenService;
         this.jwtGenerator = jwtGenerator;
         this.jwtUtil = jwtUtil;
         this.ACCESS_SECRET_KEY = jwtUtil.getSigningKey(ACCESS_SECRET_KEY);
@@ -74,7 +73,7 @@ public class JwtServiceImpl implements JwtService {
         ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
         response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
 
-        tokenRepository.save(new Token(requestUser.getIdentifier(), refreshToken));
+        tokenService.save(new Token(requestUser.getIdentifier(), refreshToken));
         return refreshToken;
     }
 
@@ -97,7 +96,7 @@ public class JwtServiceImpl implements JwtService {
     public boolean validateRefreshToken(String token, String identifier) {
         boolean isRefreshValid = jwtUtil.getTokenStatus(token, REFRESH_SECRET_KEY) == TokenStatus.AUTHENTICATED;
 
-        Token storedToken = tokenRepository.findByIdentifier(identifier);
+        Token storedToken = tokenService.findByIdentifier(identifier);
         boolean isTokenMatched = storedToken.getToken().equals(token);
 
         return isRefreshValid && isTokenMatched;
@@ -143,7 +142,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public void logout(HttpServletResponse response, String identifier) {
-        tokenRepository.deleteById(identifier);
+        tokenService.deleteById(identifier);
 
         Cookie accessCookie = jwtUtil.resetToken(ACCESS_PREFIX);
         Cookie refreshCookie = jwtUtil.resetToken(REFRESH_PREFIX);

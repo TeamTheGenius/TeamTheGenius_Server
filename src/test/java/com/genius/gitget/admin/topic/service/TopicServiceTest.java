@@ -6,7 +6,7 @@ import com.genius.gitget.topic.dto.TopicCreateRequest;
 import com.genius.gitget.topic.dto.TopicDetailResponse;
 import com.genius.gitget.topic.dto.TopicUpdateRequest;
 import com.genius.gitget.topic.repository.TopicRepository;
-import com.genius.gitget.topic.service.TopicService;
+import com.genius.gitget.topic.serviceFacade.TopicFacade;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.assertj.core.api.Assertions;
@@ -23,9 +23,11 @@ public class TopicServiceTest {
     Topic topic, topicA;
     String fileType;
     @Autowired
-    TopicService topicService;
+    TopicFacade topicFacade;
+
     @Autowired
     TopicRepository topicRepository;
+
 
     @BeforeEach
     public void setup() {
@@ -51,10 +53,10 @@ public class TopicServiceTest {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
 
-        Long savedTopicId = topicService.createTopic(topicCreateRequest);
+        Long savedTopicId = topicFacade.create(topicCreateRequest);
 
         //when
-        TopicDetailResponse topicById = topicService.getOneTopic(savedTopicId);
+        TopicDetailResponse topicById = topicFacade.findOne(savedTopicId);
 
         //then
         Assertions.assertThat(topicById.title()).isEqualTo(topicCreateRequest.title());
@@ -64,7 +66,7 @@ public class TopicServiceTest {
     public void 토픽_수정() throws Exception {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
-        Long savedTopicId = topicService.createTopic(topicCreateRequest);
+        Long savedTopicId = topicFacade.create(topicCreateRequest);
 
         //when
         TopicUpdateRequest topicUpdateRequest = TopicUpdateRequest.builder()
@@ -74,7 +76,7 @@ public class TopicServiceTest {
                 .pointPerPerson(topic.getPointPerPerson())
                 .notice(topic.getNotice()).build();
 
-        topicService.updateTopic(savedTopicId, topicUpdateRequest);
+        topicFacade.update(savedTopicId, topicUpdateRequest);
 
         //then
         Optional<Topic> findTopic = topicRepository.findById(savedTopicId);
@@ -86,14 +88,14 @@ public class TopicServiceTest {
     public void 토픽_삭제() throws Exception {
         //given
         TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
-        Long savedTopicId = topicService.createTopic(topicCreateRequest);
+        Long savedTopicId = topicFacade.create(topicCreateRequest);
 
         //when
-        topicService.deleteTopic(savedTopicId);
+        topicFacade.delete(savedTopicId);
 
         //then
         try {
-            topicService.getOneTopic(savedTopicId);
+            topicFacade.findOne(savedTopicId);
         } catch (BusinessException e) {
             org.junit.jupiter.api.Assertions.assertEquals("해당 토픽을 찾을 수 없습니다.", e.getMessage());
         }

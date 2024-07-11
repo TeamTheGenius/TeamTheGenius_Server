@@ -103,7 +103,7 @@ public class TopicFacadeTest {
                 TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
                 Long savedTopicId = topicFacade.create(topicCreateRequest);
 
-                TopicUpdateRequest topicUpdateRequest = getTopicUpdateRequest("1일 1커밋", topicA.getDescription(),
+                TopicUpdateRequest topicUpdateRequest = getTopicUpdateRequest("1일 5커밋", topicA.getDescription(),
                         topicA.getTags(), topicA.getPointPerPerson(), topicA.getNotice());
 
                 topicFacade.update(savedTopicId, topicUpdateRequest);

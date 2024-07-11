@@ -57,6 +57,16 @@ public class TopicFacadeTest {
                 .build();
     }
 
+    private TopicUpdateRequest getTopicUpdateRequest(String title, String description, String tags, int pointPerPersion,
+                                                     String notice) {
+        return TopicUpdateRequest.builder()
+                .title(title)
+                .description(description)
+                .tags(tags)
+                .pointPerPerson(pointPerPersion)
+                .notice(notice).build();
+    }
+
     @Nested
     @DisplayName("토픽 생성 메서드는")
     class Describe_topic_create {
@@ -93,12 +103,8 @@ public class TopicFacadeTest {
                 TopicCreateRequest topicCreateRequest = getTopicCreateRequest();
                 Long savedTopicId = topicFacade.create(topicCreateRequest);
 
-                TopicUpdateRequest topicUpdateRequest = TopicUpdateRequest.builder()
-                        .title("1일 5커밋")
-                        .description(topicA.getDescription())
-                        .tags(topicA.getTags())
-                        .pointPerPerson(topicA.getPointPerPerson())
-                        .notice(topicA.getNotice()).build();
+                TopicUpdateRequest topicUpdateRequest = getTopicUpdateRequest("1일 1커밋", topicA.getDescription(),
+                        topicA.getTags(), topicA.getPointPerPerson(), topicA.getNotice());
 
                 topicFacade.update(savedTopicId, topicUpdateRequest);
 

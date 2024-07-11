@@ -33,10 +33,14 @@ public class ProgressService {
             LocalDate startedDate = preActivity.getStartedDate().toLocalDate();
             LocalDate completedDate = preActivity.getCompletedDate().toLocalDate();
 
-            if (currentDate.isAfter(startedDate) && currentDate.isBefore(completedDate)) {
+            if (isUpdatableToActivity(startedDate, currentDate) && currentDate.isBefore(completedDate)) {
                 updateActivityInstance(preActivity);
             }
         }
+    }
+
+    private boolean isUpdatableToActivity(LocalDate startedDate, LocalDate currentDate) {
+        return currentDate.isEqual(startedDate) || currentDate.isAfter(startedDate);
     }
 
     private void updateActivityInstance(Instance preActivity) {

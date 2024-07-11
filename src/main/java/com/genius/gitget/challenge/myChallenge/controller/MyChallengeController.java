@@ -2,6 +2,7 @@ package com.genius.gitget.challenge.myChallenge.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
@@ -11,6 +12,7 @@ import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +37,7 @@ public class MyChallengeController {
     ) {
         List<PreActivityResponse> preActivityInstances = myChallengeService.getPreActivityInstances(
                 userPrincipal.getUser(),
-                LocalDate.now());
+                DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), preActivityInstances)
@@ -49,7 +51,7 @@ public class MyChallengeController {
     ) {
         List<ActivatedResponse> activatedInstances = myChallengeService.getActivatedInstances(
                 userPrincipal.getUser(),
-                LocalDate.now());
+                DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), activatedInstances)
@@ -62,7 +64,7 @@ public class MyChallengeController {
     ) {
         List<DoneResponse> doneInstances = myChallengeService.getDoneInstances(
                 userPrincipal.getUser(),
-                LocalDate.now());
+                DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), doneInstances)
@@ -74,8 +76,8 @@ public class MyChallengeController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
-
-        RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser(), instanceId, LocalDate.now());
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
+        RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser(), instanceId, kstDate);
         DoneResponse doneResponse = myChallengeService.getRewards(rewardRequest, false);
 
         return ResponseEntity.ok().body(

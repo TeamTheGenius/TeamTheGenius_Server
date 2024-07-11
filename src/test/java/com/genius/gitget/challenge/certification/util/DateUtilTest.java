@@ -61,7 +61,7 @@ class DateUtilTest {
         Date date = new Date(1725000000000L);
 
         //when
-        LocalDate localDate = DateUtil.convertToLocalDate(date);
+        LocalDate localDate = DateUtil.convertToKST(date);
 
         //then
         assertThat(localDate).isEqualTo(LocalDate.of(2024, 8, 30));

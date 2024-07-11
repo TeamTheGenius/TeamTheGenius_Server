@@ -2,6 +2,7 @@ package com.genius.gitget.profile.service;
 
 import static com.genius.gitget.challenge.participant.domain.JoinResult.FAIL;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.PROCESSING;
+import static com.genius.gitget.challenge.participant.domain.JoinResult.READY;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
 import static com.genius.gitget.challenge.participant.domain.JoinStatus.YES;
 
@@ -135,34 +136,34 @@ public class ProfileService {
         User findUser = getUserByIdentifier(user.getIdentifier());
         HashMap<JoinResult, List<Long>> participantHashMap = new HashMap<>() {
             {
+                put(READY, new ArrayList<>());
                 put(FAIL, new ArrayList<>());
                 put(PROCESSING, new ArrayList<>());
                 put(SUCCESS, new ArrayList<>());
             }
         };
-        List<Participant> participantInfoList = findUser.getParticipantList(); // 유저의 참여 정보를 담고 있는 리스트
-        int participanTotalCount = participantInfoList.size();
-
-        for (int i = 0; i < participantInfoList.size(); i++) { // 각 참여 정보를 받아옴.
-            if (participantInfoList.get(i).getJoinStatus() == YES) {
-                JoinResult joinResult = participantInfoList.get(i).getJoinResult();
-                if (participantHashMap.containsKey(joinResult)) { // hashmap에 저장된 key와 일치 여부 확인
-                    List<Long> participantIdList = participantHashMap.get(joinResult);
-                    participantIdList.add(participantInfoList.get(i).getId()); // 일치한다면, 해당 key의 value인 list에 id 저장
-                    participantHashMap.put(joinResult, participantIdList); // 최종적으로 hashmap에 저장
-                }
+        List<Participant> participantInfos = findUser.getParticipantList();
+        for (Participant participant : participantInfos) {
+            JoinResult joinResult = participant.getJoinResult();
+            if (!participantHashMap.containsKey(joinResult)) {
+                continue;
             }
+
+            List<Long> participantIds = participantHashMap.get(joinResult);
+            participantIds.add(participant.getId());
+            participantHashMap.put(joinResult, participantIds);
         }
 
+        int beforeStart = participantHashMap.get(READY).size();
         int fail = participantHashMap.get(FAIL).size();
         int success = participantHashMap.get(SUCCESS).size();
         int processing = participantHashMap.get(PROCESSING).size();
 
         return UserChallengeResultResponse.builder()
+                .beforeStart(beforeStart)
                 .fail(fail)
                 .success(success)
                 .processing(processing)
-                .beforeStart(participanTotalCount - fail - success - processing)
                 .build();
     }
 

@@ -144,6 +144,9 @@ public class Instance implements FileHolder {
      * 참가자 수 정보 수정
      * */
     public void updateParticipantCount(int amount) {
+        if (amount < 0 && this.participantCount + amount < 0) {
+            return;
+        }
         this.participantCount += amount;
     }
 

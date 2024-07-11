@@ -102,6 +102,45 @@ class ProgressServiceTest {
     }
 
     @Test
+    @DisplayName("PREACTIVITY 인스턴스들 중, 시작날짜가 된 인스턴스들을 ACTIVITY 상태로 바꿀 수 있다.")
+    public void should_updateToActivity_when_dDay() {
+        //given
+        LocalDate todayDate = LocalDate.of(2024, 1, 30);
+        LocalDate startedDate = LocalDate.of(2024, 3, 1);
+        LocalDate completedDate = LocalDate.of(2024, 3, 30);
+        LocalDate currentDate = LocalDate.of(2024, 3, 1);
+
+        User user = getSavedUser("nickname1", githubId);
+        Instance instance1 = getSavedInstance(startedDate, completedDate);
+        getSavedInstance(startedDate, completedDate);
+        getSavedInstance(startedDate, completedDate);
+
+        githubService.registerGithubPersonalToken(user, personalKey);
+        instanceDetailService.joinNewChallenge(
+                user,
+                JoinRequest.builder()
+                        .repository(targetRepo)
+                        .instanceId(instance1.getId())
+                        .todayDate(todayDate)
+                        .build()
+        );
+
+        Participant participant1 = participantRepository.findByJoinInfo(user.getId(), instance1.getId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.PARTICIPANT_NOT_FOUND));
+
+        //when
+        List<Instance> preActivities = instanceProvider.findAllByProgress(Progress.PREACTIVITY);
+        assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.READY);
+        scheduleService.updateToActivity(currentDate);
+        List<Instance> activities = instanceProvider.findAllByProgress(Progress.ACTIVITY);
+
+        //then
+        assertThat(preActivities.size()).isEqualTo(3);
+        assertThat(activities.size()).isEqualTo(3);
+        assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.PROCESSING);
+    }
+
+    @Test
     @DisplayName("ACTIVITY 인스턴스들 중, 특정 조건에 해당하는 인스턴스들을 DONE 상태로 바꿀 수 있다.")
     public void should_updateToDone_when_conditionMatches() {
         //given

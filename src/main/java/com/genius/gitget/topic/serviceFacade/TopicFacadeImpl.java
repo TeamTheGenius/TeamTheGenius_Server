@@ -37,7 +37,7 @@ public class TopicFacadeImpl implements TopicFacade {
 
     @Override
     public Long create(TopicCreateRequest topicCreateRequest) {
-        Topic topic = topicService.createTopicByTopicCreateRequest(topicCreateRequest);
+        Topic topic = TopicCreateRequest.from(topicCreateRequest);
         return topicService.create(topic);
     }
 

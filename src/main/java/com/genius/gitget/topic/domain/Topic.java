@@ -60,7 +60,6 @@ public class Topic extends BaseTimeEntity implements FileHolder {
         this.pointPerPerson = pointPerPerson;
     }
 
-    //== 비즈니스 로직 ==//
     public void updateExistInstance(String description) {
         this.description = description;
     }

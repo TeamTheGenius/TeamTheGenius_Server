@@ -3,7 +3,6 @@ package com.genius.gitget.topic.service;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.dto.TopicCreateRequest;
 import com.genius.gitget.topic.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +28,8 @@ public class TopicService {
     }
 
     @Transactional
-    public Long create(Topic byTopicCreateDto) {
-        Topic savedTopic = topicRepository.save(byTopicCreateDto);
+    public Long create(Topic topic) {
+        Topic savedTopic = topicRepository.save(topic);
         return savedTopic.getId();
     }
 
@@ -39,15 +38,5 @@ public class TopicService {
         Topic topic = topicRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(ErrorCode.TOPIC_NOT_FOUND));
         topicRepository.delete(topic);
-    }
-
-    public Topic createTopicByTopicCreateRequest(TopicCreateRequest topicCreateRequest) {
-        return Topic.builder()
-                .title(topicCreateRequest.title())
-                .description(topicCreateRequest.description())
-                .tags(topicCreateRequest.tags())
-                .pointPerPerson(topicCreateRequest.pointPerPerson())
-                .notice(topicCreateRequest.notice())
-                .build();
     }
 }

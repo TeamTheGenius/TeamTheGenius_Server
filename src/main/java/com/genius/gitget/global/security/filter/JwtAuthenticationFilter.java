@@ -4,7 +4,6 @@ import static com.genius.gitget.global.security.config.SecurityConfig.PERMITTED_
 
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
-import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.service.JwtFacade;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -32,14 +31,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String accessToken = jwtFacade.resolveTokenFromCookie(request, JwtRule.ACCESS_PREFIX);
+        String accessToken = jwtFacade.resolveAccessToken(request);
         if (jwtFacade.validateAccessToken(accessToken)) {
             setAuthenticationToContext(accessToken);
             filterChain.doFilter(request, response);
             return;
         }
 
-        String refreshToken = jwtFacade.resolveTokenFromCookie(request, JwtRule.REFRESH_PREFIX);
+        String refreshToken = jwtFacade.resolveRefreshToken(request);
         User user = findUserByRefreshToken(refreshToken);
 
         if (jwtFacade.validateRefreshToken(refreshToken, user.getIdentifier())) {

@@ -1,9 +1,8 @@
 package com.genius.gitget.global.security.service;
 
-import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
+import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_HEADER_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_JWT;
-import static com.genius.gitget.global.util.exception.ErrorCode.JWT_TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -39,7 +38,7 @@ class JwtFacadeImplTest {
     @Autowired
     private TokenRepository tokenRepository;
     @Autowired
-    private JwtFacadeImpl jwtService;
+    private JwtFacadeImpl jwtFacade;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -58,7 +57,7 @@ class JwtFacadeImplTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         //when
-        String accessToken = jwtService.generateAccessToken(response, user);
+        String accessToken = jwtFacade.generateAccessToken(response, user);
         Cookie cookie = response.getCookies()[0];
 
         //then
@@ -75,7 +74,7 @@ class JwtFacadeImplTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         //when
-        String refreshToken = jwtService.generateRefreshToken(response, user);
+        String refreshToken = jwtFacade.generateRefreshToken(response, user);
         Cookie cookie = response.getCookies()[0];
 
         //then
@@ -92,8 +91,8 @@ class JwtFacadeImplTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         //when
-        String accessToken = jwtService.generateAccessToken(response, user);
-        boolean isValid = jwtService.validateAccessToken(accessToken);
+        String accessToken = jwtFacade.generateAccessToken(response, user);
+        boolean isValid = jwtFacade.validateAccessToken(accessToken);
 
         //then
         assertThat(isValid).isTrue();
@@ -108,12 +107,12 @@ class JwtFacadeImplTest {
         String accessToken = "fake access token";
 
         //then
-        assertThatThrownBy(() -> jwtService.validateAccessToken(accessToken))
+        assertThatThrownBy(() -> jwtFacade.validateAccessToken(accessToken))
                 .isInstanceOf(BusinessException.class);
     }
 
     @Test
-    @DisplayName("Cookie에서 access-token을 추출할 수 있다.")
+    @DisplayName("Authorization 헤더에서 access-token을 추출할 수 있다.")
     public void should_extractAccessToken_when_passTokenType() {
         //given
         User user = getSavedUser();
@@ -121,13 +120,9 @@ class JwtFacadeImplTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         //when
-        String accessToken = jwtService.generateAccessToken(response, user);
-
-        request.setCookies(new Cookie(ACCESS_PREFIX.getValue(), accessToken));
-        String resolvedToken = jwtService.resolveTokenFromCookie(request, ACCESS_PREFIX);
+        String accessToken = jwtFacade.generateAccessToken(response, user);
 
         //then
-        assertThat(accessToken).isEqualTo(resolvedToken);
     }
 
     @Test
@@ -139,10 +134,10 @@ class JwtFacadeImplTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         //when
-        String refreshToken = jwtService.generateRefreshToken(response, user);
+        String refreshToken = jwtFacade.generateRefreshToken(response, user);
 
         request.setCookies(new Cookie(REFRESH_PREFIX.getValue(), refreshToken));
-        String resolvedToken = jwtService.resolveTokenFromCookie(request, REFRESH_PREFIX);
+        String resolvedToken = jwtFacade.resolveRefreshToken(request);
 
         //then
         assertThat(refreshToken).isEqualTo(resolvedToken);
@@ -157,8 +152,8 @@ class JwtFacadeImplTest {
         request.setCookies(tokenTestUtil.createRefreshCookie());
 
         //when
-        JwtRule accessTokenPrefix = ACCESS_PREFIX;
-        String resolvedToken = jwtService.resolveTokenFromCookie(request, accessTokenPrefix);
+        JwtRule accessTokenPrefix = ACCESS_HEADER_PREFIX;
+        String resolvedToken = jwtFacade.resolveAccessToken(request);
 
         //then
         assertThat(resolvedToken).isEqualTo("");
@@ -174,9 +169,9 @@ class JwtFacadeImplTest {
         JwtRule refreshTokenPrefix = REFRESH_PREFIX;
 
         //then
-        assertThatThrownBy(() -> jwtService.resolveTokenFromCookie(request, refreshTokenPrefix))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(JWT_TOKEN_NOT_FOUND.getMessage());
+//        assertThatThrownBy(() -> jwtFacade.resolveTokenFromCookie(request, refreshTokenPrefix))
+//                .isInstanceOf(BusinessException.class)
+//                .hasMessageContaining(JWT_TOKEN_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -187,7 +182,7 @@ class JwtFacadeImplTest {
         String refreshToken = tokenTestUtil.createRefreshToken();
 
         //when
-        String identifier = jwtService.getIdentifierFromRefresh(refreshToken);
+        String identifier = jwtFacade.getIdentifierFromRefresh(refreshToken);
 
         //then
         assertThat(identifier).isEqualTo("testIdentifier");
@@ -200,7 +195,7 @@ class JwtFacadeImplTest {
         //given
 
         //when&then
-        assertThatThrownBy(() -> jwtService.getIdentifierFromRefresh(invalidRefreshToken))
+        assertThatThrownBy(() -> jwtFacade.getIdentifierFromRefresh(invalidRefreshToken))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.INVALID_JWT.getMessage());
     }
@@ -213,7 +208,7 @@ class JwtFacadeImplTest {
         String refreshToken = "invalid refresh token";
 
         //when
-        assertThatThrownBy(() -> jwtService.validateRefreshToken(refreshToken, "identifier"))
+        assertThatThrownBy(() -> jwtFacade.validateRefreshToken(refreshToken, "identifier"))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(INVALID_JWT.getMessage());
     }

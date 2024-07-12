@@ -1,6 +1,6 @@
 package com.genius.gitget.global.security.service;
 
-import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_HEADER_PREFIX;
+import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_JWT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -152,7 +152,7 @@ class JwtFacadeImplTest {
         request.setCookies(tokenTestUtil.createRefreshCookie());
 
         //when
-        JwtRule accessTokenPrefix = ACCESS_HEADER_PREFIX;
+        JwtRule accessTokenPrefix = ACCESS_PREFIX;
         String resolvedToken = jwtFacade.resolveAccessToken(request);
 
         //then

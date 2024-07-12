@@ -1,8 +1,8 @@
 package com.genius.gitget.global.security.service;
 
 import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_HEADER;
-import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_HEADER_PREFIX;
-import static com.genius.gitget.global.security.constants.JwtRule.JWT_ISSUE_HEADER;
+import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
+import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_ISSUE;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 import static com.genius.gitget.global.util.exception.ErrorCode.JWT_TOKEN_NOT_FOUND;
 
@@ -60,7 +60,7 @@ public class JwtFacadeImpl implements JwtFacade {
     @Override
     public String generateAccessToken(HttpServletResponse response, User requestUser) {
         String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET_KEY, ACCESS_EXPIRATION, requestUser);
-        String bearer = ACCESS_HEADER_PREFIX.getValue() + accessToken;
+        String bearer = ACCESS_PREFIX.getValue() + accessToken;
         response.setHeader(ACCESS_HEADER.getValue(), bearer);
 
         return accessToken;
@@ -71,7 +71,7 @@ public class JwtFacadeImpl implements JwtFacade {
     public String generateRefreshToken(HttpServletResponse response, User requestUser) {
         String refreshToken = jwtGenerator.generateRefreshToken(REFRESH_SECRET_KEY, REFRESH_EXPIRATION, requestUser);
         ResponseCookie cookie = setTokenToCookie(REFRESH_PREFIX.getValue(), refreshToken, REFRESH_EXPIRATION / 1000);
-        response.addHeader(JWT_ISSUE_HEADER.getValue(), cookie.toString());
+        response.addHeader(REFRESH_ISSUE.getValue(), cookie.toString());
 
         tokenService.save(new Token(requestUser.getIdentifier(), refreshToken));
         return refreshToken;
@@ -99,7 +99,7 @@ public class JwtFacadeImpl implements JwtFacade {
 
         return isRefreshValid && !isHijacked;
     }
-    
+
     @Override
     public String resolveAccessToken(HttpServletRequest request) {
         String bearerHeader = request.getHeader(ACCESS_HEADER.getValue());

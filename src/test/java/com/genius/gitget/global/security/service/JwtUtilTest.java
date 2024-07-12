@@ -22,7 +22,7 @@ class JwtUtilTest {
         //given
 
         //when
-        Cookie cookie = jwtUtil.resetCookie(JwtRule.ACCESS_HEADER_PREFIX);
+        Cookie cookie = jwtUtil.resetCookie(JwtRule.ACCESS_PREFIX);
 
         //then
         assertThat(cookie.getMaxAge()).isEqualTo(0);

@@ -8,12 +8,12 @@ import lombok.RequiredArgsConstructor;
 public enum JwtRule {
 
     ACCESS_HEADER("Authorization"),
-    ACCESS_HEADER_PREFIX("Bearer "),
+    ACCESS_PREFIX("Bearer "),
 
-    JWT_ISSUE_HEADER("Set-Cookie"),
-    JWT_RESOLVE_HEADER("Cookie"),
-    ACCESS_PREFIX("access"),
-    REFRESH_PREFIX("refresh");
+    REFRESH_PREFIX("refresh"),
+
+    REFRESH_ISSUE("Set-Cookie"),
+    REFRESH_RESOLVE("Cookie");
 
     private final String value;
 }

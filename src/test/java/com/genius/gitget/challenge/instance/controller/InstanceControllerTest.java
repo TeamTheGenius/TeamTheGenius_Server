@@ -67,7 +67,7 @@ public class InstanceControllerTest {
     @WithMockCustomUser(role = Role.ADMIN)
     @DisplayName("인스턴스 리스트 조회를 요청하면, 상태코드 200반환과 함께 인스턴스 리스트를 반환한다.")
     public void 인스턴스_리스트_조회() throws Exception {
-        mockMvc.perform(get("/api/admin/instance").cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/admin/instance").headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.numberOfElements").value(2));
@@ -79,7 +79,7 @@ public class InstanceControllerTest {
     public void 특정_토픽에_대한_리스트_조회_1() throws Exception {
         Long id = savedTopic1.getId();
 
-        mockMvc.perform(get("/api/admin/topic/instances/" + id).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/admin/topic/instances/" + id).headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.numberOfElements").value(2))
@@ -93,7 +93,7 @@ public class InstanceControllerTest {
     public void 특정_토픽에_대한_리스트_조회_2() throws Exception {
         Long id = savedTopic2.getId();
 
-        mockMvc.perform(get("/api/admin/topic/instances/" + id).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/admin/topic/instances/" + id).headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("data.numberOfElements").value(0));
@@ -107,7 +107,7 @@ public class InstanceControllerTest {
 
         Long instanceId = savedInstance2.getId();
 
-        mockMvc.perform(get("/api/admin/instance/" + instanceId).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/admin/instance/" + instanceId).headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("data.topicId").value(topicId))
@@ -120,7 +120,7 @@ public class InstanceControllerTest {
     public void 인스턴스_삭제_성공() throws Exception {
         Long instanceId = savedInstance1.getId();
 
-        mockMvc.perform(delete("/api/admin/instance/" + instanceId).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(delete("/api/admin/instance/" + instanceId).headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.numberOfElements").doesNotExist());
@@ -134,7 +134,7 @@ public class InstanceControllerTest {
     public void 인스턴스_삭제_성공_실패() throws Exception {
         Long instanceId = savedInstance1.getId();
 
-        mockMvc.perform(delete("/api/admin/instance/" + instanceId + 1).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(delete("/api/admin/instance/" + instanceId + 1).headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }

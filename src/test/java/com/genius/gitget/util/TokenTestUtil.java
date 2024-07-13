@@ -4,28 +4,48 @@ import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.security.service.JwtFacadeImpl;
 import jakarta.servlet.http.Cookie;
+import java.util.Collections;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Component
 @RequiredArgsConstructor
 public class TokenTestUtil {
-    private final JwtFacadeImpl jwtService;
+    private final JwtFacadeImpl jwtFacade;
 
-    public Cookie createAccessCookie() {
+    public Cookie createAccessHeader() {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
                 .getPrincipal();
         User user = userPrincipal.getUser();
 
         MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
-        String accessCookie = jwtService.generateAccessToken(httpServletResponse, user);
+        String accessCookie = jwtFacade.generateAccessToken(httpServletResponse, user);
         return new Cookie(ACCESS_PREFIX.getValue(), accessCookie);
+    }
+
+    public HttpHeaders createAccessHeaders() {
+        UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()
+                .getPrincipal();
+        User user = userPrincipal.getUser();
+
+        MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
+
+        String accessToken = jwtFacade.generateAccessToken(httpServletResponse, user);
+        String bearerAccess = ACCESS_PREFIX.getValue() + accessToken;
+
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.put(JwtRule.ACCESS_HEADER.getValue(), Collections.singletonList(bearerAccess));
+        return HttpHeaders.readOnlyHttpHeaders(headers);
     }
 
     public String createAccessToken() {
@@ -35,7 +55,7 @@ public class TokenTestUtil {
 
         MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
-        return jwtService.generateAccessToken(httpServletResponse, user);
+        return jwtFacade.generateAccessToken(httpServletResponse, user);
     }
 
     public Cookie createRefreshCookie() {
@@ -45,7 +65,7 @@ public class TokenTestUtil {
 
         MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
-        String refreshCookie = jwtService.generateRefreshToken(httpServletResponse, user);
+        String refreshCookie = jwtFacade.generateRefreshToken(httpServletResponse, user);
         return new Cookie(REFRESH_PREFIX.getValue(), refreshCookie);
     }
 
@@ -56,6 +76,6 @@ public class TokenTestUtil {
 
         MockHttpServletResponse httpServletResponse = new MockHttpServletResponse();
 
-        return jwtService.generateRefreshToken(httpServletResponse, user);
+        return jwtFacade.generateRefreshToken(httpServletResponse, user);
     }
 }

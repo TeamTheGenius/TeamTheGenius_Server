@@ -94,7 +94,7 @@ public class LikesControllerTest {
         likesService.addLikes(user, "kimdozzi", savedInstance1.getId());
 
         mockMvc.perform(get("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON))
 
                 .andDo(print())
@@ -109,7 +109,7 @@ public class LikesControllerTest {
     public void 좋아요_목록_조회_성공_2() throws Exception {
 
         mockMvc.perform(get("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(jsonPath("$.data.numberOfElements").value(0))
@@ -129,7 +129,7 @@ public class LikesControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -148,7 +148,7 @@ public class LikesControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -167,7 +167,7 @@ public class LikesControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
@@ -187,7 +187,7 @@ public class LikesControllerTest {
         Long id = likes.getId();
 
         mockMvc.perform(delete("/api/profile/likes/" + id)
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -205,7 +205,7 @@ public class LikesControllerTest {
                 .build());
 
         mockMvc.perform(delete("/api/profile/likes/" + 2)
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }

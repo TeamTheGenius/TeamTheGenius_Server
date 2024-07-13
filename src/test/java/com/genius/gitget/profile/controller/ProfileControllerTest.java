@@ -92,7 +92,7 @@ public class ProfileControllerTest {
     @DisplayName("사용자 상세 정보 조회에 성공하면, 상태 코드 200을 반환한다.")
     public void 사용자_상세_정보_조회_성공() throws Exception {
 
-        mockMvc.perform(get("/api/profile").cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/profile").headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -102,7 +102,7 @@ public class ProfileControllerTest {
     @DisplayName("사용자 상세 정보 조회 시 같은 사용자 정보가 있으면 실패하고, 4xx(IncorrectResultSizeDataAccessException)를 반환한다.")
     public void 사용자_상세_정보_조회_실패() throws Exception {
         User user = getSavedUser();
-        mockMvc.perform(get("/api/profile").cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/profile").headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }
@@ -123,7 +123,7 @@ public class ProfileControllerTest {
         input.put("userId", id);
 
         mockMvc.perform(post("/api/profile")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
                 .andDo(print())
@@ -145,7 +145,7 @@ public class ProfileControllerTest {
         input.put("userId", id + 1);
 
         mockMvc.perform(post("/api/profile")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
                 .andDo(print())
@@ -157,7 +157,7 @@ public class ProfileControllerTest {
     @WithMockCustomUser(identifier = "kimdozzi")
     @DisplayName("사용자 관심사 조회에 성공하면, 상태 코드 200을 반환한다.")
     public void 사용자_관심사_조회_성공() throws Exception {
-        mockMvc.perform(get("/api/profile/interest").cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/profile/interest").headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -171,7 +171,7 @@ public class ProfileControllerTest {
         Map<String, List<String>> input = new HashMap<>();
         input.put("tags", new ArrayList<>(Arrays.asList("FE", "BE", "ML")));
 
-        mockMvc.perform(post("/api/profile/interest").cookie(tokenTestUtil.createAccessCookie())
+        mockMvc.perform(post("/api/profile/interest").headers(tokenTestUtil.createAccessHeaders())
                         .content(objectMapper.writeValueAsString(input))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -196,7 +196,7 @@ public class ProfileControllerTest {
         Map<String, List<String>> input = new HashMap<>();
         input.put("tags", new ArrayList<>(Arrays.asList("FE", "BE", "ML")));
 
-        mockMvc.perform(post("/api/profile/interest").cookie(tokenTestUtil.createAccessCookie())
+        mockMvc.perform(post("/api/profile/interest").headers(tokenTestUtil.createAccessHeaders())
                         .content(objectMapper.writeValueAsString(input)))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
@@ -207,7 +207,7 @@ public class ProfileControllerTest {
     @DisplayName("사용자 관심사 수정에 실패하면, 상태 코드 4xx을 반환한다.")
     public void 사용자_관심사_수정_실패_2() throws Exception {
 
-        mockMvc.perform(post("/api/profile/interest").cookie(tokenTestUtil.createAccessCookie())
+        mockMvc.perform(post("/api/profile/interest").headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
@@ -219,7 +219,7 @@ public class ProfileControllerTest {
     @WithMockCustomUser(identifier = "kimdozzi")
     @DisplayName("사용자 챌린지 현황 조회에 성공하면, 상태 코드 200을 반환한다.")
     public void 사용자_챌린지_현황_성공() throws Exception {
-        mockMvc.perform(get("/api/profile/challenges").cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/profile/challenges").headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -233,7 +233,7 @@ public class ProfileControllerTest {
         Map<String, String> input = new HashMap<>();
         input.put("reason", "이용이 불편해서");
 
-        mockMvc.perform(delete("/api/profile").cookie(tokenTestUtil.createAccessCookie())
+        mockMvc.perform(delete("/api/profile").headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
                 .andDo(print())
@@ -244,7 +244,7 @@ public class ProfileControllerTest {
     @WithMockCustomUser(identifier = "kimdozzi")
     @DisplayName("사용자 탈퇴 사유없이 탈퇴를 요청하면 실패하고, 상태 코드 4xx을 반환한다.")
     public void 사용자_탈퇴_실패() throws Exception {
-        mockMvc.perform(delete("/api/profile").cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(delete("/api/profile").headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }
@@ -254,7 +254,7 @@ public class ProfileControllerTest {
     @WithMockCustomUser(identifier = "kimdozzi")
     @DisplayName("사용자 포인트 조회에 성공하면, 상태 코드 200을 반환한다.")
     public void 사용자_포인트_조회_성공() throws Exception {
-        mockMvc.perform(get("/api/profile/point").cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/profile/point").headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }

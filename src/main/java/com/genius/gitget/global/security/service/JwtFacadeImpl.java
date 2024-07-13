@@ -4,7 +4,8 @@ import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_HEADER;
 import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_ISSUE;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
-import static com.genius.gitget.global.util.exception.ErrorCode.JWT_TOKEN_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.JWT_NOT_FOUND_IN_COOKIE;
+import static com.genius.gitget.global.util.exception.ErrorCode.JWT_NOT_FOUND_IN_HEADER;
 
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.security.constants.TokenStatus;
@@ -103,8 +104,8 @@ public class JwtFacadeImpl implements JwtFacade {
     @Override
     public String resolveAccessToken(HttpServletRequest request) {
         String bearerHeader = request.getHeader(ACCESS_HEADER.getValue());
-        if (bearerHeader == null) {
-            throw new BusinessException(JWT_TOKEN_NOT_FOUND);
+        if (bearerHeader == null || bearerHeader.isEmpty()) {
+            throw new BusinessException(JWT_NOT_FOUND_IN_HEADER);
         }
         return bearerHeader.trim().substring(7);
     }
@@ -113,18 +114,10 @@ public class JwtFacadeImpl implements JwtFacade {
     public String resolveRefreshToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            throw new BusinessException(JWT_TOKEN_NOT_FOUND);
+            throw new BusinessException(JWT_NOT_FOUND_IN_COOKIE);
         }
         return jwtUtil.resolveTokenFromCookie(cookies, REFRESH_PREFIX);
     }
-
-//    public String resolveTokenFromCookie(HttpServletRequest request, JwtRule tokenPrefix) {
-//        Cookie[] cookies = request.getCookies();
-//        if (cookies == null) {
-//            throw new BusinessException(JWT_TOKEN_NOT_FOUND);
-//        }
-//        return jwtUtil.resolveTokenFromCookie(cookies, tokenPrefix);
-//    }
 
     @Override
     public String getIdentifierFromRefresh(String refreshToken) {
@@ -141,8 +134,8 @@ public class JwtFacadeImpl implements JwtFacade {
     }
 
     @Override
-    public Authentication getAuthentication(String token) {
-        UserDetails principal = customUserDetailsService.loadUserByUsername(getUserPk(token, ACCESS_SECRET_KEY));
+    public Authentication getAuthentication(String accessToken) {
+        UserDetails principal = customUserDetailsService.loadUserByUsername(getUserPk(accessToken, ACCESS_SECRET_KEY));
         return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
     }
 

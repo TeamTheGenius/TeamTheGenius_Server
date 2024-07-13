@@ -24,12 +24,12 @@ public class TokenService {
 
     public Token findByIdentifier(String identifier) {
         return tokenRepository.findById(identifier)
-                .orElseThrow(() -> new BusinessException(ErrorCode.JWT_TOKEN_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_MATCH));
     }
 
     public boolean isRefreshHijacked(String identifier, String refreshToken) {
         Token token = findByIdentifier(identifier);
-        return token.getToken().equals(refreshToken);
+        return !token.getToken().equals(refreshToken);
     }
 
     public void deleteById(String identifier) {

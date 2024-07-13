@@ -2,7 +2,7 @@ package com.genius.gitget.global.security.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_EXPIRED_JWT;
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_JWT;
-import static com.genius.gitget.global.util.exception.ErrorCode.JWT_TOKEN_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.JWT_NOT_FOUND_IN_COOKIE;
 
 import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.constants.TokenStatus;
@@ -43,7 +43,7 @@ public class JwtUtil {
                 .filter(cookie -> cookie.getName().equals(tokenPrefix.getValue()))
                 .findFirst()
                 .map(Cookie::getValue)
-                .orElseThrow(() -> new BusinessException(JWT_TOKEN_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(JWT_NOT_FOUND_IN_COOKIE));
     }
 
     public Key getSigningKey(String secretKey) {

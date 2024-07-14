@@ -1,4 +1,4 @@
-package com.genius.gitget.admin.signout;
+package com.genius.gitget.signout;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

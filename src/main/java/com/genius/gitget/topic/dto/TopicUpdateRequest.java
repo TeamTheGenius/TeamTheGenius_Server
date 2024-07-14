@@ -1,9 +1,9 @@
-package com.genius.gitget.admin.topic.dto;
+package com.genius.gitget.topic.dto;
 
 import lombok.Builder;
 
 @Builder
-public record TopicCreateRequest(
+public record TopicUpdateRequest(
         String title,
         String tags,
         String description,

@@ -4,8 +4,8 @@ import static com.genius.gitget.challenge.instance.domain.Progress.ACTIVITY;
 import static com.genius.gitget.challenge.instance.domain.Progress.DONE;
 import static com.genius.gitget.challenge.instance.domain.Progress.PREACTIVITY;
 
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;

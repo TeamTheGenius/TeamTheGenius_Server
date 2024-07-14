@@ -1,4 +1,4 @@
-package com.genius.gitget.admin.topic.domain;
+package com.genius.gitget.topic.domain;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.domain.FileHolder;
@@ -60,7 +60,6 @@ public class Topic extends BaseTimeEntity implements FileHolder {
         this.pointPerPerson = pointPerPerson;
     }
 
-    //== 비즈니스 로직 ==//
     public void updateExistInstance(String description) {
         this.description = description;
     }

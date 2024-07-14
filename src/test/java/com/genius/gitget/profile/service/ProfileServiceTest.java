@@ -3,10 +3,10 @@ package com.genius.gitget.profile.service;
 import static com.genius.gitget.global.security.constants.ProviderInfo.GITHUB;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.genius.gitget.admin.signout.Signout;
-import com.genius.gitget.admin.signout.SignoutRepository;
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.signout.Signout;
+import com.genius.gitget.signout.SignoutRepository;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;

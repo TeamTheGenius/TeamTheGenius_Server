@@ -1,17 +1,17 @@
-package com.genius.gitget.admin.topic.controller;
+package com.genius.gitget.topic.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.admin.topic.dto.TopicCreateRequest;
-import com.genius.gitget.admin.topic.dto.TopicDetailResponse;
-import com.genius.gitget.admin.topic.dto.TopicIndexResponse;
-import com.genius.gitget.admin.topic.dto.TopicPagingResponse;
-import com.genius.gitget.admin.topic.dto.TopicUpdateRequest;
-import com.genius.gitget.admin.topic.service.TopicService;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
+import com.genius.gitget.topic.dto.TopicCreateRequest;
+import com.genius.gitget.topic.dto.TopicDetailResponse;
+import com.genius.gitget.topic.dto.TopicIndexResponse;
+import com.genius.gitget.topic.dto.TopicPagingResponse;
+import com.genius.gitget.topic.dto.TopicUpdateRequest;
+import com.genius.gitget.topic.serviceFacade.TopicFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,26 +31,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/admin/topic")
 public class TopicController {
-
-    private final TopicService topicService;
+    private final TopicFacade topicFacade;
 
     // 토픽 리스트 요청
     @GetMapping
     public ResponseEntity<PagingResponse<TopicPagingResponse>> getAllTopics(
             @PageableDefault(size = 5, direction = Sort.Direction.ASC) Pageable pageable) {
-        Page<TopicPagingResponse> allTopics = topicService.getAllTopics(pageable);
 
+        Page<TopicPagingResponse> topicPagingResponse = topicFacade.findTopics(pageable);
         return ResponseEntity.ok().body(
-                new PagingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), allTopics)
+                new PagingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), topicPagingResponse)
         );
     }
 
     // 토픽 상세 정보 요청
     @GetMapping("/{id}")
     public ResponseEntity<SingleResponse<TopicDetailResponse>> getTopicById(@PathVariable Long id) {
-        TopicDetailResponse topicDetail = topicService.getTopicById(id);
+        TopicDetailResponse topicDetailResponse = topicFacade.findOne(id);
+
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), topicDetail)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), topicDetailResponse)
         );
     }
 
@@ -58,8 +58,9 @@ public class TopicController {
     @PostMapping
     public ResponseEntity<SingleResponse<TopicIndexResponse>> createTopic(
             @RequestBody TopicCreateRequest topicCreateRequest) {
-        Long topicId = topicService.createTopic(topicCreateRequest);
-        TopicIndexResponse topicUpdateResponse = new TopicIndexResponse(topicId);
+
+        Long topic = topicFacade.create(topicCreateRequest);
+        TopicIndexResponse topicUpdateResponse = new TopicIndexResponse(topic);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(
@@ -72,8 +73,9 @@ public class TopicController {
     public ResponseEntity<SingleResponse<TopicIndexResponse>> updateTopic(
             @PathVariable Long id,
             @RequestBody TopicUpdateRequest topicUpdateRequest) {
-        Long topicId = topicService.updateTopic(id, topicUpdateRequest);
-        TopicIndexResponse topicUpdateResponse = new TopicIndexResponse(topicId);
+
+        Long updateTopic = topicFacade.update(id, topicUpdateRequest);
+        TopicIndexResponse topicUpdateResponse = new TopicIndexResponse(updateTopic);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), topicUpdateResponse)
@@ -83,7 +85,9 @@ public class TopicController {
     // 토픽 삭제 요청
     @DeleteMapping("/{id}")
     public ResponseEntity<CommonResponse> deleteTopic(@PathVariable Long id) {
-        topicService.deleteTopic(id);
+
+        topicFacade.delete(id);
+
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
         );

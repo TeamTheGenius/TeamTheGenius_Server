@@ -1,4 +1,4 @@
-package com.genius.gitget.admin.signout;
+package com.genius.gitget.signout;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

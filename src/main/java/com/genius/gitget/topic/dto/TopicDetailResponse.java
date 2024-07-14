@@ -1,7 +1,7 @@
-package com.genius.gitget.admin.topic.dto;
+package com.genius.gitget.topic.dto;
 
-import com.genius.gitget.admin.topic.domain.Topic;
 import com.genius.gitget.global.file.dto.FileResponse;
+import com.genius.gitget.topic.domain.Topic;
 import lombok.Builder;
 
 @Builder
@@ -13,7 +13,8 @@ public record TopicDetailResponse(
         String notice,
         int pointPerPerson,
         FileResponse fileResponse) {
-    public static TopicDetailResponse createByEntity(Topic topic, FileResponse fileResponse) {
+
+    public static TopicDetailResponse of(Topic topic, FileResponse fileResponse) {
         return TopicDetailResponse.builder()
                 .topicId(topic.getId())
                 .title(topic.getTitle())

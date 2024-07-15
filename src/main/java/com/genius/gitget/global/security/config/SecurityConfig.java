@@ -59,7 +59,7 @@ public class SecurityConfig {
                 // JWT 검증 필터 추가
                 .addFilterBefore(new JwtAuthenticationFilter(jwtFacade, userService),
                         UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class)
+                .addFilterBefore(new ExceptionHandlerFilter(jwtFacade), JwtAuthenticationFilter.class)
 
                 // OAuth 로그인 설정
                 .oauth2Login(customConfigurer -> customConfigurer

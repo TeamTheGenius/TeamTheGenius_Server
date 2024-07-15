@@ -30,7 +30,7 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token);
             return TokenStatus.AUTHENTICATED;
-        } catch (ExpiredJwtException | IllegalArgumentException e) {
+        } catch (ExpiredJwtException e) {
             log.error(INVALID_EXPIRED_JWT.getMessage());
             return TokenStatus.EXPIRED;
         } catch (JwtException e) {

@@ -1,11 +1,16 @@
 package com.genius.gitget.global.security.service;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.JWT_NOT_FOUND_IN_DB;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.global.security.domain.Token;
 import com.genius.gitget.global.security.repository.TokenRepository;
+import com.genius.gitget.global.util.exception.BusinessException;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,74 +19,83 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 class TokenServiceTest {
+    private String identifier = "identifier";
+    private String refreshToken = "refresh token example";
+    private Token token;
+
     @Autowired
     private TokenService tokenService;
 
     @Autowired
     private TokenRepository tokenRepository;
 
+
+    @BeforeEach
+    void setup() {
+        token = tokenRepository.save(new Token(identifier, refreshToken));
+    }
+
     @AfterEach
     void clearMongo() {
         tokenRepository.deleteAll();
     }
 
-    @Test
-    @DisplayName("특정 리프레시 토큰을 identifier를 통해 DB에서 값을 조회할 수 있어야 한다.")
-    public void should_findToken_when_findByIdentifier() {
-        //given
-        String identifier = "SSung023";
-        String refreshToken = "refresh token example";
-        Token token = Token.builder()
-                .identifier(identifier)
-                .token(refreshToken)
-                .build();
-
-        //when
-        Token savedToken = tokenRepository.save(token);
-        Token tokenByIdentifier = tokenService.findByIdentifier(identifier);
-
-        //then
-        assertThat(savedToken.getIdentifier()).isEqualTo(tokenByIdentifier.getIdentifier());
-        assertThat(savedToken.getToken()).isEqualTo(tokenByIdentifier.getToken());
-
+    @Nested
+    @DisplayName("DB에 저장되어 있는 Token 객체를 찾으려 할 때")
+    class describe_find_stored_token {
+        @Nested
+        @DisplayName("사용자의 식별자(identifier)를 전달하면")
+        class context_pass_identifier {
+            @Test
+            @DisplayName("저장되어 있던 Token 객체를 반환받을 수 있다.")
+            public void it_returns_stored_Token() {
+                Token byIdentifier = tokenService.findByIdentifier(identifier);
+                assertThat(byIdentifier.getIdentifier()).isEqualTo(identifier);
+                assertThat(byIdentifier.getToken()).isEqualTo(refreshToken);
+            }
+        }
     }
 
-    @Test
-    @DisplayName("리프레시 토큰 요청이 들어왔을 때, identifier-token 짝이 맞게 저장되어 있으면 true를 반환한다.")
-    public void should_returnTrue_when_tokenValid() {
-        //given
-        String identifier = "SSung023";
-        String refreshToken = "refresh token example";
-        Token token = Token.builder()
-                .identifier(identifier)
-                .token(refreshToken)
-                .build();
+    @Nested
+    @DisplayName("Refresh token 탈취 여부를 확인할 때")
+    class describe_check_hijack {
+        @Nested
+        @DisplayName("사용자의 식별자와 요청받은 토큰을 전달하면")
+        class context_pass_identifier_and_token {
+            @Test
+            @DisplayName("저장되어 있던 토큰와 같으면 false를 반환한다.")
+            public void it_returns_false_token_same() {
+                boolean refreshHijacked = tokenService.isRefreshHijacked(identifier, refreshToken);
+                assertThat(refreshHijacked).isFalse();
+            }
 
-        //when
-        tokenRepository.save(token);
-        boolean isRefreshHijacked = tokenService.isRefreshHijacked(identifier, refreshToken);
+            @Test
+            @DisplayName("저장되어 있던 토큰과 다르다면 true를 반환한다.")
+            public void it_returns_true_token_different() {
+                String fakeRefreshToken = "fake refresh token";
+                tokenRepository.save(new Token(identifier, fakeRefreshToken));
 
-        //then
-        assertThat(isRefreshHijacked).isTrue();
+                boolean refreshHijacked = tokenService.isRefreshHijacked(identifier, refreshToken);
+                assertThat(refreshHijacked).isTrue();
+            }
+        }
     }
 
-    @Test
-    @DisplayName("리프레시 토큰 요청이 들어왔을 때, identifier-token 짝이 맞게 저장되어 있으면 true를 반환한다.")
-    public void should_returnFalse_when_tokenInvalid() {
-        //given
-        String identifier = "SSung023";
-        String refreshToken = "refresh token example";
-        String fakeRefreshToken = "fake refresh token example";
-        Token token = Token.builder()
-                .identifier(identifier)
-                .token(refreshToken)
-                .build();
+    @Nested
+    @DisplayName("저장되어 있던 토큰을 삭제하고자 할 때")
+    class describe_delete_token {
+        @Nested
+        @DisplayName("사용자의 식별자를 전달하면")
+        class context_pass_user_identifier {
+            @Test
+            @DisplayName("저장되어 있는 토큰을 삭제한다.")
+            public void it_delete_stored_token() {
+                tokenService.deleteById(identifier);
 
-        //when
-        tokenRepository.save(token);
-        boolean isRefreshHijacked = tokenService.isRefreshHijacked(identifier, fakeRefreshToken);
-
-        //then
-        assertThat(isRefreshHijacked).isFalse();
+                assertThatThrownBy(() -> tokenService.findByIdentifier(identifier))
+                        .isInstanceOf(BusinessException.class)
+                        .hasMessageContaining(JWT_NOT_FOUND_IN_DB.getMessage());
+            }
+        }
     }
 }

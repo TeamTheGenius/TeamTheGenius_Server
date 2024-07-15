@@ -24,7 +24,7 @@ public class TokenService {
 
     public Token findByIdentifier(String identifier) {
         return tokenRepository.findById(identifier)
-                .orElseThrow(() -> new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_MATCH));
+                .orElseThrow(() -> new BusinessException(ErrorCode.JWT_NOT_FOUND_IN_DB));
     }
 
     public boolean isRefreshHijacked(String identifier, String refreshToken) {

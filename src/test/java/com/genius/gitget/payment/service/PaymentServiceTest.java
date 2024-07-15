@@ -4,7 +4,7 @@ import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PAS
 import static com.genius.gitget.store.item.domain.ItemCategory.POINT_MULTIPLIER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.likes.service.LikesService;

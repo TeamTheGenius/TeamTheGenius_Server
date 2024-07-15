@@ -4,8 +4,8 @@ import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOU
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_INSTANCE_DATE;
 import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
 
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceDetailResponse;

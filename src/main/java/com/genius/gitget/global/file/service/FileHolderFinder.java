@@ -4,7 +4,7 @@ import static com.genius.gitget.global.util.exception.ErrorCode.INSTANCE_NOT_FOU
 import static com.genius.gitget.global.util.exception.ErrorCode.MEMBER_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.TOPIC_NOT_FOUND;
 
-import com.genius.gitget.admin.topic.repository.TopicRepository;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.domain.FileHolder;

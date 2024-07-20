@@ -6,8 +6,6 @@ import static com.genius.gitget.challenge.participant.domain.JoinResult.READY;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
 import static com.genius.gitget.challenge.participant.domain.JoinStatus.YES;
 
-import com.genius.gitget.signout.Signout;
-import com.genius.gitget.signout.SignoutRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.user.domain.User;
@@ -23,7 +21,9 @@ import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserInterestResponse;
 import com.genius.gitget.profile.dto.UserInterestUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
-import com.genius.gitget.store.item.service.OrdersProvider;
+import com.genius.gitget.signout.Signout;
+import com.genius.gitget.signout.SignoutRepository;
+import com.genius.gitget.store.item.service.OrdersService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final FilesService filesService;
     private final SignoutRepository signoutRepository;
-    private final OrdersProvider ordersProvider;
+    private final OrdersService ordersService;
 
     // 포인트 조회
     public UserPointResponse getUserPoint(User user) {
@@ -54,7 +54,7 @@ public class ProfileService {
     // 사용자 정보 조회
     public UserInformationResponse getUserInformation(Long userId) {
         User findUser = getUserById(userId);
-        Long frameId = ordersProvider.getUsingFrameItem(userId).getId();
+        Long frameId = ordersService.getUsingFrameItem(userId).getId();
 
         FileResponse fileResponse = filesService.convertToFileResponse(findUser.getFiles());
         return UserInformationResponse.createByEntity(findUser, frameId, fileResponse);

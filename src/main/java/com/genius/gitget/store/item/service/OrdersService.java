@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class OrdersProvider {
+public class OrdersService {
     private final OrdersRepository ordersRepository;
 
 

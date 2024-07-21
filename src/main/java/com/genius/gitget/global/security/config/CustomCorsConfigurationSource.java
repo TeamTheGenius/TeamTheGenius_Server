@@ -1,5 +1,7 @@
 package com.genius.gitget.global.security.config;
 
+import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_HEADER;
+
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +26,7 @@ public class CustomCorsConfigurationSource implements CorsConfigurationSource {
         config.setAllowedMethods(ALLOWED_METHODS);
         config.setAllowCredentials(true);
         config.setAllowedHeaders(Collections.singletonList("*"));
+        config.addAllowedHeader(ACCESS_HEADER.getValue());
         config.setMaxAge(3600L);
         return config;
     }

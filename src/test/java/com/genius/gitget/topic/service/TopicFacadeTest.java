@@ -1,4 +1,4 @@
-package com.genius.gitget.admin.topic.service;
+package com.genius.gitget.topic.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

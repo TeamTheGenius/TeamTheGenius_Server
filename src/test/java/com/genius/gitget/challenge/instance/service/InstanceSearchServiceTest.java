@@ -1,18 +1,16 @@
 package com.genius.gitget.challenge.instance.service;
 
-import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
-import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.challenge.instance.repository.SearchRepository;
-import java.io.IOException;
-import java.time.LocalDateTime;
+import com.genius.gitget.challenge.instance.facade.InstanceFacade;
+import com.genius.gitget.challenge.instance.util.TestDTOFactory;
+import com.genius.gitget.challenge.instance.util.TestSetup;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.facade.TopicFacade;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,69 +25,53 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class InstanceSearchServiceTest {
     @Autowired
-    SearchRepository searchRepository;
+    InstanceFacade instanceFacade;
     @Autowired
-    TopicRepository topicRepository;
-    @Autowired
-    InstanceRepository instanceRepository;
-    @Autowired
-    InstanceSearchService instanceSearchService;
+    TopicFacade topicFacade;
+
+    /*TODO instanceService Facade 적용 후 제거 예정*/
     @Autowired
     InstanceService instanceService;
 
 
+    List<Topic> topicList;
+    List<Instance> instanceList;
+    String fileType;
+
+    @BeforeEach
+    public void setup() {
+        topicList = TestSetup.createTopicList();
+        instanceList = TestSetup.createInstanceList();
+        fileType = "topic";
+    }
+
     @Test
     public void 인스턴스_검색() throws Exception {
-        //given
-        Topic topic = Topic.builder()
-                .title("1일 1알고리즘")
-                .description("하루에 한 문제씩 문제를 해결합니다.")
-                .tags("BE, FE, CS")
-                .pointPerPerson(100)
-                .build();
+        List<Topic> topics = topicList;
+        Topic topic = topics.get(0);
+        int instanceCount = 0;
+        topicFacade.create(TestDTOFactory.createTopicCreateRequest(topic.getTitle(),
+                topic.getDescription(),
+                topic.getTags(),
+                topic.getPointPerPerson()));
 
-        Instance instance = Instance.builder()
-                .title("1일 1알고리즘")
-                .description("하루에 한 문제씩 문제를 해결합니다.")
-                .tags("BE, FE, CS")
-                .pointPerPerson(100)
-                .progress(Progress.PREACTIVITY)
-                .startedDate(LocalDateTime.now())
-                .completedDate(LocalDateTime.now().plusDays(3))
-                .build();
+//
+//        Topic savedTopic = topicRepository.save(topic);
+//
+//        createInstance(savedTopic, instance, instance.getTitle());
+//        createInstance(savedTopic, instance, instance.getTitle());
+//        createInstance(savedTopic, instance, "title");
 
-        Topic savedTopic = topicRepository.save(topic);
-
-        createInstance(savedTopic, instance, instance.getTitle());
-        createInstance(savedTopic, instance, instance.getTitle());
-        createInstance(savedTopic, instance, "title");
-
-        //when
-        InstanceSearchRequest instanceSearchRequest = new InstanceSearchRequest("고리", "preactivity");
-
-        //then
-        Page<InstanceSearchResponse> orderList = instanceSearchService.searchInstances("고리", "preactivity",
+        Page<InstanceSearchResponse> orderList = instanceFacade.searchInstances("이펙티브", "preactivity",
                 PageRequest.of(0, 3));
 
         for (InstanceSearchResponse instanceSearchResponse : orderList) {
-            System.out.println("instanceSearchResponse = " + instanceSearchResponse.getKeyword());
+            if (instanceSearchResponse.getKeyword() != null) {
+                instanceCount++;
+            }
         }
 
-        Assertions.assertThat(orderList.getTotalElements()).isEqualTo(2);
+        Assertions.assertThat(instanceCount).isEqualTo(2);
 
-    }
-
-    private void createInstance(Topic savedTopic, Instance instance, String title) throws IOException {
-        instanceService.createInstance(
-                InstanceCreateRequest.builder()
-                        .topicId(savedTopic.getId())
-                        .title(title)
-                        .tags(instance.getTags())
-                        .description(instance.getDescription())
-                        .notice(instance.getNotice())
-                        .pointPerPerson(instance.getPointPerPerson())
-                        .startedAt(instance.getStartedDate())
-                        .completedAt(instance.getCompletedDate()).build(),
-                instance.getCompletedDate().minusDays(3).toLocalDate());
     }
 }

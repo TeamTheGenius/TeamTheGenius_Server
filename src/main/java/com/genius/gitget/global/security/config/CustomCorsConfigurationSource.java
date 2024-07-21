@@ -26,7 +26,7 @@ public class CustomCorsConfigurationSource implements CorsConfigurationSource {
         config.setAllowedMethods(ALLOWED_METHODS);
         config.setAllowCredentials(true);
         config.setAllowedHeaders(Collections.singletonList("*"));
-        config.addAllowedHeader(ACCESS_HEADER.getValue());
+        config.setExposedHeaders(Collections.singletonList(ACCESS_HEADER.getValue()));
         config.setMaxAge(3600L);
         return config;
     }

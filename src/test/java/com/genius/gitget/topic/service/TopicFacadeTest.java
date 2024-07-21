@@ -7,7 +7,7 @@ import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.dto.TopicCreateRequest;
 import com.genius.gitget.topic.dto.TopicDetailResponse;
 import com.genius.gitget.topic.dto.TopicUpdateRequest;
-import com.genius.gitget.topic.serviceFacade.TopicFacade;
+import com.genius.gitget.topic.facade.TopicFacade;
 import jakarta.transaction.Transactional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,4 +1,4 @@
-package com.genius.gitget.topic.serviceFacade;
+package com.genius.gitget.topic.facade;
 
 import com.genius.gitget.topic.dto.TopicCreateRequest;
 import com.genius.gitget.topic.dto.TopicDetailResponse;

@@ -1,4 +1,4 @@
-package com.genius.gitget.topic.serviceFacade;
+package com.genius.gitget.topic.facade;
 
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Component
 @Transactional
-public class TopicFacadeImpl implements TopicFacade {
+public class TopicFacadeService implements TopicFacade {
 
     private final FilesService filesService;
     private final TopicService topicService;

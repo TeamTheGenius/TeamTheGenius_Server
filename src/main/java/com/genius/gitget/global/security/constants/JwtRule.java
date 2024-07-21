@@ -9,6 +9,7 @@ public enum JwtRule {
 
     ACCESS_HEADER("Authorization"),
     ACCESS_PREFIX("Bearer "),
+    ACCESS_REISSUED_HEADER("token-reissued"),
 
     REFRESH_PREFIX("refresh"),
 

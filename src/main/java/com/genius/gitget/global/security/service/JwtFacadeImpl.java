@@ -2,6 +2,7 @@ package com.genius.gitget.global.security.service;
 
 import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_HEADER;
 import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
+import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_REISSUED_HEADER;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_ISSUE;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;
 import static com.genius.gitget.global.util.exception.ErrorCode.JWT_NOT_FOUND_IN_COOKIE;
@@ -63,6 +64,7 @@ public class JwtFacadeImpl implements JwtFacade {
         String accessToken = jwtGenerator.generateAccessToken(ACCESS_SECRET_KEY, ACCESS_EXPIRATION, requestUser);
         String bearer = ACCESS_PREFIX.getValue() + accessToken;
         response.setHeader(ACCESS_HEADER.getValue(), bearer);
+        response.setHeader(ACCESS_REISSUED_HEADER.getValue(), "False");
 
         return accessToken;
     }
@@ -99,6 +101,11 @@ public class JwtFacadeImpl implements JwtFacade {
         boolean isHijacked = tokenService.isRefreshHijacked(identifier, token);
 
         return isRefreshValid && !isHijacked;
+    }
+
+    @Override
+    public void setReissuedHeader(HttpServletResponse response) {
+        response.setHeader(ACCESS_REISSUED_HEADER.getValue(), "True");
     }
 
     @Override

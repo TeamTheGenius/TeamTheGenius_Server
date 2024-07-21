@@ -20,6 +20,8 @@ public interface JwtFacade {
 
     boolean validateRefreshToken(String refreshToken, String identifier);
 
+    void setReissuedHeader(HttpServletResponse response);
+
     void logout(HttpServletResponse response, String identifier);
 
     Authentication getAuthentication(String accessToken);

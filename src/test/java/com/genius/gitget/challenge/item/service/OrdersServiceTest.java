@@ -195,7 +195,7 @@ class OrdersServiceTest {
     }
 
     private Orders getSavedOrder(User user, Item item, int count) {
-        Orders orders = Orders.createDefault(count, item.getItemCategory());
+        Orders orders = Orders.of(count, item.getItemCategory());
         orders.setUser(user);
         orders.setItem(item);
         return ordersRepository.save(orders);

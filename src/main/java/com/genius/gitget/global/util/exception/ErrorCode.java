@@ -71,7 +71,7 @@ public enum ErrorCode {
 
     NOT_ENOUGH_POINT(HttpStatus.BAD_REQUEST, "사용자의 보유 포인트가 충분하지 않습니다."),
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "아이템 정보를 찾을 수 없습니다."),
-    USER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다."),
+    ORDERS_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다."),
     HAS_NO_ITEM(HttpStatus.NOT_FOUND, "해당 아이템을 보유하고 있지 않습니다."),
     CAN_NOT_USE_PASS_ITEM(HttpStatus.BAD_REQUEST, "인증 패스 아이템을 사용할 수 없는 조건입니다."),
     ITEM_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 카테고리에 맞는 아이템을 찾을 수 없습니다."),

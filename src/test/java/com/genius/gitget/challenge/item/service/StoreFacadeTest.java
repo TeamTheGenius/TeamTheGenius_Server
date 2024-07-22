@@ -30,9 +30,9 @@ import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.dto.ItemResponse;
 import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
+import com.genius.gitget.store.item.facade.StoreFacade;
 import com.genius.gitget.store.item.repository.ItemRepository;
 import com.genius.gitget.store.item.repository.OrdersRepository;
-import com.genius.gitget.store.item.service.StoreFacadeImpl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,9 +51,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class StoreFacadeImplTest {
+class StoreFacadeTest {
     @Autowired
-    private StoreFacadeImpl storeFacadeImpl;
+    private StoreFacade storeFacade;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -78,7 +78,7 @@ class StoreFacadeImplTest {
         Orders orders = getSavedOrder(user, item, itemCategory, 1);
 
         //when
-        List<ItemResponse> itemResponses = storeFacadeImpl.getItemsByCategory(user, itemCategory);
+        List<ItemResponse> itemResponses = storeFacade.getItemsByCategory(user, itemCategory);
 
         //then
         for (ItemResponse itemResponse : itemResponses) {
@@ -98,7 +98,7 @@ class StoreFacadeImplTest {
         user.updatePoints(1000L);
 
         //when
-        ItemResponse itemResponse = storeFacadeImpl.orderItem(user, item.getId());
+        ItemResponse itemResponse = storeFacade.orderItem(user, item.getId());
 
         //then
         assertThat(itemResponse.getItemId()).isEqualTo(item.getIdentifier());
@@ -116,7 +116,7 @@ class StoreFacadeImplTest {
         Item item = getSavedItem(itemCategory);
 
         //when & then
-        assertThatThrownBy(() -> storeFacadeImpl.orderItem(user, item.getId()))
+        assertThatThrownBy(() -> storeFacade.orderItem(user, item.getId()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.NOT_ENOUGH_POINT.getMessage());
     }
@@ -135,7 +135,7 @@ class StoreFacadeImplTest {
         instance.updateProgress(Progress.ACTIVITY);
 
         //when && then
-        assertThatThrownBy(() -> storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate))
+        assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.HAS_NO_ITEM.getMessage());
     }
@@ -154,9 +154,9 @@ class StoreFacadeImplTest {
         getSavedCertification(NOT_YET, currentDate, participant);
 
         //then
-        assertThatThrownBy(() -> storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate))
+        assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
                 .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.USER_ITEM_NOT_FOUND.getMessage());
+                .hasMessageContaining(ErrorCode.ORDERS_NOT_FOUND.getMessage());
     }
 
     @Test
@@ -172,7 +172,7 @@ class StoreFacadeImplTest {
 
         //when
         orders.updateEquipStatus(EquipStatus.AVAILABLE);
-        ItemUseResponse itemUseResponse = storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate);
+        ItemUseResponse itemUseResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
         assertThat(orders.getEquipStatus()).isEqualTo(EquipStatus.IN_USE);
@@ -187,10 +187,10 @@ class StoreFacadeImplTest {
         user.updatePoints(1000L);
 
         // when
-        storeFacadeImpl.orderItem(user, item.getId());
+        storeFacade.orderItem(user, item.getId());
 
         //when & then
-        assertThatThrownBy(() -> storeFacadeImpl.orderItem(user, item.getId()))
+        assertThatThrownBy(() -> storeFacade.orderItem(user, item.getId()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.ALREADY_PURCHASED.getMessage());
     }
@@ -204,7 +204,7 @@ class StoreFacadeImplTest {
         getSavedOrder(user, item, ItemCategory.PROFILE_FRAME, 0);
 
         //when && then
-        assertThatThrownBy(() -> storeFacadeImpl.useItem(user, item.getId(), 0L, LocalDate.now()))
+        assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), 0L, LocalDate.now()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.HAS_NO_ITEM.getMessage());
     }
@@ -220,7 +220,7 @@ class StoreFacadeImplTest {
         orders.updateEquipStatus(EquipStatus.UNAVAILABLE);
 
         //when && then
-        assertThatThrownBy(() -> storeFacadeImpl.useItem(user, item.getId(), 0L, LocalDate.now()))
+        assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), 0L, LocalDate.now()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.INVALID_EQUIP_CONDITION.getMessage());
     }
@@ -236,7 +236,7 @@ class StoreFacadeImplTest {
         orders.updateEquipStatus(EquipStatus.IN_USE);
 
         //when && then
-        assertThatThrownBy(() -> storeFacadeImpl.useItem(user, item.getId(), 0L, LocalDate.now()))
+        assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), 0L, LocalDate.now()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.TOO_MANY_USING_FRAME.getMessage());
     }
@@ -255,7 +255,7 @@ class StoreFacadeImplTest {
         //when
         instance.updateProgress(Progress.ACTIVITY);
         Certification certification = getSavedCertification(NOT_YET, currentDate, participant);
-        ItemUseResponse itemUseResponse = storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate);
+        ItemUseResponse itemUseResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
         assertThat(orders.getCount()).isEqualTo(0);
@@ -277,7 +277,7 @@ class StoreFacadeImplTest {
         instance.updateProgress(Progress.ACTIVITY);
 
         //then
-        ItemUseResponse itemUseResponse = storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate);
+        ItemUseResponse itemUseResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
         Optional<Certification> certification = certificationRepository.findByDate(currentDate, participant.getId());
@@ -298,7 +298,7 @@ class StoreFacadeImplTest {
         Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
         //when & then
-        assertThatThrownBy(() -> storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate))
+        assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.NOT_ACTIVITY_INSTANCE.getMessage());
     }
@@ -320,7 +320,7 @@ class StoreFacadeImplTest {
         getSavedCertification(certificateStatus, currentDate, participant);
 
         //then
-        assertThatThrownBy(() -> storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate))
+        assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.CAN_NOT_USE_PASS_ITEM.getMessage());
     }
@@ -342,7 +342,7 @@ class StoreFacadeImplTest {
         participant.updateJoinResult(JoinResult.SUCCESS);
         getSavedCertification(CERTIFICATED, currentDate, participant);
         getSavedCertification(CERTIFICATED, currentDate.plusDays(1), participant);
-        storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
+        storeFacade.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
         Long afterRewards = user.getPoint();
 
         //then
@@ -366,7 +366,7 @@ class StoreFacadeImplTest {
         participant.updateJoinResult(JoinResult.SUCCESS);
         getSavedCertification(CERTIFICATED, currentDate, participant);
         getSavedCertification(CERTIFICATED, currentDate.plusDays(1), participant);
-        storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
+        storeFacade.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
 
         //then
         assertThat(ordersRepository.findById(orders.getId())).isNotPresent();
@@ -385,7 +385,7 @@ class StoreFacadeImplTest {
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
-        storeFacadeImpl.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
+        storeFacade.useItem(user, item.getId(), instance.getId(), currentDate.plusDays(1));
 
         //then
         assertThat(ordersRepository.findById(orders.getId())).isNotPresent();
@@ -400,8 +400,8 @@ class StoreFacadeImplTest {
         getSavedOrder(user, item, ItemCategory.PROFILE_FRAME, 1);
 
         //when
-        storeFacadeImpl.useItem(user, item.getId(), 0L, LocalDate.now());
-        ProfileResponse profileResponse = storeFacadeImpl.unmountFrame(user).get(0);
+        storeFacade.useItem(user, item.getId(), 0L, LocalDate.now());
+        ProfileResponse profileResponse = storeFacade.unmountFrame(user).get(0);
 
         //then
         assertThat(profileResponse.getItemId()).isEqualTo(item.getIdentifier());
@@ -420,7 +420,7 @@ class StoreFacadeImplTest {
         Orders orders = getSavedOrder(user, item, item.getItemCategory(), 1);
 
         //when
-        List<ProfileResponse> profileResponses = storeFacadeImpl.unmountFrame(user);
+        List<ProfileResponse> profileResponses = storeFacade.unmountFrame(user);
 
         //when & then
         assertThat(profileResponses.size()).isEqualTo(0);
@@ -435,7 +435,7 @@ class StoreFacadeImplTest {
         getSavedOrder(user, item, item.getItemCategory(), 1);
 
         // when
-        List<ProfileResponse> profileResponses = storeFacadeImpl.unmountFrame(user);
+        List<ProfileResponse> profileResponses = storeFacade.unmountFrame(user);
 
         //when & then
         assertThat(profileResponses.size()).isEqualTo(0);
@@ -463,7 +463,7 @@ class StoreFacadeImplTest {
     }
 
     private Orders getSavedOrder(User user, Item item, ItemCategory itemCategory, int count) {
-        Orders orders = Orders.createDefault(count, itemCategory);
+        Orders orders = Orders.of(count, itemCategory);
         orders.setItem(item);
         orders.setUser(user);
         return ordersRepository.save(orders);
@@ -526,7 +526,7 @@ class StoreFacadeImplTest {
             getSavedOrder(user, item, itemCategory, 0);
             user.updatePoints(1000L);
 
-            ItemResponse itemResponse = storeFacadeImpl.orderItem(user, item.getId());
+            ItemResponse itemResponse = storeFacade.orderItem(user, item.getId());
 
             assertThat(itemResponse.getItemCategory()).isEqualTo(itemCategory);
         }
@@ -539,12 +539,12 @@ class StoreFacadeImplTest {
             getSavedOrder(user, item, itemCategory, 0);
             user.updatePoints(1000L);
 
-            ItemResponse itemResponse1 = storeFacadeImpl.orderItem(user, item.getId());
+            ItemResponse itemResponse1 = storeFacade.orderItem(user, item.getId());
 
             assertThat(user.getPoint()).isEqualTo(900L);
             assertThat(itemResponse1.getCount()).isEqualTo(1);
 
-            ItemResponse itemResponse2 = storeFacadeImpl.orderItem(user, item.getId());
+            ItemResponse itemResponse2 = storeFacade.orderItem(user, item.getId());
 
             assertThat(user.getPoint()).isEqualTo(800L);
             assertThat(itemResponse2.getCount()).isEqualTo(2);

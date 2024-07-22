@@ -17,9 +17,9 @@ import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.dto.ItemResponse;
+import com.genius.gitget.store.item.facade.StoreFacadeImpl2;
 import com.genius.gitget.store.item.repository.ItemRepository;
 import com.genius.gitget.store.item.repository.OrdersRepository;
-import com.genius.gitget.store.item.service.StoreFacadeImpl;
 import com.genius.gitget.store.payment.domain.Payment;
 import com.genius.gitget.store.payment.dto.PaymentDetailsResponse;
 import com.genius.gitget.store.payment.dto.PaymentRequest;
@@ -63,7 +63,7 @@ public class PaymentServiceTest {
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
-    private StoreFacadeImpl storeFacadeImpl;
+    private StoreFacadeImpl2 storeFacadeImpl2;
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
@@ -89,7 +89,7 @@ public class PaymentServiceTest {
         getSavedOrder(user, item, itemCategory, 0);
         user.updatePoints(1000L);
 
-        ItemResponse itemResponse = storeFacadeImpl.orderItem(user, item.getId());
+        ItemResponse itemResponse = storeFacadeImpl2.orderItem(user, item.getId());
         assertThat(itemResponse.getItemCategory()).isEqualTo(itemCategory);
 
         Page<PaymentDetailsResponse> paymentDetails = paymentService.getPaymentDetails(user, PageRequest.of(0, 10));
@@ -115,7 +115,7 @@ public class PaymentServiceTest {
     }
 
     private Orders getSavedOrder(User user, Item item, ItemCategory itemCategory, int count) {
-        Orders orders = Orders.createDefault(count, itemCategory);
+        Orders orders = Orders.of(count, itemCategory);
         orders.setItem(item);
         orders.setUser(user);
         return ordersRepository.save(orders);

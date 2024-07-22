@@ -1,4 +1,4 @@
-package com.genius.gitget.store.item.service;
+package com.genius.gitget.store.item.facade;
 
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.store.item.domain.ItemCategory;

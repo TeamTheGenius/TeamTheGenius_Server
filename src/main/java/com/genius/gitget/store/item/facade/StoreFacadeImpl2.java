@@ -1,4 +1,4 @@
-package com.genius.gitget.store.item.service;
+package com.genius.gitget.store.item.facade;
 
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
 import com.genius.gitget.challenge.certification.service.CertificationService;
@@ -17,6 +17,8 @@ import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.dto.ItemResponse;
 import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
+import com.genius.gitget.store.item.service.ItemService;
+import com.genius.gitget.store.item.service.OrdersService;
 import com.genius.gitget.store.payment.domain.OrderType;
 import com.genius.gitget.store.payment.domain.Payment;
 import com.genius.gitget.store.payment.repository.PaymentRepository;
@@ -30,12 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class StoreFacadeImpl implements StoreFacade {
+public class StoreFacadeImpl2 implements StoreFacade {
     private final UserService userService;
     private final ItemService itemService;
     private final OrdersService ordersService;
 
-    //TODO: Service를 의존하는게 맘에 들지 않는다 provider만을 의존하게 할 순 없을까?
     private final CertificationService certificationService;
     private final MyChallengeService myChallengeService;
 
@@ -89,7 +90,7 @@ public class StoreFacadeImpl implements StoreFacade {
     }
 
     private Orders createNew(User user, Item item) {
-        Orders orders = Orders.createDefault(0, item.getItemCategory());
+        Orders orders = Orders.of(0, item.getItemCategory());
         orders.setUserAndItem(user, item);
         return ordersService.save(orders);
     }
@@ -137,7 +138,7 @@ public class StoreFacadeImpl implements StoreFacade {
                 return useMultiplierItem(orders, instanceId, currentDate);
             }
         }
-        throw new BusinessException(ErrorCode.USER_ITEM_NOT_FOUND);
+        throw new BusinessException(ErrorCode.ORDERS_NOT_FOUND);
     }
 
     @Override

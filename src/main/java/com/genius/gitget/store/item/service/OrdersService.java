@@ -1,6 +1,6 @@
 package com.genius.gitget.store.item.service;
 
-import static com.genius.gitget.global.util.exception.ErrorCode.USER_ITEM_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.ORDERS_NOT_FOUND;
 
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -39,17 +39,17 @@ public class OrdersService {
 
     public Orders findByOrderInfo(Long userId, Long itemId) {
         return ordersRepository.findByOrderInfo(userId, itemId)
-                .orElseThrow(() -> new BusinessException(USER_ITEM_NOT_FOUND));
+                .orElseThrow(() -> new BusinessException(ORDERS_NOT_FOUND));
     }
 
-
-    public List<Orders> findAllByCategory(Long userId, ItemCategory itemCategory) {
-        return ordersRepository.findAllByCategory(userId, itemCategory);
+    public Orders findOrSave(User user, Item item) {
+        return ordersRepository.findByOrderInfo(user.getId(), item.getId())
+                .orElseGet(() -> ordersRepository.save(Orders.create(user, item)));
     }
 
     public List<Orders> findAllUsingFrames(Long userId) {
-        return findAllByCategory(userId, ItemCategory.PROFILE_FRAME)
-                .stream()
+        List<Orders> frames = ordersRepository.findAllByCategory(userId, ItemCategory.PROFILE_FRAME);
+        return frames.stream()
                 .filter(frameOrder -> frameOrder.getEquipStatus() == EquipStatus.IN_USE)
                 .toList();
     }

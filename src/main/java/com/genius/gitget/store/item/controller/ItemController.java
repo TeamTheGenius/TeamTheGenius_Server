@@ -12,8 +12,8 @@ import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.dto.ItemResponse;
 import com.genius.gitget.store.item.dto.ItemUseResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
+import com.genius.gitget.store.item.facade.StoreFacade;
 import com.genius.gitget.store.item.service.ItemService;
-import com.genius.gitget.store.item.service.StoreFacade;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,9 +38,8 @@ public class ItemController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String category
     ) {
-        List<ItemResponse> itemResponses;
         ItemCategory itemCategory = ItemCategory.findCategory(category);
-        itemResponses = storeFacade.getItemsByCategory(userPrincipal.getUser(), itemCategory);
+        List<ItemResponse> itemResponses = storeFacade.getItemsByCategory(userPrincipal.getUser(), itemCategory);
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponses)

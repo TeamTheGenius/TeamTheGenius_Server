@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Slf4j
 @ActiveProfiles({"jwt"})
-class JwtFacadeImplTest {
+class JwtFacadeServiceTest {
     User user;
     MockHttpServletRequest request;
     MockHttpServletResponse response;

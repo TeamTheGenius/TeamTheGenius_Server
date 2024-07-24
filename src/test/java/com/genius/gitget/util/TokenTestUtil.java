@@ -6,7 +6,7 @@ import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.domain.UserPrincipal;
-import com.genius.gitget.global.security.service.JwtFacadeImpl;
+import com.genius.gitget.global.security.service.JwtFacadeService;
 import jakarta.servlet.http.Cookie;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import org.springframework.util.MultiValueMap;
 @Component
 @RequiredArgsConstructor
 public class TokenTestUtil {
-    private final JwtFacadeImpl jwtFacade;
+    private final JwtFacadeService jwtFacade;
 
     public Cookie createAccessHeader() {
         UserPrincipal userPrincipal = (UserPrincipal) SecurityContextHolder.getContext().getAuthentication()

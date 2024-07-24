@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @Slf4j
-public class JwtFacadeImpl implements JwtFacade {
+public class JwtFacadeService implements JwtFacade {
     private final CustomUserDetailsService customUserDetailsService;
     private final TokenService tokenService;
     private final JwtGenerator jwtGenerator;
@@ -41,13 +41,13 @@ public class JwtFacadeImpl implements JwtFacade {
     private final long ACCESS_EXPIRATION;
     private final long REFRESH_EXPIRATION;
 
-    public JwtFacadeImpl(CustomUserDetailsService customUserDetailsService,
-                         TokenService tokenService,
-                         JwtGenerator jwtGenerator, JwtUtil jwtUtil,
-                         @Value("${jwt.access-secret}") String ACCESS_SECRET_KEY,
-                         @Value("${jwt.refresh-secret}") String REFRESH_SECRET_KEY,
-                         @Value("${jwt.access-expiration}") long ACCESS_EXPIRATION,
-                         @Value("${jwt.refresh-expiration}") long REFRESH_EXPIRATION) {
+    public JwtFacadeService(CustomUserDetailsService customUserDetailsService,
+                            TokenService tokenService,
+                            JwtGenerator jwtGenerator, JwtUtil jwtUtil,
+                            @Value("${jwt.access-secret}") String ACCESS_SECRET_KEY,
+                            @Value("${jwt.refresh-secret}") String REFRESH_SECRET_KEY,
+                            @Value("${jwt.access-expiration}") long ACCESS_EXPIRATION,
+                            @Value("${jwt.refresh-expiration}") long REFRESH_EXPIRATION) {
         this.customUserDetailsService = customUserDetailsService;
         this.tokenService = tokenService;
         this.jwtGenerator = jwtGenerator;

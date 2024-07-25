@@ -61,7 +61,7 @@ class SecurityConfigTest {
 
         //when & then
         mockMvc.perform(get("/api/admin/topic")
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andExpect(status().is2xxSuccessful());
     }
 
@@ -70,7 +70,7 @@ class SecurityConfigTest {
     @WithMockCustomUser(role = Role.USER)
     public void should_status4xx_when_roleNotAdmin() throws Exception {
         mockMvc.perform(get("/api/admin/topic")
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andExpect(status().is4xxClientError());
     }
 }

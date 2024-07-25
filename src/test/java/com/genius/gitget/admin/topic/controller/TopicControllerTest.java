@@ -58,7 +58,7 @@ public class TopicControllerTest {
         Topic savedTopic = getSavedTopic();
         Long id = savedTopic.getId();
 
-        mockMvc.perform(get("/api/admin/topic/" + id).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/admin/topic/" + id).headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value("title"));
@@ -74,7 +74,7 @@ public class TopicControllerTest {
 
         mockMvc.perform(get("/api/admin/topic")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.numberOfElements").value(3))
@@ -91,7 +91,7 @@ public class TopicControllerTest {
         Topic savedTopic = getSavedTopic();
         Long id = savedTopic.getId();
 
-        mockMvc.perform(delete("/api/admin/topic/" + id).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(delete("/api/admin/topic/" + id).headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.numberOfElements").doesNotExist());
@@ -106,7 +106,7 @@ public class TopicControllerTest {
         Topic savedTopic = getSavedTopic();
         Long id = savedTopic.getId();
 
-        mockMvc.perform(delete("/api/admin/topic/" + id + 1).cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(delete("/api/admin/topic/" + id + 1).headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }

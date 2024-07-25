@@ -2,6 +2,7 @@ package com.genius.gitget.global.security.service;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_EXPIRED_JWT;
 import static com.genius.gitget.global.util.exception.ErrorCode.INVALID_JWT;
+import static com.genius.gitget.global.util.exception.ErrorCode.JWT_NOT_FOUND_IN_COOKIE;
 
 import com.genius.gitget.global.security.constants.JwtRule;
 import com.genius.gitget.global.security.constants.TokenStatus;
@@ -15,15 +16,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Base64;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-@Service
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
+@Component
 public class JwtUtil {
 
     public TokenStatus getTokenStatus(String token, Key secretKey) {
@@ -33,7 +30,7 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token);
             return TokenStatus.AUTHENTICATED;
-        } catch (ExpiredJwtException | IllegalArgumentException e) {
+        } catch (ExpiredJwtException e) {
             log.error(INVALID_EXPIRED_JWT.getMessage());
             return TokenStatus.EXPIRED;
         } catch (JwtException e) {
@@ -46,7 +43,7 @@ public class JwtUtil {
                 .filter(cookie -> cookie.getName().equals(tokenPrefix.getValue()))
                 .findFirst()
                 .map(Cookie::getValue)
-                .orElse("");
+                .orElseThrow(() -> new BusinessException(JWT_NOT_FOUND_IN_COOKIE));
     }
 
     public Key getSigningKey(String secretKey) {
@@ -58,7 +55,7 @@ public class JwtUtil {
         return Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
-    public Cookie resetToken(JwtRule tokenPrefix) {
+    public Cookie resetCookie(JwtRule tokenPrefix) {
         Cookie cookie = new Cookie(tokenPrefix.getValue(), null);
         cookie.setMaxAge(0);
         cookie.setPath("/");

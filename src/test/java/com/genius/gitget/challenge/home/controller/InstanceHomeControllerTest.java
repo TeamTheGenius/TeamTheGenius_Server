@@ -58,7 +58,7 @@ class InstanceHomeControllerTest {
 
         //when & then
         mockMvc.perform(get("/api/challenges/recommend")
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.numberOfElements").value(3));
     }

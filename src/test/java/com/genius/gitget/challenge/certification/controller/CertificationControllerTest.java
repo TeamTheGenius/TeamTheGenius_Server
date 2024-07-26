@@ -74,7 +74,7 @@ class CertificationControllerTest {
 
         //then
         mockMvc.perform(post("/api/certification/register/token")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().is2xxSuccessful());
@@ -93,7 +93,7 @@ class CertificationControllerTest {
     @WithMockCustomUser(role = Role.NOT_REGISTERED)
     public void should_throwException_when_JWTNonExist() throws Exception {
         mockMvc.perform(post("/api/certification/register/token")
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -106,7 +106,7 @@ class CertificationControllerTest {
 
         //when & then
         mockMvc.perform(post("/api/certification/register/token")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().is4xxClientError());
@@ -125,7 +125,7 @@ class CertificationControllerTest {
 
         //then
         mockMvc.perform(get("/api/certification/verify/repository?repo=" + targetRepo)
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andExpect(status().is2xxSuccessful());
     }
 

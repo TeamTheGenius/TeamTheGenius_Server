@@ -124,6 +124,10 @@ public class User extends BaseTimeEntity implements FileHolder {
         return this.point;
     }
 
+    public boolean isRegistered() {
+        return this.role != Role.NOT_REGISTERED;
+    }
+
     @Override
     public Optional<Files> getFiles() {
         return Optional.ofNullable(this.files);

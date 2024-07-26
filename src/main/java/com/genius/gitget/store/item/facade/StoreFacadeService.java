@@ -15,7 +15,7 @@ import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.dto.ItemResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.OrderResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
 import com.genius.gitget.store.item.service.ItemService;
 import com.genius.gitget.store.item.service.OrdersService;
@@ -82,7 +82,7 @@ public class StoreFacadeService implements StoreFacade {
     }
 
     @Override
-    public ItemUseResponse useItem(User user, Long itemId, Long instanceId, LocalDate currentDate) {
+    public OrderResponse useItem(User user, Long itemId, Long instanceId, LocalDate currentDate) {
         Item item = itemService.findById(itemId);
         Orders orders = ordersService.findByOrderInfo(user.getId(), itemId);
 
@@ -105,11 +105,11 @@ public class StoreFacadeService implements StoreFacade {
     }
 
     @Override
-    public ItemUseResponse useFrameItem(Long userId, Orders orders) {
+    public OrderResponse useFrameItem(Long userId, Orders orders) {
         validateFrameEquip(userId, orders);
         orders.updateEquipStatus(EquipStatus.IN_USE);
 
-        return new ItemUseResponse(orders.getItem().getId());
+        return new OrderResponse(orders.getItem().getId());
     }
 
     private void validateFrameEquip(Long userId, Orders orders) {
@@ -132,7 +132,7 @@ public class StoreFacadeService implements StoreFacade {
      * 4. 적절한 응답 반환
      */
     @Override
-    public ItemUseResponse usePasserItem(Orders orders, Long instanceId, LocalDate currentDate) {
+    public OrderResponse usePasserItem(Orders orders, Long instanceId, LocalDate currentDate) {
         Long userId = orders.getUser().getId();
         Long itemId = orders.getItem().getId();
         ActivatedResponse activatedResponse = certificationService.passCertification(
@@ -151,7 +151,7 @@ public class StoreFacadeService implements StoreFacade {
      * 3. user의 포인트 업데이트
      */
     @Override
-    public ItemUseResponse useMultiplierItem(Orders orders, Long instanceId, LocalDate currentDate) {
+    public OrderResponse useMultiplierItem(Orders orders, Long instanceId, LocalDate currentDate) {
         User user = orders.getUser();
         DoneResponse doneResponse = myChallengeService.getRewards(
                 new RewardRequest(user, instanceId, currentDate), true

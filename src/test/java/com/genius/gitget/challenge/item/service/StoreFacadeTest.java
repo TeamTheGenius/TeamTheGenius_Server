@@ -28,7 +28,7 @@ import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.dto.ItemResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.OrderResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
 import com.genius.gitget.store.item.facade.StoreFacade;
 import com.genius.gitget.store.item.repository.ItemRepository;
@@ -172,7 +172,7 @@ class StoreFacadeTest {
 
         //when
         orders.updateEquipStatus(EquipStatus.AVAILABLE);
-        ItemUseResponse itemUseResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
+        OrderResponse orderResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
         assertThat(orders.getEquipStatus()).isEqualTo(EquipStatus.IN_USE);
@@ -255,7 +255,7 @@ class StoreFacadeTest {
         //when
         instance.updateProgress(Progress.ACTIVITY);
         Certification certification = getSavedCertification(NOT_YET, currentDate, participant);
-        ItemUseResponse itemUseResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
+        OrderResponse orderResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
         assertThat(orders.getCount()).isEqualTo(0);
@@ -277,7 +277,7 @@ class StoreFacadeTest {
         instance.updateProgress(Progress.ACTIVITY);
 
         //then
-        ItemUseResponse itemUseResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
+        OrderResponse orderResponse = storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
 
         //then
         Optional<Certification> certification = certificationRepository.findByDate(currentDate, participant.getId());

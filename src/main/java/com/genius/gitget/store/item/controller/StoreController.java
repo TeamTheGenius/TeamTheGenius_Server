@@ -10,7 +10,7 @@ import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.dto.ItemResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.OrderResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
 import com.genius.gitget.store.item.facade.StoreFacade;
 import com.genius.gitget.store.item.service.ItemService;
@@ -66,11 +66,11 @@ public class StoreController {
             @RequestParam(required = false) Long instanceId
     ) {
         Item item = itemService.findByIdentifier(identifier);
-        ItemUseResponse itemUseResponse = storeFacade.useItem(userPrincipal.getUser(), item.getId(),
+        OrderResponse orderResponse = storeFacade.useItem(userPrincipal.getUser(), item.getId(),
                 instanceId, DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemUseResponse)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), orderResponse)
         );
     }
 

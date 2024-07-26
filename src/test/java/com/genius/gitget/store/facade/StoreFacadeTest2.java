@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.item.service;
+package com.genius.gitget.store.facade;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
@@ -51,7 +51,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class StoreFacadeTest {
+class StoreFacadeTest2 {
+
     @Autowired
     private StoreFacade storeFacade;
     @Autowired
@@ -66,7 +67,6 @@ class StoreFacadeTest {
     private ParticipantRepository participantRepository;
     @Autowired
     private CertificationRepository certificationRepository;
-
 
     @ParameterizedTest
     @DisplayName("카테고리에 해당하는 아이템들을 받아올 수 있다.")

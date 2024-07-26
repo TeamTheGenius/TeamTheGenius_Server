@@ -1,4 +1,4 @@
-package com.genius.gitget.util;
+package com.genius.gitget.util.security;
 
 import static com.genius.gitget.global.security.constants.JwtRule.ACCESS_PREFIX;
 import static com.genius.gitget.global.security.constants.JwtRule.REFRESH_PREFIX;

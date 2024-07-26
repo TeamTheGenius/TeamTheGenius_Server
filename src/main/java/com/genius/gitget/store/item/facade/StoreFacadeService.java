@@ -1,7 +1,11 @@
 package com.genius.gitget.store.item.facade;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
+
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
+import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.certification.service.CertificationService;
+import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
@@ -36,7 +40,10 @@ public class StoreFacadeService implements StoreFacade {
     private final OrdersService ordersService;
 
     private final UserService userService;
+
+    //TODO: Facade 패턴 적용 시 CertificationService로 통일하기
     private final CertificationService certificationService;
+    private final CertificationProvider certificationProvider;
 
     //TODO: MyChallengeService 말고 책임이 분명한 Service를 만들어서 적용하기
     private final MyChallengeService myChallengeService;
@@ -144,7 +151,7 @@ public class StoreFacadeService implements StoreFacade {
     }
 
     /**
-     * 일반 포인트 수령과 다른 부분: user의 포인트 업데이트 2배 (이런 부분이 facade로 되어야)
+     * 일반 포인트 수령과 다른 부분: user의 포인트 업데이트 2배
      * 0. 수령받을 수 있는 조건인지 확인 -> 성공인지, 아직 보상을 안받았는지
      * 1. Participant를 찾은 후, 포인트 수령 처리
      * 2. instance에서 보상 포인트 확인
@@ -159,6 +166,15 @@ public class StoreFacadeService implements StoreFacade {
         doneResponse.setItemId(orders.getItem().getId());
         ordersService.useItem(orders);
         return doneResponse;
+    }
+
+    private double getAchievementRate(Instance instance, Long participantId, LocalDate targetDate) {
+        int totalAttempt = instance.getTotalAttempt();
+        int successCount = certificationProvider.countByStatus(participantId, CERTIFICATED,
+                targetDate);
+
+        double successPercent = (double) successCount / (double) totalAttempt * 100;
+        return Math.round(successPercent * 100 / 100.0);
     }
 
     @Override

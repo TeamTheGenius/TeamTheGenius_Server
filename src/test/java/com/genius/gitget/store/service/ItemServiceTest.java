@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.item.service;
+package com.genius.gitget.store.service;
 
 import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PASSER;
 import static org.assertj.core.api.Assertions.assertThat;

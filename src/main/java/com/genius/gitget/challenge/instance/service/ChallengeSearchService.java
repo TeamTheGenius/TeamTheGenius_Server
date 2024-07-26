@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Slf4j
-public class InstanceSearchService {
+public class ChallengeSearchService {
     private final SearchRepository searchRepository;
     private final StringToEnum stringToEnum;
 

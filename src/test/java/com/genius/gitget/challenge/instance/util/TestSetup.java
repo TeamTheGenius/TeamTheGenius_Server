@@ -5,7 +5,9 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.topic.domain.Topic;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TestSetup {
     public static List<Topic> createTopicList() {
         Topic topicA = Topic.builder()
@@ -39,7 +41,7 @@ public class TestSetup {
                 .tags("BE, FE")
                 .pointPerPerson(100)
                 .progress(Progress.PREACTIVITY)
-                .startedDate(LocalDateTime.now())
+                .startedDate(LocalDateTime.now().plusDays(10))
                 .completedDate(LocalDateTime.now().plusDays(30))
                 .build();
 
@@ -49,7 +51,7 @@ public class TestSetup {
                 .tags("BE, FE")
                 .pointPerPerson(300)
                 .progress(Progress.PREACTIVITY)
-                .startedDate(LocalDateTime.now())
+                .startedDate(LocalDateTime.now().plusDays(10))
                 .completedDate(LocalDateTime.now().plusDays(30))
                 .build();
 
@@ -59,7 +61,7 @@ public class TestSetup {
                 .tags("BE, FE, CS")
                 .pointPerPerson(500)
                 .progress(Progress.PREACTIVITY)
-                .startedDate(LocalDateTime.now())
+                .startedDate(LocalDateTime.now().plusDays(10))
                 .completedDate(LocalDateTime.now().plusDays(30))
                 .build();
 
@@ -69,7 +71,7 @@ public class TestSetup {
                 .tags("BE, FE, CS")
                 .pointPerPerson(400)
                 .progress(Progress.PREACTIVITY)
-                .startedDate(LocalDateTime.now())
+                .startedDate(LocalDateTime.now().plusDays(10))
                 .completedDate(LocalDateTime.now().plusDays(30))
                 .build();
 
@@ -79,7 +81,7 @@ public class TestSetup {
                 .tags("BE, FE, CS")
                 .pointPerPerson(700)
                 .progress(Progress.PREACTIVITY)
-                .startedDate(LocalDateTime.now())
+                .startedDate(LocalDateTime.now().plusDays(10))
                 .completedDate(LocalDateTime.now().plusDays(30))
                 .build();
 
@@ -89,7 +91,7 @@ public class TestSetup {
                 .tags("BE, FE, CS")
                 .pointPerPerson(1000)
                 .progress(Progress.PREACTIVITY)
-                .startedDate(LocalDateTime.now())
+                .startedDate(LocalDateTime.now().plusDays(10))
                 .completedDate(LocalDateTime.now().plusDays(30))
                 .build();
 

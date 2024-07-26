@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
+import com.genius.gitget.challenge.instance.facade.InstanceHomeFacade;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.instance.service.ChallengeRecommendationService;
 import com.genius.gitget.challenge.user.domain.User;
@@ -23,7 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class ChallengeRecommendationServiceTest {
+class InstanceHomeFacadeTest {
+    @Autowired
+    InstanceHomeFacade instanceHomeFacade;
     @Autowired
     ChallengeRecommendationService challengeRecommendationService;
     @Autowired
@@ -44,7 +47,7 @@ class ChallengeRecommendationServiceTest {
         User user = User.builder().tags("BE,React").build();
 
         //when
-        Slice<HomeInstanceResponse> recommendations = challengeRecommendationService.getRecommendations(user,
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.recommendInstances(user,
                 pageRequest);
 
         //then
@@ -71,7 +74,7 @@ class ChallengeRecommendationServiceTest {
         User user = User.builder().tags("BE").build();
 
         //when
-        Slice<HomeInstanceResponse> recommendations = challengeRecommendationService.getRecommendations(user,
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.recommendInstances(user,
                 pageRequest);
 
         //then
@@ -94,7 +97,7 @@ class ChallengeRecommendationServiceTest {
         User user = User.builder().tags("BE").build();
 
         //when
-        Slice<HomeInstanceResponse> recommendations = challengeRecommendationService.getRecommendations(user,
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.recommendInstances(user,
                 pageRequest);
 
         //then

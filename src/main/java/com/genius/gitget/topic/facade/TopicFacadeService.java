@@ -22,6 +22,7 @@ public class TopicFacadeService implements TopicFacade {
     private final FilesService filesService;
     private final TopicService topicService;
 
+
     @Override
     public Page<TopicPagingResponse> findTopics(Pageable pageable) {
         Page<Topic> findTopics = topicService.findTopics(pageable);

@@ -4,18 +4,20 @@ import static com.genius.gitget.challenge.instance.domain.Progress.ACTIVITY;
 import static com.genius.gitget.challenge.instance.domain.Progress.DONE;
 import static com.genius.gitget.challenge.instance.domain.Progress.PREACTIVITY;
 
-import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
-import com.genius.gitget.challenge.instance.service.InstanceSearchService;
+import com.genius.gitget.challenge.instance.facade.InstanceFacade;
+import com.genius.gitget.challenge.instance.service.ChallengeSearchService;
 import com.genius.gitget.challenge.instance.service.InstanceService;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.util.file.FileTestUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,9 +43,11 @@ public class InstanceSearchRepositoryTest {
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    InstanceSearchService instanceSearchService;
+    ChallengeSearchService challengeSearchService;
     @Autowired
     InstanceService instanceService;
+    @Autowired
+    InstanceFacade instanceFacade;
 
     @Autowired
     FileTestUtil fileTestUtil;
@@ -94,13 +98,32 @@ public class InstanceSearchRepositoryTest {
 
         Topic savedTopic = topicRepository.save(topic);
 
-        createInstance(savedTopic, instanceA, instanceA.getTitle());
-        createInstance(savedTopic, instanceA, instanceA.getTitle());
-        createInstance(savedTopic, instanceA, instanceA.getTitle());
-        createInstance(savedTopic, instanceB, instanceB.getTitle());
-        createInstance(savedTopic, instanceB, instanceB.getTitle());
-        createInstance(savedTopic, instanceB, "2일 3알고리즘");
-        createInstance(savedTopic, instanceC, instanceC.getTitle());
+        instanceFacade.createInstance(createInstance(savedTopic, instanceA, instanceA.getTitle()),
+                instanceA.getStartedDate().minusDays(3).toLocalDate());
+        instanceFacade.createInstance(createInstance(savedTopic, instanceB, instanceB.getTitle()),
+                instanceA.getStartedDate().minusDays(3).toLocalDate());
+        instanceFacade.createInstance(createInstance(savedTopic, instanceB, instanceB.getTitle()),
+                instanceA.getStartedDate().minusDays(3).toLocalDate());
+        instanceFacade.createInstance(createInstance(savedTopic, instanceA, instanceA.getTitle()),
+                instanceA.getStartedDate().minusDays(3).toLocalDate());
+        instanceFacade.createInstance(createInstance(savedTopic, instanceB, "2일 3알고리즘"),
+                instanceA.getStartedDate().minusDays(3).toLocalDate());
+        instanceFacade.createInstance(createInstance(savedTopic, instanceC, instanceC.getTitle()),
+                instanceA.getStartedDate().minusDays(3).toLocalDate());
+
+    }
+
+    @Builder
+    private InstanceCreateRequest createInstance(Topic savedTopic, Instance instance, String title) {
+        return InstanceCreateRequest.builder()
+                .topicId(savedTopic.getId())
+                .title(title)
+                .tags(instance.getTags())
+                .description(instance.getDescription())
+                .notice(instance.getNotice())
+                .pointPerPerson(instance.getPointPerPerson())
+                .startedAt(instance.getStartedDate())
+                .completedAt(instance.getCompletedDate()).build();
     }
 
 
@@ -140,7 +163,7 @@ public class InstanceSearchRepositoryTest {
                 cnt++;
             }
         }
-        Assertions.assertThat(cnt).isEqualTo(7);
+        Assertions.assertThat(cnt).isEqualTo(6);
     }
 
     @Test
@@ -182,18 +205,4 @@ public class InstanceSearchRepositoryTest {
         Assertions.assertThat(cnt).isEqualTo(4);
     }
 
-
-    private void createInstance(Topic savedTopic, Instance instance, String title) {
-        instanceService.createInstance(
-                InstanceCreateRequest.builder()
-                        .topicId(savedTopic.getId())
-                        .title(title)
-                        .tags(instance.getTags())
-                        .description(instance.getDescription())
-                        .notice(instance.getNotice())
-                        .pointPerPerson(instance.getPointPerPerson())
-                        .startedAt(instance.getStartedDate())
-                        .completedAt(instance.getCompletedDate()).build(),
-                instance.getStartedDate().minusDays(3).toLocalDate());
-    }
 }

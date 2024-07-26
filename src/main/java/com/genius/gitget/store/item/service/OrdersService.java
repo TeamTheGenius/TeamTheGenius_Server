@@ -76,6 +76,13 @@ public class OrdersService {
         return usingFrames.get(0).getItem();
     }
 
+    public void useItem(Orders orders) {
+        orders.useItem();
+        if (!orders.hasItem()) {
+            delete(orders);
+        }
+    }
+
     public int countNumOfItem(User user, Long itemId) {
         Optional<Orders> optionalUserItem = ordersRepository.findByOrderInfo(user.getId(), itemId);
         return optionalUserItem.map(Orders::getCount)

@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class ItemController {
+public class StoreController {
     private final StoreFacade storeFacade;
     private final ItemService itemService;
 

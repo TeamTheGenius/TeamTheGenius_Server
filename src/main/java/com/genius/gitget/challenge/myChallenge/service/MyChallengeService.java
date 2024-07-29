@@ -71,7 +71,7 @@ public class MyChallengeService {
 
     public List<DoneResponse> getDoneInstances(User user, LocalDate targetDate) {
         List<DoneResponse> done = new ArrayList<>();
-        List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.DONE);
+        List<Participant> participants = participantProvider.findDoneInstances(user.getId());
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();

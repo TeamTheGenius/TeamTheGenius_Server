@@ -17,9 +17,10 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
     Optional<Participant> findByJoinInfo(@Param("userId") Long userId,
                                          @Param("instanceId") Long instanceId);
 
-    @Query("select p from Participant p where p.user.id = :userId and p.instance.progress = :progress and p.joinStatus = 'YES'")
-    List<Participant> findAllJoinedByProgress(@Param("userId") Long userId,
-                                              @Param("progress") Progress progress);
+    @Query("select p from Participant p where p.user.id = :userId and p.instance.progress = :progress and p.joinStatus = :joinStatus")
+    List<Participant> findAllByStatus(@Param("userId") Long userId,
+                                      @Param("progress") Progress progress,
+                                      @Param("joinStatus") JoinStatus joinStatus);
 
     @Query("select p from Participant p where p.instance.id = :instanceId and p.joinStatus = :joinStatus")
     Slice<Participant> findAllByInstanceId(@Param("instanceId") Long instanceId,

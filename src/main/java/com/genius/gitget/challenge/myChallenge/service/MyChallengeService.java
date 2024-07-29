@@ -76,20 +76,20 @@ public class MyChallengeService {
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+            double achievementRate = getAchievementRate(instance, participant.getId(), targetDate);
 
             // 포인트를 아직 수령하지 않았을 때
             if (participant.getRewardStatus() == NO) {
                 Item item = itemProvider.findAllByCategory(POINT_MULTIPLIER).get(0);
                 int numOfPassItem = ordersProvider.countNumOfItem(user, item.getId());
                 DoneResponse doneResponse = DoneResponse.createNotRewarded(
-                        instance, participant, numOfPassItem, fileResponse);
+                        instance, participant, numOfPassItem, achievementRate, fileResponse);
                 doneResponse.setItemId(item.getId());
                 done.add(doneResponse);
                 continue;
             }
 
             // 포인트를 수령했을 때
-            double achievementRate = getAchievementRate(instance, participant.getId(), targetDate);
             DoneResponse doneResponse = DoneResponse.createRewarded(
                     instance, participant, achievementRate, fileResponse);
             done.add(doneResponse);

@@ -8,6 +8,7 @@ import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +62,19 @@ public class ParticipantProvider {
     }
 
     public List<Participant> findJoinedByProgress(Long userId, Progress progress) {
-        return participantRepository.findAllJoinedByProgress(userId, progress);
+        return participantRepository.findAllByStatus(userId, progress, JoinStatus.YES);
+    }
+
+    public List<Participant> findDoneInstances(Long userId) {
+        List<Participant> doneInstances = new ArrayList<>();
+        // 실패한 챌린지 리스트
+        doneInstances.addAll(participantRepository.findAllByStatus(userId, Progress.ACTIVITY, JoinStatus.NO));
+        doneInstances.addAll(participantRepository.findAllByStatus(userId, Progress.DONE, JoinStatus.NO));
+
+        // 성공한 챌린지 리스트
+        doneInstances.addAll(participantRepository.findAllByStatus(userId, Progress.DONE, JoinStatus.YES));
+
+        return doneInstances;
     }
 
     public boolean hasJoinedParticipant(Long userId, Long instanceId) {

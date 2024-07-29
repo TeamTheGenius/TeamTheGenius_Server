@@ -1,11 +1,7 @@
 package com.genius.gitget.store.item.facade;
 
-import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
-
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
-import com.genius.gitget.challenge.certification.service.CertificationProvider;
 import com.genius.gitget.challenge.certification.service.CertificationService;
-import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
@@ -41,11 +37,9 @@ public class StoreFacadeService implements StoreFacade {
 
     private final UserService userService;
 
-    //TODO: Facade 패턴 적용 시 CertificationService로 통일하기
     private final CertificationService certificationService;
-    private final CertificationProvider certificationProvider;
 
-    //TODO: MyChallengeService 말고 책임이 분명한 Service를 만들어서 적용하기
+    //TODO: 책임이 분명한 Service를 만들어서 적용하기(MyChallenge 진행 시)
     private final MyChallengeService myChallengeService;
 
     private final PaymentRepository paymentRepository;
@@ -132,49 +126,27 @@ public class StoreFacadeService implements StoreFacade {
         }
     }
 
-    /**
-     * 1. participant를 찾아서 해당 일자에 인증 여부 확인
-     * 2. 인증이 가능한 조건이고 & 아직 인증 시도를 하지 않았거나, 인증이 안된 상태라면
-     * 3. pass로 등록 (CertificationService로 처리되지  않을까)
-     * 4. 적절한 응답 반환
-     */
     @Override
     public OrderResponse usePasserItem(Orders orders, Long instanceId, LocalDate currentDate) {
         Long userId = orders.getUser().getId();
         Long itemId = orders.getItem().getId();
         ActivatedResponse activatedResponse = certificationService.passCertification(
                 userId,
-                new CertificationRequest(instanceId, currentDate));
+                CertificationRequest.of(instanceId, currentDate));
         activatedResponse.setItemId(itemId);
         ordersService.useItem(orders);
         return activatedResponse;
     }
 
-    /**
-     * 일반 포인트 수령과 다른 부분: user의 포인트 업데이트 2배
-     * 0. 수령받을 수 있는 조건인지 확인 -> 성공인지, 아직 보상을 안받았는지
-     * 1. Participant를 찾은 후, 포인트 수령 처리
-     * 2. instance에서 보상 포인트 확인
-     * 3. user의 포인트 업데이트
-     */
     @Override
     public OrderResponse useMultiplierItem(Orders orders, Long instanceId, LocalDate currentDate) {
         User user = orders.getUser();
         DoneResponse doneResponse = myChallengeService.getRewards(
-                new RewardRequest(user, instanceId, currentDate), true
+                RewardRequest.of(user, instanceId, currentDate), true
         );
         doneResponse.setItemId(orders.getItem().getId());
         ordersService.useItem(orders);
         return doneResponse;
-    }
-
-    private double getAchievementRate(Instance instance, Long participantId, LocalDate targetDate) {
-        int totalAttempt = instance.getTotalAttempt();
-        int successCount = certificationProvider.countByStatus(participantId, CERTIFICATED,
-                targetDate);
-
-        double successPercent = (double) successCount / (double) totalAttempt * 100;
-        return Math.round(successPercent * 100 / 100.0);
     }
 
     @Override

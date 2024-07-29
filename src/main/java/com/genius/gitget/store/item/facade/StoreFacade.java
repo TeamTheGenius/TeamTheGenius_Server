@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface StoreFacade {
+
     List<ItemResponse> getItemsByCategory(User user, ItemCategory itemCategory);
 
     ItemResponse orderItem(User user, Long itemId);

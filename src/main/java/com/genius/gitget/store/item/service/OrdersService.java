@@ -44,7 +44,7 @@ public class OrdersService {
 
     public Orders findOrSave(User user, Item item) {
         return ordersRepository.findByOrderInfo(user.getId(), item.getId())
-                .orElseGet(() -> ordersRepository.save(Orders.create(user, item)));
+                .orElseGet(() -> ordersRepository.save(Orders.of(user, item)));
     }
 
     public List<Orders> findAllUsingFrames(Long userId) {

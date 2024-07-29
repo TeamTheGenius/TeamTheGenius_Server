@@ -44,12 +44,13 @@ public class Orders {
         this.equipStatus = equipStatus;
     }
 
-    public static Orders create(User user, Item item) {
+    public static Orders of(User user, Item item) {
         Orders orders;
         if (item.getItemCategory() == ItemCategory.PROFILE_FRAME) {
             orders = new Orders(0, EquipStatus.AVAILABLE);
+        } else {
+            orders = new Orders(0, EquipStatus.UNAVAILABLE);
         }
-        orders = new Orders(0, EquipStatus.UNAVAILABLE);
         orders.setUserAndItem(user, item);
         return orders;
     }

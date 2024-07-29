@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ChallengeRecommendationService {
+public class InstanceRecommendationService {
     private final InstanceRepository instanceRepository;
 
     public List<Instance> getRecommendations(User user) {

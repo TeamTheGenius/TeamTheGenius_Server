@@ -5,8 +5,8 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.service.ChallengeRecommendationService;
-import com.genius.gitget.challenge.instance.service.ChallengeSearchService;
+import com.genius.gitget.challenge.instance.service.InstanceRecommendationService;
+import com.genius.gitget.challenge.instance.service.InstanceSearchService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
@@ -27,14 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class InstanceHomeFacadeService implements InstanceHomeFacade {
 
-    private final ChallengeRecommendationService challengeRecommendationService;
-    private final ChallengeSearchService challengeSearchService;
+    private final InstanceRecommendationService instanceRecommendationService;
+    private final InstanceSearchService instanceSearchService;
     private final FilesService filesService;
 
     @Override
     public Page<InstanceSearchResponse> searchInstancesByKeywordAndProgress(InstanceSearchRequest instanceSearchRequest,
                                                                             Pageable pageable) {
-        Page<Instance> searchedInstances = challengeSearchService.searchInstances(instanceSearchRequest.keyword(),
+        Page<Instance> searchedInstances = instanceSearchService.searchInstances(instanceSearchRequest.keyword(),
                 instanceSearchRequest.progress(), pageable);
 
         return searchedInstances.map(this::convertToSearchResponse);
@@ -42,14 +42,14 @@ public class InstanceHomeFacadeService implements InstanceHomeFacade {
 
     @Override
     public Slice<HomeInstanceResponse> recommendInstances(User user, Pageable pageable) {
-        List<Instance> instanceList = challengeRecommendationService.getRecommendations(user);
+        List<Instance> instanceList = instanceRecommendationService.getRecommendations(user);
         List<HomeInstanceResponse> recommendations = convertToHomeInstanceResponseList(instanceList);
         return createPageFromList(recommendations, pageable);
     }
 
     @Override
     public Slice<HomeInstanceResponse> findInstancesByCondition(Pageable pageable) {
-        Slice<Instance> instancesByCondition = challengeRecommendationService.getInstancesByCondition(pageable);
+        Slice<Instance> instancesByCondition = instanceRecommendationService.getInstancesByCondition(pageable);
         return instancesByCondition.map(this::mapToHomeInstanceResponse);
     }
 

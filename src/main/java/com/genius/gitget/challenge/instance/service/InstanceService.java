@@ -31,7 +31,7 @@ public class InstanceService {
     private final FilesService filesService;
 
     @NotNull
-    private static String getUuid() {
+    private String getUuid() {
         String uuid = UUID.randomUUID().toString();
         return uuid.replaceAll("-", "").substring(0, 16);
     }

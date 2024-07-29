@@ -7,7 +7,7 @@ import static com.genius.gitget.challenge.instance.domain.Progress.PREACTIVITY;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.instance.facade.InstanceFacade;
-import com.genius.gitget.challenge.instance.service.ChallengeSearchService;
+import com.genius.gitget.challenge.instance.service.InstanceSearchService;
 import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
@@ -43,7 +43,7 @@ public class InstanceSearchRepositoryTest {
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    ChallengeSearchService challengeSearchService;
+    InstanceSearchService instanceSearchService;
     @Autowired
     InstanceService instanceService;
     @Autowired

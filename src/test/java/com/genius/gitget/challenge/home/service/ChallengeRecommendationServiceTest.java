@@ -7,7 +7,7 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.facade.InstanceHomeFacade;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.challenge.instance.service.ChallengeRecommendationService;
+import com.genius.gitget.challenge.instance.service.InstanceRecommendationService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
@@ -28,7 +28,7 @@ class InstanceHomeFacadeTest {
     @Autowired
     InstanceHomeFacade instanceHomeFacade;
     @Autowired
-    ChallengeRecommendationService challengeRecommendationService;
+    InstanceRecommendationService instanceRecommendationService;
     @Autowired
     TopicRepository topicRepository;
     @Autowired

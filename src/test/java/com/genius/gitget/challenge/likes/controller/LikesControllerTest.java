@@ -9,8 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -23,6 +21,8 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.constants.ProviderInfo;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.util.TokenTestUtil;
 import com.genius.gitget.util.WithMockCustomUser;
 import java.time.LocalDateTime;
@@ -41,7 +41,7 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest
 @Transactional
 public class LikesControllerTest {
-    private static Topic savedTopic1, savedTopic2;
+    private static Topic savedTopic1;
     private static Instance savedInstance1, savedInstance2;
 
     MockMvc mockMvc;
@@ -72,7 +72,6 @@ public class LikesControllerTest {
                 .build();
 
         savedTopic1 = getSavedTopic();
-        savedTopic2 = getSavedTopic();
 
         savedInstance1 = getSavedInstance("title1", "FE", 50, 1000);
         savedInstance2 = getSavedInstance("title2", "BE, CS", 50, 1000);

@@ -123,7 +123,7 @@ class StoreFacadeTest {
                 Item item = itemRepository.save(StoreFactory.createItem(itemCategory));
                 user.updatePoints(1000L);
 
-                ItemResponse itemResponse = storeFacade.orderItem(user, item.getId());
+                ItemResponse itemResponse = storeFacade.orderItem(user, item.getIdentifier());
 
                 assertThat(itemResponse.getItemId()).isEqualTo(item.getIdentifier());
                 assertThat(itemResponse.getName()).isEqualTo(item.getName());
@@ -141,7 +141,7 @@ class StoreFacadeTest {
             public void it_throws_NOT_ENOUGH_POINT_exception(ItemCategory itemCategory) {
                 Item item = itemRepository.save(StoreFactory.createItem(itemCategory));
 
-                assertThatThrownBy(() -> storeFacade.orderItem(user, item.getId()))
+                assertThatThrownBy(() -> storeFacade.orderItem(user, item.getIdentifier()))
                         .isInstanceOf(BusinessException.class)
                         .hasMessageContaining(ErrorCode.NOT_ENOUGH_POINT.getMessage());
             }
@@ -169,7 +169,7 @@ class StoreFacadeTest {
                 item = itemRepository.save(StoreFactory.createItem(itemCategory));
                 ordersRepository.save(StoreFactory.createOrders(user, item, itemCategory, 0));
 
-                assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
+                assertThatThrownBy(() -> storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate))
                         .isInstanceOf(BusinessException.class)
                         .hasMessageContaining(ErrorCode.HAS_NO_ITEM.getMessage());
             }
@@ -180,7 +180,7 @@ class StoreFacadeTest {
             public void it_throws_ORDERS_NOT_FOUND_exception(ItemCategory itemCategory) {
                 item = itemRepository.save(StoreFactory.createItem(itemCategory));
 
-                assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
+                assertThatThrownBy(() -> storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate))
                         .isInstanceOf(BusinessException.class)
                         .hasMessageContaining(ErrorCode.ORDERS_NOT_FOUND.getMessage());
             }
@@ -214,7 +214,7 @@ class StoreFacadeTest {
             @DisplayName("인증 정보가 존재하지 않는 경우 아이템을 사용할 수 있다.")
             public void it_returns_200_when_certification_not_exist() {
                 int holding = orders.getCount();
-                storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
+                storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate);
                 assertThat(orders.getCount()).isEqualTo(holding - 1);
             }
 
@@ -225,7 +225,7 @@ class StoreFacadeTest {
                 certificationRepository.save(
                         CertificationFactory.create(CertificateStatus.NOT_YET, currentDate, participant)
                 );
-                storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
+                storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate);
 
                 assertThat(orders.getCount()).isEqualTo(holding - 1);
             }
@@ -237,7 +237,7 @@ class StoreFacadeTest {
                 certificationRepository.save(
                         CertificationFactory.create(certificateStatus, currentDate, participant)
                 );
-                assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
+                assertThatThrownBy(() -> storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate))
                         .isInstanceOf(BusinessException.class)
                         .hasMessageContaining(CAN_NOT_USE_PASS_ITEM.getMessage());
             }
@@ -251,7 +251,7 @@ class StoreFacadeTest {
             public void it_throws_exception_when_instance_not_ACTIVITY() {
                 instance = instanceRepository.save(InstanceFactory.createPreActivity(10));
                 participant = participantRepository.save(ParticipantFactory.createProcessing(user, instance));
-                assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
+                assertThatThrownBy(() -> storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate))
                         .isInstanceOf(BusinessException.class)
                         .hasMessageContaining(ErrorCode.NOT_ACTIVITY_INSTANCE.getMessage());
             }
@@ -262,7 +262,7 @@ class StoreFacadeTest {
                 int holding = orders.getCount();
                 instance = instanceRepository.save(InstanceFactory.createActivity(10));
                 participant = participantRepository.save(ParticipantFactory.createProcessing(user, instance));
-                storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
+                storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate);
 
                 assertThat(orders.getCount()).isEqualTo(holding - 1);
             }
@@ -292,7 +292,7 @@ class StoreFacadeTest {
                 instance = instanceRepository.save(InstanceFactory.createActivity(10));
                 participant = participantRepository.save(ParticipantFactory.createProcessing(user, instance));
 
-                assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
+                assertThatThrownBy(() -> storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate))
                         .isInstanceOf(BusinessException.class)
                         .hasMessageContaining(CAN_NOT_GET_REWARDS.getMessage());
             }
@@ -305,7 +305,7 @@ class StoreFacadeTest {
                 participant = participantRepository.save(
                         ParticipantFactory.createByRewardStatus(user, instance, RewardStatus.NO));
 
-                storeFacade.useItem(user, item.getId(), instance.getId(), currentDate);
+                storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate);
 
                 assertThat(orders.getCount()).isEqualTo(holding - 1);
             }
@@ -325,7 +325,7 @@ class StoreFacadeTest {
             public void it_throws_exception_when_JoinResult_not_SUCCESS(JoinResult joinResult) {
                 participant = participantRepository.save(
                         ParticipantFactory.createByJoinResult(user, instance, joinResult));
-                assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
+                assertThatThrownBy(() -> storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate))
                         .isInstanceOf(BusinessException.class)
                         .hasMessageContaining(CAN_NOT_GET_REWARDS.getMessage());
             }
@@ -336,7 +336,7 @@ class StoreFacadeTest {
                 participant = participantRepository.save(
                         ParticipantFactory.createByRewardStatus(user, instance, RewardStatus.YES)
                 );
-                assertThatThrownBy(() -> storeFacade.useItem(user, item.getId(), instance.getId(), currentDate))
+                assertThatThrownBy(() -> storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate))
                         .isInstanceOf(BusinessException.class)
                         .hasMessageContaining(ALREADY_REWARDED.getMessage());
             }

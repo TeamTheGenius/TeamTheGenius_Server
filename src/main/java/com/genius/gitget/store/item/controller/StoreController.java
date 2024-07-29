@@ -7,13 +7,11 @@ import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
-import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.dto.ItemResponse;
 import com.genius.gitget.store.item.dto.OrderResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
 import com.genius.gitget.store.item.facade.StoreFacade;
-import com.genius.gitget.store.item.service.ItemService;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class StoreController {
     private final StoreFacade storeFacade;
-    private final ItemService itemService;
+//    private final ItemService itemService;
 
     @GetMapping("/items")
     public ResponseEntity<ListResponse<ItemResponse>> getItemList(
@@ -51,8 +49,7 @@ public class StoreController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable int identifier
     ) {
-        Item item = itemService.findByIdentifier(identifier);
-        ItemResponse itemResponse = storeFacade.orderItem(userPrincipal.getUser(), item.getId());
+        ItemResponse itemResponse = storeFacade.orderItem(userPrincipal.getUser(), identifier);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponse)
@@ -65,8 +62,7 @@ public class StoreController {
             @PathVariable int identifier,
             @RequestParam(required = false) Long instanceId
     ) {
-        Item item = itemService.findByIdentifier(identifier);
-        OrderResponse orderResponse = storeFacade.useItem(userPrincipal.getUser(), item.getId(),
+        OrderResponse orderResponse = storeFacade.useItem(userPrincipal.getUser(), identifier,
                 instanceId, DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(

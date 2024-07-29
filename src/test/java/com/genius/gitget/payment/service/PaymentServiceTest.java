@@ -89,7 +89,7 @@ public class PaymentServiceTest {
         getSavedOrder(user, item, itemCategory, 0);
         user.updatePoints(1000L);
 
-        ItemResponse itemResponse = storeFacade.orderItem(user, item.getId());
+        ItemResponse itemResponse = storeFacade.orderItem(user, item.getIdentifier());
         assertThat(itemResponse.getItemCategory()).isEqualTo(itemCategory);
 
         Page<PaymentDetailsResponse> paymentDetails = paymentService.getPaymentDetails(user, PageRequest.of(0, 10));

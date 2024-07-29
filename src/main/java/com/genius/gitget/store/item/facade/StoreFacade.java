@@ -13,9 +13,9 @@ public interface StoreFacade {
 
     List<ItemResponse> getItemsByCategory(User user, ItemCategory itemCategory);
 
-    ItemResponse orderItem(User user, Long itemId);
+    ItemResponse orderItem(User user, int itemIdentifier);
 
-    OrderResponse useItem(User user, Long itemId, Long instanceId, LocalDate currentDate);
+    OrderResponse useItem(User user, int itemIdentifier, Long instanceId, LocalDate currentDate);
 
     OrderResponse useFrameItem(Long userId, Orders orders);
 

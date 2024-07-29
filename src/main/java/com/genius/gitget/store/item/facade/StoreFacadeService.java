@@ -67,9 +67,9 @@ public class StoreFacadeService implements StoreFacade {
     }
 
     @Override
-    public ItemResponse orderItem(User user, Long itemId) {
+    public ItemResponse orderItem(User user, int identifier) {
         User persistUser = userService.findUserById(user.getId());
-        Item item = itemService.findById(itemId);
+        Item item = itemService.findByIdentifier(identifier);
 
         persistUser.hasEnoughPoint(item.getCost());
 
@@ -83,9 +83,9 @@ public class StoreFacadeService implements StoreFacade {
     }
 
     @Override
-    public OrderResponse useItem(User user, Long itemId, Long instanceId, LocalDate currentDate) {
-        Item item = itemService.findById(itemId);
-        Orders orders = ordersService.findByOrderInfo(user.getId(), itemId);
+    public OrderResponse useItem(User user, int identifier, Long instanceId, LocalDate currentDate) {
+        Item item = itemService.findByIdentifier(identifier);
+        Orders orders = ordersService.findByOrderInfo(user.getId(), item.getId());
 
         if (!orders.hasItem()) {
             throw new BusinessException(ErrorCode.HAS_NO_ITEM);

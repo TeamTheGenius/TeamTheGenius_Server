@@ -69,7 +69,6 @@ public class ParticipantProvider {
         List<Participant> doneInstances = new ArrayList<>();
         // 실패한 챌린지 리스트
         doneInstances.addAll(participantRepository.findAllByStatus(userId, Progress.ACTIVITY, JoinStatus.NO));
-        doneInstances.addAll(participantRepository.findAllByStatus(userId, Progress.DONE, JoinStatus.NO));
 
         // 성공한 챌린지 리스트
         doneInstances.addAll(participantRepository.findAllByStatus(userId, Progress.DONE, JoinStatus.YES));

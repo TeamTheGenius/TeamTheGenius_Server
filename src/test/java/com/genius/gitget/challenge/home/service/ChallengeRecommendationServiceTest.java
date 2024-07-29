@@ -2,14 +2,15 @@ package com.genius.gitget.challenge.home.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
+import com.genius.gitget.challenge.instance.facade.InstanceHomeFacade;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.challenge.instance.service.InstanceHomeService;
+import com.genius.gitget.challenge.instance.service.InstanceRecommendationService;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,9 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class InstanceHomeServiceTest {
+class InstanceHomeFacadeTest {
     @Autowired
-    InstanceHomeService instanceHomeService;
+    InstanceHomeFacade instanceHomeFacade;
+    @Autowired
+    InstanceRecommendationService instanceRecommendationService;
     @Autowired
     TopicRepository topicRepository;
     @Autowired
@@ -44,7 +47,8 @@ class InstanceHomeServiceTest {
         User user = User.builder().tags("BE,React").build();
 
         //when
-        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getRecommendations(user, pageRequest);
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.recommendInstances(user,
+                pageRequest);
 
         //then
         assertThat(recommendations.getContent().size()).isEqualTo(4);
@@ -70,7 +74,8 @@ class InstanceHomeServiceTest {
         User user = User.builder().tags("BE").build();
 
         //when
-        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getRecommendations(user, pageRequest);
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.recommendInstances(user,
+                pageRequest);
 
         //then
         assertThat(recommendations.getContent().size()).isEqualTo(2);
@@ -92,7 +97,8 @@ class InstanceHomeServiceTest {
         User user = User.builder().tags("BE").build();
 
         //when
-        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getRecommendations(user, pageRequest);
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.recommendInstances(user,
+                pageRequest);
 
         //then
         assertThat(recommendations.getContent().size()).isEqualTo(3);

@@ -11,7 +11,7 @@ import com.genius.gitget.topic.dto.TopicDetailResponse;
 import com.genius.gitget.topic.dto.TopicIndexResponse;
 import com.genius.gitget.topic.dto.TopicPagingResponse;
 import com.genius.gitget.topic.dto.TopicUpdateRequest;
-import com.genius.gitget.topic.serviceFacade.TopicFacade;
+import com.genius.gitget.topic.facade.TopicFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

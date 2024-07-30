@@ -5,8 +5,7 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
-import com.genius.gitget.challenge.instance.service.InstanceHomeService;
-import com.genius.gitget.challenge.instance.service.InstanceSearchService;
+import com.genius.gitget.challenge.instance.facade.InstanceHomeFacade;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -30,16 +29,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/challenges")
 public class InstanceHomeController {
-    private final InstanceHomeService instanceHomeService;
-    private final InstanceSearchService instanceSearchService;
+    private final InstanceHomeFacade instanceHomeFacade;
 
     @PostMapping("/search")
     public ResponseEntity<PagingResponse<InstanceSearchResponse>> searchInstances(
             @RequestBody InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
 
         Page<InstanceSearchResponse> searchResults
-                = instanceSearchService.searchInstances(instanceSearchRequest.keyword(),
-                instanceSearchRequest.progress(), pageable);
+                = instanceHomeFacade.searchInstancesByKeywordAndProgress(instanceSearchRequest, pageable);
 
         return ResponseEntity.ok().body(
                 new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), searchResults)
@@ -54,7 +51,7 @@ public class InstanceHomeController {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(Direction.DESC, "participantCount"));
 
-        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getRecommendations(
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.recommendInstances(
                 userPrincipal.getUser(), pageRequest);
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), recommendations)
@@ -66,7 +63,8 @@ public class InstanceHomeController {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(Direction.DESC, "participantCount"));
 
-        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getInstancesByCondition(pageRequest);
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.findInstancesByCondition(
+                pageRequest);
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), recommendations)
         );
@@ -77,7 +75,8 @@ public class InstanceHomeController {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
                 Sort.by(Direction.DESC, "startedDate"));
 
-        Slice<HomeInstanceResponse> recommendations = instanceHomeService.getInstancesByCondition(pageRequest);
+        Slice<HomeInstanceResponse> recommendations = instanceHomeFacade.findInstancesByCondition(
+                pageRequest);
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), recommendations)
         );

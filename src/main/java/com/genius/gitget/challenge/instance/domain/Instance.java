@@ -1,15 +1,14 @@
 package com.genius.gitget.challenge.instance.domain;
 
 
-import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.challenge.certification.util.DateUtil;
-import com.genius.gitget.challenge.instance.dto.crud.InstanceCreateRequest;
 import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.FileHolder;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.topic.domain.Topic;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -103,19 +102,6 @@ public class Instance implements FileHolder {
         this.completedDate = completedDate;
     }
 
-    public static Instance createByRequest(InstanceCreateRequest instanceCreateRequest) {
-        return Instance.builder()
-                .title(instanceCreateRequest.title())
-                .tags(instanceCreateRequest.tags())
-                .description(instanceCreateRequest.description())
-                .pointPerPerson(instanceCreateRequest.pointPerPerson())
-                .notice(instanceCreateRequest.notice())
-                .startedDate(instanceCreateRequest.startedAt())
-                .completedDate(instanceCreateRequest.completedAt())
-                .certificationMethod(instanceCreateRequest.certificationMethod())
-                .progress(Progress.PREACTIVITY)
-                .build();
-    }
 
     //== 연관관계 편의 메서드 ==//
     public void setTopic(Topic topic) {

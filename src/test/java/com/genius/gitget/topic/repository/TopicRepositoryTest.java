@@ -1,10 +1,9 @@
-package com.genius.gitget.admin.topic.repository;
+package com.genius.gitget.topic.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.repository.TopicRepository;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;

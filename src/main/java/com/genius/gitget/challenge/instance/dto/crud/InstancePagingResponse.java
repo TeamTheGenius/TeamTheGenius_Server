@@ -13,7 +13,7 @@ public record InstancePagingResponse(
         LocalDateTime startedAt,
         LocalDateTime completedAt,
         FileResponse fileResponse) {
-    public static InstancePagingResponse createByEntity(Instance instance, FileResponse fileResponse) {
+    public static InstancePagingResponse of(Instance instance, FileResponse fileResponse) {
         return InstancePagingResponse.builder()
                 .topicId(instance.getTopic().getId())
                 .instanceId(instance.getId())

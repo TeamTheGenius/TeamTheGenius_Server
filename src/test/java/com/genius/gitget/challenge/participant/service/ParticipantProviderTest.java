@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.participant.service;
 
 import static com.genius.gitget.challenge.instance.domain.Progress.ACTIVITY;
+import static com.genius.gitget.challenge.instance.domain.Progress.DONE;
 import static com.genius.gitget.challenge.instance.domain.Progress.PREACTIVITY;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -88,6 +89,63 @@ class ParticipantProviderTest {
         assertThat(participants.size()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("Participant들 중, ACTIVITY에 해당하는 정보들을 불러올 수 있다.")
+    public void should_return_activity_participants() {
+        //given
+        User user = getSavedUser();
+        Instance instance1 = getSavedInstance(PREACTIVITY);
+        Instance instance2 = getSavedInstance(PREACTIVITY);
+        Instance instance3 = getSavedInstance(ACTIVITY);
+        Participant participant1 = getSavedParticipant(user, instance1);
+        Participant participant2 = getSavedParticipant(user, instance2);
+        Participant participant3 = getSavedParticipant(user, instance3);
+
+        //when
+        List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), ACTIVITY);
+
+        //then
+        assertThat(participants.size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Participants들 중, 진행 중이지만 도중 참가 취소로 인해 실패한 챌린지 리스트를 불러올 수 있다.")
+    public void should_return_quit_instances_when_activity() {
+        //given
+        User user = getSavedUser();
+        Instance instance1 = getSavedInstance(PREACTIVITY);
+        Instance instance2 = getSavedInstance(ACTIVITY);
+        Instance instance3 = getSavedInstance(ACTIVITY);
+        Participant participant3 = getSavedParticipant(user, instance1);
+        Participant participant2 = getSavedParticipant(user, instance2);
+        Participant participant1 = getSavedParticipant(user, instance3, JoinStatus.NO);
+
+        //when
+        List<Participant> participants = participantProvider.findDoneInstances(user.getId());
+
+        //then
+        assertThat(participants.size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("Participants들 중, 성공한 챌린지 리스트들을 불러올 수 있다.")
+    public void should_return_success_instances() {
+        //given
+        User user = getSavedUser();
+        Instance instance1 = getSavedInstance(ACTIVITY);
+        Instance instance2 = getSavedInstance(DONE);
+        Instance instance3 = getSavedInstance(DONE);
+        Participant participant3 = getSavedParticipant(user, instance1);
+        Participant participant2 = getSavedParticipant(user, instance2);
+        Participant participant1 = getSavedParticipant(user, instance3);
+
+        //when
+        List<Participant> participants = participantProvider.findDoneInstances(user.getId());
+
+        //then
+        assertThat(participants.size()).isEqualTo(2);
+    }
+
 
     private User getSavedUser() {
         return userRepository.save(
@@ -113,6 +171,14 @@ class ParticipantProviderTest {
     private Participant getSavedParticipant(User user, Instance instance) {
         Participant participant = Participant.builder()
                 .joinStatus(JoinStatus.YES)
+                .build();
+        participant.setUserAndInstance(user, instance);
+        return participantRepository.save(participant);
+    }
+
+    private Participant getSavedParticipant(User user, Instance instance, JoinStatus joinStatus) {
+        Participant participant = Participant.builder()
+                .joinStatus(joinStatus)
                 .build();
         participant.setUserAndInstance(user, instance);
         return participantRepository.save(participant);

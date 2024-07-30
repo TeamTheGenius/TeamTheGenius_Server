@@ -709,7 +709,7 @@ class CertificationServiceTest {
         Item item = itemRepository.save(Item.builder()
                 .itemCategory(itemCategory)
                 .build());
-        Orders orders = Orders.createDefault(count, itemCategory);
+        Orders orders = Orders.of(count, itemCategory);
         orders.setItem(item);
         orders.setUser(user);
         return ordersRepository.save(orders);

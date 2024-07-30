@@ -16,7 +16,7 @@ import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.store.item.domain.Item;
-import com.genius.gitget.store.item.service.OrdersProvider;
+import com.genius.gitget.store.item.service.OrdersService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final OrdersProvider ordersProvider;
+    private final OrdersService ordersService;
     private final FilesService filesService;
     private final EncryptUtil encryptUtil;
 
@@ -98,12 +98,12 @@ public class UserService {
     public AuthResponse getUserAuthInfo(String identifier) {
         User user = userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
-        Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
+        Item usingFrame = ordersService.getUsingFrameItem(user.getId());
         return new AuthResponse(user.getRole(), usingFrame.getId());
     }
 
     public UserProfileInfo getUserProfileInfo(User user) {
-        Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
+        Long frameId = ordersService.getUsingFrameItem(user.getId()).getId();
         FileResponse fileResponse = filesService.convertToFileResponse(user.getFiles());
 
         return UserProfileInfo.createByEntity(user, frameId, fileResponse);

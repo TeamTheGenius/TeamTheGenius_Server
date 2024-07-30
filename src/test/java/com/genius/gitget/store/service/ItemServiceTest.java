@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.item.service;
+package com.genius.gitget.store.service;
 
 import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PASSER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,7 +9,7 @@ import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.repository.ItemRepository;
-import com.genius.gitget.store.item.service.ItemProvider;
+import com.genius.gitget.store.item.service.ItemService;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -24,11 +24,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class ItemProviderTest {
+class ItemServiceTest {
     @Autowired
     ItemRepository itemRepository;
     @Autowired
-    ItemProvider itemProvider;
+    ItemService itemService;
 
     @ParameterizedTest
     @DisplayName("DB에 저장되어 있는 아이템을 카테고리 별로 받아올 수 있다.")
@@ -38,7 +38,7 @@ class ItemProviderTest {
         Item item = getSavedItem(10, itemCategory);
 
         //when
-        List<Item> items = itemProvider.findAllByCategory(itemCategory);
+        List<Item> items = itemService.findAllByCategory(itemCategory);
 
         //then
         assertThat(items.size()).isEqualTo(2);
@@ -53,7 +53,7 @@ class ItemProviderTest {
         Item item = getSavedItem(10, CERTIFICATION_PASSER);
 
         //when
-        Item foundItem = itemProvider.findById(item.getId());
+        Item foundItem = itemService.findById(item.getId());
 
         //then
         assertThat(item.getId()).isEqualTo(foundItem.getId());
@@ -64,7 +64,7 @@ class ItemProviderTest {
     @Test
     @DisplayName("PK를 통해 아이템을 조회하려고 했을 때, 존재하지 않으면 예외를 발생시켜야 한다.")
     public void should_throwException_when_pkNotExist() {
-        assertThatThrownBy(() -> itemProvider.findById(0L))
+        assertThatThrownBy(() -> itemService.findById(0L))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.ITEM_NOT_FOUND.getMessage());
     }
@@ -77,7 +77,7 @@ class ItemProviderTest {
         Item item = getSavedItem(identifier, CERTIFICATION_PASSER);
 
         //when
-        Item byIdentifier = itemProvider.findByIdentifier(identifier);
+        Item byIdentifier = itemService.findByIdentifier(identifier);
 
         //then
         assertThat(item.getId()).isEqualTo(byIdentifier.getId());

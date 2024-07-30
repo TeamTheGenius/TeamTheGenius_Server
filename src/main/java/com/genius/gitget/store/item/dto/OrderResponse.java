@@ -5,13 +5,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ItemUseResponse {
+public class OrderResponse {
     Long itemId;
 
-    public ItemUseResponse() {
+    public OrderResponse() {
     }
 
-    public ItemUseResponse(Long itemId) {
+    public OrderResponse(Long itemId) {
         this.itemId = itemId;
     }
 }

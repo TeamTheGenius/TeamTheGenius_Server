@@ -2,7 +2,7 @@ package com.genius.gitget.global.security.controller;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
-import com.genius.gitget.util.TokenTestUtil;
+import com.genius.gitget.util.security.TokenTestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;

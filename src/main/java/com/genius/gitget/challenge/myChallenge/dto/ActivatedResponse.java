@@ -3,14 +3,14 @@ package com.genius.gitget.challenge.myChallenge.dto;
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.OrderResponse;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ActivatedResponse extends ItemUseResponse {
+public class ActivatedResponse extends OrderResponse {
     private Long instanceId;
     private String title;
     private int pointPerPerson;

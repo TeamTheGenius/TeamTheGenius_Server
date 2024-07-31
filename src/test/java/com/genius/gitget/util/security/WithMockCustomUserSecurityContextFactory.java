@@ -1,4 +1,4 @@
-package com.genius.gitget.util;
+package com.genius.gitget.util.security;
 
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;

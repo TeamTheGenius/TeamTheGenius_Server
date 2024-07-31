@@ -8,15 +8,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.global.file.service.FilesService;
-import com.genius.gitget.util.TokenTestUtil;
-import com.genius.gitget.util.WithMockCustomUser;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
+import com.genius.gitget.util.security.TokenTestUtil;
+import com.genius.gitget.util.security.WithMockCustomUser;
 import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

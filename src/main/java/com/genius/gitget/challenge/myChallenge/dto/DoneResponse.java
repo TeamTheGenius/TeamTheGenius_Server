@@ -5,14 +5,14 @@ import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.domain.RewardStatus;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.OrderResponse;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class DoneResponse extends ItemUseResponse {
+public class DoneResponse extends OrderResponse {
     private Long instanceId;
     private String title;
     private int pointPerPerson;

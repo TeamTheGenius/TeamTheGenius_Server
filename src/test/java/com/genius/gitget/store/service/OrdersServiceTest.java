@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.item.service;
+package com.genius.gitget.store.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,7 +15,7 @@ import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.repository.ItemRepository;
 import com.genius.gitget.store.item.repository.OrdersRepository;
-import com.genius.gitget.store.item.service.OrdersProvider;
+import com.genius.gitget.store.item.service.OrdersService;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class OrdersProviderTest {
+class OrdersServiceTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -35,7 +35,7 @@ class OrdersProviderTest {
     @Autowired
     private OrdersRepository ordersRepository;
     @Autowired
-    private OrdersProvider ordersProvider;
+    private OrdersService ordersService;
 
     @Test
     @DisplayName("사용자가 특정 아이템을 보유하고 있을 때, 보유하고 있는 아이템의 개수를 반환받을 수 있다.")
@@ -46,7 +46,7 @@ class OrdersProviderTest {
         getSavedOrder(user, item, 1);
 
         //when
-        int numOfItem = ordersProvider.countNumOfItem(user, item.getId());
+        int numOfItem = ordersService.countNumOfItem(user, item.getId());
 
         //then
         assertThat(numOfItem).isEqualTo(1);
@@ -60,7 +60,7 @@ class OrdersProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when
-        int numOfItem = ordersProvider.countNumOfItem(user, item.getId());
+        int numOfItem = ordersService.countNumOfItem(user, item.getId());
 
         //then
         assertThat(numOfItem).isEqualTo(0);
@@ -75,7 +75,7 @@ class OrdersProviderTest {
         Orders orders = getSavedOrder(user, item, 1);
 
         //when
-        Optional<Orders> optionalOrders = ordersProvider.findOptionalByOrderInfo(user.getId(), item.getId());
+        Optional<Orders> optionalOrders = ordersService.findOptionalByOrderInfo(user.getId(), item.getId());
 
         //then
         assertThat(optionalOrders).isPresent();
@@ -90,7 +90,7 @@ class OrdersProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when
-        Optional<Orders> optionalOrders = ordersProvider.findOptionalByOrderInfo(user.getId(), item.getId());
+        Optional<Orders> optionalOrders = ordersService.findOptionalByOrderInfo(user.getId(), item.getId());
 
         //then
         assertThat(optionalOrders).isNotPresent();
@@ -105,7 +105,7 @@ class OrdersProviderTest {
         getSavedOrder(user, item, 1);
 
         //when
-        EquipStatus equipStatus = ordersProvider.getEquipStatus(user.getId(), item.getId());
+        EquipStatus equipStatus = ordersService.getEquipStatus(user.getId(), item.getId());
 
         //then
         assertThat(equipStatus).isEqualTo(EquipStatus.AVAILABLE);
@@ -119,7 +119,7 @@ class OrdersProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when
-        EquipStatus equipStatus = ordersProvider.getEquipStatus(user.getId(), item.getId());
+        EquipStatus equipStatus = ordersService.getEquipStatus(user.getId(), item.getId());
 
         //then
         assertThat(equipStatus).isEqualTo(EquipStatus.UNAVAILABLE);
@@ -134,7 +134,7 @@ class OrdersProviderTest {
         Orders orders = getSavedOrder(user, item, 1);
 
         //when
-        Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
+        Item usingFrame = ordersService.getUsingFrameItem(user.getId());
 
         //then
         assertThat(item.getItemCategory()).isEqualTo(usingFrame.getItemCategory());
@@ -153,7 +153,7 @@ class OrdersProviderTest {
         orders2.updateEquipStatus(EquipStatus.IN_USE);
 
         //when & then
-        assertThatThrownBy(() -> ordersProvider.getUsingFrameItem(user.getId()))
+        assertThatThrownBy(() -> ordersService.getUsingFrameItem(user.getId()))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.TOO_MANY_USING_FRAME.getMessage());
     }
@@ -166,7 +166,7 @@ class OrdersProviderTest {
         Item item = getSavedItem(ItemCategory.PROFILE_FRAME);
 
         //when
-        Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
+        Item usingFrame = ordersService.getUsingFrameItem(user.getId());
 
         //then
         assertThat(usingFrame.getId()).isNull();
@@ -195,7 +195,7 @@ class OrdersProviderTest {
     }
 
     private Orders getSavedOrder(User user, Item item, int count) {
-        Orders orders = Orders.createDefault(count, item.getItemCategory());
+        Orders orders = Orders.of(count, item.getItemCategory());
         orders.setUser(user);
         orders.setItem(item);
         return ordersRepository.save(orders);

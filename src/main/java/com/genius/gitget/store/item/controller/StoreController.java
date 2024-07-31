@@ -7,13 +7,11 @@ import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
-import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.dto.ItemResponse;
-import com.genius.gitget.store.item.dto.ItemUseResponse;
+import com.genius.gitget.store.item.dto.OrderResponse;
 import com.genius.gitget.store.item.dto.ProfileResponse;
-import com.genius.gitget.store.item.service.ItemProvider;
-import com.genius.gitget.store.item.service.ItemService;
+import com.genius.gitget.store.item.facade.StoreFacade;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,22 +27,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class ItemController {
-    private final ItemService itemService;
-    private final ItemProvider itemProvider;
+public class StoreController {
+    private final StoreFacade storeFacade;
+//    private final ItemService itemService;
 
     @GetMapping("/items")
     public ResponseEntity<ListResponse<ItemResponse>> getItemList(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam String category
     ) {
-        List<ItemResponse> itemResponses;
-        if (category.trim().equalsIgnoreCase("all")) {
-            itemResponses = itemService.getAllItems(userPrincipal.getUser());
-        } else {
-            ItemCategory itemCategory = ItemCategory.findCategory(category);
-            itemResponses = itemService.getItemsByCategory(userPrincipal.getUser(), itemCategory);
-        }
+        ItemCategory itemCategory = ItemCategory.findCategory(category);
+        List<ItemResponse> itemResponses = storeFacade.getItemsByCategory(userPrincipal.getUser(), itemCategory);
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponses)
@@ -56,8 +49,7 @@ public class ItemController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable int identifier
     ) {
-        Item item = itemProvider.findByIdentifier(identifier);
-        ItemResponse itemResponse = itemService.orderItem(userPrincipal.getUser(), item.getId());
+        ItemResponse itemResponse = storeFacade.orderItem(userPrincipal.getUser(), identifier);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponse)
@@ -70,12 +62,11 @@ public class ItemController {
             @PathVariable int identifier,
             @RequestParam(required = false) Long instanceId
     ) {
-        Item item = itemProvider.findByIdentifier(identifier);
-        ItemUseResponse itemUseResponse = itemService.useItem(userPrincipal.getUser(), item.getId(),
+        OrderResponse orderResponse = storeFacade.useItem(userPrincipal.getUser(), identifier,
                 instanceId, DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemUseResponse)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), orderResponse)
         );
     }
 
@@ -83,7 +74,7 @@ public class ItemController {
     public ResponseEntity<ListResponse<ProfileResponse>> unmountItem(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<ProfileResponse> profileResponses = itemService.unmountFrame(userPrincipal.getUser());
+        List<ProfileResponse> profileResponses = storeFacade.unmountFrame(userPrincipal.getUser());
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), profileResponses)

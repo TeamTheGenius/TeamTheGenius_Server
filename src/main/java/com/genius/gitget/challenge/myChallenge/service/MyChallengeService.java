@@ -26,8 +26,8 @@ import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.item.domain.Item;
-import com.genius.gitget.store.item.service.ItemProvider;
-import com.genius.gitget.store.item.service.OrdersProvider;
+import com.genius.gitget.store.item.service.ItemService;
+import com.genius.gitget.store.item.service.OrdersService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,8 +43,8 @@ public class MyChallengeService {
     private final FilesService filesService;
     private final ParticipantProvider participantProvider;
     private final CertificationProvider certificationProvider;
-    private final ItemProvider itemProvider;
-    private final OrdersProvider ordersProvider;
+    private final ItemService itemService;
+    private final OrdersService ordersService;
 
 
     public List<PreActivityResponse> getPreActivityInstances(User user, LocalDate targetDate) {
@@ -79,8 +79,8 @@ public class MyChallengeService {
 
             // 포인트를 아직 수령하지 않았을 때
             if (participant.getRewardStatus() == NO) {
-                Item item = itemProvider.findAllByCategory(POINT_MULTIPLIER).get(0);
-                int numOfPassItem = ordersProvider.countNumOfItem(user, item.getId());
+                Item item = itemService.findAllByCategory(POINT_MULTIPLIER).get(0);
+                int numOfPassItem = ordersService.countNumOfItem(user, item.getId());
                 DoneResponse doneResponse = DoneResponse.createNotRewarded(
                         instance, participant, numOfPassItem, fileResponse);
                 doneResponse.setItemId(item.getId());
@@ -118,8 +118,8 @@ public class MyChallengeService {
                     .orElse(getDummyCertification());
 
             //TODO: 로직 수정 필요
-            Item item = itemProvider.findAllByCategory(CERTIFICATION_PASSER).get(0);
-            int numOfPassItem = ordersProvider.countNumOfItem(user, item.getId());
+            Item item = itemService.findAllByCategory(CERTIFICATION_PASSER).get(0);
+            int numOfPassItem = ordersService.countNumOfItem(user, item.getId());
 
             ActivatedResponse activatedResponse = ActivatedResponse.create(
                     instance, certification.getCertificationStatus(),

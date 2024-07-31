@@ -8,4 +8,8 @@ public record RewardRequest(
         Long instanceId,
         LocalDate targetDate
 ) {
+
+    public static RewardRequest of(User user, Long instanceId, LocalDate targetDate) {
+        return new RewardRequest(user, instanceId, targetDate);
+    }
 }

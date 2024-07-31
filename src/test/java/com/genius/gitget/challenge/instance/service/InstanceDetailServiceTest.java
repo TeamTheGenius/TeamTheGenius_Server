@@ -15,7 +15,7 @@ import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.likes.dto.UserLikesAddResponse;
-import com.genius.gitget.challenge.likes.service.LikesService;
+import com.genius.gitget.challenge.likes.facade.LikesFacade;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -45,7 +45,7 @@ class InstanceDetailServiceTest {
     @Autowired
     InstanceDetailService instanceDetailService;
     @Autowired
-    LikesService likesService;
+    LikesFacade likesFacade;
     @Autowired
     ParticipantProvider participantProvider;
     @Autowired
@@ -321,7 +321,7 @@ class InstanceDetailServiceTest {
         Instance savedInstance = getSavedInstance(Progress.PREACTIVITY, LocalDate.now().plusDays(2));
 
         //when
-        UserLikesAddResponse userLikesAddResponse = likesService.addLikes(savedUser, savedUser.getIdentifier(),
+        UserLikesAddResponse userLikesAddResponse = likesFacade.addLikes(savedUser, savedUser.getIdentifier(),
                 savedInstance.getId());
         InstanceResponse instanceResponse = instanceDetailService.getInstanceDetailInformation(savedUser,
                 savedInstance.getId());

@@ -44,7 +44,7 @@ public class Likes {
 
     @CreatedDate
     @Column(name = "liked_at")
-    private LocalDateTime likedAt; // 찜하기 누른 시각
+    private LocalDateTime likedAt;
 
     @Builder
     public Likes(User user, Instance instance) {

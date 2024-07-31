@@ -5,7 +5,7 @@ import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
-import com.genius.gitget.challenge.myChallenge.service.MyChallengeService;
+import com.genius.gitget.challenge.myChallenge.facade.MyChallengeFacadeService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -40,7 +40,7 @@ public class StoreFacadeService implements StoreFacade {
     private final CertificationService certificationService;
 
     //TODO: 책임이 분명한 Service를 만들어서 적용하기(MyChallenge 진행 시)
-    private final MyChallengeService myChallengeService;
+    private final MyChallengeFacadeService myChallengeFacadeService;
 
     private final PaymentRepository paymentRepository;
 
@@ -142,7 +142,7 @@ public class StoreFacadeService implements StoreFacade {
     @Override
     public OrderResponse useMultiplierItem(Orders orders, Long instanceId, LocalDate currentDate) {
         User user = orders.getUser();
-        DoneResponse doneResponse = myChallengeService.getRewards(
+        DoneResponse doneResponse = myChallengeFacadeService.getRewards(
                 RewardRequest.of(user, instanceId, currentDate), true
         );
         doneResponse.setItemId(orders.getItem().getId());

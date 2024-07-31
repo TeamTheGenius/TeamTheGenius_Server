@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.myChallenge.service;
+package com.genius.gitget.challenge.myChallenge.facade;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
@@ -38,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class MyChallengeService {
+public class MyChallengeFacadeService implements MyChallengeFacade {
     private final UserService userService;
     private final FilesService filesService;
     private final ParticipantProvider participantProvider;
@@ -47,6 +47,7 @@ public class MyChallengeService {
     private final OrdersService ordersService;
 
 
+    @Override
     public List<PreActivityResponse> getPreActivityInstances(User user, LocalDate targetDate) {
         List<PreActivityResponse> preActivity = new ArrayList<>();
         List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.PREACTIVITY);
@@ -65,6 +66,7 @@ public class MyChallengeService {
         return preActivity;
     }
 
+    @Override
     public List<DoneResponse> getDoneInstances(User user, LocalDate targetDate) {
         List<DoneResponse> done = new ArrayList<>();
         List<Participant> participants = participantProvider.findDoneInstances(user.getId());
@@ -103,6 +105,7 @@ public class MyChallengeService {
         return Math.round(successPercent * 100 / 100.0);
     }
 
+    @Override
     public List<ActivatedResponse> getActivatedInstances(User user, LocalDate targetDate) {
         List<ActivatedResponse> activated = new ArrayList<>();
         List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.ACTIVITY);

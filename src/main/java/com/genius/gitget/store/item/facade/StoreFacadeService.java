@@ -67,15 +67,16 @@ public class StoreFacadeService implements StoreFacade {
     }
 
     @Override
+    @Transactional
     public ItemResponse orderItem(User user, int identifier) {
         User persistUser = userService.findUserById(user.getId());
         Item item = itemService.findByIdentifier(identifier);
 
         persistUser.hasEnoughPoint(item.getCost());
 
-        paymentRepository.save(Payment.create(user, item));
+        paymentRepository.save(Payment.create(persistUser, item));
 
-        Orders orders = ordersService.findOrSave(user, item);
+        Orders orders = ordersService.findOrSave(persistUser, item);
         int numOfItem = orders.purchase();
         persistUser.updatePoints((long) item.getCost() * -1);
 

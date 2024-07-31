@@ -54,15 +54,11 @@ public class MyChallengeService {
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+            int remainDays = DateUtil.getRemainDaysToStart(participant.getStartedDate(), targetDate);
 
-            PreActivityResponse preActivityResponse = PreActivityResponse.builder()
-                    .instanceId(instance.getId())
-                    .title(instance.getTitle())
-                    .participantCount(instance.getParticipantCount())
-                    .pointPerPerson(instance.getPointPerPerson())
-                    .remainDays(DateUtil.getRemainDaysToStart(participant.getStartedDate(), targetDate))
-                    .fileResponse(fileResponse)
-                    .build();
+            PreActivityResponse preActivityResponse = PreActivityResponse.of(
+                    instance, remainDays, fileResponse
+            );
             preActivity.add(preActivityResponse);
         }
 
@@ -121,7 +117,7 @@ public class MyChallengeService {
             Item item = itemService.findAllByCategory(CERTIFICATION_PASSER).get(0);
             int numOfPassItem = ordersService.countNumOfItem(user, item.getId());
 
-            ActivatedResponse activatedResponse = ActivatedResponse.create(
+            ActivatedResponse activatedResponse = ActivatedResponse.of(
                     instance, certification.getCertificationStatus(),
                     numOfPassItem, participant.getRepositoryName(), fileResponse
             );

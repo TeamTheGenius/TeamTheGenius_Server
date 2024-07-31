@@ -34,8 +34,8 @@ public class ActivatedResponse extends OrderResponse {
         this.fileResponse = fileResponse;
     }
 
-    public static ActivatedResponse create(Instance instance, CertificateStatus certificateStatus,
-                                           int numOfPassItem, String repository, FileResponse fileResponse) {
+    public static ActivatedResponse of(Instance instance, CertificateStatus certificateStatus,
+                                       int numOfPassItem, String repository, FileResponse fileResponse) {
         boolean canUseItem = checkItemCondition(certificateStatus, numOfPassItem);
 
         return ActivatedResponse.builder()

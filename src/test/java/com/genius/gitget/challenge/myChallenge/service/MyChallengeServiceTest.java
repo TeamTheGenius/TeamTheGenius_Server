@@ -1,5 +1,6 @@
 package com.genius.gitget.challenge.myChallenge.service;
 
+import static com.genius.gitget.challenge.participant.domain.JoinResult.FAIL;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.PROCESSING;
 import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -180,6 +181,33 @@ class MyChallengeServiceTest {
         //then
         assertThat(doneResponses.size()).isEqualTo(1);
         assertThat(doneResponses.get(0).isCanGetReward()).isTrue();
+    }
+
+    @Test
+    @DisplayName("챌린지는 종료되었으나 실패한 챌린지에 대해, 정보를 전달해야 한다.")
+    public void should_returnInfo_when_failedChallenge() {
+        //given
+        LocalDate targetDate = LocalDate.of(2024, 2, 14);
+        User user = getSavedUser();
+        Instance instance = getSavedInstance(Progress.DONE);
+        getSavedParticipant(user, instance, FAIL);
+
+        //when
+        List<DoneResponse> doneInstances = myChallengeService.getDoneInstances(user, targetDate);
+        DoneResponse doneResponse = doneInstances.get(0);
+
+        //then
+        assertThat(doneInstances.size()).isEqualTo(1);
+
+        assertThat(doneResponse.getInstanceId()).isEqualTo(instance.getId());
+        assertThat(doneResponse.getTitle()).isEqualTo(instance.getTitle());
+        assertThat(doneResponse.getInstanceId()).isEqualTo(instance.getId());
+        assertThat(doneResponse.getRewardedPoints()).isZero();
+        assertThat(doneResponse.getJoinResult()).isEqualTo(FAIL);
+        assertThat(doneResponse.getFileResponse()).isNotNull();
+        assertThat(doneResponse.isCanGetReward()).isFalse();
+        assertThat(doneResponse.getAchievementRate()).isEqualTo(0.0);
+        assertThat(doneResponse.getNumOfPointItem()).isEqualTo(0);
     }
 
 

@@ -42,6 +42,7 @@ public class OrdersService {
                 .orElseThrow(() -> new BusinessException(ORDERS_NOT_FOUND));
     }
 
+    @Transactional
     public Orders findOrSave(User user, Item item) {
         return ordersRepository.findByOrderInfo(user.getId(), item.getId())
                 .orElseGet(() -> ordersRepository.save(Orders.of(user, item)));
@@ -76,6 +77,7 @@ public class OrdersService {
         return usingFrames.get(0).getItem();
     }
 
+    @Transactional
     public void useItem(Orders orders) {
         orders.useItem();
         if (!orders.hasItem()) {

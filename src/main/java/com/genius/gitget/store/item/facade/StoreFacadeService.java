@@ -146,6 +146,8 @@ public class StoreFacadeService implements StoreFacade {
         User user = orders.getUser();
         Instance instance = instanceService.findInstanceById(instanceId);
         Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
+        
+        participant.validateRewardCondition();
 
         int rewardPoints = instance.getPointPerPerson() * 2;
         user.updatePoints((long) rewardPoints);

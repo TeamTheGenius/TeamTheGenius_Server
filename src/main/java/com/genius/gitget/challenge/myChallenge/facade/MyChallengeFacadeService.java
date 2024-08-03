@@ -116,19 +116,19 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
     @Override
     @Transactional
     public DoneResponse getRewards(RewardRequest rewardRequest) {
-        User user = userService.findUserById(rewardRequest.userId());
-        Participant participant = participantProvider.findByJoinInfo(user.getId(), rewardRequest.instanceId());
+        Participant participant = participantProvider.findByJoinInfo(
+                rewardRequest.userId(), rewardRequest.instanceId()
+        );
         Instance instance = participant.getInstance();
 
         FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
 
         int rewardPoints = instance.getPointPerPerson();
-        participant.validateRewardCondition();
-        user.updatePoints((long) rewardPoints);
-        participant.getRewards(rewardPoints);
-
+        participantProvider.getRewards(participant, rewardPoints);
+        
         double achievementRate = certificationProvider.getAchievementRate(instance, participant.getId(),
                 rewardRequest.targetDate());
+
         return DoneResponse.createRewarded(instance, participant, achievementRate, fileResponse);
     }
 }

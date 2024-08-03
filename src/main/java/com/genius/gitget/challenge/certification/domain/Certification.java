@@ -1,5 +1,6 @@
 package com.genius.gitget.challenge.certification.domain;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
 
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -64,11 +65,11 @@ public class Certification extends BaseTimeEntity {
                 .build();
     }
 
-    public static Certification createDummy() {
+    public static Certification createDummy(LocalDate certificatedAt) {
         return Certification.builder()
                 .currentAttempt(0)
-                .certificationStatus(CertificateStatus.NOT_YET)
-                .certificatedAt(null)
+                .certificationStatus(NOT_YET)
+                .certificatedAt(certificatedAt)
                 .certificationLinks(null)
                 .build();
     }

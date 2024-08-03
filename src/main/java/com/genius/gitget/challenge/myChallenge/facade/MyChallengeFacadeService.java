@@ -51,9 +51,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
             int remainDays = DateUtil.getRemainDaysToStart(participant.getStartedDate(), targetDate);
 
-            PreActivityResponse preActivityResponse = PreActivityResponse.of(
-                    instance, remainDays, fileResponse
-            );
+            PreActivityResponse preActivityResponse = PreActivityResponse.of(instance, remainDays, fileResponse);
             preActivity.add(preActivityResponse);
         }
 
@@ -68,8 +66,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
-            Certification certification = certificationProvider.findByDate(targetDate, participant.getId())
-                    .orElse(Certification.createDummy());
+            Certification certification = certificationProvider.findOrGetDummy(targetDate, participant.getId());
 
             //TODO: 로직 수정 필요
             Item item = itemService.findAllByCategory(CERTIFICATION_PASSER).get(0);

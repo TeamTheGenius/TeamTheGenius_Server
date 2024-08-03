@@ -52,6 +52,12 @@ public class CertificationProvider {
     }
 
     @Transactional
+    public Certification findOrGetDummy(LocalDate targetDate, Long participantId) {
+        return findByDate(targetDate, participantId)
+                .orElse(Certification.createDummy(targetDate));
+    }
+
+    @Transactional
     public Certification createCertification(Participant participant,
                                              LocalDate targetDate,
                                              List<String> pullRequests) {

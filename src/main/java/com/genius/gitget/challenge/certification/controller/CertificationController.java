@@ -14,7 +14,7 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
-import com.genius.gitget.challenge.participant.service.ParticipantProvider;
+import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
@@ -45,7 +45,7 @@ public class CertificationController {
     private final UserService userService;
     private final CertificationService certificationService;
     private final InstanceProvider instanceProvider;
-    private final ParticipantProvider participantProvider;
+    private final ParticipantService participantService;
 
 
     @GetMapping("/{instanceId}")
@@ -92,7 +92,7 @@ public class CertificationController {
             @PathVariable Long instanceId
     ) {
         LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
-        Participant participant = participantProvider.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
+        Participant participant = participantService.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
         WeekResponse weekResponse = certificationService.getMyWeekCertifications(participant.getId(), kstDate);
 
         return ResponseEntity.ok().body(
@@ -123,7 +123,7 @@ public class CertificationController {
     ) {
         LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         User user = userService.findUserById(userId);
-        Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
+        Participant participant = participantService.findByJoinInfo(user.getId(), instanceId);
         TotalResponse totalResponse = certificationService.getTotalCertification(
                 participant.getId(), kstDate);
 
@@ -140,7 +140,7 @@ public class CertificationController {
 
         LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         Instance instance = instanceProvider.findById(instanceId);
-        Participant participant = participantProvider.findByJoinInfo(
+        Participant participant = participantService.findByJoinInfo(
                 userPrincipal.getUser().getId(),
                 instanceId);
 

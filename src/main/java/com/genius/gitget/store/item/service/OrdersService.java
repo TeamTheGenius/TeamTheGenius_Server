@@ -90,4 +90,13 @@ public class OrdersService {
         return optionalUserItem.map(Orders::getCount)
                 .orElse(0);
     }
+
+    public void validateUnmountCondition(Orders orders) {
+        if (orders.getItem().getItemCategory() != ItemCategory.PROFILE_FRAME) {
+            throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
+        }
+        if (orders.getEquipStatus() != EquipStatus.IN_USE) {
+            throw new BusinessException(ErrorCode.IN_USE_FRAME_NOT_FOUND);
+        }
+    }
 }

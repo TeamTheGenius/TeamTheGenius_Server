@@ -7,7 +7,7 @@ import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
-import com.genius.gitget.challenge.participant.service.ParticipantProvider;
+import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
@@ -39,9 +39,9 @@ public class StoreFacadeService implements StoreFacade {
 
     private final UserService userService;
     private final InstanceService instanceService;
-    private final ParticipantProvider participantProvider;
+    private final ParticipantService participantService;
 
-    // TODO: CertificationProvider에만 의존하도록 변경
+    // TODO: CertificationProvider에만 의존하도록 변경(파사드 패턴 적용 시)
     private final CertificationService certificationService;
     private final PaymentRepository paymentRepository;
 
@@ -145,10 +145,10 @@ public class StoreFacadeService implements StoreFacade {
     public OrderResponse useMultiplierItem(Orders orders, Long instanceId, LocalDate currentDate) {
         User user = orders.getUser();
         Instance instance = instanceService.findInstanceById(instanceId);
-        Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
+        Participant participant = participantService.findByJoinInfo(user.getId(), instanceId);
 
         int rewardPoints = instance.getPointPerPerson() * 2;
-        participantProvider.getRewards(participant, rewardPoints);
+        participantService.getRewards(participant, rewardPoints);
         ordersService.useItem(orders);
 
         return DoneResponse.builder()
@@ -162,20 +162,11 @@ public class StoreFacadeService implements StoreFacade {
         List<Orders> frameOrders = ordersService.findAllUsingFrames(user.getId());
 
         for (Orders frameOrder : frameOrders) {
-            validateUnmountCondition(frameOrder);
+            ordersService.validateUnmountCondition(frameOrder);
             frameOrder.updateEquipStatus(EquipStatus.AVAILABLE);
             profileResponses.add(ProfileResponse.createByEntity(frameOrder));
         }
 
         return profileResponses;
-    }
-
-    private void validateUnmountCondition(Orders orders) {
-        if (orders.getItem().getItemCategory() != ItemCategory.PROFILE_FRAME) {
-            throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
-        }
-        if (orders.getEquipStatus() != EquipStatus.IN_USE) {
-            throw new BusinessException(ErrorCode.IN_USE_FRAME_NOT_FOUND);
-        }
     }
 }

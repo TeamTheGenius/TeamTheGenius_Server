@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ParticipantProvider {
+public class ParticipantService {
     private final ParticipantRepository participantRepository;
 
     @Transactional

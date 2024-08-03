@@ -14,7 +14,7 @@ import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
 import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
 import com.genius.gitget.challenge.participant.domain.Participant;
-import com.genius.gitget.challenge.participant.service.ParticipantProvider;
+import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyChallengeFacadeService implements MyChallengeFacade {
     private final FilesService filesService;
     private final UserService userService;
-    private final ParticipantProvider participantProvider;
+    private final ParticipantService participantService;
     private final CertificationProvider certificationProvider;
     private final ItemService itemService;
     private final OrdersService ordersService;
@@ -44,7 +44,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
     @Override
     public List<PreActivityResponse> getPreActivityInstances(User user, LocalDate targetDate) {
         List<PreActivityResponse> preActivity = new ArrayList<>();
-        List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.PREACTIVITY);
+        List<Participant> participants = participantService.findJoinedByProgress(user.getId(), Progress.PREACTIVITY);
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
@@ -61,7 +61,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
     @Override
     public List<ActivatedResponse> getActivatedInstances(User user, LocalDate targetDate) {
         List<ActivatedResponse> activated = new ArrayList<>();
-        List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), Progress.ACTIVITY);
+        List<Participant> participants = participantService.findJoinedByProgress(user.getId(), Progress.ACTIVITY);
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
@@ -85,7 +85,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
     @Override
     public List<DoneResponse> getDoneInstances(User user, LocalDate targetDate) {
         List<DoneResponse> done = new ArrayList<>();
-        List<Participant> participants = participantProvider.findDoneInstances(user.getId());
+        List<Participant> participants = participantService.findDoneInstances(user.getId());
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
@@ -116,7 +116,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
     @Override
     @Transactional
     public DoneResponse getRewards(RewardRequest rewardRequest) {
-        Participant participant = participantProvider.findByJoinInfo(
+        Participant participant = participantService.findByJoinInfo(
                 rewardRequest.userId(), rewardRequest.instanceId()
         );
         Instance instance = participant.getInstance();
@@ -124,8 +124,8 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
         FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
 
         int rewardPoints = instance.getPointPerPerson();
-        participantProvider.getRewards(participant, rewardPoints);
-        
+        participantService.getRewards(participant, rewardPoints);
+
         double achievementRate = certificationProvider.getAchievementRate(instance, participant.getId(),
                 rewardRequest.targetDate());
 

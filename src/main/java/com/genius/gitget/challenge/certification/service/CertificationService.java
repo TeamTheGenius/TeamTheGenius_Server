@@ -17,7 +17,7 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
-import com.genius.gitget.challenge.participant.service.ParticipantProvider;
+import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.service.UserService;
@@ -49,18 +49,18 @@ public class CertificationService {
     private final FilesService filesService;
     private final GithubProvider githubProvider;
     private final CertificationProvider certificationProvider;
-    private final ParticipantProvider participantProvider;
+    private final ParticipantService participantService;
     private final InstanceProvider instanceProvider;
 
 
     public WeekResponse getMyWeekCertifications(Long participantId, LocalDate currentDate) {
-        Participant participant = participantProvider.findById(participantId);
+        Participant participant = participantService.findById(participantId);
         return getWeekResponse(participant, currentDate);
     }
 
     public Slice<WeekResponse> getOthersWeekCertifications(Long userId, Long instanceId,
                                                            LocalDate currentDate, Pageable pageable) {
-        Slice<Participant> participants = participantProvider.findAllByInstanceId(userId, instanceId, pageable);
+        Slice<Participant> participants = participantService.findAllByInstanceId(userId, instanceId, pageable);
         return participants.map(
                 participant -> getWeekResponse(participant, currentDate)
         );
@@ -107,7 +107,7 @@ public class CertificationService {
     }
 
     public TotalResponse getTotalCertification(Long participantId, LocalDate currentDate) {
-        Instance instance = participantProvider.getInstanceById(participantId);
+        Instance instance = participantService.getInstanceById(participantId);
         LocalDate startDate = instance.getStartedDate().toLocalDate();
 
         int totalAttempts = instance.getTotalAttempt();
@@ -156,7 +156,7 @@ public class CertificationService {
     @Transactional
     public ActivatedResponse passCertification(Long userId, CertificationRequest certificationRequest) {
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
-        Participant participant = participantProvider.findByJoinInfo(userId, instance.getId());
+        Participant participant = participantService.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
         Optional<Certification> optionalCertification = certificationProvider.findByDate(targetDate,
@@ -193,7 +193,7 @@ public class CertificationService {
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
-        Participant participant = participantProvider.findByJoinInfo(user.getId(), instance.getId());
+        Participant participant = participantService.findByJoinInfo(user.getId(), instance.getId());
 
         String repositoryName = participant.getRepositoryName();
         LocalDate targetDate = certificationRequest.targetDate();

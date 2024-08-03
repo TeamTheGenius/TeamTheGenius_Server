@@ -24,9 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @Transactional
-class ParticipantProviderTest {
+class ParticipantServiceTest {
     @Autowired
-    ParticipantProvider participantProvider;
+    ParticipantService participantService;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -44,7 +44,7 @@ class ParticipantProviderTest {
         getSavedParticipant(savedUser, savedInstance);
 
         //when
-        Participant participant = participantProvider.findByJoinInfo(savedUser.getId(),
+        Participant participant = participantService.findByJoinInfo(savedUser.getId(),
                 savedInstance.getId());
 
         //then
@@ -61,7 +61,7 @@ class ParticipantProviderTest {
         Participant participant = getSavedParticipant(savedUser, savedInstance);
 
         //when
-        Participant foundParticipant = participantProvider.findById(participant.getId());
+        Participant foundParticipant = participantService.findById(participant.getId());
 
         //then
         assertThat(foundParticipant.getId()).isEqualTo(participant.getId());
@@ -83,7 +83,7 @@ class ParticipantProviderTest {
         Participant participant3 = getSavedParticipant(user, instance3);
 
         //when
-        List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), PREACTIVITY);
+        List<Participant> participants = participantService.findJoinedByProgress(user.getId(), PREACTIVITY);
 
         //then
         assertThat(participants.size()).isEqualTo(2);
@@ -102,7 +102,7 @@ class ParticipantProviderTest {
         Participant participant3 = getSavedParticipant(user, instance3);
 
         //when
-        List<Participant> participants = participantProvider.findJoinedByProgress(user.getId(), ACTIVITY);
+        List<Participant> participants = participantService.findJoinedByProgress(user.getId(), ACTIVITY);
 
         //then
         assertThat(participants.size()).isEqualTo(1);
@@ -121,7 +121,7 @@ class ParticipantProviderTest {
         Participant participant1 = getSavedParticipant(user, instance3, JoinStatus.NO);
 
         //when
-        List<Participant> participants = participantProvider.findDoneInstances(user.getId());
+        List<Participant> participants = participantService.findDoneInstances(user.getId());
 
         //then
         assertThat(participants.size()).isEqualTo(1);
@@ -140,7 +140,7 @@ class ParticipantProviderTest {
         Participant participant1 = getSavedParticipant(user, instance3);
 
         //when
-        List<Participant> participants = participantProvider.findDoneInstances(user.getId());
+        List<Participant> participants = participantService.findDoneInstances(user.getId());
 
         //then
         assertThat(participants.size()).isEqualTo(2);

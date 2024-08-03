@@ -64,6 +64,15 @@ public class Certification extends BaseTimeEntity {
                 .build();
     }
 
+    public static Certification createDummy() {
+        return Certification.builder()
+                .currentAttempt(0)
+                .certificationStatus(CertificateStatus.NOT_YET)
+                .certificatedAt(null)
+                .certificationLinks(null)
+                .build();
+    }
+
     //=== 비지니스 로직 ===//
     public void update(LocalDate certificatedAt, CertificateStatus status, String certificationLinks) {
         this.certificatedAt = certificatedAt;

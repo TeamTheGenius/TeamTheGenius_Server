@@ -15,7 +15,7 @@ import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
-import com.genius.gitget.challenge.myChallenge.facade.MyChallengeFacadeService;
+import com.genius.gitget.challenge.myChallenge.facade.MyChallengeFacade;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -46,9 +46,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class MyChallengeFacadeServiceTest {
+class MyChallengeFacadeTest {
     @Autowired
-    private MyChallengeFacadeService myChallengeFacadeService;
+    private MyChallengeFacade myChallengeFacade;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -76,7 +76,7 @@ class MyChallengeFacadeServiceTest {
         Participant participant3 = getSavedParticipant(user, instance3, PROCESSING);
 
         //when
-        List<PreActivityResponse> instances = myChallengeFacadeService.getPreActivityInstances(user, targetDate);
+        List<PreActivityResponse> instances = myChallengeFacade.getPreActivityInstances(user, targetDate);
 
         //then
         assertThat(instances.size()).isEqualTo(3);
@@ -105,7 +105,7 @@ class MyChallengeFacadeServiceTest {
 
         //when
         getSavedCertification(CertificateStatus.NOT_YET, targetDate, participant2);
-        List<ActivatedResponse> activatedResponses = myChallengeFacadeService.getActivatedInstances(user, targetDate);
+        List<ActivatedResponse> activatedResponses = myChallengeFacade.getActivatedInstances(user, targetDate);
 
         //then
         assertThat(activatedResponses.size()).isEqualTo(2);
@@ -128,7 +128,7 @@ class MyChallengeFacadeServiceTest {
 
         //when
         getSavedCertification(certificateStatus, targetDate, participant1);
-        List<ActivatedResponse> instances = myChallengeFacadeService.getActivatedInstances(user, targetDate);
+        List<ActivatedResponse> instances = myChallengeFacade.getActivatedInstances(user, targetDate);
 
         //then
         assertThat(instances.size()).isEqualTo(1);
@@ -151,7 +151,7 @@ class MyChallengeFacadeServiceTest {
         //when
         getSavedCertification(CertificateStatus.PASSED, targetDate.toLocalDate(), participant);
         getSavedCertification(CertificateStatus.CERTIFICATED, targetDate.plusDays(1).toLocalDate(), participant);
-        List<DoneResponse> doneResponses = myChallengeFacadeService.getDoneInstances(user, targetDate.toLocalDate());
+        List<DoneResponse> doneResponses = myChallengeFacade.getDoneInstances(user, targetDate.toLocalDate());
 
         //then
         DoneResponse doneResponse = doneResponses.get(0);
@@ -177,7 +177,7 @@ class MyChallengeFacadeServiceTest {
         getSavedOrder(user, item, item.getItemCategory(), 3);
 
         //when
-        List<DoneResponse> doneResponses = myChallengeFacadeService.getDoneInstances(user, targetDate);
+        List<DoneResponse> doneResponses = myChallengeFacade.getDoneInstances(user, targetDate);
 
         //then
         assertThat(doneResponses.size()).isEqualTo(1);
@@ -194,7 +194,7 @@ class MyChallengeFacadeServiceTest {
         getSavedParticipant(user, instance, FAIL);
 
         //when
-        List<DoneResponse> doneInstances = myChallengeService.getDoneInstances(user, targetDate);
+        List<DoneResponse> doneInstances = myChallengeFacade.getDoneInstances(user, targetDate);
         DoneResponse doneResponse = doneInstances.get(0);
 
         //then

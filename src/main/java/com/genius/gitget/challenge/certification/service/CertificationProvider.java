@@ -7,6 +7,7 @@ import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
+import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import java.time.LocalDate;
 import java.util.List;
@@ -82,5 +83,13 @@ public class CertificationProvider {
             return NOT_YET;
         }
         return CERTIFICATED;
+    }
+
+    public double getAchievementRate(Instance instance, Long participantId, LocalDate targetDate) {
+        int totalAttempt = instance.getTotalAttempt();
+        int successCount = countByStatus(participantId, CERTIFICATED, targetDate);
+
+        double successPercent = (double) successCount / (double) totalAttempt * 100;
+        return Math.round(successPercent * 100 / 100.0);
     }
 }

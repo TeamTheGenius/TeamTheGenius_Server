@@ -19,4 +19,40 @@ public class CertificationFactory {
         certification.setParticipant(participant);
         return certification;
     }
+
+    public static Certification createNotYet(Participant participant, LocalDate certificatedAt) {
+        int attempt = DateUtil.getAttemptCount(participant.getStartedDate(), certificatedAt);
+        Certification certification = Certification.builder()
+                .certificationStatus(CertificateStatus.NOT_YET)
+                .currentAttempt(attempt)
+                .certificatedAt(certificatedAt)
+                .certificationLinks(null)
+                .build();
+        certification.setParticipant(participant);
+        return certification;
+    }
+
+    public static Certification createCertificated(Participant participant, LocalDate certificatedAt) {
+        int attempt = DateUtil.getAttemptCount(participant.getStartedDate(), certificatedAt);
+        Certification certification = Certification.builder()
+                .certificationStatus(CertificateStatus.CERTIFICATED)
+                .currentAttempt(attempt)
+                .certificatedAt(certificatedAt)
+                .certificationLinks("certificationLink")
+                .build();
+        certification.setParticipant(participant);
+        return certification;
+    }
+
+    public static Certification createPassed(Participant participant, LocalDate certificatedAt) {
+        int attempt = DateUtil.getAttemptCount(participant.getStartedDate(), certificatedAt);
+        Certification certification = Certification.builder()
+                .certificationStatus(CertificateStatus.PASSED)
+                .currentAttempt(attempt)
+                .certificatedAt(certificatedAt)
+                .certificationLinks(null)
+                .build();
+        certification.setParticipant(participant);
+        return certification;
+    }
 }

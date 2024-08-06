@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class GithubProvider {
+public class GithubService {
     private final UserService userService;
     private final int PAGE_SIZE = 10;
 

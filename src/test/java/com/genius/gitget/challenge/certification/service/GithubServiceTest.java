@@ -21,9 +21,9 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({"github"})
-class GithubProviderTest {
+class GithubServiceTest {
     @Autowired
-    private GithubProvider githubProvider;
+    private GithubService githubService;
 
     @Value("${github.yeon-personalKey}")
     private String personalKey;
@@ -40,7 +40,7 @@ class GithubProviderTest {
         //given
 
         //when
-        GitHub gitHub = githubProvider.getGithubConnection(personalKey);
+        GitHub gitHub = githubService.getGithubConnection(personalKey);
 
         //then
         assertThat(gitHub).isNotNull();
@@ -53,7 +53,7 @@ class GithubProviderTest {
         GitHub gitHub = getGitHub();
 
         //when
-        githubProvider.validateGithubConnection(gitHub, githubId);
+        githubService.validateGithubConnection(gitHub, githubId);
     }
 
     @Test
@@ -64,7 +64,7 @@ class GithubProviderTest {
         String githubId = "fake Id";
 
         //when & then
-        assertThatThrownBy(() -> githubProvider.validateGithubConnection(gitHub, githubId))
+        assertThatThrownBy(() -> githubService.validateGithubConnection(gitHub, githubId))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_ID_INCORRECT.getMessage());
     }
@@ -76,7 +76,7 @@ class GithubProviderTest {
         GitHub gitHub = getGitHub();
 
         //when & then
-        githubProvider.validateGithubRepository(gitHub, githubId + "/" + repository);
+        githubService.validateGithubRepository(gitHub, githubId + "/" + repository);
     }
 
     @Test
@@ -87,7 +87,7 @@ class GithubProviderTest {
         String repositoryName = "fake repository";
 
         //when & then
-        assertThatThrownBy(() -> githubProvider.validateGithubRepository(gitHub, repositoryName))
+        assertThatThrownBy(() -> githubService.validateGithubRepository(gitHub, repositoryName))
                 .isInstanceOf(BusinessException.class);
     }
 
@@ -99,7 +99,7 @@ class GithubProviderTest {
         LocalDate createdAt = LocalDate.of(2024, 2, 5);
 
         //when
-        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repository, createdAt);
+        List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repository, createdAt);
 
         //then
         assertThat(pullRequest.size()).isEqualTo(1);
@@ -114,7 +114,7 @@ class GithubProviderTest {
         LocalDate createdAt = LocalDate.of(2024, 2, 5);
 
         //when & then
-        assertThatThrownBy(() -> githubProvider.getPullRequestByDate(gitHub, repositoryName, createdAt))
+        assertThatThrownBy(() -> githubService.getPullRequestByDate(gitHub, repositoryName, createdAt))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
     }
@@ -126,7 +126,7 @@ class GithubProviderTest {
         GitHub gitHub = getGitHub();
 
         //when
-        List<GHRepository> repositoryList = githubProvider.getRepositoryList(gitHub);
+        List<GHRepository> repositoryList = githubService.getRepositoryList(gitHub);
 
         //then
         assertThat(repositoryList.size()).isGreaterThan(0);
@@ -140,13 +140,13 @@ class GithubProviderTest {
         LocalDate kstDate = LocalDate.of(2024, 2, 25);
 
         //when
-        List<GHPullRequest> pullRequests = githubProvider.getPullRequestByDate(gitHub, repository, kstDate);
+        List<GHPullRequest> pullRequests = githubService.getPullRequestByDate(gitHub, repository, kstDate);
 
         //then
         assertThat(pullRequests.size()).isEqualTo(2);
     }
 
     private GitHub getGitHub() {
-        return githubProvider.getGithubConnection(personalKey);
+        return githubService.getGithubConnection(personalKey);
     }
 }

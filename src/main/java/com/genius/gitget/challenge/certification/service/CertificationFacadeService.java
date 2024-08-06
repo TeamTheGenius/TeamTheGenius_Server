@@ -48,7 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CertificationFacadeService implements CertificationFacade {
     private final UserService userService;
     private final FilesService filesService;
-    private final GithubProvider githubProvider;
+    private final GithubService githubService;
     private final CertificationService certificationService;
     private final ParticipantService participantService;
     private final InstanceProvider instanceProvider;
@@ -196,7 +196,7 @@ public class CertificationFacadeService implements CertificationFacade {
     @Override
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
+        GitHub gitHub = githubService.getGithubConnection(user);
         Instance instance = instanceProvider.findById(certificationRequest.instanceId());
         Participant participant = participantService.findByJoinInfo(user.getId(), instance.getId());
 
@@ -206,7 +206,7 @@ public class CertificationFacadeService implements CertificationFacade {
         validCertificationCondition(instance, targetDate);
 
         List<String> filteredPullRequests = filterValidPR(
-                githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate),
+                githubService.getPullRequestByDate(gitHub, repositoryName, targetDate),
                 instance.getPrTemplate(targetDate)
         );
 

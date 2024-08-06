@@ -24,14 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GithubFacadeService implements GithubFacade {
     private final UserService userService;
-    private final GithubProvider githubProvider;
+    private final GithubService githubService;
     private final EncryptUtil encryptUtil;
 
     @Override
     @Transactional
     public void registerGithubPersonalToken(User user, String githubToken) {
-        GitHub gitHub = githubProvider.getGithubConnection(githubToken);
-        githubProvider.validateGithubConnection(gitHub, user.getIdentifier());
+        GitHub gitHub = githubService.getGithubConnection(githubToken);
+        githubService.validateGithubConnection(gitHub, user.getIdentifier());
 
         String encryptedToken = encryptUtil.encrypt(githubToken);
         user.updateGithubPersonalToken(encryptedToken);
@@ -42,23 +42,23 @@ public class GithubFacadeService implements GithubFacade {
     public void verifyGithubToken(User user) {
         String githubToken = encryptUtil.decrypt(user.getGithubToken());
 
-        GitHub gitHub = githubProvider.getGithubConnection(githubToken);
-        githubProvider.validateGithubConnection(gitHub, user.getIdentifier());
+        GitHub gitHub = githubService.getGithubConnection(githubToken);
+        githubService.validateGithubConnection(gitHub, user.getIdentifier());
     }
 
     @Override
     @Transactional
     public void verifyRepository(User user, String repository) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
+        GitHub gitHub = githubService.getGithubConnection(user);
 
-        String repositoryFullName = githubProvider.getRepoFullName(gitHub, repository);
-        githubProvider.validateGithubRepository(gitHub, repositoryFullName);
+        String repositoryFullName = githubService.getRepoFullName(gitHub, repository);
+        githubService.validateGithubRepository(gitHub, repositoryFullName);
     }
 
     @Override
     public List<String> getPublicRepositories(User user) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
-        List<GHRepository> repositoryList = githubProvider.getRepositoryList(gitHub);
+        GitHub gitHub = githubService.getGithubConnection(user);
+        List<GHRepository> repositoryList = githubService.getRepositoryList(gitHub);
         return repositoryList.stream()
                 .map(GHRepository::getName)
                 .toList();
@@ -78,9 +78,9 @@ public class GithubFacadeService implements GithubFacade {
     @Override
     public List<PullRequestResponse> getPullRequestListByDate(User user, String repositoryName,
                                                               LocalDate targetDate) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
+        GitHub gitHub = githubService.getGithubConnection(user);
 
-        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate);
+        List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repositoryName, targetDate);
 
         return pullRequest.stream()
                 .map(PullRequestResponse::create)

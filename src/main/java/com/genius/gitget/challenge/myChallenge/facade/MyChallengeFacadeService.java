@@ -16,7 +16,6 @@ import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.store.item.domain.Item;
@@ -34,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MyChallengeFacadeService implements MyChallengeFacade {
     private final FilesService filesService;
-    private final UserService userService;
     private final ParticipantService participantService;
     private final CertificationProvider certificationProvider;
     private final ItemService itemService;
@@ -68,7 +66,6 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
             Certification certification = certificationProvider.findOrGetDummy(targetDate, participant.getId());
 
-            //TODO: 로직 수정 필요
             Item item = itemService.findAllByCategory(CERTIFICATION_PASSER).get(0);
             int numOfPassItem = ordersService.countNumOfItem(user, item.getId());
 

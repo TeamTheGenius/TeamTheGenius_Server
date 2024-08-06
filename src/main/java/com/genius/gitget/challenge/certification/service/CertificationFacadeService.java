@@ -15,7 +15,7 @@ import com.genius.gitget.challenge.certification.facade.CertificationFacade;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.instance.service.InstanceProvider;
+import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantService;
@@ -46,12 +46,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CertificationFacadeService implements CertificationFacade {
-    private final UserService userService;
     private final FilesService filesService;
+    
+    private final UserService userService;
+    private final InstanceService instanceService;
+    private final ParticipantService participantService;
     private final GithubService githubService;
     private final CertificationService certificationService;
-    private final ParticipantService participantService;
-    private final InstanceProvider instanceProvider;
 
     @Override
     public WeekResponse getMyWeekCertifications(Long participantId, LocalDate currentDate) {
@@ -159,7 +160,7 @@ public class CertificationFacadeService implements CertificationFacade {
     @Override
     @Transactional
     public ActivatedResponse passCertification(Long userId, CertificationRequest certificationRequest) {
-        Instance instance = instanceProvider.findById(certificationRequest.instanceId());
+        Instance instance = instanceService.findInstanceById(certificationRequest.instanceId());
         Participant participant = participantService.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
@@ -197,7 +198,7 @@ public class CertificationFacadeService implements CertificationFacade {
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
         GitHub gitHub = githubService.getGithubConnection(user);
-        Instance instance = instanceProvider.findById(certificationRequest.instanceId());
+        Instance instance = instanceService.findInstanceById(certificationRequest.instanceId());
         Participant participant = participantService.findByJoinInfo(user.getId(), instance.getId());
 
         String repositoryName = participant.getRepositoryName();
@@ -252,7 +253,7 @@ public class CertificationFacadeService implements CertificationFacade {
 
     @Override
     public InstancePreviewResponse getInstancePreview(Long instanceId) {
-        Instance instance = instanceProvider.findById(instanceId);
+        Instance instance = instanceService.findInstanceById(instanceId);
         FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
         return InstancePreviewResponse.createByEntity(instance, fileResponse);
     }

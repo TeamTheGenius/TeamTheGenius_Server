@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.genius.gitget.challenge.certification.service.CertificationService;
+import com.genius.gitget.challenge.certification.facade.CertificationFacade;
 import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -38,7 +38,7 @@ class CertificationControllerTest {
     @Autowired
     TokenTestUtil tokenTestUtil;
     @Autowired
-    CertificationService certificationService;
+    CertificationFacade certificationFacade;
     @Autowired
     GithubService githubService;
     @Autowired

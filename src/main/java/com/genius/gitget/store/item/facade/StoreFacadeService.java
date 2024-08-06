@@ -1,7 +1,7 @@
 package com.genius.gitget.store.item.facade;
 
 import com.genius.gitget.challenge.certification.dto.CertificationRequest;
-import com.genius.gitget.challenge.certification.service.CertificationService;
+import com.genius.gitget.challenge.certification.facade.CertificationFacade;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
@@ -41,8 +41,8 @@ public class StoreFacadeService implements StoreFacade {
     private final InstanceService instanceService;
     private final ParticipantService participantService;
 
-    // TODO: CertificationProvider에만 의존하도록 변경(파사드 패턴 적용 시)
-    private final CertificationService certificationService;
+    // TODO: CertificationService에만 의존하도록 변경
+    private final CertificationFacade certificationFacade;
     private final PaymentRepository paymentRepository;
 
 
@@ -133,7 +133,7 @@ public class StoreFacadeService implements StoreFacade {
     public OrderResponse usePasserItem(Orders orders, Long instanceId, LocalDate currentDate) {
         Long userId = orders.getUser().getId();
         Long itemId = orders.getItem().getId();
-        ActivatedResponse activatedResponse = certificationService.passCertification(
+        ActivatedResponse activatedResponse = certificationFacade.passCertification(
                 userId,
                 CertificationRequest.of(instanceId, currentDate));
         activatedResponse.setItemId(itemId);

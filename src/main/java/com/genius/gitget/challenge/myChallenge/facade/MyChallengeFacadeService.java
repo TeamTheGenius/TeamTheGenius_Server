@@ -5,7 +5,7 @@ import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PAS
 import static com.genius.gitget.store.item.domain.ItemCategory.POINT_MULTIPLIER;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
-import com.genius.gitget.challenge.certification.service.CertificationProvider;
+import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MyChallengeFacadeService implements MyChallengeFacade {
     private final FilesService filesService;
     private final ParticipantService participantService;
-    private final CertificationProvider certificationProvider;
+    private final CertificationService certificationService;
     private final ItemService itemService;
     private final OrdersService ordersService;
 
@@ -64,7 +64,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
-            Certification certification = certificationProvider.findOrGetDummy(targetDate, participant.getId());
+            Certification certification = certificationService.findOrGetDummy(targetDate, participant.getId());
 
             Item item = itemService.findAllByCategory(CERTIFICATION_PASSER).get(0);
             int numOfPassItem = ordersService.countNumOfItem(user, item.getId());
@@ -87,7 +87,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
-            double achievementRate = certificationProvider.getAchievementRate(instance, participant.getId(),
+            double achievementRate = certificationService.getAchievementRate(instance, participant.getId(),
                     targetDate);
 
             // 포인트를 아직 수령하지 않았을 때
@@ -123,7 +123,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
         int rewardPoints = instance.getPointPerPerson();
         participantService.getRewards(participant, rewardPoints);
 
-        double achievementRate = certificationProvider.getAchievementRate(instance, participant.getId(),
+        double achievementRate = certificationService.getAchievementRate(instance, participant.getId(),
                 rewardRequest.targetDate());
 
         return DoneResponse.createRewarded(instance, participant, achievementRate, fileResponse);

@@ -42,6 +42,7 @@ public class OrdersService {
                 .orElseThrow(() -> new BusinessException(ORDERS_NOT_FOUND));
     }
 
+    @Transactional
     public Orders findOrSave(User user, Item item) {
         return ordersRepository.findByOrderInfo(user.getId(), item.getId())
                 .orElseGet(() -> ordersRepository.save(Orders.of(user, item)));
@@ -76,6 +77,7 @@ public class OrdersService {
         return usingFrames.get(0).getItem();
     }
 
+    @Transactional
     public void useItem(Orders orders) {
         orders.useItem();
         if (!orders.hasItem()) {
@@ -87,5 +89,14 @@ public class OrdersService {
         Optional<Orders> optionalUserItem = ordersRepository.findByOrderInfo(user.getId(), itemId);
         return optionalUserItem.map(Orders::getCount)
                 .orElse(0);
+    }
+
+    public void validateUnmountCondition(Orders orders) {
+        if (orders.getItem().getItemCategory() != ItemCategory.PROFILE_FRAME) {
+            throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
+        }
+        if (orders.getEquipStatus() != EquipStatus.IN_USE) {
+            throw new BusinessException(ErrorCode.IN_USE_FRAME_NOT_FOUND);
+        }
     }
 }

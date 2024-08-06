@@ -20,7 +20,7 @@ import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
-import com.genius.gitget.challenge.participant.service.ParticipantProvider;
+import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
@@ -47,7 +47,7 @@ class InstanceDetailServiceTest {
     @Autowired
     LikesFacade likesFacade;
     @Autowired
-    ParticipantProvider participantProvider;
+    ParticipantService participantService;
     @Autowired
     GithubService githubService;
     @Autowired
@@ -202,7 +202,7 @@ class InstanceDetailServiceTest {
         instanceDetailService.joinNewChallenge(savedUser, joinRequest);
         savedInstance.updateProgress(Progress.ACTIVITY);
         instanceDetailService.quitChallenge(savedUser, savedInstance.getId());
-        Participant participant = participantProvider.findByJoinInfo(savedUser.getId(),
+        Participant participant = participantService.findByJoinInfo(savedUser.getId(),
                 savedInstance.getId());
 
         //then

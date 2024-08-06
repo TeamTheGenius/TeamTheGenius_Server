@@ -32,7 +32,7 @@ public class InstanceFactory {
      */
     public static Instance createDone(int duration) {
         return Instance.builder()
-                .progress(Progress.ACTIVITY)
+                .progress(Progress.DONE)
                 .startedDate(LocalDateTime.now().minusDays(duration - 1))
                 .completedDate(LocalDateTime.now().minusDays(1))
                 .build();

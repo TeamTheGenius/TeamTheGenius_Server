@@ -7,6 +7,7 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
+import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ParticipantProvider {
+public class ParticipantService {
     private final ParticipantRepository participantRepository;
 
     @Transactional
@@ -80,5 +81,14 @@ public class ParticipantProvider {
         return participantRepository.findByJoinInfo(userId, instanceId)
                 .map(participant -> participant.getJoinStatus() != JoinStatus.NO)
                 .orElse(false);
+    }
+
+    @Transactional
+    public void getRewards(Participant participant, int rewardPoints) {
+        User user = participant.getUser();
+
+        participant.validateRewardCondition();
+        user.updatePoints((long) rewardPoints);
+        participant.getRewards(rewardPoints);
     }
 }

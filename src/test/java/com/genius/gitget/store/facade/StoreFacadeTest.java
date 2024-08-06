@@ -1,5 +1,8 @@
 package com.genius.gitget.store.facade;
 
+import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
+import static com.genius.gitget.challenge.participant.domain.RewardStatus.NO;
+import static com.genius.gitget.challenge.participant.domain.RewardStatus.YES;
 import static com.genius.gitget.global.util.exception.ErrorCode.ALREADY_REWARDED;
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_GET_REWARDS;
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_USE_PASS_ITEM;
@@ -15,7 +18,6 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
-import com.genius.gitget.challenge.participant.domain.RewardStatus;
 import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
@@ -223,7 +225,7 @@ class StoreFacadeTest {
             public void it_returns_200_when_certification_is_NOT_YET() {
                 int holding = orders.getCount();
                 certificationRepository.save(
-                        CertificationFactory.create(CertificateStatus.NOT_YET, currentDate, participant)
+                        CertificationFactory.createNotYet(participant, currentDate)
                 );
                 storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate);
 
@@ -303,7 +305,7 @@ class StoreFacadeTest {
                 int holding = orders.getCount();
                 instance = instanceRepository.save(InstanceFactory.createDone(10));
                 participant = participantRepository.save(
-                        ParticipantFactory.createByRewardStatus(user, instance, RewardStatus.NO));
+                        ParticipantFactory.createByRewardStatus(user, instance, SUCCESS, NO));
 
                 storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate);
 
@@ -334,7 +336,7 @@ class StoreFacadeTest {
             @DisplayName("participant의 RewardStatus가 YES라면 ALREADY_REWARDED 예외가 발생한다.")
             public void it_throws_exception_when_RewardStatus_is_YES() {
                 participant = participantRepository.save(
-                        ParticipantFactory.createByRewardStatus(user, instance, RewardStatus.YES)
+                        ParticipantFactory.createByRewardStatus(user, instance, SUCCESS, YES)
                 );
                 assertThatThrownBy(() -> storeFacade.useItem(user, item.getIdentifier(), instance.getId(), currentDate))
                         .isInstanceOf(BusinessException.class)
@@ -349,7 +351,7 @@ class StoreFacadeTest {
             void setup() {
                 instance = instanceRepository.save(InstanceFactory.createDone(10));
                 participant = participantRepository.save(
-                        ParticipantFactory.createByRewardStatus(user, instance, RewardStatus.NO));
+                        ParticipantFactory.createByRewardStatus(user, instance, SUCCESS, NO));
             }
 
             @Test

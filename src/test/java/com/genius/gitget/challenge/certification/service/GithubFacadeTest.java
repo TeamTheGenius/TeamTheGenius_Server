@@ -8,6 +8,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
+import com.genius.gitget.challenge.certification.facade.GithubFacade;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -37,11 +38,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class GithubServiceTest {
+class GithubFacadeTest {
     @Autowired
     private EncryptUtil encryptUtil;
     @Autowired
-    private GithubService githubService;
+    private GithubFacade githubFacade;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -66,7 +67,7 @@ class GithubServiceTest {
         String encrypted = encryptUtil.encrypt(personalKey);
 
         //when
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
         User updatedUser = userRepository.findByIdentifier(githubId).get();
 
         //then
@@ -81,7 +82,7 @@ class GithubServiceTest {
         encryptUtil.encrypt(personalKey);
 
         //when & then
-        assertThatThrownBy(() -> githubService.registerGithubPersonalToken(user, personalKey))
+        assertThatThrownBy(() -> githubFacade.registerGithubPersonalToken(user, personalKey))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.GITHUB_ID_INCORRECT.getMessage());
     }
@@ -92,10 +93,10 @@ class GithubServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         //when
-        githubService.verifyRepository(user, targetRepo);
+        githubFacade.verifyRepository(user, targetRepo);
 
     }
 
@@ -106,10 +107,10 @@ class GithubServiceTest {
         String fakeRepositoryName = "Fake";
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         //when & then
-        assertThatThrownBy(() -> githubService.verifyRepository(user, fakeRepositoryName))
+        assertThatThrownBy(() -> githubFacade.verifyRepository(user, fakeRepositoryName))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
     }
@@ -123,7 +124,7 @@ class GithubServiceTest {
         Participant participant = getParticipantInfo(user, instance);
 
         //when & then
-        assertThatThrownBy(() -> githubService.verifyRepository(user, targetRepo))
+        assertThatThrownBy(() -> githubFacade.verifyRepository(user, targetRepo))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
     }
@@ -133,12 +134,12 @@ class GithubServiceTest {
     public void should_returnEmptyList_when_prNotExist() throws IOException {
         //given
         User user = getSavedUser(githubId);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 1, 4);
 
         //when
-        List<PullRequestResponse> pullRequestResponses = githubService.getPullRequestListByDate(
+        List<PullRequestResponse> pullRequestResponses = githubFacade.getPullRequestListByDate(
                 user, targetRepo, targetDate);
 
         //then
@@ -153,7 +154,7 @@ class GithubServiceTest {
         User user = getSavedUser(githubId);
 
         //when & then
-        assertThatThrownBy(() -> githubService.getPullRequestListByDate(user, targetRepo, targetDate))
+        assertThatThrownBy(() -> githubFacade.getPullRequestListByDate(user, targetRepo, targetDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
     }
@@ -165,10 +166,10 @@ class GithubServiceTest {
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
         User user = getSavedUser(githubId);
         String fakeRepo = "fake Repo";
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         //when & then
-        assertThatThrownBy(() -> githubService.getPullRequestListByDate(user, fakeRepo, targetDate))
+        assertThatThrownBy(() -> githubFacade.getPullRequestListByDate(user, fakeRepo, targetDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
     }
@@ -178,12 +179,12 @@ class GithubServiceTest {
     public void should_loadPRList_when_tryJoin() {
         //given
         User user = getSavedUser(githubId);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
 
         //when
-        List<PullRequestResponse> pullRequestResponses = githubService.getPullRequestListByDate(
+        List<PullRequestResponse> pullRequestResponses = githubFacade.getPullRequestListByDate(
                 user, targetRepo, targetDate);
 
         //then
@@ -196,12 +197,13 @@ class GithubServiceTest {
     public void should_checkPR_when_tryToVerify() {
         //given
         User user = getSavedUser(githubId);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
 
         //when
-        List<PullRequestResponse> pullRequestResponses = githubService.verifyPullRequest(user, targetRepo, targetDate);
+        List<PullRequestResponse> pullRequestResponses = githubFacade.verifyPullRequest(user, targetRepo,
+                targetDate);
 
         //then
         assertThat(pullRequestResponses.size()).isNotZero();
@@ -212,12 +214,12 @@ class GithubServiceTest {
     public void should_throwException_when_PRNotExist() {
         //given
         User user = getSavedUser(githubId);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 3, 5);
 
         //when & then
-        assertThatThrownBy(() -> githubService.verifyPullRequest(user, targetRepo, targetDate))
+        assertThatThrownBy(() -> githubFacade.verifyPullRequest(user, targetRepo, targetDate))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.GITHUB_PR_NOT_FOUND.getMessage());
     }

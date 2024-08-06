@@ -17,6 +17,8 @@ import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
 import com.genius.gitget.challenge.certification.dto.TotalResponse;
 import com.genius.gitget.challenge.certification.dto.WeekResponse;
+import com.genius.gitget.challenge.certification.facade.CertificationFacade;
+import com.genius.gitget.challenge.certification.facade.GithubFacade;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
@@ -59,11 +61,11 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @Transactional
 @ActiveProfiles({"github"})
-class CertificationFacadeServiceTest {
+class CertificationFacadeTest {
     @Autowired
-    private CertificationFacadeService certificationFacadeService;
+    private CertificationFacade certificationFacade;
     @Autowired
-    private GithubService githubService;
+    private GithubFacade githubFacade;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -94,7 +96,7 @@ class CertificationFacadeServiceTest {
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         getSavedParticipant(user, instance);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
 
@@ -105,7 +107,7 @@ class CertificationFacadeServiceTest {
         instance.updateProgress(Progress.ACTIVITY);
 
         //when
-        CertificationResponse certificationResponse = certificationFacadeService.updateCertification(user,
+        CertificationResponse certificationResponse = certificationFacade.updateCertification(user,
                 certificationRequest);
         Certification certification = certificationRepository.findById(certificationResponse.certificationId())
                 .get();
@@ -124,7 +126,7 @@ class CertificationFacadeServiceTest {
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 5);
 
@@ -136,7 +138,7 @@ class CertificationFacadeServiceTest {
 
         //when
         Certification certification = getSavedCertification(CERTIFICATED, targetDate, participant);
-        CertificationResponse certificationResponse = certificationFacadeService.updateCertification(user,
+        CertificationResponse certificationResponse = certificationFacade.updateCertification(user,
                 certificationRequest);
 
         //then
@@ -152,7 +154,7 @@ class CertificationFacadeServiceTest {
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         getSavedParticipant(user, instance);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 12, 6);
 
@@ -163,7 +165,7 @@ class CertificationFacadeServiceTest {
         instance.updateProgress(Progress.ACTIVITY);
 
         //when && then
-        assertThatThrownBy(() -> certificationFacadeService.updateCertification(user, certificationRequest))
+        assertThatThrownBy(() -> certificationFacade.updateCertification(user, certificationRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(NOT_CERTIFICATE_PERIOD.getMessage());
     }
@@ -175,7 +177,7 @@ class CertificationFacadeServiceTest {
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         Participant participant = getSavedParticipant(user, instance);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 6);
 
@@ -189,7 +191,7 @@ class CertificationFacadeServiceTest {
         getSavedCertification(PASSED, targetDate, participant);
 
         //then
-        assertThatThrownBy(() -> certificationFacadeService.updateCertification(user, certificationRequest))
+        assertThatThrownBy(() -> certificationFacade.updateCertification(user, certificationRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ALREADY_PASSED_CERTIFICATION.getMessage());
     }
@@ -201,7 +203,7 @@ class CertificationFacadeServiceTest {
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
         getSavedParticipant(user, instance);
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         LocalDate targetDate = LocalDate.of(2024, 2, 6);
 
@@ -212,7 +214,7 @@ class CertificationFacadeServiceTest {
         instance.updateProgress(Progress.ACTIVITY);
 
         //when
-        CertificationResponse certificationResponse = certificationFacadeService.updateCertification(user,
+        CertificationResponse certificationResponse = certificationFacade.updateCertification(user,
                 certificationRequest);
         Certification certification = certificationRepository.findById(certificationResponse.certificationId())
                 .get();
@@ -230,10 +232,10 @@ class CertificationFacadeServiceTest {
         //given
         User user = getSavedUser(githubId);
         Instance instance = getSavedInstance();
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
 
         //when
-        List<String> repositoryList = githubService.getPublicRepositories(user);
+        List<String> repositoryList = githubFacade.getPublicRepositories(user);
 
         //then
         assertThat(repositoryList.size()).isGreaterThan(0);
@@ -246,7 +248,7 @@ class CertificationFacadeServiceTest {
         User user = getSavedUser(githubId);
 
         //when & then
-        assertThatThrownBy(() -> githubService.getPublicRepositories(user))
+        assertThatThrownBy(() -> githubFacade.getPublicRepositories(user))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
     }
@@ -268,7 +270,7 @@ class CertificationFacadeServiceTest {
         getSavedCertification(CERTIFICATED, endDate.minusDays(1), participant);
         getSavedCertification(CERTIFICATED, endDate, participant);
 
-        WeekResponse weekCertification = certificationFacadeService.getMyWeekCertifications(
+        WeekResponse weekCertification = certificationFacade.getMyWeekCertifications(
                 participant.getId(), currentDate);
 
         //then
@@ -297,7 +299,7 @@ class CertificationFacadeServiceTest {
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
         getSavedCertification(CERTIFICATED, currentDate, participant);
 
-        WeekResponse weekCertification = certificationFacadeService.getMyWeekCertifications(
+        WeekResponse weekCertification = certificationFacade.getMyWeekCertifications(
                 participant.getId(), currentDate);
 
         //then
@@ -326,7 +328,7 @@ class CertificationFacadeServiceTest {
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(6), participant);
 
-        TotalResponse totalResponse = certificationFacadeService.getTotalCertification(participant.getId(),
+        TotalResponse totalResponse = certificationFacade.getTotalCertification(participant.getId(),
                 currentDate);
 
         //then
@@ -345,7 +347,7 @@ class CertificationFacadeServiceTest {
         Participant participant = getSavedParticipant(getSavedUser(githubId), instance);
 
         //when
-        TotalResponse totalCertification = certificationFacadeService.getTotalCertification(participant.getId(),
+        TotalResponse totalCertification = certificationFacade.getTotalCertification(participant.getId(),
                 currentDate);
 
         //then
@@ -366,7 +368,7 @@ class CertificationFacadeServiceTest {
         //when
         instance.updateProgress(Progress.ACTIVITY);
         getSavedCertification(PASSED, currentDate, participant);
-        TotalResponse totalCertification = certificationFacadeService.getTotalCertification(participant.getId(),
+        TotalResponse totalCertification = certificationFacade.getTotalCertification(participant.getId(),
                 currentDate);
 
         //then
@@ -386,7 +388,7 @@ class CertificationFacadeServiceTest {
 
         //when
         instance.updateProgress(Progress.DONE);
-        TotalResponse totalCertification = certificationFacadeService.getTotalCertification(participant.getId(),
+        TotalResponse totalCertification = certificationFacade.getTotalCertification(participant.getId(),
                 currentDate);
 
         //then
@@ -404,7 +406,7 @@ class CertificationFacadeServiceTest {
         Participant participant = getSavedParticipant(user, instance);
 
         //when
-        InstancePreviewResponse instancePreviewResponse = certificationFacadeService.getInstancePreview(
+        InstancePreviewResponse instancePreviewResponse = certificationFacade.getInstancePreview(
                 instance.getId());
 
         //then
@@ -421,7 +423,7 @@ class CertificationFacadeServiceTest {
         Participant participant = getSavedParticipant(user, instance);
 
         //when
-        CertificationInformation information = certificationFacadeService.getCertificationInformation(instance,
+        CertificationInformation information = certificationFacade.getCertificationInformation(instance,
                 participant, targetDate);
 
         //then
@@ -451,7 +453,7 @@ class CertificationFacadeServiceTest {
         getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
         getSavedCertification(PASSED, startDate.plusDays(6), participant);
-        CertificationInformation information = certificationFacadeService.getCertificationInformation(instance,
+        CertificationInformation information = certificationFacade.getCertificationInformation(instance,
                 participant, targetDate);
 
         //then
@@ -480,7 +482,7 @@ class CertificationFacadeServiceTest {
         getSavedCertification(CERTIFICATED, startDate.plusDays(1), participant);
         getSavedCertification(CERTIFICATED, startDate.plusDays(4), participant);
         getSavedCertification(PASSED, startDate.plusDays(6), participant);
-        CertificationInformation information = certificationFacadeService.getCertificationInformation(instance,
+        CertificationInformation information = certificationFacade.getCertificationInformation(instance,
                 participant, targetDate);
 
         //then
@@ -507,7 +509,7 @@ class CertificationFacadeServiceTest {
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
-        Slice<WeekResponse> certification = certificationFacadeService.getOthersWeekCertifications(
+        Slice<WeekResponse> certification = certificationFacade.getOthersWeekCertifications(
                 user1.getId(), instance.getId(), currentDate, pageRequest);
 
         //then
@@ -535,7 +537,7 @@ class CertificationFacadeServiceTest {
         getSavedCertification(CERTIFICATED, currentDate.plusDays(4), participant);
         getSavedCertification(CERTIFICATED, currentDate.plusDays(6), participant);
 
-        ActivatedResponse activatedResponse = certificationFacadeService.passCertification(
+        ActivatedResponse activatedResponse = certificationFacade.passCertification(
                 user.getId(),
                 certificationRequest);
 
@@ -569,7 +571,7 @@ class CertificationFacadeServiceTest {
         getSavedCertification(certificateStatus, currentDate, participant);
 
         //then
-        assertThatThrownBy(() -> certificationFacadeService.passCertification(user.getId(), certificationRequest))
+        assertThatThrownBy(() -> certificationFacade.passCertification(user.getId(), certificationRequest))
                 .isInstanceOf(BusinessException.class)
                 .hasMessageContaining(ErrorCode.CAN_NOT_USE_PASS_ITEM.getMessage());
     }
@@ -591,7 +593,7 @@ class CertificationFacadeServiceTest {
         //when
         instance.updateProgress(Progress.ACTIVITY);
         getSavedCertification(NOT_YET, currentDate, participant);
-        ActivatedResponse activatedResponse = certificationFacadeService.passCertification(user.getId(),
+        ActivatedResponse activatedResponse = certificationFacade.passCertification(user.getId(),
                 certificationRequest);
 
         //then
@@ -621,7 +623,7 @@ class CertificationFacadeServiceTest {
 
         //when
         instance.updateProgress(Progress.ACTIVITY);
-        ActivatedResponse activatedResponse = certificationFacadeService.passCertification(user.getId(),
+        ActivatedResponse activatedResponse = certificationFacade.passCertification(user.getId(),
                 certificationRequest);
 
         //then

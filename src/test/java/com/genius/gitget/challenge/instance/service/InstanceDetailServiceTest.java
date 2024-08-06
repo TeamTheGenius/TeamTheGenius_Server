@@ -7,7 +7,7 @@ import static com.genius.gitget.global.util.exception.ErrorCode.PARTICIPANT_NOT_
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.genius.gitget.challenge.certification.service.GithubService;
+import com.genius.gitget.challenge.certification.facade.GithubFacade;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
@@ -49,7 +49,7 @@ class InstanceDetailServiceTest {
     @Autowired
     ParticipantService participantService;
     @Autowired
-    GithubService githubService;
+    GithubFacade githubFacade;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -361,7 +361,7 @@ class InstanceDetailServiceTest {
                         .tags("BE,FE")
                         .build()
         );
-        githubService.registerGithubPersonalToken(user, githubToken);
+        githubFacade.registerGithubPersonalToken(user, githubToken);
         return user;
     }
 

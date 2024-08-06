@@ -3,6 +3,7 @@ package com.genius.gitget.challenge.certification.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_PR_NOT_FOUND;
 
 import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
+import com.genius.gitget.challenge.certification.facade.GithubFacade;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
@@ -21,11 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class GithubService {
+public class GithubFacadeService implements GithubFacade {
     private final UserService userService;
     private final GithubProvider githubProvider;
     private final EncryptUtil encryptUtil;
 
+    @Override
     @Transactional
     public void registerGithubPersonalToken(User user, String githubToken) {
         GitHub gitHub = githubProvider.getGithubConnection(githubToken);
@@ -36,6 +38,7 @@ public class GithubService {
         userService.save(user);
     }
 
+    @Override
     public void verifyGithubToken(User user) {
         String githubToken = encryptUtil.decrypt(user.getGithubToken());
 
@@ -43,6 +46,7 @@ public class GithubService {
         githubProvider.validateGithubConnection(gitHub, user.getIdentifier());
     }
 
+    @Override
     @Transactional
     public void verifyRepository(User user, String repository) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
@@ -51,6 +55,7 @@ public class GithubService {
         githubProvider.validateGithubRepository(gitHub, repositoryFullName);
     }
 
+    @Override
     public List<String> getPublicRepositories(User user) {
         GitHub gitHub = githubProvider.getGithubConnection(user);
         List<GHRepository> repositoryList = githubProvider.getRepositoryList(gitHub);
@@ -59,6 +64,7 @@ public class GithubService {
                 .toList();
     }
 
+    @Override
     //TODO: PR이 날라온 브랜치의 이름이 정해진 규칙에 맞는지 여부 확인 필요
     public List<PullRequestResponse> verifyPullRequest(User user, String repositoryName, LocalDate targetDate) {
         List<PullRequestResponse> responses = getPullRequestListByDate(user, repositoryName, targetDate);
@@ -69,6 +75,7 @@ public class GithubService {
         return responses;
     }
 
+    @Override
     public List<PullRequestResponse> getPullRequestListByDate(User user, String repositoryName,
                                                               LocalDate targetDate) {
         GitHub gitHub = githubProvider.getGithubConnection(user);

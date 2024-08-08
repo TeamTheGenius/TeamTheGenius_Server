@@ -113,7 +113,7 @@ class CertificationServiceTest {
         List<String> pullRequests = List.of("pr link1", "pr link2");
 
         //when
-        Certification certification = certificationService.createCertification(participant, targetDate,
+        Certification certification = certificationService.createCertificated(participant, targetDate,
                 pullRequests);
 
         //then

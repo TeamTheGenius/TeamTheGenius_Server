@@ -65,7 +65,6 @@ public class GithubFacadeService implements GithubFacade {
     }
 
     @Override
-    //TODO: PR이 날라온 브랜치의 이름이 정해진 규칙에 맞는지 여부 확인 필요
     public List<PullRequestResponse> verifyPullRequest(User user, String repositoryName, LocalDate targetDate) {
         List<PullRequestResponse> responses = getPullRequestListByDate(user, repositoryName, targetDate);
 
@@ -76,8 +75,7 @@ public class GithubFacadeService implements GithubFacade {
     }
 
     @Override
-    public List<PullRequestResponse> getPullRequestListByDate(User user, String repositoryName,
-                                                              LocalDate targetDate) {
+    public List<PullRequestResponse> getPullRequestListByDate(User user, String repositoryName, LocalDate targetDate) {
         GitHub gitHub = githubService.getGithubConnection(user);
 
         List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repositoryName, targetDate);

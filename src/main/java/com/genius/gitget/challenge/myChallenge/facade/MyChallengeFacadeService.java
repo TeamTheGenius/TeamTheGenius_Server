@@ -1,5 +1,6 @@
 package com.genius.gitget.challenge.myChallenge.facade;
 
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 import static com.genius.gitget.challenge.participant.domain.RewardStatus.NO;
 import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PASSER;
 import static com.genius.gitget.store.item.domain.ItemCategory.POINT_MULTIPLIER;
@@ -64,7 +65,8 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
             FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
-            Certification certification = certificationService.findOrGetDummy(targetDate, participant.getId());
+
+            Certification certification = certificationService.findOrSave(participant, NOT_YET, targetDate);
 
             Item item = itemService.findAllByCategory(CERTIFICATION_PASSER).get(0);
             int numOfPassItem = ordersService.countNumOfItem(user, item.getId());

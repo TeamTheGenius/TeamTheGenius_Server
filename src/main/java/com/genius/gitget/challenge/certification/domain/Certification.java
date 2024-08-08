@@ -1,10 +1,11 @@
 package com.genius.gitget.challenge.certification.domain;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
-import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
 
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -57,22 +58,15 @@ public class Certification extends BaseTimeEntity {
         this.certificationStatus = certificationStatus;
     }
 
-    public static Certification createPassed(LocalDate certificatedAt) {
+    public static Certification of(CertificateStatus status, int currentAttempt, LocalDate certificatedAt) {
         return Certification.builder()
                 .certificatedAt(certificatedAt)
-                .certificationStatus(PASSED)
+                .currentAttempt(currentAttempt)
+                .certificationStatus(status)
                 .certificationLinks("")
                 .build();
     }
 
-    public static Certification createDummy(LocalDate certificatedAt) {
-        return Certification.builder()
-                .currentAttempt(0)
-                .certificationStatus(NOT_YET)
-                .certificatedAt(certificatedAt)
-                .certificationLinks(null)
-                .build();
-    }
 
     //=== 비지니스 로직 ===//
     public void update(LocalDate certificatedAt, CertificateStatus status, String certificationLinks) {
@@ -85,6 +79,12 @@ public class Certification extends BaseTimeEntity {
         this.certificatedAt = certificatedAt;
         this.certificationStatus = CertificateStatus.PASSED;
         this.certificationLinks = "";
+    }
+
+    public void validatePassCondition() {
+        if (this.certificationStatus != NOT_YET) {
+            throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
+        }
     }
 
 

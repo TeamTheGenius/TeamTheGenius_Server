@@ -52,15 +52,21 @@ public class CertificationService {
     }
 
     @Transactional
-    public Certification findOrGetDummy(LocalDate targetDate, Long participantId) {
-        return findByDate(targetDate, participantId)
-                .orElse(Certification.createDummy(targetDate));
+    public Certification findOrSave(Participant participant, CertificateStatus status, LocalDate targetDate) {
+        int currentAttempt = DateUtil.getAttemptCount(participant.getStartedDate(), targetDate);
+
+        return findByDate(targetDate, participant.getId())
+                .orElseGet(() -> {
+                    Certification certification = Certification.of(status, currentAttempt, targetDate);
+                    certification.setParticipant(participant);
+                    return certificationRepository.save(certification);
+                });
     }
 
     @Transactional
-    public Certification createCertification(Participant participant,
-                                             LocalDate targetDate,
-                                             List<String> pullRequests) {
+    public Certification createCertificated(Participant participant,
+                                            LocalDate targetDate,
+                                            List<String> pullRequests) {
         int attempt = DateUtil.getAttemptCount(participant.getStartedDate(), targetDate);
 
         Certification certification = Certification.builder()

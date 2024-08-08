@@ -30,7 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class GithubService {
     private final UserService userService;
-    private final int PAGE_SIZE = 10;
+
 
     public GitHub getGithubConnection(String githubToken) {
         try {

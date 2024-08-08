@@ -1,10 +1,12 @@
 package com.genius.gitget.store.item.facade;
 
-import com.genius.gitget.challenge.certification.dto.CertificationRequest;
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+
+import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.facade.CertificationFacade;
+import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceService;
-import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantService;
@@ -42,6 +44,7 @@ public class StoreFacadeService implements StoreFacade {
     private final ParticipantService participantService;
 
     // TODO: CertificationService에만 의존하도록 변경
+    private final CertificationService certificationService;
     private final CertificationFacade certificationFacade;
     private final PaymentRepository paymentRepository;
 
@@ -133,12 +136,19 @@ public class StoreFacadeService implements StoreFacade {
     public OrderResponse usePasserItem(Orders orders, Long instanceId, LocalDate currentDate) {
         Long userId = orders.getUser().getId();
         Long itemId = orders.getItem().getId();
-        ActivatedResponse activatedResponse = certificationFacade.passCertification(
-                userId,
-                CertificationRequest.of(instanceId, currentDate));
-        activatedResponse.setItemId(itemId);
+
+        Instance instance = instanceService.findInstanceById(instanceId);
+        Participant participant = participantService.findByJoinInfo(userId, instanceId);
+
+        Certification certification = certificationService.findOrSave(participant, NOT_YET, currentDate);
+
+        instance.validateCertificateCondition(currentDate);
+        certification.validatePassCondition();
+
+        certification.updateToPass(currentDate);
+
         ordersService.useItem(orders);
-        return activatedResponse;
+        return OrderResponse.of(itemId);
     }
 
     @Override

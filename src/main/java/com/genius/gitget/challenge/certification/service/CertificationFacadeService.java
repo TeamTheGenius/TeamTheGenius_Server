@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHPullRequest;
@@ -47,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CertificationFacadeService implements CertificationFacade {
     private final FilesService filesService;
-    
+
     private final UserService userService;
     private final InstanceService instanceService;
     private final ParticipantService participantService;
@@ -164,34 +163,16 @@ public class CertificationFacadeService implements CertificationFacade {
         Participant participant = participantService.findByJoinInfo(userId, instance.getId());
         LocalDate targetDate = certificationRequest.targetDate();
 
-        Optional<Certification> optionalCertification = certificationService.findByDate(targetDate,
-                participant.getId());
+        Certification certification = certificationService.findOrSave(participant, NOT_YET, targetDate);
 
-        validCertificationCondition(instance, targetDate);
-        validatePassCondition(optionalCertification);
+        instance.validateCertificateCondition(targetDate);
+        certification.validatePassCondition();
 
-        Certification certification = optionalCertification
-                .map(passed -> {
-                    passed.updateToPass(targetDate);
-                    return passed;
-                })
-                .orElseGet(() -> {
-                    Certification passed = Certification.createPassed(targetDate);
-                    passed.setParticipant(participant);
-                    certificationService.save(passed);
-                    return passed;
-                });
+        certification.updateToPass(targetDate);
 
         FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
-        //TODO: pass 했기 때문에 pass item이 필요없어 numOfPassItem을 0으로 전달하는 것 같음. but, 가독성이 떨어지기 때문에 수정 필요
         return ActivatedResponse.of(instance, certification.getCertificationStatus(),
                 0, participant.getRepositoryName(), fileResponse);
-    }
-
-    private void validatePassCondition(Optional<Certification> optional) {
-        if (optional.isPresent() && optional.get().getCertificationStatus() != NOT_YET) {
-            throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
-        }
     }
 
     @Override
@@ -204,7 +185,7 @@ public class CertificationFacadeService implements CertificationFacade {
         String repositoryName = participant.getRepositoryName();
         LocalDate targetDate = certificationRequest.targetDate();
 
-        validCertificationCondition(instance, targetDate);
+        instance.validateCertificateCondition(targetDate);
 
         List<String> filteredPullRequests = filterValidPR(
                 githubService.getPullRequestByDate(gitHub, repositoryName, targetDate),
@@ -219,7 +200,7 @@ public class CertificationFacadeService implements CertificationFacade {
                     return certificationService.update(updated, targetDate, filteredPullRequests);
                 })
                 .orElseGet(
-                        () -> certificationService.createCertification(participant, targetDate, filteredPullRequests)
+                        () -> certificationService.createCertificated(participant, targetDate, filteredPullRequests)
                 );
 
         return CertificationResponse.createExist(certification);
@@ -235,20 +216,6 @@ public class CertificationFacadeService implements CertificationFacade {
                 })
                 .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
                 .toList();
-    }
-
-    private void validCertificationCondition(Instance instance, LocalDate targetDate) {
-        if (instance.getProgress() != Progress.ACTIVITY) {
-            throw new BusinessException(ErrorCode.NOT_ACTIVITY_INSTANCE);
-        }
-
-        LocalDate startedDate = instance.getStartedDate().toLocalDate().minusDays(1);
-        LocalDate completedDate = instance.getCompletedDate().toLocalDate().plusDays(1);
-
-        boolean isValidPeriod = targetDate.isAfter(startedDate) && targetDate.isBefore(completedDate);
-        if (!isValidPeriod) {
-            throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
-        }
     }
 
     @Override

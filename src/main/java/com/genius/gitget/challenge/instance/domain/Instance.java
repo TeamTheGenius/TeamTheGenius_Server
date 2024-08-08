@@ -183,4 +183,18 @@ public class Instance implements FileHolder {
         String today = currentDate.toString().replace("-", "");
         return "GITGET-" + instanceUUID + "-" + today;
     }
+
+    public void validateCertificateCondition(LocalDate targetDate) {
+        if (this.getProgress() != Progress.ACTIVITY) {
+            throw new BusinessException(ErrorCode.NOT_ACTIVITY_INSTANCE);
+        }
+
+        LocalDate startedDate = this.getStartedDate().toLocalDate().minusDays(1);
+        LocalDate completedDate = this.getCompletedDate().toLocalDate().plusDays(1);
+
+        boolean isValidPeriod = targetDate.isAfter(startedDate) && targetDate.isBefore(completedDate);
+        if (!isValidPeriod) {
+            throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
+        }
+    }
 }

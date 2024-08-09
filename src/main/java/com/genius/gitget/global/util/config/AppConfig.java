@@ -1,9 +1,9 @@
 package com.genius.gitget.global.util.config;
 
-import com.genius.gitget.global.file.service.FileManager;
+import com.genius.gitget.global.file.service.FileService;
 import com.genius.gitget.global.file.service.FileUtil;
-import com.genius.gitget.global.file.service.LocalFileManager;
-import com.genius.gitget.global.file.service.S3FileManager;
+import com.genius.gitget.global.file.service.LocalFileService;
+import com.genius.gitget.global.file.service.S3FileService;
 import com.genius.gitget.global.util.formatter.LocalDateFormatter;
 import com.genius.gitget.global.util.formatter.LocalDateTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -25,17 +25,17 @@ public class AppConfig {
     }
 
     @Bean
-    public FileManager fileManager() {
+    public FileService fileManager() {
         final String fileMode = env.getProperty("file.mode");
         assert fileMode != null;
 
         if (fileMode.equals("local")) {
             final String UPLOAD_PATH = env.getProperty("file.upload.path");
-            return new LocalFileManager(fileUtil(), UPLOAD_PATH);
+            return new LocalFileService(fileUtil(), UPLOAD_PATH);
         }
 
         final String bucket = env.getProperty("cloud.aws.s3.bucket");
-        return new S3FileManager(s3Config.amazonS3Client(), fileUtil(), bucket);
+        return new S3FileService(s3Config.amazonS3Client(), fileUtil(), bucket);
     }
 
     @Bean

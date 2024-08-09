@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.util.security.TokenTestUtil;
 import com.genius.gitget.util.security.WithMockCustomUser;
@@ -38,7 +38,7 @@ public class PaymentControllerTest {
     @Autowired
     TopicRepository topicRepository;
     @Autowired
-    FilesService filesService;
+    FilesManager filesManager;
     @Autowired
     private ObjectMapper objectMapper;
 

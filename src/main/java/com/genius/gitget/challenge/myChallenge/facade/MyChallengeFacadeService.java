@@ -17,7 +17,7 @@ import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.service.ItemService;
 import com.genius.gitget.store.item.service.OrdersService;
@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MyChallengeFacadeService implements MyChallengeFacade {
-    private final FilesService filesService;
+    private final FilesManager filesManager;
     private final ParticipantService participantService;
     private final CertificationProvider certificationProvider;
     private final ItemService itemService;
@@ -46,7 +46,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
-            FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+            FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
             int remainDays = DateUtil.getRemainDaysToStart(participant.getStartedDate(), targetDate);
 
             PreActivityResponse preActivityResponse = PreActivityResponse.of(instance, remainDays, fileResponse);
@@ -63,7 +63,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
-            FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+            FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
             Certification certification = certificationProvider.findOrGetDummy(targetDate, participant.getId());
 
             Item item = itemService.findAllByCategory(CERTIFICATION_PASSER).get(0);
@@ -86,7 +86,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
 
         for (Participant participant : participants) {
             Instance instance = participant.getInstance();
-            FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+            FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
             double achievementRate = certificationProvider.getAchievementRate(instance, participant.getId(),
                     targetDate);
 
@@ -118,7 +118,7 @@ public class MyChallengeFacadeService implements MyChallengeFacade {
         );
         Instance instance = participant.getInstance();
 
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
 
         int rewardPoints = instance.getPointPerPerson();
         participantService.getRewards(participant, rewardPoints);

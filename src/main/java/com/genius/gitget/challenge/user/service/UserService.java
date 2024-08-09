@@ -12,7 +12,7 @@ import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.store.item.domain.Item;
@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final OrdersService ordersService;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
     private final EncryptUtil encryptUtil;
 
     @Value("${admin.githubId}")
@@ -104,7 +104,7 @@ public class UserService {
 
     public UserProfileInfo getUserProfileInfo(User user) {
         Long frameId = ordersService.getUsingFrameItem(user.getId()).getId();
-        FileResponse fileResponse = filesService.convertToFileResponse(user.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(user.getFiles());
 
         return UserProfileInfo.createByEntity(user, frameId, fileResponse);
     }

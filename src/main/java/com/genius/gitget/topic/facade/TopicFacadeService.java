@@ -1,7 +1,7 @@
 package com.genius.gitget.topic.facade;
 
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.dto.TopicCreateRequest;
 import com.genius.gitget.topic.dto.TopicDetailResponse;
@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TopicFacadeService implements TopicFacade {
 
-    private final FilesService filesService;
+    private final FilesManager filesManager;
     private final TopicService topicService;
 
 
@@ -32,7 +32,7 @@ public class TopicFacadeService implements TopicFacade {
     @Override
     public TopicDetailResponse findOne(Long id) {
         Topic findTopic = topicService.findOne(id);
-        FileResponse fileResponse = filesService.convertToFileResponse(findTopic.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(findTopic.getFiles());
         return TopicDetailResponse.of(findTopic, fileResponse);
     }
 
@@ -62,7 +62,7 @@ public class TopicFacadeService implements TopicFacade {
     }
 
     private TopicPagingResponse convertToTopicPagingResponseDto(Topic topic) {
-        FileResponse fileResponse = filesService.convertToFileResponse(topic.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(topic.getFiles());
         return TopicPagingResponse.of(topic, fileResponse);
     }
 }

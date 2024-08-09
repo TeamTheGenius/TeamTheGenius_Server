@@ -20,12 +20,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
-public class LocalFileManager implements FileManager {
+public class LocalFileService implements FileService {
     private final String UPLOAD_PATH;
     private final FileUtil fileUtil;
 
 
-    public LocalFileManager(FileUtil fileUtil, @Value("${file.upload.path}") String UPLOAD_PATH) {
+    public LocalFileService(FileUtil fileUtil, @Value("${file.upload.path}") String UPLOAD_PATH) {
         this.fileUtil = fileUtil;
         this.UPLOAD_PATH = UPLOAD_PATH;
     }

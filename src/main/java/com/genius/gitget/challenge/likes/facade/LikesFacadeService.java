@@ -7,7 +7,7 @@ import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
 import com.genius.gitget.challenge.likes.service.LikesService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import java.util.LinkedList;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -19,11 +19,11 @@ import org.springframework.stereotype.Component;
 public class LikesFacadeService implements LikesFacade {
 
     LikesService likesService;
-    FilesService filesService;
+    FilesManager filesManager;
 
-    public LikesFacadeService(LikesService likesService, FilesService filesService) {
+    public LikesFacadeService(LikesService likesService, FilesManager filesManager) {
         this.likesService = likesService;
-        this.filesService = filesService;
+        this.filesManager = filesManager;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class LikesFacadeService implements LikesFacade {
 
         for (Likes like : likesList) {
             Instance instance = like.getInstance();
-            FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+            FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
             UserLikesResponse userLikesResponse = getUserLikesResponse(like, instance, fileResponse);
             userLikesResponses.addFirst(userLikesResponse);
         }

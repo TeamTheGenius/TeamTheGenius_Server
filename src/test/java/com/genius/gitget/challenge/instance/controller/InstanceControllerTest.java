@@ -12,7 +12,7 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.domain.Role;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.util.security.TokenTestUtil;
@@ -44,7 +44,7 @@ public class InstanceControllerTest {
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    FilesService filesService;
+    FilesManager filesManager;
 
     @BeforeEach
     public void setup() {

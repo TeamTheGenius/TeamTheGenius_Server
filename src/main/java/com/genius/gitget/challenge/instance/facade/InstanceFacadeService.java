@@ -8,7 +8,7 @@ import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateDTO;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Transactional
 public class InstanceFacadeService implements InstanceFacade {
-    private final FilesService filesService;
+    private final FilesManager filesManager;
     private final InstanceService instanceService;
 
     // 인스턴스 생성
@@ -56,7 +56,7 @@ public class InstanceFacadeService implements InstanceFacade {
     @Override
     public InstanceDetailResponse findOne(Long id) {
         Instance instance = instanceService.findInstanceById(id);
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
 
         return InstanceDetailResponse.of(instance, fileResponse);
     }
@@ -75,7 +75,7 @@ public class InstanceFacadeService implements InstanceFacade {
     }
 
     private InstancePagingResponse mapToInstancePagingResponse(Instance instance) {
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
         return InstancePagingResponse.of(instance, fileResponse);
     }
 }

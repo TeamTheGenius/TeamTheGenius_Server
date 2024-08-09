@@ -22,7 +22,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
@@ -46,7 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CertificationService {
     private final UserService userService;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
     private final GithubProvider githubProvider;
     private final CertificationProvider certificationProvider;
     private final ParticipantService participantService;
@@ -177,7 +177,7 @@ public class CertificationService {
                     return passed;
                 });
 
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
         //TODO: pass 했기 때문에 pass item이 필요없어 numOfPassItem을 0으로 전달하는 것 같음. but, 가독성이 떨어지기 때문에 수정 필요
         return ActivatedResponse.of(instance, certification.getCertificationStatus(),
                 0, participant.getRepositoryName(), fileResponse);
@@ -247,7 +247,7 @@ public class CertificationService {
 
     public InstancePreviewResponse getInstancePreview(Long instanceId) {
         Instance instance = instanceProvider.findById(instanceId);
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
         return InstancePreviewResponse.createByEntity(instance, fileResponse);
     }
 

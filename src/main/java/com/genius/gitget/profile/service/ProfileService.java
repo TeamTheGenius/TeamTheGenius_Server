@@ -11,7 +11,7 @@ import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
@@ -39,7 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ProfileService {
     private final UserRepository userRepository;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
     private final SignoutRepository signoutRepository;
     private final OrdersService ordersService;
 
@@ -56,7 +56,7 @@ public class ProfileService {
         User findUser = getUserById(userId);
         Long frameId = ordersService.getUsingFrameItem(userId).getId();
 
-        FileResponse fileResponse = filesService.convertToFileResponse(findUser.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(findUser.getFiles());
         return UserInformationResponse.createByEntity(findUser, frameId, fileResponse);
     }
 
@@ -72,7 +72,7 @@ public class ProfileService {
                 participantCount = (joinResult == SUCCESS) ? participantCount + 1 : participantCount - 1;
             }
         }
-        FileResponse fileResponse = filesService.convertToFileResponse(findUser.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(findUser.getFiles());
         return UserDetailsInformationResponse.createByEntity(findUser, participantCount, fileResponse);
     }
 
@@ -93,7 +93,7 @@ public class ProfileService {
     public void deleteUserInformation(User user, String reason) {
         User findUser = getUserByIdentifier(user.getIdentifier());
 
-        filesService.deleteFile(findUser.getFiles());
+        filesManager.deleteFile(findUser.getFiles());
         findUser.setFiles(null);
 
         findUser.deleteLikesList();

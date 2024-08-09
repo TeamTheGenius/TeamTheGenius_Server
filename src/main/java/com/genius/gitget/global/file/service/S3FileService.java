@@ -18,12 +18,12 @@ import java.util.Base64;
 import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
-public class S3FileManager implements FileManager {
+public class S3FileService implements FileService {
     private final AmazonS3 amazonS3;
     private final FileUtil fileUtil;
     private final String bucket;
 
-    public S3FileManager(AmazonS3 amazonS3, FileUtil fileUtil, String bucket) {
+    public S3FileService(AmazonS3 amazonS3, FileUtil fileUtil, String bucket) {
         this.amazonS3 = amazonS3;
         this.fileUtil = fileUtil;
         this.bucket = bucket;
@@ -61,7 +61,7 @@ public class S3FileManager implements FileManager {
     @Override
     public FileDTO copy(Files files, FileType fileType) {
         validateFileExist(files);
-        
+
         CopyDTO copyDTO = fileUtil.getCopyInfo(files, fileType, "");
 
         CopyObjectRequest copyObjectRequest = new CopyObjectRequest(

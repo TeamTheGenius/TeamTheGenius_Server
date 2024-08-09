@@ -7,7 +7,7 @@ import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FileHolderFinder;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/file")
 public class FilesController {
     private final FileHolderFinder finder;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
 
 
     @PostMapping("/{id}")
@@ -40,8 +40,8 @@ public class FilesController {
         FileHolder fileHolder = finder.findByInfo(id, fileType);
         Files files;
 
-        files = filesService.uploadFile(fileHolder, multipartFile, fileType);
-        FileResponse fileResponse = filesService.convertToFileResponse(Optional.ofNullable(files));
+        files = filesManager.uploadFile(fileHolder, multipartFile, fileType);
+        FileResponse fileResponse = filesManager.convertToFileResponse(Optional.ofNullable(files));
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), fileResponse)
@@ -56,8 +56,8 @@ public class FilesController {
     ) {
         FileType fileType = FileType.findType(type);
         FileHolder fileHolder = finder.findByInfo(id, fileType);
-        Files files = filesService.updateFile(fileHolder.getFiles(), multipartFile);
-        FileResponse fileResponse = filesService.convertToFileResponse(Optional.ofNullable(files));
+        Files files = filesManager.updateFile(fileHolder.getFiles(), multipartFile);
+        FileResponse fileResponse = filesManager.convertToFileResponse(Optional.ofNullable(files));
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), fileResponse)

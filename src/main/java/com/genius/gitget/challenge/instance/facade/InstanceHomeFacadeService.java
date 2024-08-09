@@ -9,7 +9,7 @@ import com.genius.gitget.challenge.instance.service.InstanceRecommendationServic
 import com.genius.gitget.challenge.instance.service.InstanceSearchService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +29,7 @@ public class InstanceHomeFacadeService implements InstanceHomeFacade {
 
     private final InstanceRecommendationService instanceRecommendationService;
     private final InstanceSearchService instanceSearchService;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
 
     @Override
     public Page<InstanceSearchResponse> searchInstancesByKeywordAndProgress(InstanceSearchRequest instanceSearchRequest,
@@ -54,7 +54,7 @@ public class InstanceHomeFacadeService implements InstanceHomeFacade {
     }
 
     private InstanceSearchResponse convertToSearchResponse(Instance instance) {
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
         return InstanceSearchResponse.builder()
                 .topicId(instance.getTopic().getId())
                 .instanceId(instance.getId())
@@ -72,7 +72,7 @@ public class InstanceHomeFacadeService implements InstanceHomeFacade {
     }
 
     private HomeInstanceResponse mapToHomeInstanceResponse(Instance instance) {
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
         return HomeInstanceResponse.createByEntity(instance, fileResponse);
     }
 

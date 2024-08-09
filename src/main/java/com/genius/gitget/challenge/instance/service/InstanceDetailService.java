@@ -18,7 +18,7 @@ import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class InstanceDetailService {
     private final UserService userService;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
     private final InstanceProvider instanceProvider;
     private final ParticipantService participantService;
     private final GithubProvider githubProvider;
@@ -43,7 +43,7 @@ public class InstanceDetailService {
 
     public InstanceResponse getInstanceDetailInformation(User user, Long instanceId) {
         Instance instance = instanceProvider.findById(instanceId);
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
         LikesInfo likesInfo = getLikesInfo(user.getId(), instance);
 
         if (participantService.hasJoinedParticipant(user.getId(), instanceId)) {

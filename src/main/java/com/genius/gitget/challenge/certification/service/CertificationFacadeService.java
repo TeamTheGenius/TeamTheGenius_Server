@@ -192,6 +192,8 @@ public class CertificationFacadeService implements CertificationFacade {
                 instance.getPrTemplate(targetDate)
         );
 
+        certificationService.findOrSave(participant, NOT_YET, targetDate);
+
         Certification certification = certificationService.findByDate(targetDate, participant.getId())
                 .map(updated -> {
                     if (updated.getCertificationStatus() == PASSED) {

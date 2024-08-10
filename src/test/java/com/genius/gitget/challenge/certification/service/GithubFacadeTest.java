@@ -5,11 +5,8 @@ import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.genius.gitget.challenge.certification.domain.CertificateStatus;
-import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
 import com.genius.gitget.challenge.certification.facade.GithubFacade;
-import com.genius.gitget.challenge.certification.repository.CertificationRepository;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -49,8 +46,6 @@ class GithubFacadeTest {
     private InstanceRepository instanceRepository;
     @Autowired
     private ParticipantRepository participantRepository;
-    @Autowired
-    private CertificationRepository certificationRepository;
 
     @Value("${github.yeon-personalKey}")
     private String personalKey;
@@ -256,16 +251,5 @@ class GithubFacadeTest {
         participant.setUserAndInstance(user, instance);
 
         return participant;
-    }
-
-    private Certification getSavedCertification(CertificateStatus status, LocalDate certificatedAt,
-                                                Participant participant) {
-        Certification certification = Certification.builder()
-                .certificationStatus(status)
-                .certificatedAt(certificatedAt)
-                .certificationLinks("certificationLink")
-                .build();
-        certification.setParticipant(participant);
-        return certificationRepository.save(certification);
     }
 }

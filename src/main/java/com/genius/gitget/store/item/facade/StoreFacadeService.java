@@ -3,7 +3,6 @@ package com.genius.gitget.store.item.facade;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
 
 import com.genius.gitget.challenge.certification.domain.Certification;
-import com.genius.gitget.challenge.certification.facade.CertificationFacade;
 import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.service.InstanceService;
@@ -43,9 +42,7 @@ public class StoreFacadeService implements StoreFacade {
     private final InstanceService instanceService;
     private final ParticipantService participantService;
 
-    // TODO: CertificationService에만 의존하도록 변경
     private final CertificationService certificationService;
-    private final CertificationFacade certificationFacade;
     private final PaymentRepository paymentRepository;
 
 

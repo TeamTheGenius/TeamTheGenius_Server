@@ -6,6 +6,16 @@ import com.genius.gitget.global.security.constants.ProviderInfo;
 
 public class UserFactory {
 
+    public static User createByInfo(String identifier, Role role) {
+        return User.builder()
+                .role(role)
+                .providerInfo(ProviderInfo.GITHUB)
+                .identifier(identifier)
+                .information("information")
+                .tags("BE,FE")
+                .build();
+    }
+
     public static User createUser() {
         return User.builder()
                 .role(Role.USER)

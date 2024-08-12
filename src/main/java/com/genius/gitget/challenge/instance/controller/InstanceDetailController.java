@@ -8,7 +8,7 @@ import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
-import com.genius.gitget.challenge.instance.service.InstanceDetailService;
+import com.genius.gitget.challenge.instance.service.InstanceDetailFacade;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/challenges")
 public class InstanceDetailController {
-    private final InstanceDetailService instanceDetailService;
+    private final InstanceDetailFacade instanceDetailFacade;
 
 
     @GetMapping("/{instanceId}")
@@ -38,7 +38,7 @@ public class InstanceDetailController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
-        InstanceResponse instanceDetailInformation = instanceDetailService.getInstanceDetailInformation(
+        InstanceResponse instanceDetailInformation = instanceDetailFacade.getInstanceDetailInformation(
                 userPrincipal.getUser(), instanceId);
 
         return ResponseEntity.ok().body(
@@ -58,7 +58,7 @@ public class InstanceDetailController {
                 .repository(repo)
                 .todayDate(kstDate)
                 .build();
-        JoinResponse joinResponse = instanceDetailService.joinNewChallenge(userPrincipal.getUser(), joinRequest);
+        JoinResponse joinResponse = instanceDetailFacade.joinNewChallenge(userPrincipal.getUser(), joinRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(JOIN_SUCCESS.getStatus(), JOIN_SUCCESS.getMessage(), joinResponse)
@@ -70,7 +70,7 @@ public class InstanceDetailController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
-        JoinResponse joinResponse = instanceDetailService.quitChallenge(userPrincipal.getUser(), instanceId);
+        JoinResponse joinResponse = instanceDetailFacade.quitChallenge(userPrincipal.getUser(), instanceId);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(QUIT_SUCCESS.getStatus(), QUIT_SUCCESS.getMessage(), joinResponse)

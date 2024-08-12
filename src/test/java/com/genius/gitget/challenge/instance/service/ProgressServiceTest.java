@@ -39,8 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles({"github"})
 class ProgressServiceTest {
     @Autowired
-    private InstanceDetailService instanceDetailService;
-    @Autowired
     private ProgressService scheduleService;
     @Autowired
     private GithubFacade githubFacade;
@@ -53,7 +51,8 @@ class ProgressServiceTest {
     @Autowired
     private CertificationRepository certificationRepository;
     @Autowired
-    private InstanceProvider instanceProvider;
+    private InstanceDetailFacade instanceDetailFacade;
+
 
     @Value("${github.yeon-personalKey}")
     private String personalKey;
@@ -77,7 +76,7 @@ class ProgressServiceTest {
         getSavedInstance(startedDate, completedDate);
 
         githubFacade.registerGithubPersonalToken(user, personalKey);
-        instanceDetailService.joinNewChallenge(
+        instanceDetailFacade.joinNewChallenge(
                 user,
                 JoinRequest.builder()
                         .repository(targetRepo)
@@ -90,10 +89,10 @@ class ProgressServiceTest {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PARTICIPANT_NOT_FOUND));
 
         //when
-        List<Instance> preActivities = instanceProvider.findAllByProgress(Progress.PREACTIVITY);
+        List<Instance> preActivities = instanceRepository.findAllByProgress(Progress.PREACTIVITY);
         assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.READY);
         scheduleService.updateToActivity(currentDate);
-        List<Instance> activities = instanceProvider.findAllByProgress(Progress.ACTIVITY);
+        List<Instance> activities = instanceRepository.findAllByProgress(Progress.ACTIVITY);
 
         //then
         assertThat(preActivities.size()).isEqualTo(3);
@@ -116,7 +115,7 @@ class ProgressServiceTest {
         getSavedInstance(startedDate, completedDate);
 
         githubFacade.registerGithubPersonalToken(user, personalKey);
-        instanceDetailService.joinNewChallenge(
+        instanceDetailFacade.joinNewChallenge(
                 user,
                 JoinRequest.builder()
                         .repository(targetRepo)
@@ -129,10 +128,10 @@ class ProgressServiceTest {
                 .orElseThrow(() -> new BusinessException(ErrorCode.PARTICIPANT_NOT_FOUND));
 
         //when
-        List<Instance> preActivities = instanceProvider.findAllByProgress(Progress.PREACTIVITY);
+        List<Instance> preActivities = instanceRepository.findAllByProgress(Progress.PREACTIVITY);
         assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.READY);
         scheduleService.updateToActivity(currentDate);
-        List<Instance> activities = instanceProvider.findAllByProgress(Progress.ACTIVITY);
+        List<Instance> activities = instanceRepository.findAllByProgress(Progress.ACTIVITY);
 
         //then
         assertThat(preActivities.size()).isEqualTo(3);
@@ -153,9 +152,9 @@ class ProgressServiceTest {
         getSavedInstance(startedDate, completedDate);
 
         //when
-        List<Instance> activities = instanceProvider.findAllByProgress(Progress.PREACTIVITY);
+        List<Instance> activities = instanceRepository.findAllByProgress(Progress.PREACTIVITY);
         scheduleService.updateToDone(currentDate);
-        List<Instance> done = instanceProvider.findAllByProgress(Progress.DONE);
+        List<Instance> done = instanceRepository.findAllByProgress(Progress.DONE);
 
         //then
         assertThat(activities.size()).isEqualTo(3);
@@ -183,7 +182,7 @@ class ProgressServiceTest {
         scheduleService.updateToDone(currentDate);
 
         //then
-        List<Instance> done = instanceProvider.findAllByProgress(Progress.DONE);
+        List<Instance> done = instanceRepository.findAllByProgress(Progress.DONE);
         assertThat(done.size()).isEqualTo(3);
         assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.SUCCESS);
     }
@@ -209,7 +208,7 @@ class ProgressServiceTest {
         scheduleService.updateToDone(currentDate);
 
         //then
-        List<Instance> done = instanceProvider.findAllByProgress(Progress.DONE);
+        List<Instance> done = instanceRepository.findAllByProgress(Progress.DONE);
         assertThat(done.size()).isEqualTo(3);
         assertThat(participant1.getJoinResult()).isEqualTo(JoinResult.FAIL);
     }

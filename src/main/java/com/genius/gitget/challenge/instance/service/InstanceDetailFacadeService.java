@@ -10,8 +10,7 @@ import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
 import com.genius.gitget.challenge.instance.dto.detail.JoinRequest;
 import com.genius.gitget.challenge.instance.dto.detail.JoinResponse;
 import com.genius.gitget.challenge.instance.dto.detail.LikesInfo;
-import com.genius.gitget.challenge.likes.domain.Likes;
-import com.genius.gitget.challenge.likes.repository.LikesRepository;
+import com.genius.gitget.challenge.likes.service.LikesService;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantService;
@@ -21,52 +20,55 @@ import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
-import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GitHub;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
-@Slf4j
-@Service
-@Transactional(readOnly = true)
-@RequiredArgsConstructor
-public class InstanceDetailService {
-    private final UserService userService;
+@Component
+public class InstanceDetailFacadeService implements InstanceDetailFacade {
+
+    private final InstanceService instanceService;
     private final FilesService filesService;
-    private final InstanceProvider instanceProvider;
     private final ParticipantService participantService;
+    private final LikesService likesService;
+    private final UserService userService;
     private final GithubService githubService;
-    private final LikesRepository likesRepository;
 
+    public InstanceDetailFacadeService(InstanceService instanceService, FilesService filesService,
+                                       ParticipantService participantService, LikesService likesService,
+                                       UserService userService, GithubService githubService) {
+        this.instanceService = instanceService;
+        this.filesService = filesService;
+        this.participantService = participantService;
+        this.likesService = likesService;
+        this.userService = userService;
+        this.githubService = githubService;
+    }
 
+    @Override
     public InstanceResponse getInstanceDetailInformation(User user, Long instanceId) {
-        Instance instance = instanceProvider.findById(instanceId);
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
-        LikesInfo likesInfo = getLikesInfo(user.getId(), instance);
 
-        if (participantService.hasJoinedParticipant(user.getId(), instanceId)) {
+        // 인스턴스 정보
+        Instance instance = instanceService.findInstanceById(instanceId);
+
+        // 파일 객체 생성
+        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+
+        // 좋아요 정보
+        LikesInfo likesInfo = likesService.getLikesInfo(user.getId(), instance);
+
+        if (participantService.hasJoinedParticipant(user.getId(), instance.getId())) {
             return InstanceResponse.createByEntity(instance, likesInfo, JoinStatus.YES, fileResponse);
         }
-
         return InstanceResponse.createByEntity(instance, likesInfo, JoinStatus.NO, fileResponse);
     }
 
-    private LikesInfo getLikesInfo(Long userId, Instance instance) {
-        Optional<Likes> optionalLikes = likesRepository.findSpecificLike(userId, instance.getId());
-        if (optionalLikes.isPresent()) {
-            Likes likes = optionalLikes.get();
-            return LikesInfo.createExist(likes.getId(), instance.getLikesCount());
-        }
 
-        return LikesInfo.createNotExist(instance.getLikesCount());
-    }
-
-    @Transactional
+    @Override
     public JoinResponse joinNewChallenge(User user, JoinRequest joinRequest) {
+
         User persistUser = userService.findUserById(user.getId());
-        Instance instance = instanceProvider.findById(joinRequest.instanceId());
+
+        Instance instance = instanceService.findInstanceById(joinRequest.instanceId());
 
         String repository = joinRequest.repository();
 
@@ -103,9 +105,9 @@ public class InstanceDetailService {
         githubService.validateGithubRepository(gitHub, repositoryFullName);
     }
 
-    @Transactional
+    @Override
     public JoinResponse quitChallenge(User user, Long instanceId) {
-        Instance instance = instanceProvider.findById(instanceId);
+        Instance instance = instanceService.findInstanceById(instanceId);
         Participant participant = participantService.findByJoinInfo(user.getId(), instanceId);
 
         if (instance.getProgress() == Progress.DONE) {

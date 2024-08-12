@@ -9,11 +9,10 @@ import static com.genius.gitget.challenge.participant.domain.JoinStatus.YES;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.user.domain.User;
-import com.genius.gitget.challenge.user.repository.UserRepository;
+import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
 import com.genius.gitget.profile.dto.UserInformationResponse;
@@ -21,48 +20,47 @@ import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserInterestResponse;
 import com.genius.gitget.profile.dto.UserInterestUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
-import com.genius.gitget.signout.Signout;
-import com.genius.gitget.signout.SignoutRepository;
 import com.genius.gitget.store.item.service.OrdersService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.stereotype.Component;
 
-@Service
-@RequiredArgsConstructor
-@Slf4j
-@Transactional(readOnly = true)
-public class ProfileService {
-    private final UserRepository userRepository;
-    private final FilesService filesService;
-    private final SignoutRepository signoutRepository;
+@Component
+public class ProfileFacadeService implements ProfileFacade {
+    private final UserService userService;
     private final OrdersService ordersService;
+    private final FilesService filesService;
 
-    // 포인트 조회
+    public ProfileFacadeService(UserService userService, OrdersService ordersService,
+                                FilesService filesService) {
+        this.userService = userService;
+        this.ordersService = ordersService;
+        this.filesService = filesService;
+    }
+
+    @Override
     public UserPointResponse getUserPoint(User user) {
+        Long userPoint = userService.getUserPoint(user.getId());
         return UserPointResponse.builder()
                 .identifier(user.getIdentifier())
-                .point(user.getPoint())
+                .point(userPoint)
                 .build();
     }
 
-    // 사용자 정보 조회
+    @Override
     public UserInformationResponse getUserInformation(Long userId) {
-        User findUser = getUserById(userId);
+        User findUser = userService.findUserById(userId);
         Long frameId = ordersService.getUsingFrameItem(userId).getId();
-
         FileResponse fileResponse = filesService.convertToFileResponse(findUser.getFiles());
         return UserInformationResponse.createByEntity(findUser, frameId, fileResponse);
     }
 
-    // 마이페이지 - 사용자 정보 상세 조회
+    @Override
     public UserDetailsInformationResponse getUserDetailsInformation(User user) {
-        User findUser = getUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findUserByIdentifier(user.getIdentifier());
+
         int participantCount = 0;
         List<Participant> participantInfoList = findUser.getParticipantList();
 
@@ -76,49 +74,39 @@ public class ProfileService {
         return UserDetailsInformationResponse.createByEntity(findUser, participantCount, fileResponse);
     }
 
-    // 마이페이지 - 사용자 정보 수정
-    @Transactional
+    @Override
     public Long updateUserInformation(User user, UserInformationUpdateRequest userInformationUpdateRequest) {
-        User findUser = getUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findUserByIdentifier(user.getIdentifier());
         findUser.updateUserInformation(
                 userInformationUpdateRequest.getNickname(),
                 userInformationUpdateRequest.getInformation());
 
-        User updatedUser = userRepository.save(findUser);
-        return updatedUser.getId();
+        return userService.save(findUser);
     }
 
-    // 마이페이지 - 회원 탈퇴
-    @Transactional
+    @Override
     public void deleteUserInformation(User user, String reason) {
-        User findUser = getUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findUserByIdentifier(user.getIdentifier());
 
         filesService.deleteFile(findUser.getFiles());
         findUser.setFiles(null);
-
         findUser.deleteLikesList();
-        userRepository.deleteById(findUser.getId());
-        signoutRepository.save(
-                Signout.builder()
-                        .identifier(user.getIdentifier())
-                        .reason(reason)
-                        .build()
-        );
+
+        userService.delete(findUser.getId(), user.getIdentifier(), reason);
     }
 
-    // 마이페이지 - 관심사 수정
-    @Transactional
+    @Override
     public void updateUserTags(User user, UserInterestUpdateRequest userInterestUpdateRequest) {
         if (userInterestUpdateRequest.getTags() == null) {
             throw new BusinessException();
         }
-        User findUser = getUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findUserByIdentifier(user.getIdentifier());
         String interest = String.join(",", userInterestUpdateRequest.getTags());
         findUser.updateUserTags(interest);
-        userRepository.save(findUser);
+        userService.save(findUser);
     }
 
-    // 관심사 조회
+    @Override
     public UserInterestResponse getUserInterest(User user) {
         String tags = user.getTags();
         String[] tagsList = tags.split(",");
@@ -131,9 +119,9 @@ public class ProfileService {
                 .build();
     }
 
-    // 마이페이지 - 챌린지 현황
+    @Override
     public UserChallengeResultResponse getUserChallengeResult(User user) {
-        User findUser = getUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findUserByIdentifier(user.getIdentifier());
         HashMap<JoinResult, List<Long>> participantHashMap = new HashMap<>() {
             {
                 put(READY, new ArrayList<>());
@@ -165,15 +153,5 @@ public class ProfileService {
                 .success(success)
                 .processing(processing)
                 .build();
-    }
-
-    private User getUserByIdentifier(String identifier) {
-        return userRepository.findByIdentifier(identifier)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-    }
-
-    private User getUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
     }
 }

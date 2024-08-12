@@ -24,8 +24,6 @@ import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
-import com.genius.gitget.global.util.exception.BusinessException;
-import com.genius.gitget.global.util.exception.ErrorCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GitHub;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -187,7 +184,7 @@ public class CertificationFacadeService implements CertificationFacade {
 
         instance.validateCertificateCondition(targetDate);
 
-        List<String> filteredPullRequests = filterValidPR(
+        List<String> filteredPullRequests = githubService.filterValidPR(
                 githubService.getPullRequestByDate(gitHub, repositoryName, targetDate),
                 instance.getPrTemplate(targetDate)
         );
@@ -196,9 +193,7 @@ public class CertificationFacadeService implements CertificationFacade {
 
         Certification certification = certificationService.findByDate(targetDate, participant.getId())
                 .map(updated -> {
-                    if (updated.getCertificationStatus() == PASSED) {
-                        throw new BusinessException(ErrorCode.ALREADY_PASSED_CERTIFICATION);
-                    }
+                    updated.validateCertificateCondition();
                     return certificationService.update(updated, targetDate, filteredPullRequests);
                 })
                 .orElseGet(
@@ -206,18 +201,6 @@ public class CertificationFacadeService implements CertificationFacade {
                 );
 
         return CertificationResponse.createExist(certification);
-    }
-
-    private List<String> filterValidPR(List<GHPullRequest> ghPullRequests, String prTemplate) {
-        return ghPullRequests.stream()
-                .filter(ghPullRequest -> {
-                    if (ghPullRequest.getBody() == null) {
-                        return false;
-                    }
-                    return ghPullRequest.getBody().contains(prTemplate);
-                })
-                .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
-                .toList();
     }
 
     @Override

@@ -132,29 +132,15 @@ class CertificationFacadeTest {
             @BeforeEach
             void setup() {
                 currentDate = LocalDate.of(2024, 8, 13);
+
+                instance = instanceRepository.save(InstanceFactory.createByInfo(currentDate, ACTIVITY));
+                participant = participantRepository.save(ParticipantFactory.createProcessing(user, instance));
             }
 
             @Test
             @DisplayName("챌린지의 시작일자가 월요일이 아니고 첫째주일 때, 시작일부터 현재 일자까지의 인증 내역을 반환해야 한다.")
             public void it_return_current_certifications() {
                 int passedDays = 3;
-
-                instance = instanceRepository.save(InstanceFactory.createByInfo(currentDate, ACTIVITY));
-                participant = participantRepository.save(ParticipantFactory.createProcessing(user, instance));
-
-                WeekResponse weekResponses = certificationFacade.getMyWeekCertifications(participant.getId(),
-                        currentDate.plusDays(passedDays));
-
-                assertThat(weekResponses.certifications().size()).isEqualTo(passedDays + 1);
-            }
-
-            @Test
-            @DisplayName("저장된 인증 내역이 없을 때에도 더미 데이터를 포함하여 연속적인 데이터를 받을 수 있다.")
-            public void it_return_continuous_data_saved_data_not_exist() {
-                int passedDays = 3;
-
-                instance = instanceRepository.save(InstanceFactory.createByInfo(currentDate, ACTIVITY));
-                participant = participantRepository.save(ParticipantFactory.createProcessing(user, instance));
 
                 WeekResponse weekResponses = certificationFacade.getMyWeekCertifications(participant.getId(),
                         currentDate.plusDays(passedDays));
@@ -283,10 +269,6 @@ class CertificationFacadeTest {
             @Test
             @DisplayName("인스턴스의 상태가 ACTIVITY이고, 인스턴스 진행일 사이라면 예외가 발생하지 않는다.")
             public void it_not_throw_exception_when_condition_valid() {
-                instance = instanceRepository.save(InstanceFactory.createByInfo(currentDate, ACTIVITY));
-                participant = participantRepository.save(ParticipantFactory.createProcessing(user, instance));
-                participant.updateRepository(targetRepo);
-
                 assertThatNoException().isThrownBy(() -> {
                     certificationFacade.updateCertification(user,
                             CertificationRequest.of(instance.getId(), currentDate));
@@ -311,10 +293,6 @@ class CertificationFacadeTest {
             @DisplayName("현재 일자가 인스턴스 진행 일 사이가 아니라면 NOT_CERTIFICATE_PERIOD 예외가 발생한다.")
             public void it_throws_NOT_CERTIFICATE_PERIOD_exception() {
                 currentDate = startedDate.minusDays(1);
-
-                instance = instanceRepository.save(InstanceFactory.createByInfo(startedDate, ACTIVITY));
-                participant = participantRepository.save(ParticipantFactory.createProcessing(user, instance));
-                participant.updateRepository(targetRepo);
 
                 assertThatThrownBy(() -> certificationFacade.updateCertification(user,
                         CertificationRequest.of(instance.getId(), currentDate)))

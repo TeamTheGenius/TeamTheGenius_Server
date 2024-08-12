@@ -119,6 +119,18 @@ public class GithubService {
         }
     }
 
+    public List<String> filterValidPR(List<GHPullRequest> ghPullRequests, String prTemplate) {
+        return ghPullRequests.stream()
+                .filter(ghPullRequest -> {
+                    if (ghPullRequest.getBody() == null) {
+                        return false;
+                    }
+                    return ghPullRequest.getBody().contains(prTemplate);
+                })
+                .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
+                .toList();
+    }
+
     private GHUser getGHUser(GitHub gitHub) throws IOException {
         String accountId = gitHub.getMyself().getLogin();
         return gitHub.getUser(accountId);

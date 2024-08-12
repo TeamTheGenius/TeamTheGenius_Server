@@ -1,6 +1,7 @@
 package com.genius.gitget.challenge.certification.domain;
 
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.NOT_YET;
+import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
 
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
@@ -84,6 +85,12 @@ public class Certification extends BaseTimeEntity {
     public void validatePassCondition() {
         if (this.certificationStatus != NOT_YET) {
             throw new BusinessException(ErrorCode.CAN_NOT_USE_PASS_ITEM);
+        }
+    }
+
+    public void validateCertificateCondition() {
+        if (this.getCertificationStatus() == PASSED) {
+            throw new BusinessException(ErrorCode.ALREADY_PASSED_CERTIFICATION);
         }
     }
 

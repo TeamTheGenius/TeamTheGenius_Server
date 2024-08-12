@@ -3,7 +3,7 @@ package com.genius.gitget.schedule.service;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
 
-import com.genius.gitget.challenge.certification.service.CertificationProvider;
+import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.service.InstanceProvider;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ProgressService {
     private final InstanceProvider instanceProvider;
-    private final CertificationProvider certificationProvider;
+    private final CertificationService certificationService;
     private final double SUCCESS_THRESHOLD = 85;
 
     @Transactional
@@ -86,8 +86,8 @@ public class ProgressService {
     }
 
     private int getSuccessAttempt(Long participantId, LocalDate currentDate) {
-        int certificated = certificationProvider.countByStatus(participantId, CERTIFICATED, currentDate);
-        int passed = certificationProvider.countByStatus(participantId, PASSED, currentDate);
+        int certificated = certificationService.countByStatus(participantId, CERTIFICATED, currentDate);
+        int passed = certificationService.countByStatus(participantId, PASSED, currentDate);
         return certificated + passed;
     }
 

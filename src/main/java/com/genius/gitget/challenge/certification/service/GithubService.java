@@ -1,82 +1,146 @@
 package com.genius.gitget.challenge.certification.service;
 
-import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_PR_NOT_FOUND;
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_CONNECTION_FAILED;
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_ID_INCORRECT;
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITORY_INCORRECT;
 
-import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
-import com.genius.gitget.challenge.certification.util.EncryptUtil;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.kohsuke.github.GHDirection;
+import org.kohsuke.github.GHFileNotFoundException;
 import org.kohsuke.github.GHPullRequest;
+import org.kohsuke.github.GHPullRequestSearchBuilder;
 import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GHRepositorySearchBuilder;
+import org.kohsuke.github.GHRepositorySearchBuilder.Sort;
+import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class GithubService {
     private final UserService userService;
-    private final GithubProvider githubProvider;
-    private final EncryptUtil encryptUtil;
 
-    @Transactional
-    public void registerGithubPersonalToken(User user, String githubToken) {
-        GitHub gitHub = githubProvider.getGithubConnection(githubToken);
-        githubProvider.validateGithubConnection(gitHub, user.getIdentifier());
 
-        String encryptedToken = encryptUtil.encrypt(githubToken);
-        user.updateGithubPersonalToken(encryptedToken);
-        userService.save(user);
-    }
-
-    public void verifyGithubToken(User user) {
-        String githubToken = encryptUtil.decrypt(user.getGithubToken());
-
-        GitHub gitHub = githubProvider.getGithubConnection(githubToken);
-        githubProvider.validateGithubConnection(gitHub, user.getIdentifier());
-    }
-
-    @Transactional
-    public void verifyRepository(User user, String repository) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
-
-        String repositoryFullName = githubProvider.getRepoFullName(gitHub, repository);
-        githubProvider.validateGithubRepository(gitHub, repositoryFullName);
-    }
-
-    public List<String> getPublicRepositories(User user) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
-        List<GHRepository> repositoryList = githubProvider.getRepositoryList(gitHub);
-        return repositoryList.stream()
-                .map(GHRepository::getName)
-                .toList();
-    }
-
-    //TODO: PR이 날라온 브랜치의 이름이 정해진 규칙에 맞는지 여부 확인 필요
-    public List<PullRequestResponse> verifyPullRequest(User user, String repositoryName, LocalDate targetDate) {
-        List<PullRequestResponse> responses = getPullRequestListByDate(user, repositoryName, targetDate);
-
-        if (responses.isEmpty()) {
-            throw new BusinessException(GITHUB_PR_NOT_FOUND);
+    public GitHub getGithubConnection(String githubToken) {
+        try {
+            GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
+            gitHub.checkApiUrlValidity();
+            return gitHub;
+        } catch (IOException e) {
+            throw new BusinessException(GITHUB_CONNECTION_FAILED);
         }
-        return responses;
     }
 
-    public List<PullRequestResponse> getPullRequestListByDate(User user, String repositoryName,
-                                                              LocalDate targetDate) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
+    public GitHub getGithubConnection(User user) {
+        try {
+            String githubToken = userService.getGithubToken(user);
+            GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
+            gitHub.checkApiUrlValidity();
+            return gitHub;
+        } catch (IOException e) {
+            throw new BusinessException(GITHUB_CONNECTION_FAILED);
+        }
+    }
 
-        List<GHPullRequest> pullRequest = githubProvider.getPullRequestByDate(gitHub, repositoryName, targetDate);
+    public void validateGithubConnection(GitHub gitHub, String githubId) {
+        try {
+            String accountId = gitHub.getMyself().getLogin();
+            validateGithubAccount(githubId, accountId);
+        } catch (IOException e) {
+            throw new BusinessException(GITHUB_CONNECTION_FAILED);
+        }
+    }
 
-        return pullRequest.stream()
-                .map(PullRequestResponse::create)
+    private void validateGithubAccount(String githubId, String accountId) {
+        if (!githubId.equals(accountId)) {
+            throw new BusinessException(GITHUB_ID_INCORRECT);
+        }
+    }
+
+    public void validateGithubRepository(GitHub gitHub, String repositoryFullName) {
+        try {
+            gitHub.getRepository(repositoryFullName);
+        } catch (GHFileNotFoundException e) {
+            throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
+        } catch (IllegalArgumentException | IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public List<GHRepository> getRepositoryList(GitHub gitHub) {
+        try {
+            GHRepositorySearchBuilder builder = gitHub.searchRepositories()
+                    .user(getGHUser(gitHub).getLogin())
+                    .sort(Sort.UPDATED)
+                    .order(GHDirection.DESC);
+            return builder.list().iterator().nextPage();
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public List<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName,
+                                                    LocalDate kstDate) {
+        try {
+            GHRepository repository = gitHub.getRepository(getRepoFullName(gitHub, repositoryName));
+            GHPullRequestSearchBuilder prSearchBuilder = gitHub.searchPullRequests()
+                    .repo(repository)
+                    .author(getGHUser(gitHub))
+                    .created(kstDate.minusDays(1), kstDate);
+
+            return prSearchBuilder.list().iterator().nextPage().stream()
+                    .filter(pr -> isEqualToKST(pr, kstDate))
+                    .toList();
+
+        } catch (GHFileNotFoundException e) {
+            throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    private boolean isEqualToKST(GHPullRequest ghPullRequest, LocalDate targetDate) {
+        try {
+            LocalDate kst = DateUtil.convertToKST(ghPullRequest.getCreatedAt());
+            return kst.isEqual(targetDate);
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    public List<String> filterValidPR(List<GHPullRequest> ghPullRequests, String prTemplate) {
+        return ghPullRequests.stream()
+                .filter(ghPullRequest -> {
+                    if (ghPullRequest.getBody() == null) {
+                        return false;
+                    }
+                    return ghPullRequest.getBody().contains(prTemplate);
+                })
+                .map(ghPullRequest -> ghPullRequest.getHtmlUrl().toString())
                 .toList();
+    }
+
+    private GHUser getGHUser(GitHub gitHub) throws IOException {
+        String accountId = gitHub.getMyself().getLogin();
+        return gitHub.getUser(accountId);
+    }
+
+    public String getRepoFullName(GitHub gitHub, String repositoryName) {
+        try {
+            return gitHub.getMyself().getLogin() + "/" + repositoryName;
+        } catch (IOException e) {
+            throw new BusinessException(e);
+        }
     }
 }

@@ -14,4 +14,8 @@ public class OrderResponse {
     public OrderResponse(Long itemId) {
         this.itemId = itemId;
     }
+
+    public static OrderResponse of(Long itemId) {
+        return new OrderResponse(itemId);
+    }
 }

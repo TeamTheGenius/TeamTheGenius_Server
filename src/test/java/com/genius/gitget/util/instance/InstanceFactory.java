@@ -2,9 +2,18 @@ package com.genius.gitget.util.instance;
 
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class InstanceFactory {
+    public static Instance createByInfo(LocalDate started, Progress progress) {
+        return Instance.builder()
+                .progress(progress)
+                .startedDate(started.atTime(0, 0))
+                .completedDate(started.plusDays(10).atTime(1, 0))
+                .build();
+    }
+
     /**
      * LocalDate.now()를 기준으로 PREACTIVITY(시작 전) 인스턴스 생성 후 반환
      */

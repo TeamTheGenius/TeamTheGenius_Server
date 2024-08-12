@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.genius.gitget.challenge.certification.domain.CertificateStatus;
 import com.genius.gitget.challenge.certification.domain.Certification;
+import com.genius.gitget.challenge.certification.facade.GithubFacade;
 import com.genius.gitget.challenge.certification.repository.CertificationRepository;
-import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
@@ -43,7 +43,7 @@ class ProgressServiceTest {
     @Autowired
     private ProgressService scheduleService;
     @Autowired
-    private GithubService githubService;
+    private GithubFacade githubFacade;
     @Autowired
     private InstanceRepository instanceRepository;
     @Autowired
@@ -76,7 +76,7 @@ class ProgressServiceTest {
         getSavedInstance(startedDate, completedDate);
         getSavedInstance(startedDate, completedDate);
 
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
         instanceDetailService.joinNewChallenge(
                 user,
                 JoinRequest.builder()
@@ -115,7 +115,7 @@ class ProgressServiceTest {
         getSavedInstance(startedDate, completedDate);
         getSavedInstance(startedDate, completedDate);
 
-        githubService.registerGithubPersonalToken(user, personalKey);
+        githubFacade.registerGithubPersonalToken(user, personalKey);
         instanceDetailService.joinNewChallenge(
                 user,
                 JoinRequest.builder()

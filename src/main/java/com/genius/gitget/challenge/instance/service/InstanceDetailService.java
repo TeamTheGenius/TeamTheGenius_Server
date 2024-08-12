@@ -3,7 +3,7 @@ package com.genius.gitget.challenge.instance.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_JOIN_INSTANCE;
 import static com.genius.gitget.global.util.exception.ErrorCode.CAN_NOT_QUIT_INSTANCE;
 
-import com.genius.gitget.challenge.certification.service.GithubProvider;
+import com.genius.gitget.challenge.certification.service.GithubService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.dto.detail.InstanceResponse;
@@ -37,7 +37,7 @@ public class InstanceDetailService {
     private final FilesService filesService;
     private final InstanceProvider instanceProvider;
     private final ParticipantService participantService;
-    private final GithubProvider githubProvider;
+    private final GithubService githubService;
     private final LikesRepository likesRepository;
 
 
@@ -98,9 +98,9 @@ public class InstanceDetailService {
     }
 
     private void validateGithub(User user, String repository) {
-        GitHub gitHub = githubProvider.getGithubConnection(user);
-        String repositoryFullName = githubProvider.getRepoFullName(gitHub, repository);
-        githubProvider.validateGithubRepository(gitHub, repositoryFullName);
+        GitHub gitHub = githubService.getGithubConnection(user);
+        String repositoryFullName = githubService.getRepoFullName(gitHub, repository);
+        githubService.validateGithubRepository(gitHub, repositoryFullName);
     }
 
     @Transactional

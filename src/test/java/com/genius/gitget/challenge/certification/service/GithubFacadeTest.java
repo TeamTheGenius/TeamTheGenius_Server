@@ -3,29 +3,24 @@ package com.genius.gitget.challenge.certification.service;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_REPOSITORY_INCORRECT;
 import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
 import com.genius.gitget.challenge.certification.facade.GithubFacade;
 import com.genius.gitget.challenge.certification.util.EncryptUtil;
-import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.instance.repository.InstanceRepository;
-import com.genius.gitget.challenge.participant.domain.JoinResult;
-import com.genius.gitget.challenge.participant.domain.JoinStatus;
-import com.genius.gitget.challenge.participant.domain.Participant;
-import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
-import java.io.IOException;
+import com.genius.gitget.util.user.UserFactory;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,221 +30,200 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @SpringBootTest
 @Transactional
-class GithubFacadeTest {
+public class GithubFacadeTest {
     @Autowired
     private EncryptUtil encryptUtil;
     @Autowired
     private GithubFacade githubFacade;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private InstanceRepository instanceRepository;
-    @Autowired
-    private ParticipantRepository participantRepository;
 
     @Value("${github.yeon-personalKey}")
-    private String personalKey;
+    private String githubToken;
     @Value("${github.yeon-githubId}")
     private String githubId;
     @Value("${github.yeon-repository}")
     private String targetRepo;
 
-    @Test
-    @DisplayName("Github personal access token 연결에 이상이 없다면, 암호화하여 User 엔티티에 저장한다.")
-    public void should_updateTokenInfo_when_tokenValid() {
-        //given
-        User user = getSavedUser(githubId);
-        String encrypted = encryptUtil.encrypt(personalKey);
+    private User user;
 
-        //when
-        githubFacade.registerGithubPersonalToken(user, personalKey);
-        User updatedUser = userRepository.findByIdentifier(githubId).get();
-
-        //then
-        assertThat(updatedUser.getGithubToken()).isEqualTo(encrypted);
+    @BeforeEach
+    void setup() {
+        user = userRepository.save(UserFactory.createByInfo(githubId, Role.USER));
     }
 
-    @Test
-    @DisplayName("Github personal access token과 소셜로그인 시의 계정이 일치하지 않으면 예외를 발생시킨다.")
-    public void should_throwException_when_accountIncorrect() {
-        //given
-        User user = getSavedUser("incorrect Id");
-        encryptUtil.encrypt(personalKey);
+    @Nested
+    @DisplayName("Github Token 등록 시")
+    class context_register_github_token {
+        @Nested
+        @DisplayName("Github 연결에 이상이 없다면")
+        class describe_connection_valid {
+            @Test
+            @DisplayName("Github token을 암호화하여 User 엔티티에 저장한다.")
+            public void it_save_token_to_user_entity() {
+                String encrypted = encryptUtil.encrypt(githubToken);
 
-        //when & then
-        assertThatThrownBy(() -> githubFacade.registerGithubPersonalToken(user, personalKey))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.GITHUB_ID_INCORRECT.getMessage());
+                githubFacade.registerGithubPersonalToken(user, githubToken);
+
+                assertThat(user.getGithubToken()).isEqualTo(encrypted);
+            }
+        }
+
+        @Nested
+        @DisplayName("깃허브 계정 정보와 identifier 비교 시")
+        class describe_mismatch_id {
+            @Test
+            @DisplayName("사용자의 identifier와 일치하지 않으면 GITHUB_ID_INCORRECT 예외가 발생한다.")
+            public void it_throws_GITHUB_ID_INCORRECT_exception() {
+                user = userRepository.save(UserFactory.createByInfo("incorrectID", Role.USER));
+
+                assertThatThrownBy(() -> githubFacade.registerGithubPersonalToken(user, githubToken))
+                        .isInstanceOf(BusinessException.class)
+                        .hasMessageContaining(ErrorCode.GITHUB_ID_INCORRECT.getMessage());
+            }
+        }
     }
 
-    @Test
-    @DisplayName("repository 이름을 전달했을 때, 해당 깃허브 계정에 레포지토리가 있어야 한다.")
-    public void should_repositoryExist_when_passRepositoryName() {
-        //given
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-        githubFacade.registerGithubPersonalToken(user, personalKey);
+    @Nested
+    @DisplayName("Repository 유효성 확인 시")
+    class context_register_repository {
+        @Nested
+        @DisplayName("사용자로부터 Github token을 불러올 때")
+        class describe_get_github_token {
+            @Test
+            @DisplayName("사용자에게 Github token이 저장되어 있지 않다면 GITHUB_TOKEN_NOT_FOUND 예외가 발생한다.")
+            public void it_throws_GITHUB_TOKEN_NOT_FOUND_exception() {
+                assertThatThrownBy(() -> githubFacade.verifyRepository(user, targetRepo))
+                        .isInstanceOf(BusinessException.class)
+                        .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
+            }
+        }
 
-        //when
-        githubFacade.verifyRepository(user, targetRepo);
+        @Nested
+        @DisplayName("repository의 이름을 전달했을 때")
+        class describe_pass_repository_name {
+            @BeforeEach
+            void setup() {
+                user.updateGithubPersonalToken(encryptUtil.encrypt(githubToken));
+            }
 
+            @Test
+            @DisplayName("해당 깃허브 계정에 repository가 존재한다면 예외가 발생하지 않는다.")
+            public void it_not_throw_exception() {
+                assertThatNoException().isThrownBy(() -> {
+                    githubFacade.verifyRepository(user, targetRepo);
+                });
+            }
+
+            @Test
+            @DisplayName("해당 깃허브 계정에 Repository가 존재하지 않는다면 GITHUB_REPOSITORY_INCORRECT 예외가 발생한다.")
+            public void it_throw_GITHUB_REPOSITORY_INCORRECT_exception() {
+                String fakeRepoName = "Fake";
+
+                assertThatThrownBy(() -> githubFacade.verifyRepository(user, fakeRepoName))
+                        .isInstanceOf(BusinessException.class)
+                        .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
+            }
+        }
     }
 
-    @Test
-    @DisplayName("repository 등록 시, 해당 레포지토리가 없다면 예외가 발생해야 한다.")
-    public void should_throw_Exception_when_thereIsNoRepository() {
-        //given
-        String fakeRepositoryName = "Fake";
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-        githubFacade.registerGithubPersonalToken(user, personalKey);
+    @Nested
+    @DisplayName("특정 일자의 PR 내역 확인 시")
+    class context_check_PR {
+        LocalDate targetDate;
 
-        //when & then
-        assertThatThrownBy(() -> githubFacade.verifyRepository(user, fakeRepositoryName))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
+        @Nested
+        @DisplayName("조건 확인 시")
+        class describe_validate_condition {
+            @Test
+            @DisplayName("사용자의 Github token이 저장되어 있지 않을 때 GITHUB_TOKEN_NOT_FOUND 예외가 발생한다.")
+            public void it_throws_GITHUB_TOKEN_NOT_FOUND_exception() {
+                targetDate = LocalDate.of(2024, 1, 4);
+                assertThatThrownBy(() -> githubFacade.getPullRequestListByDate(user, targetRepo, targetDate))
+                        .isInstanceOf(BusinessException.class)
+                        .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
+            }
+
+            @Test
+            @DisplayName("repository 이름이 유효하지 않을 때 예외가 발생한다.")
+            public void it_throws_GITHUB_REPOSITORY_INCORRECT_exception() {
+                String fakeRepo = "fake Repo";
+                targetDate = LocalDate.of(2024, 2, 5);
+                user.updateGithubPersonalToken(encryptUtil.encrypt(githubToken));
+
+                assertThatThrownBy(() -> githubFacade.getPullRequestListByDate(user, fakeRepo, targetDate))
+                        .isInstanceOf(BusinessException.class)
+                        .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
+            }
+        }
+
+        @Nested
+        @DisplayName("PR을 확인할 수 있는 유효한 조건일 때")
+        class describe_valid_condition {
+            @BeforeEach
+            void setup() {
+                user.updateGithubPersonalToken(encryptUtil.encrypt(githubToken));
+            }
+
+            @Test
+            @DisplayName("특정 일자에 PR이 존재하지 않는다면 빈 리스트를 반환한다.")
+            public void it_returns_emptyList_when_pr_not_exist() {
+                LocalDate targetDate = LocalDate.of(2024, 1, 4);
+
+                List<PullRequestResponse> pullRequestResponses = githubFacade.getPullRequestListByDate(
+                        user, targetRepo, targetDate);
+
+                assertThat(pullRequestResponses.size()).isEqualTo(0);
+            }
+
+            @Test
+            @DisplayName("특정 일자에 PR이 존재한다면 목록을 불러 올 수  있다.")
+            public void it_returns_pr_list() {
+                LocalDate targetDate = LocalDate.of(2024, 2, 5);
+
+                List<PullRequestResponse> pullRequestResponses = githubFacade.getPullRequestListByDate(
+                        user, targetRepo, targetDate);
+
+                assertThat(pullRequestResponses.size()).isEqualTo(1);
+            }
+        }
     }
 
-    @Test
-    @DisplayName("repository 등록 시, 사용자에게 Github token이 저장되어있지 않다면 예외가 발생해야 한다.")
-    public void should_throwException_when_userDontHaveToken() {
-        //given
-        User user = getSavedUser(githubId);
-        Instance instance = getSavedInstance();
-        Participant participant = getParticipantInfo(user, instance);
+    @Nested
+    @DisplayName("특정 레포지토리에 PR이 존재하는지 확인 시")
+    class context_verify_pr {
+        LocalDate targetDate;
 
-        //when & then
-        assertThatThrownBy(() -> githubFacade.verifyRepository(user, targetRepo))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
-    }
+        @BeforeEach
+        void setup() {
+            targetDate = LocalDate.of(2024, 3, 5);
+            user.updateGithubPersonalToken(encryptUtil.encrypt(githubToken));
+        }
 
-    @Test
-    @DisplayName("특정 일자에 PR이 존재하지 않는다면 빈 리스트를 반환한다.")
-    public void should_returnEmptyList_when_prNotExist() throws IOException {
-        //given
-        User user = getSavedUser(githubId);
-        githubFacade.registerGithubPersonalToken(user, personalKey);
+        @Nested
+        @DisplayName("PR 확인 시")
+        class describe_check_pr {
+            @Test
+            @DisplayName("존재하지 않는다면 GITHUB_PR_NOT_FOUND 예외가 발생한다.")
+            public void it_throws_GITHUB_PR_NOT_FOUND_exception() {
+                assertThatThrownBy(() -> githubFacade.verifyPullRequest(user, targetRepo, targetDate))
+                        .isInstanceOf(BusinessException.class)
+                        .hasMessageContaining(ErrorCode.GITHUB_PR_NOT_FOUND.getMessage());
+            }
 
-        LocalDate targetDate = LocalDate.of(2024, 1, 4);
+            @Test
+            @DisplayName("특정 일자에 PR이 존재한다면 결과를 List로 반환한다.")
+            public void it_returns_list_if_pr_exist() {
+                targetDate = LocalDate.of(2024, 2, 5);
 
-        //when
-        List<PullRequestResponse> pullRequestResponses = githubFacade.getPullRequestListByDate(
-                user, targetRepo, targetDate);
+                //when
+                List<PullRequestResponse> pullRequestResponses = githubFacade.verifyPullRequest(user, targetRepo,
+                        targetDate);
 
-        //then
-        assertThat(pullRequestResponses.size()).isEqualTo(0);
-    }
+                //then
+                assertThat(pullRequestResponses.size()).isNotZero();
 
-    @Test
-    @DisplayName("사용자의 github token이 저장되어있지 않을 때 예외가 발생해야 한다.")
-    public void should_throwException_when_githubTokenNotSaved() {
-        //given
-        LocalDate targetDate = LocalDate.of(2024, 2, 5);
-        User user = getSavedUser(githubId);
-
-        //when & then
-        assertThatThrownBy(() -> githubFacade.getPullRequestListByDate(user, targetRepo, targetDate))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
-    }
-
-    @Test
-    @DisplayName("repository가 등록되어있지 않을 때 예외가 발생해야 한다.")
-    public void should_throwException_when_repositoryNotRegistered() {
-        //given
-        LocalDate targetDate = LocalDate.of(2024, 2, 5);
-        User user = getSavedUser(githubId);
-        String fakeRepo = "fake Repo";
-        githubFacade.registerGithubPersonalToken(user, personalKey);
-
-        //when & then
-        assertThatThrownBy(() -> githubFacade.getPullRequestListByDate(user, fakeRepo, targetDate))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(GITHUB_REPOSITORY_INCORRECT.getMessage());
-    }
-
-    @Test
-    @DisplayName("특정 레포지토리에 특정 날짜에 생성된 PR 목록을 불러올 수 있다.")
-    public void should_loadPRList_when_tryJoin() {
-        //given
-        User user = getSavedUser(githubId);
-        githubFacade.registerGithubPersonalToken(user, personalKey);
-
-        LocalDate targetDate = LocalDate.of(2024, 2, 5);
-
-        //when
-        List<PullRequestResponse> pullRequestResponses = githubFacade.getPullRequestListByDate(
-                user, targetRepo, targetDate);
-
-        //then
-        assertThat(pullRequestResponses.size()).isEqualTo(1);
-        log.info(pullRequestResponses.get(0).toString());
-    }
-
-    @Test
-    @DisplayName("특정 일자에 특정 브랜치에 PR이 있는지 확인할 수 있다.")
-    public void should_checkPR_when_tryToVerify() {
-        //given
-        User user = getSavedUser(githubId);
-        githubFacade.registerGithubPersonalToken(user, personalKey);
-
-        LocalDate targetDate = LocalDate.of(2024, 2, 5);
-
-        //when
-        List<PullRequestResponse> pullRequestResponses = githubFacade.verifyPullRequest(user, targetRepo,
-                targetDate);
-
-        //then
-        assertThat(pullRequestResponses.size()).isNotZero();
-    }
-
-    @Test
-    @DisplayName("PR 검증을 요청했을 때, PR이 해당 브랜치에 존재하지 않는다면 예외를 발생한다.")
-    public void should_throwException_when_PRNotExist() {
-        //given
-        User user = getSavedUser(githubId);
-        githubFacade.registerGithubPersonalToken(user, personalKey);
-
-        LocalDate targetDate = LocalDate.of(2024, 3, 5);
-
-        //when & then
-        assertThatThrownBy(() -> githubFacade.verifyPullRequest(user, targetRepo, targetDate))
-                .isInstanceOf(BusinessException.class)
-                .hasMessageContaining(ErrorCode.GITHUB_PR_NOT_FOUND.getMessage());
-    }
-
-
-    private User getSavedUser(String githubId) {
-        return userRepository.save(
-                User.builder()
-                        .role(Role.USER)
-                        .nickname("nickname")
-                        .providerInfo(ProviderInfo.GITHUB)
-                        .identifier(githubId)
-                        .information("information")
-                        .tags("BE,FE")
-                        .build()
-        );
-    }
-
-    private Instance getSavedInstance() {
-        return instanceRepository.save(
-                Instance.builder()
-                        .progress(Progress.PREACTIVITY)
-                        .build()
-        );
-    }
-
-    private Participant getParticipantInfo(User user, Instance instance) {
-        Participant participant = participantRepository.save(
-                Participant.builder()
-                        .joinResult(JoinResult.PROCESSING)
-                        .joinStatus(JoinStatus.YES)
-                        .build()
-        );
-        participant.setUserAndInstance(user, instance);
-
-        return participant;
+            }
+        }
     }
 }

@@ -3,10 +3,6 @@ package com.genius.gitget.profile.service;
 import static com.genius.gitget.global.security.constants.ProviderInfo.GITHUB;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.genius.gitget.signout.Signout;
-import com.genius.gitget.signout.SignoutRepository;
-import com.genius.gitget.topic.domain.Topic;
-import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -26,12 +22,18 @@ import com.genius.gitget.profile.dto.UserInformationUpdateRequest;
 import com.genius.gitget.profile.dto.UserInterestResponse;
 import com.genius.gitget.profile.dto.UserInterestUpdateRequest;
 import com.genius.gitget.profile.dto.UserPointResponse;
+import com.genius.gitget.signout.Signout;
+import com.genius.gitget.signout.SignoutRepository;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,9 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Rollback
 public class ProfileServiceTest {
-    static User user1, user2;
-    static Topic topic1;
-    static Instance instance1, instance2, instance3;
+
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -56,9 +56,13 @@ public class ProfileServiceTest {
     @Autowired
     LikesService likesService;
     @Autowired
-    ProfileService profileService;
+    ProfileFacade profileFacade;
     @Autowired
     SignoutRepository signoutRepository;
+
+    static User user1, user2;
+    static Topic topic1;
+    static Instance instance1, instance2, instance3;
 
     @BeforeEach
     void setup() {
@@ -84,100 +88,144 @@ public class ProfileServiceTest {
         likesRepository.save(likes3);
     }
 
-    // TODO 챌린지 현황 조회 -> 코드 병합 후 테스트할 것
+    @Nested
+    @DisplayName("유저 상세 정보 조회")
+    class Describe_getUserDetailsInformation {
 
-    @Test
-    void 유저_상세_조회() {
-        UserDetailsInformationResponse userDetailsInformation = profileService.getUserDetailsInformation(user1);
-        Assertions.assertThat(userDetailsInformation.getIdentifier()).isEqualTo("neo5188@gmail.com");
-    }
-
-    @Test
-    void 유저_조회() {
-        List<Long> userIdList = new ArrayList<>();
-        List<User> all = userRepository.findAll();
-        for (User user : all) {
-            Long id = user.getId();
-            userIdList.add(id);
-        }
-
-        for (int i = userIdList.size() - 1; i >= 0; i--) {
-            UserInformationResponse userInformation = profileService.getUserInformation(userIdList.get(i));
-            Assertions.assertThat(userInformation.getNickname()).isEqualTo("alias" + (i + 1));
+        @Test
+        @DisplayName("유저의 상세 정보를 반환한다.")
+        void it_returns_user_details_information() {
+            UserDetailsInformationResponse userDetailsInformation = profileFacade.getUserDetailsInformation(user1);
+            Assertions.assertThat(userDetailsInformation.getIdentifier()).isEqualTo("neo5188@gmail.com");
         }
     }
 
-    @Test
-    void 유저_정보_수정() {
-        profileService.updateUserInformation(user1,
-                UserInformationUpdateRequest.builder()
-                        .nickname("수정된 nickname")
-                        .information("수정된 information")
-                        .build());
+    @Nested
+    @DisplayName("유저 정보 조회")
+    class Describe_getUserInformation {
 
-        User user = userRepository.findByIdentifier(user1.getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+        @Test
+        @DisplayName("유저의 정보를 반환한다.")
+        void it_returns_user_information() {
+            List<Long> userIdList = new ArrayList<>();
+            List<User> all = userRepository.findAll();
+            for (User user : all) {
+                Long id = user.getId();
+                userIdList.add(id);
+            }
 
-        Assertions.assertThat(user.getNickname()).isEqualTo("수정된 nickname");
+            for (int i = userIdList.size() - 1; i >= 0; i--) {
+                UserInformationResponse userInformation = profileFacade.getUserInformation(userIdList.get(i));
+                Assertions.assertThat(userInformation.getNickname()).isEqualTo("alias" + (i + 1));
+            }
+        }
     }
 
-    @Test
-    void 유저_관심사_조회() {
-        UserInterestResponse userInterest = profileService.getUserInterest(user1);
-        List<String> tags = userInterest.getTags();
-        String join = String.join(",", tags);
-        Assertions.assertThat(join).isEqualTo("BE,FE");
+    @Nested
+    @DisplayName("유저 정보 수정")
+    class Describe_updateUserInformation {
+
+        @Test
+        @DisplayName("유저의 정보를 수정한다.")
+        void it_updates_user_information() {
+            profileFacade.updateUserInformation(user1,
+                    UserInformationUpdateRequest.builder()
+                            .nickname("수정된 nickname")
+                            .information("수정된 information")
+                            .build());
+
+            User user = userRepository.findByIdentifier(user1.getIdentifier())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+            Assertions.assertThat(user.getNickname()).isEqualTo("수정된 nickname");
+        }
     }
 
-    @Test
-    void 유저_관심사_수정() {
-        profileService.updateUserTags(user1,
-                UserInterestUpdateRequest.builder().tags(new ArrayList<>(Arrays.asList("FE", "BE"))).build());
-        User user = userRepository.findByIdentifier(user1.getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        Assertions.assertThat(user.getTags()).isEqualTo("FE,BE");
+    @Nested
+    @DisplayName("유저 관심사 조회")
+    class Describe_getUserInterest {
+
+        @Test
+        @DisplayName("유저의 관심사를 반환한다.")
+        void it_returns_user_interest() {
+            UserInterestResponse userInterest = profileFacade.getUserInterest(user1);
+            List<String> tags = userInterest.getTags();
+            String join = String.join(",", tags);
+            Assertions.assertThat(join).isEqualTo("BE,FE");
+        }
     }
 
+    @Nested
+    @DisplayName("유저 관심사 수정")
+    class Describe_updateUserTags {
 
-    @Test
-    void 회원_탈퇴() {
-        User user = userRepository.findByIdentifier(user1.getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        String userIdentifier = user.getIdentifier();
-        profileService.deleteUserInformation(user, "서비스 이용 불편");
-
-        assertThrows(BusinessException.class,
-                () -> userRepository.findByIdentifier(userIdentifier)
-                        .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND)));
-
-        Signout byIdentifier = signoutRepository.findByIdentifier(userIdentifier);
-
-        Assertions.assertThat(byIdentifier.getReason()).isEqualTo("서비스 이용 불편");
+        @Test
+        @DisplayName("유저의 관심사를 수정한다.")
+        void it_updates_user_tags() {
+            profileFacade.updateUserTags(user1,
+                    UserInterestUpdateRequest.builder().tags(new ArrayList<>(Arrays.asList("FE", "BE"))).build());
+            User user = userRepository.findByIdentifier(user1.getIdentifier())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+            Assertions.assertThat(user.getTags()).isEqualTo("FE,BE");
+        }
     }
 
-    @Test
-    void 유저_포인트_조회() {
-        User user = userRepository.findByIdentifier(user1.getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
-        user.updatePoints(1500L);
-        userRepository.save(user);
-        UserPointResponse userPoint = profileService.getUserPoint(user1);
-        Assertions.assertThat(userPoint.getPoint()).isEqualTo(1500);
+    @Nested
+    @DisplayName("회원 탈퇴")
+    class Describe_deleteUserInformation {
+
+        @Test
+        @DisplayName("유저의 정보를 삭제한다.")
+        void it_deletes_user_information() {
+            User user = userRepository.findByIdentifier(user1.getIdentifier())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+            String userIdentifier = user.getIdentifier();
+            profileFacade.deleteUserInformation(user, "서비스 이용 불편");
+
+            assertThrows(BusinessException.class,
+                    () -> userRepository.findByIdentifier(userIdentifier)
+                            .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND)));
+
+            Signout byIdentifier = signoutRepository.findByIdentifier(userIdentifier);
+
+            Assertions.assertThat(byIdentifier.getReason()).isEqualTo("서비스 이용 불편");
+        }
     }
 
-    @Test
-    void 챌린지_현황_조회() {
-        // TODO 챌린지 현황 조회
-        User user = userRepository.findByIdentifier(user1.getIdentifier())
-                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+    @Nested
+    @DisplayName("유저 포인트 조회")
+    class Describe_getUserPoint {
 
-        UserChallengeResultResponse userChallengeResult = profileService.getUserChallengeResult(user);
-        System.out.println(userChallengeResult.getBeforeStart());
-        System.out.println(userChallengeResult.getProcessing());
-        System.out.println(userChallengeResult.getFail());
-        System.out.println(userChallengeResult.getSuccess());
+        @Test
+        @DisplayName("유저의 포인트를 반환한다.")
+        void it_returns_user_point() {
+            User user = userRepository.findByIdentifier(user1.getIdentifier())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+            user.updatePoints(1500L);
+            userRepository.save(user);
+            UserPointResponse userPoint = profileFacade.getUserPoint(user1);
+            Assertions.assertThat(userPoint.getPoint()).isEqualTo(1500);
+        }
     }
 
+    @Nested
+    @DisplayName("챌린지 현황 조회")
+    class Describe_getUserChallengeResult {
+
+        @Test
+        @DisplayName("유저의 챌린지 현황을 반환한다.")
+        void it_returns_user_challenge_result() {
+            // TODO 챌린지 현황 조회
+            User user = userRepository.findByIdentifier(user1.getIdentifier())
+                    .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+            UserChallengeResultResponse userChallengeResult = profileFacade.getUserChallengeResult(user);
+            System.out.println(userChallengeResult.getBeforeStart());
+            System.out.println(userChallengeResult.getProcessing());
+            System.out.println(userChallengeResult.getFail());
+            System.out.println(userChallengeResult.getSuccess());
+        }
+    }
 
     private User getSavedUser(String identifier, ProviderInfo providerInfo, String nickname) {
         User user = userRepository.save(

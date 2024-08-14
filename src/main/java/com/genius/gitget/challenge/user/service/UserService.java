@@ -15,6 +15,9 @@ import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesService;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.signout.Signout;
+import com.genius.gitget.signout.SignoutRepository;
 import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.service.OrdersService;
 import java.util.List;
@@ -33,6 +36,7 @@ public class UserService {
     private final OrdersService ordersService;
     private final FilesService filesService;
     private final EncryptUtil encryptUtil;
+    private final SignoutRepository signoutRepository;
 
     @Value("${admin.githubId}")
     private List<String> adminIds;
@@ -51,6 +55,24 @@ public class UserService {
     @Transactional
     public Long save(User user) {
         return userRepository.saveAndFlush(user).getId();
+    }
+
+
+    public void delete(Long userId, String identifier, String reason) {
+        userRepository.deleteById(userId);
+        signoutRepository.save(
+                Signout.builder()
+                        .identifier(identifier)
+                        .reason(reason)
+                        .build());
+    }
+
+    // 포인트 조회
+    public Long getUserPoint(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return user.getPoint();
     }
 
     @Transactional

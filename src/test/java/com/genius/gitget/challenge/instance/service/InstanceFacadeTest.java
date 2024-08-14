@@ -16,7 +16,7 @@ import com.genius.gitget.challenge.instance.util.TestSetup;
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.repository.FilesRepository;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
@@ -45,7 +45,7 @@ public class InstanceFacadeTest {
     @Autowired
     TopicRepository topicRepository;
     @Autowired
-    FilesService filesService;
+    FilesManager filesManager;
     @Autowired
     FilesRepository filesRepository;
     @Autowired

@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.genius.gitget.challenge.user.domain.Role;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
 import com.genius.gitget.util.security.TokenTestUtil;
@@ -38,7 +38,7 @@ public class TopicControllerTest {
     @Autowired
     TopicRepository topicRepository;
     @Autowired
-    FilesService filesService;
+    FilesManager filesManager;
     @Autowired
     private ObjectMapper objectMapper;
 

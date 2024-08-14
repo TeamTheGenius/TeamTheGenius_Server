@@ -33,7 +33,7 @@ class FileUtilTest {
     @Autowired
     private FileUtil fileUtil;
     @Autowired
-    private FilesService filesService;
+    private FilesManager filesManager;
     @Value("${file.upload.path}")
     private String UPLOAD_PATH;
 

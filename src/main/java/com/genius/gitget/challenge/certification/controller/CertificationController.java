@@ -11,7 +11,7 @@ import com.genius.gitget.challenge.certification.dto.WeekResponse;
 import com.genius.gitget.challenge.certification.facade.CertificationFacade;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.instance.service.InstanceProvider;
+import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantService;
@@ -43,8 +43,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/certification")
 public class CertificationController {
     private final UserService userService;
+    private final InstanceService instanceService;
     private final CertificationFacade certificationFacade;
-    private final InstanceProvider instanceProvider;
     private final ParticipantService participantService;
 
 
@@ -139,7 +139,7 @@ public class CertificationController {
     ) {
 
         LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
-        Instance instance = instanceProvider.findById(instanceId);
+        Instance instance = instanceService.findInstanceById(instanceId);
         Participant participant = participantService.findByJoinInfo(
                 userPrincipal.getUser().getId(),
                 instanceId);

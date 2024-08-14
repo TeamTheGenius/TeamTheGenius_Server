@@ -11,7 +11,7 @@ import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
 import com.genius.gitget.profile.dto.UserDetailsInformationResponse;
@@ -31,13 +31,13 @@ import org.springframework.stereotype.Component;
 public class ProfileFacadeService implements ProfileFacade {
     private final UserService userService;
     private final OrdersService ordersService;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
 
     public ProfileFacadeService(UserService userService, OrdersService ordersService,
-                                FilesService filesService) {
+                                FilesManager filesManager) {
         this.userService = userService;
         this.ordersService = ordersService;
-        this.filesService = filesService;
+        this.filesManager = filesManager;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ProfileFacadeService implements ProfileFacade {
     public UserInformationResponse getUserInformation(Long userId) {
         User findUser = userService.findUserById(userId);
         Long frameId = ordersService.getUsingFrameItem(userId).getId();
-        FileResponse fileResponse = filesService.convertToFileResponse(findUser.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(findUser.getFiles());
         return UserInformationResponse.createByEntity(findUser, frameId, fileResponse);
     }
 
@@ -70,7 +70,7 @@ public class ProfileFacadeService implements ProfileFacade {
                 participantCount = (joinResult == SUCCESS) ? participantCount + 1 : participantCount - 1;
             }
         }
-        FileResponse fileResponse = filesService.convertToFileResponse(findUser.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(findUser.getFiles());
         return UserDetailsInformationResponse.createByEntity(findUser, participantCount, fileResponse);
     }
 
@@ -88,7 +88,7 @@ public class ProfileFacadeService implements ProfileFacade {
     public void deleteUserInformation(User user, String reason) {
         User findUser = userService.findUserByIdentifier(user.getIdentifier());
 
-        filesService.deleteFile(findUser.getFiles());
+        filesManager.deleteFile(findUser.getFiles());
         findUser.setFiles(null);
         findUser.deleteLikesList();
 

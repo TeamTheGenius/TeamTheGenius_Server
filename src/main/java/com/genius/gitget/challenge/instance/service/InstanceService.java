@@ -8,7 +8,7 @@ import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateDTO;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.global.file.domain.Files;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.topic.domain.Topic;
@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class InstanceService {
     private final InstanceRepository instanceRepository;
     private final TopicRepository topicRepository;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
 
     @NotNull
     private String getUuid() {
@@ -82,7 +82,7 @@ public class InstanceService {
         Long filesId = files != null ? files.getId() : null;
 
         if (filesId != null) {
-            filesService.deleteFile(filesId);
+            filesManager.deleteFile(filesId);
             instance.setFiles(null);
         }
         instanceRepository.delete(instance);

@@ -5,8 +5,8 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 import com.genius.gitget.global.file.domain.FileType;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FileManager;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FileService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.util.Optional;
@@ -29,16 +29,16 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @RequestMapping("/api/file/test")
 public class FileTestController {
-    private final FilesService filesService;
-    private final FileManager fileManager;
+    private final FilesManager filesManager;
+    private final FileService fileService;
 
 
     @GetMapping("/{fileId}")
     public ResponseEntity<SingleResponse<FileResponse>> download(
             @PathVariable Long fileId
     ) {
-        Files files = filesService.findById(fileId);
-        FileResponse fileResponse = filesService.convertToFileResponse(Optional.ofNullable(files));
+        Files files = filesManager.findById(fileId);
+        FileResponse fileResponse = filesManager.convertToFileResponse(Optional.ofNullable(files));
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), fileResponse)
@@ -51,8 +51,8 @@ public class FileTestController {
             @RequestParam("type") String type
     ) {
         FileType fileType = FileType.findType(type);
-        Files files = filesService.uploadFile(multipartFile, fileType);
-        String encodedImage = fileManager.getEncodedImage(files);
+        Files files = filesManager.uploadFile(multipartFile, fileType);
+        String encodedImage = fileService.getEncodedImage(files);
         FileResponse fileResponse = FileResponse.createExistFile(files.getId(), encodedImage);
 
         return ResponseEntity.ok().body(
@@ -64,8 +64,8 @@ public class FileTestController {
     public ResponseEntity<SingleResponse<FileResponse>> update(
             @PathVariable Long fileId,
             @RequestParam("files") MultipartFile multipartFile) {
-        Files files = filesService.updateFile(fileId, multipartFile);
-        String encodedImage = fileManager.getEncodedImage(files);
+        Files files = filesManager.updateFile(fileId, multipartFile);
+        String encodedImage = fileService.getEncodedImage(files);
         FileResponse fileResponse = FileResponse.createExistFile(files.getId(), encodedImage);
 
         return ResponseEntity.ok().body(
@@ -79,10 +79,10 @@ public class FileTestController {
             @RequestParam("type") String type) {
 
         FileType fileType = FileType.findType(type);
-        Files files = filesService.findById(fileId);
-        Files copiedFile = filesService.copyFile(files, fileType);
+        Files files = filesManager.findById(fileId);
+        Files copiedFile = filesManager.copyFile(files, fileType);
 
-        String encodedImage = fileManager.getEncodedImage(copiedFile);
+        String encodedImage = fileService.getEncodedImage(copiedFile);
         FileResponse fileResponse = FileResponse.createExistFile(copiedFile.getId(), encodedImage);
 
         return ResponseEntity.ok().body(
@@ -94,7 +94,7 @@ public class FileTestController {
     public ResponseEntity<CommonResponse> delete(
             @PathVariable Long fileId
     ) {
-        filesService.deleteFile(fileId);
+        filesManager.deleteFile(fileId);
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())

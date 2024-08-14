@@ -17,7 +17,7 @@ import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
 import org.kohsuke.github.GitHub;
@@ -27,17 +27,17 @@ import org.springframework.stereotype.Component;
 public class InstanceDetailFacadeService implements InstanceDetailFacade {
 
     private final InstanceService instanceService;
-    private final FilesService filesService;
+    private final FilesManager filesManager;
     private final ParticipantService participantService;
     private final LikesService likesService;
     private final UserService userService;
     private final GithubService githubService;
 
-    public InstanceDetailFacadeService(InstanceService instanceService, FilesService filesService,
+    public InstanceDetailFacadeService(InstanceService instanceService, FilesManager filesManager,
                                        ParticipantService participantService, LikesService likesService,
                                        UserService userService, GithubService githubService) {
         this.instanceService = instanceService;
-        this.filesService = filesService;
+        this.filesManager = filesManager;
         this.participantService = participantService;
         this.likesService = likesService;
         this.userService = userService;
@@ -51,7 +51,7 @@ public class InstanceDetailFacadeService implements InstanceDetailFacade {
         Instance instance = instanceService.findInstanceById(instanceId);
 
         // 파일 객체 생성
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
 
         // 좋아요 정보
         LikesInfo likesInfo = likesService.getLikesInfo(user.getId(), instance);

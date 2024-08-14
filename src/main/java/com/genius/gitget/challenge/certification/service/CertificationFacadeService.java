@@ -23,7 +23,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CertificationFacadeService implements CertificationFacade {
-    private final FilesService filesService;
+    private final FilesManager filesManager;
 
     private final UserService userService;
     private final InstanceService instanceService;
@@ -167,7 +167,7 @@ public class CertificationFacadeService implements CertificationFacade {
 
         certification.updateToPass(targetDate);
 
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
         return ActivatedResponse.of(instance, certification.getCertificationStatus(),
                 0, participant.getRepositoryName(), fileResponse);
     }
@@ -206,7 +206,7 @@ public class CertificationFacadeService implements CertificationFacade {
     @Override
     public InstancePreviewResponse getInstancePreview(Long instanceId) {
         Instance instance = instanceService.findInstanceById(instanceId);
-        FileResponse fileResponse = filesService.convertToFileResponse(instance.getFiles());
+        FileResponse fileResponse = filesManager.convertToFileResponse(instance.getFiles());
         return InstancePreviewResponse.createByEntity(instance, fileResponse);
     }
 

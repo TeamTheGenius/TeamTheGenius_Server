@@ -22,14 +22,14 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class FilesService {
-    private final FileManager fileManager;
+public class FilesManager {
+    private final FileService fileService;
     private final FilesRepository filesRepository;
 
 
     @Transactional
     public Files uploadFile(MultipartFile multipartFile, FileType fileType) {
-        FileDTO fileDTO = fileManager.upload(multipartFile, fileType);
+        FileDTO fileDTO = fileService.upload(multipartFile, fileType);
 
         Files file = Files.builder()
                 .originalFilename(fileDTO.originalFilename())
@@ -45,7 +45,7 @@ public class FilesService {
         if (multipartFile == null) {
             throw new BusinessException(MULTIPART_FILE_NOT_EXIST);
         }
-        FileDTO fileDTO = fileManager.upload(multipartFile, fileType);
+        FileDTO fileDTO = fileService.upload(multipartFile, fileType);
 
         Files file = Files.builder()
                 .originalFilename(fileDTO.originalFilename())
@@ -59,7 +59,7 @@ public class FilesService {
 
     @Transactional
     public Files copyFile(Files files, FileType fileType) {
-        FileDTO fileDTO = fileManager.copy(files, fileType);
+        FileDTO fileDTO = fileService.copy(files, fileType);
 
         Files copyFiles = Files.create(fileDTO);
         return filesRepository.save(copyFiles);
@@ -74,7 +74,7 @@ public class FilesService {
             return files;
         }
 
-        UpdateDTO updateDTO = fileManager.update(files, multipartFile);
+        UpdateDTO updateDTO = fileService.update(files, multipartFile);
         files.updateFiles(updateDTO);
         return files;
     }
@@ -86,7 +86,7 @@ public class FilesService {
             return files;
         }
 
-        UpdateDTO updateDTO = fileManager.update(files, multipartFile);
+        UpdateDTO updateDTO = fileService.update(files, multipartFile);
         files.updateFiles(updateDTO);
         return files;
     }
@@ -101,7 +101,7 @@ public class FilesService {
         Files files = filesRepository.findById(fileId)
                 .orElseThrow(() -> new BusinessException(FILE_NOT_EXIST));
 
-        fileManager.deleteInStorage(files);
+        fileService.deleteInStorage(files);
         filesRepository.delete(files);
     }
 
@@ -112,7 +112,7 @@ public class FilesService {
         }
         Files files = optionalFiles.get();
 
-        fileManager.deleteInStorage(files);
+        fileService.deleteInStorage(files);
         filesRepository.delete(files);
     }
 
@@ -124,7 +124,7 @@ public class FilesService {
     public FileResponse convertToFileResponse(Optional<Files> optionalFiles) {
         return optionalFiles
                 .map(files -> {
-                    String encodedImage = fileManager.getEncodedImage(files);
+                    String encodedImage = fileService.getEncodedImage(files);
                     return FileResponse.createExistFile(files.getId(), encodedImage);
                 })
                 .orElseGet(FileResponse::createNotExistFile);

@@ -17,7 +17,7 @@ import com.genius.gitget.challenge.participant.repository.ParticipantRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.topic.domain.Topic;
 import com.genius.gitget.topic.repository.TopicRepository;
@@ -57,7 +57,7 @@ public class ProfileControllerTest {
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    FilesService filesService;
+    FilesManager filesManager;
     @Autowired
     LikesService likesService;
     @Autowired

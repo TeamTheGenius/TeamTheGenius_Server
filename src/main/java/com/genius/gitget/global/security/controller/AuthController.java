@@ -1,13 +1,15 @@
 package com.genius.gitget.global.security.controller;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.security.dto.AuthResponse;
-import com.genius.gitget.global.security.dto.SignupResponse;
-import com.genius.gitget.global.security.service.JwtService;
+import com.genius.gitget.global.security.dto.TokenRequest;
+import com.genius.gitget.global.security.service.JwtFacade;
+import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,18 +29,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class AuthController {
     private final UserService userService;
-    private final JwtService jwtService;
+    private final JwtFacade jwtFacade;
 
     @PostMapping("/auth")
     public ResponseEntity<SingleResponse<AuthResponse>> generateToken(HttpServletResponse response,
-                                                                      @RequestBody SignupResponse tokenRequest) {
-        User requestUser = userService.findUserByIdentifier(tokenRequest.identifier());
-        jwtService.validateUser(requestUser);
+                                                                      @RequestBody TokenRequest tokenRequest) {
+        User user = userService.findUserByIdentifier(tokenRequest.identifier());
+        if (!user.isRegistered()) {
+            throw new BusinessException(NOT_AUTHENTICATED_USER);
+        }
 
-        jwtService.generateAccessToken(response, requestUser);
-        jwtService.generateRefreshToken(response, requestUser);
+        jwtFacade.generateAccessToken(response, user);
+        jwtFacade.generateRefreshToken(response, user);
 
-        AuthResponse authResponse = userService.getUserAuthInfo(requestUser.getIdentifier());
+        AuthResponse authResponse = userService.getUserAuthInfo(user.getIdentifier());
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), authResponse)
@@ -49,7 +53,7 @@ public class AuthController {
     public ResponseEntity<CommonResponse> logout(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             HttpServletResponse response) {
-        jwtService.logout(userPrincipal.getUser(), response);
+        jwtFacade.logout(response, userPrincipal.getUser().getIdentifier());
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())

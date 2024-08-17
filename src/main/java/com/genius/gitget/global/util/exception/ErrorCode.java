@@ -42,7 +42,10 @@ public enum ErrorCode {
     INVALID_JWT(HttpStatus.BAD_REQUEST, "JWT가 유효하지 않습니다."),
     INVALID_PROGRESS(HttpStatus.BAD_REQUEST, "존재하지 않는 정보입니다."),
 
-    JWT_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "Cookie에 토큰이 존재하지 않습니다."),
+    JWT_NOT_FOUND_IN_DB(HttpStatus.NOT_FOUND, "DB에 JWT 정보가 존재하지 않습니다."),
+    JWT_NOT_FOUND_IN_HEADER(HttpStatus.NOT_FOUND, "Header에 JWT 정보가 존재하지 않습니다."),
+    JWT_NOT_FOUND_IN_COOKIE(HttpStatus.NOT_FOUND, "Cookie에 JWT 정보가 존재하지 않습니다."),
+    REFRESH_TOKEN_NOT_MATCH(HttpStatus.BAD_REQUEST, "DB에 저장되어 있는 Refresh token과 일치하지 않습니다."),
 
     MULTIPART_FILE_NOT_EXIST(HttpStatus.BAD_REQUEST, "MultipartFile이 전달되지 않았습니다."),
     FILE_NOT_EXIST(HttpStatus.BAD_REQUEST, "해당 파일(이미지)이 존재하지 않습니다."),
@@ -71,7 +74,7 @@ public enum ErrorCode {
 
     NOT_ENOUGH_POINT(HttpStatus.BAD_REQUEST, "사용자의 보유 포인트가 충분하지 않습니다."),
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "아이템 정보를 찾을 수 없습니다."),
-    USER_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다."),
+    ORDERS_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 아이템 보유 정보를 찾을 수 없습니다."),
     HAS_NO_ITEM(HttpStatus.NOT_FOUND, "해당 아이템을 보유하고 있지 않습니다."),
     CAN_NOT_USE_PASS_ITEM(HttpStatus.BAD_REQUEST, "인증 패스 아이템을 사용할 수 없는 조건입니다."),
     ITEM_CATEGORY_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 카테고리에 맞는 아이템을 찾을 수 없습니다."),

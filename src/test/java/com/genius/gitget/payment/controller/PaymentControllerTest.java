@@ -7,10 +7,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
-import com.genius.gitget.global.file.service.FilesService;
-import com.genius.gitget.util.TokenTestUtil;
-import com.genius.gitget.util.WithMockCustomUser;
+import com.genius.gitget.global.file.service.FilesManager;
+import com.genius.gitget.topic.repository.TopicRepository;
+import com.genius.gitget.util.security.TokenTestUtil;
+import com.genius.gitget.util.security.WithMockCustomUser;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +38,7 @@ public class PaymentControllerTest {
     @Autowired
     TopicRepository topicRepository;
     @Autowired
-    FilesService filesService;
+    FilesManager filesManager;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -55,7 +55,7 @@ public class PaymentControllerTest {
     @DisplayName("결제 내역 조회를 요청하면, 상태코드 200을 반환한다.")
     public void 결제_내역_조회_성공() throws Exception {
 
-        mockMvc.perform(get("/api/payment").cookie(tokenTestUtil.createAccessCookie()))
+        mockMvc.perform(get("/api/payment").headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk());
     }
@@ -71,7 +71,7 @@ public class PaymentControllerTest {
         input.put("pointAmount", 100L);
         input.put("userEmail", "kimdozzi");
 
-        mockMvc.perform(post("/api/payment/toss").cookie(tokenTestUtil.createAccessCookie())
+        mockMvc.perform(post("/api/payment/toss").headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
                 .andDo(print())
@@ -88,7 +88,7 @@ public class PaymentControllerTest {
         input.put("pointAmount", 100L);
         input.put("userEmail", "test@gmail.com");
 
-        mockMvc.perform(post("/api/payment/toss").cookie(tokenTestUtil.createAccessCookie())
+        mockMvc.perform(post("/api/payment/toss").headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(input)))
                 .andDo(print())
@@ -100,7 +100,7 @@ public class PaymentControllerTest {
     @DisplayName("결제 요청을 실패하면, 상태코드 4xx을 반환한다.")
     public void 결제_요청_실패_2() throws Exception {
 
-        mockMvc.perform(post("/api/payment/toss").cookie(tokenTestUtil.createAccessCookie())
+        mockMvc.perform(post("/api/payment/toss").headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
@@ -116,7 +116,7 @@ public class PaymentControllerTest {
         input.put("pointAmount", 100L);
         input.put("userEmail", "test@gmail.com");
 
-        mockMvc.perform(post("/api/payment/toss").cookie(tokenTestUtil.createAccessCookie())
+        mockMvc.perform(post("/api/payment/toss").headers(tokenTestUtil.createAccessHeaders())
                         .content(objectMapper.writeValueAsString(input)))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());

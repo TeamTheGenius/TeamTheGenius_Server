@@ -3,10 +3,10 @@ package com.genius.gitget.schedule.service;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.CERTIFICATED;
 import static com.genius.gitget.challenge.certification.domain.CertificateStatus.PASSED;
 
-import com.genius.gitget.challenge.certification.service.CertificationProvider;
+import com.genius.gitget.challenge.certification.service.CertificationService;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
-import com.genius.gitget.challenge.instance.service.InstanceProvider;
+import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.participant.domain.JoinResult;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import java.time.LocalDate;
@@ -22,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProgressService {
-    private final InstanceProvider instanceProvider;
-    private final CertificationProvider certificationProvider;
+    private final CertificationService certificationService;
+    private final InstanceRepository instanceRepository;
     private final double SUCCESS_THRESHOLD = 85;
 
     @Transactional
     public void updateToActivity(LocalDate currentDate) {
-        List<Instance> preActivities = instanceProvider.findAllByProgress(Progress.PREACTIVITY);
+        List<Instance> preActivities = instanceRepository.findAllByProgress(Progress.PREACTIVITY);
         for (Instance preActivity : preActivities) {
             LocalDate startedDate = preActivity.getStartedDate().toLocalDate();
             LocalDate completedDate = preActivity.getCompletedDate().toLocalDate();
@@ -53,8 +53,8 @@ public class ProgressService {
     @Transactional
     public void updateToDone(LocalDate currentDate) {
         List<Instance> instances = new ArrayList<>();
-        instances.addAll(instanceProvider.findAllByProgress(Progress.PREACTIVITY));
-        instances.addAll(instanceProvider.findAllByProgress(Progress.ACTIVITY));
+        instances.addAll(instanceRepository.findAllByProgress(Progress.PREACTIVITY));
+        instances.addAll(instanceRepository.findAllByProgress(Progress.ACTIVITY));
 
         for (Instance instance : instances) {
             LocalDate startedDate = instance.getStartedDate().toLocalDate();
@@ -86,8 +86,8 @@ public class ProgressService {
     }
 
     private int getSuccessAttempt(Long participantId, LocalDate currentDate) {
-        int certificated = certificationProvider.countByStatus(participantId, CERTIFICATED, currentDate);
-        int passed = certificationProvider.countByStatus(participantId, PASSED, currentDate);
+        int certificated = certificationService.countByStatus(participantId, CERTIFICATED, currentDate);
+        int passed = certificationService.countByStatus(participantId, PASSED, currentDate);
         return certificated + passed;
     }
 

@@ -1,6 +1,8 @@
 package com.genius.gitget.schedule.service;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,11 +19,11 @@ public class ScheduleService {
     @Transactional
     @Scheduled(cron = "${schedule.cron}")
     public void run() {
-        LocalDate now = LocalDate.now();
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
 
-        log.info(now + ": Schedule 설정에 따라 instance의 Progress 업데이트 진행");
+        log.info(kstDate + ": Schedule 설정에 따라 instance의 Progress 업데이트 진행");
 
-        scheduleService.updateToActivity(now);
-        scheduleService.updateToDone(now);
+        scheduleService.updateToActivity(kstDate);
+        scheduleService.updateToDone(kstDate);
     }
 }

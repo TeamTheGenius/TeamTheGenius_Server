@@ -2,6 +2,7 @@ package com.genius.gitget.store.payment.domain;
 
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
+import com.genius.gitget.store.item.domain.Item;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -68,6 +69,16 @@ public class Payment extends BaseTimeEntity {
         this.failReason = failReason;
         this.user = user;
         this.orderType = orderType;
+    }
+
+    public static Payment create(User user, Item item) {
+        return Payment.builder()
+                .user(user)
+                .orderType(OrderType.ITEM)
+                .isSuccess(true)
+                .pointAmount(Long.parseLong(String.valueOf(item.getCost())))
+                .orderName(item.getName())
+                .build();
     }
 
     public void setPaymentSuccessStatus(String paymentKey, boolean isSuccess) {

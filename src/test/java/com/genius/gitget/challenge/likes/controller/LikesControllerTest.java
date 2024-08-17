@@ -9,8 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.genius.gitget.admin.topic.domain.Topic;
-import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
@@ -21,10 +19,12 @@ import com.genius.gitget.challenge.likes.service.LikesService;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.security.constants.ProviderInfo;
-import com.genius.gitget.util.TokenTestUtil;
-import com.genius.gitget.util.WithMockCustomUser;
+import com.genius.gitget.topic.domain.Topic;
+import com.genius.gitget.topic.repository.TopicRepository;
+import com.genius.gitget.util.security.TokenTestUtil;
+import com.genius.gitget.util.security.WithMockCustomUser;
 import java.time.LocalDateTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +41,7 @@ import org.springframework.web.context.WebApplicationContext;
 @SpringBootTest
 @Transactional
 public class LikesControllerTest {
-    private static Topic savedTopic1, savedTopic2;
+    private static Topic savedTopic1;
     private static Instance savedInstance1, savedInstance2;
 
     MockMvc mockMvc;
@@ -54,7 +54,7 @@ public class LikesControllerTest {
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
-    FilesService filesService;
+    FilesManager filesManager;
     @Autowired
     LikesService likesService;
     @Autowired
@@ -72,7 +72,6 @@ public class LikesControllerTest {
                 .build();
 
         savedTopic1 = getSavedTopic();
-        savedTopic2 = getSavedTopic();
 
         savedInstance1 = getSavedInstance("title1", "FE", 50, 1000);
         savedInstance2 = getSavedInstance("title2", "BE, CS", 50, 1000);
@@ -94,7 +93,7 @@ public class LikesControllerTest {
         likesService.addLikes(user, "kimdozzi", savedInstance1.getId());
 
         mockMvc.perform(get("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON))
 
                 .andDo(print())
@@ -109,7 +108,7 @@ public class LikesControllerTest {
     public void 좋아요_목록_조회_성공_2() throws Exception {
 
         mockMvc.perform(get("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(jsonPath("$.data.numberOfElements").value(0))
@@ -129,7 +128,7 @@ public class LikesControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -148,7 +147,7 @@ public class LikesControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
@@ -167,7 +166,7 @@ public class LikesControllerTest {
                 .build();
 
         mockMvc.perform(post("/api/profile/likes")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
@@ -187,7 +186,7 @@ public class LikesControllerTest {
         Long id = likes.getId();
 
         mockMvc.perform(delete("/api/profile/likes/" + id)
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -205,7 +204,7 @@ public class LikesControllerTest {
                 .build());
 
         mockMvc.perform(delete("/api/profile/likes/" + 2)
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andDo(print())
                 .andExpect(status().is4xxClientError());
     }

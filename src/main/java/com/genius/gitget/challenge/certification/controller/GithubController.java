@@ -4,11 +4,12 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.certification.dto.github.GithubTokenRequest;
 import com.genius.gitget.challenge.certification.dto.github.PullRequestResponse;
-import com.genius.gitget.challenge.certification.service.GithubService;
+import com.genius.gitget.challenge.certification.facade.GithubFacade;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api/certification")
 public class GithubController {
-    private final GithubService githubService;
+    private final GithubFacade githubFacade;
 
     @PostMapping("/register/token")
     public ResponseEntity<CommonResponse> registerGithubToken(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody GithubTokenRequest githubTokenRequest
     ) {
-        githubService.registerGithubPersonalToken(userPrincipal.getUser(), githubTokenRequest.githubToken());
+        githubFacade.registerGithubPersonalToken(userPrincipal.getUser(), githubTokenRequest.githubToken());
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
@@ -44,7 +45,7 @@ public class GithubController {
     public ResponseEntity<ListResponse<String>> getPublicRepositories(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<String> repositories = githubService.getPublicRepositories(userPrincipal.getUser());
+        List<String> repositories = githubFacade.getPublicRepositories(userPrincipal.getUser());
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), repositories)
@@ -55,8 +56,8 @@ public class GithubController {
     public ResponseEntity<CommonResponse> verifyGithubToken(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        githubService.verifyGithubToken(userPrincipal.getUser());
-        
+        githubFacade.verifyGithubToken(userPrincipal.getUser());
+
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
         );
@@ -68,7 +69,7 @@ public class GithubController {
             @RequestParam String repo
     ) {
 
-        githubService.verifyRepository(userPrincipal.getUser(), repo);
+        githubFacade.verifyRepository(userPrincipal.getUser(), repo);
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())
@@ -81,8 +82,8 @@ public class GithubController {
             @RequestParam String repo
     ) {
 
-        List<PullRequestResponse> pullRequestResponses = githubService.verifyPullRequest(
-                userPrincipal.getUser(), repo, LocalDate.now()
+        List<PullRequestResponse> pullRequestResponses = githubFacade.verifyPullRequest(
+                userPrincipal.getUser(), repo, DateUtil.convertToKST(LocalDateTime.now())
         );
 
         return ResponseEntity.ok().body(

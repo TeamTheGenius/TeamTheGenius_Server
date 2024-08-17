@@ -12,11 +12,14 @@ import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.repository.UserRepository;
 import com.genius.gitget.global.file.dto.FileResponse;
-import com.genius.gitget.global.file.service.FilesService;
+import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
+import com.genius.gitget.signout.Signout;
+import com.genius.gitget.signout.SignoutRepository;
 import com.genius.gitget.store.item.domain.Item;
-import com.genius.gitget.store.item.service.OrdersProvider;
+import com.genius.gitget.store.item.service.OrdersService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +33,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final OrdersProvider ordersProvider;
-    private final FilesService filesService;
+    private final OrdersService ordersService;
+    private final FilesManager filesManager;
     private final EncryptUtil encryptUtil;
+    private final SignoutRepository signoutRepository;
 
     @Value("${admin.githubId}")
     private List<String> adminIds;
@@ -51,6 +55,24 @@ public class UserService {
     @Transactional
     public Long save(User user) {
         return userRepository.saveAndFlush(user).getId();
+    }
+
+
+    public void delete(Long userId, String identifier, String reason) {
+        userRepository.deleteById(userId);
+        signoutRepository.save(
+                Signout.builder()
+                        .identifier(identifier)
+                        .reason(reason)
+                        .build());
+    }
+
+    // 포인트 조회
+    public Long getUserPoint(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return user.getPoint();
     }
 
     @Transactional
@@ -98,13 +120,13 @@ public class UserService {
     public AuthResponse getUserAuthInfo(String identifier) {
         User user = userRepository.findByIdentifier(identifier)
                 .orElseThrow(() -> new BusinessException(MEMBER_NOT_FOUND));
-        Item usingFrame = ordersProvider.getUsingFrameItem(user.getId());
+        Item usingFrame = ordersService.getUsingFrameItem(user.getId());
         return new AuthResponse(user.getRole(), usingFrame.getId());
     }
 
     public UserProfileInfo getUserProfileInfo(User user) {
-        Long frameId = ordersProvider.getUsingFrameItem(user.getId()).getId();
-        FileResponse fileResponse = filesService.convertToFileResponse(user.getFiles());
+        Long frameId = ordersService.getUsingFrameItem(user.getId()).getId();
+        FileResponse fileResponse = filesManager.convertToFileResponse(user.getFiles());
 
         return UserProfileInfo.createByEntity(user, frameId, fileResponse);
     }

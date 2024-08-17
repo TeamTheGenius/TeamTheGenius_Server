@@ -1,8 +1,13 @@
 package com.genius.gitget.challenge.participant.domain;
 
+import static com.genius.gitget.challenge.participant.domain.JoinResult.SUCCESS;
+import static com.genius.gitget.challenge.participant.domain.RewardStatus.YES;
+
 import com.genius.gitget.challenge.certification.domain.Certification;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -106,6 +111,15 @@ public class Participant {
 
     public LocalDate getStartedDate() {
         return this.getInstance().getStartedDate().toLocalDate();
+    }
+
+    public void validateRewardCondition() {
+        if (this.getJoinResult() != SUCCESS) {
+            throw new BusinessException(ErrorCode.CAN_NOT_GET_REWARDS);
+        }
+        if (this.getRewardStatus() == YES) {
+            throw new BusinessException(ErrorCode.ALREADY_REWARDED);
+        }
     }
 
 

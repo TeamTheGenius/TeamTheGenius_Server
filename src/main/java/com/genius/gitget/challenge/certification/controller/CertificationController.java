@@ -8,18 +8,20 @@ import com.genius.gitget.challenge.certification.dto.CertificationResponse;
 import com.genius.gitget.challenge.certification.dto.InstancePreviewResponse;
 import com.genius.gitget.challenge.certification.dto.TotalResponse;
 import com.genius.gitget.challenge.certification.dto.WeekResponse;
-import com.genius.gitget.challenge.certification.service.CertificationService;
+import com.genius.gitget.challenge.certification.facade.CertificationFacade;
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.instance.domain.Instance;
-import com.genius.gitget.challenge.instance.service.InstanceProvider;
+import com.genius.gitget.challenge.instance.service.InstanceService;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.participant.domain.Participant;
-import com.genius.gitget.challenge.participant.service.ParticipantProvider;
+import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.global.util.response.dto.SlicingResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -41,16 +43,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/certification")
 public class CertificationController {
     private final UserService userService;
-    private final CertificationService certificationService;
-    private final InstanceProvider instanceProvider;
-    private final ParticipantProvider participantProvider;
+    private final InstanceService instanceService;
+    private final CertificationFacade certificationFacade;
+    private final ParticipantService participantService;
 
 
     @GetMapping("/{instanceId}")
     public ResponseEntity<SingleResponse<InstancePreviewResponse>> getInstanceInformation(
             @PathVariable Long instanceId
     ) {
-        InstancePreviewResponse instancePreviewResponse = certificationService.getInstancePreview(instanceId);
+        InstancePreviewResponse instancePreviewResponse = certificationFacade.getInstancePreview(instanceId);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), instancePreviewResponse)
@@ -62,9 +64,8 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody CertificationRequest certificationRequest
     ) {
-        CertificationResponse certificationResponse = certificationService.updateCertification(
-                userPrincipal.getUser(),
-                new CertificationRequest(certificationRequest.instanceId(), LocalDate.now()));
+        CertificationResponse certificationResponse = certificationFacade.updateCertification(
+                userPrincipal.getUser(), certificationRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
@@ -77,9 +78,8 @@ public class CertificationController {
             @RequestBody CertificationRequest certificationRequest
     ) {
         User user = userPrincipal.getUser();
-        ActivatedResponse activatedResponse = certificationService.passCertification(
-                user.getId(),
-                new CertificationRequest(certificationRequest.instanceId(), LocalDate.now()));
+        ActivatedResponse activatedResponse = certificationFacade.passCertification(
+                user.getId(), certificationRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), activatedResponse)
@@ -91,9 +91,9 @@ public class CertificationController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
-        Participant participant = participantProvider.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
-        WeekResponse weekResponse = certificationService.getMyWeekCertifications(
-                participant.getId(), LocalDate.now());
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
+        Participant participant = participantService.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
+        WeekResponse weekResponse = certificationFacade.getMyWeekCertifications(participant.getId(), kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), weekResponse)
@@ -106,9 +106,10 @@ public class CertificationController {
             @PathVariable Long instanceId,
             @PageableDefault Pageable pageable
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         User user = userPrincipal.getUser();
-        Slice<WeekResponse> certifications = certificationService.getOthersWeekCertifications(
-                user.getId(), instanceId, LocalDate.now(), pageable);
+        Slice<WeekResponse> certifications = certificationFacade.getOthersWeekCertifications(
+                user.getId(), instanceId, kstDate, pageable);
 
         return ResponseEntity.ok().body(
                 new SlicingResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certifications)
@@ -120,10 +121,11 @@ public class CertificationController {
             @PathVariable Long instanceId,
             @RequestParam Long userId
     ) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         User user = userService.findUserById(userId);
-        Participant participant = participantProvider.findByJoinInfo(user.getId(), instanceId);
-        TotalResponse totalResponse = certificationService.getTotalCertification(
-                participant.getId(), LocalDate.now());
+        Participant participant = participantService.findByJoinInfo(user.getId(), instanceId);
+        TotalResponse totalResponse = certificationFacade.getTotalCertification(
+                participant.getId(), kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), totalResponse)
@@ -136,13 +138,14 @@ public class CertificationController {
             @PathVariable Long instanceId
     ) {
 
-        Instance instance = instanceProvider.findById(instanceId);
-        Participant participant = participantProvider.findByJoinInfo(
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
+        Instance instance = instanceService.findInstanceById(instanceId);
+        Participant participant = participantService.findByJoinInfo(
                 userPrincipal.getUser().getId(),
                 instanceId);
 
-        CertificationInformation certificationInformation = certificationService.getCertificationInformation(
-                instance, participant, LocalDate.now());
+        CertificationInformation certificationInformation = certificationFacade.getCertificationInformation(
+                instance, participant, kstDate);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationInformation)

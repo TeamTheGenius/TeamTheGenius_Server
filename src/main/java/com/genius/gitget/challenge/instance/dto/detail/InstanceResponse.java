@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.participant.domain.JoinStatus;
 import com.genius.gitget.global.file.dto.FileResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.Builder;
 
 @Builder
@@ -28,13 +29,14 @@ public record InstanceResponse(
 
     public static InstanceResponse createByEntity(Instance instance, LikesInfo likesInfo,
                                                   JoinStatus joinStatus, FileResponse fileResponse) {
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         LocalDate startedLocalDate = instance.getStartedDate().toLocalDate();
         LocalDate completedLocalDate = instance.getCompletedDate().toLocalDate();
         return InstanceResponse.builder()
                 .instanceId(instance.getId())
                 .progress(instance.getProgress())
                 .title(instance.getTitle())
-                .remainDays(DateUtil.getRemainDaysToStart(startedLocalDate, LocalDate.now()))
+                .remainDays(DateUtil.getRemainDaysToStart(startedLocalDate, kstDate))
                 .startedDate(startedLocalDate)
                 .completedDate(completedLocalDate)
                 .participantCount(instance.getParticipantCount())

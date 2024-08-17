@@ -2,15 +2,17 @@ package com.genius.gitget.challenge.myChallenge.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.myChallenge.dto.ActivatedResponse;
 import com.genius.gitget.challenge.myChallenge.dto.DoneResponse;
 import com.genius.gitget.challenge.myChallenge.dto.PreActivityResponse;
 import com.genius.gitget.challenge.myChallenge.dto.RewardRequest;
-import com.genius.gitget.challenge.myChallenge.service.MyChallengeService;
+import com.genius.gitget.challenge.myChallenge.facade.MyChallengeFacade;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +28,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @CrossOrigin
 public class MyChallengeController {
-    private final MyChallengeService myChallengeService;
-
+    private final MyChallengeFacade myChallengeFacade;
 
     @GetMapping("/my/pre-activity")
     public ResponseEntity<ListResponse<PreActivityResponse>> getPreActivityChallenges(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<PreActivityResponse> preActivityInstances = myChallengeService.getPreActivityInstances(
+        List<PreActivityResponse> preActivityInstances = myChallengeFacade.getPreActivityInstances(
                 userPrincipal.getUser(),
-                LocalDate.now());
+                DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), preActivityInstances)
@@ -47,9 +48,9 @@ public class MyChallengeController {
     public ResponseEntity<ListResponse<ActivatedResponse>> getActivatedChallenges(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<ActivatedResponse> activatedInstances = myChallengeService.getActivatedInstances(
+        List<ActivatedResponse> activatedInstances = myChallengeFacade.getActivatedInstances(
                 userPrincipal.getUser(),
-                LocalDate.now());
+                DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), activatedInstances)
@@ -60,9 +61,9 @@ public class MyChallengeController {
     public ResponseEntity<ListResponse<DoneResponse>> getDoneChallenges(
             @AuthenticationPrincipal UserPrincipal userPrincipal
     ) {
-        List<DoneResponse> doneInstances = myChallengeService.getDoneInstances(
+        List<DoneResponse> doneInstances = myChallengeFacade.getDoneInstances(
                 userPrincipal.getUser(),
-                LocalDate.now());
+                DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), doneInstances)
@@ -74,9 +75,9 @@ public class MyChallengeController {
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId
     ) {
-
-        RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser(), instanceId, LocalDate.now());
-        DoneResponse doneResponse = myChallengeService.getRewards(rewardRequest, false);
+        LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
+        RewardRequest rewardRequest = new RewardRequest(userPrincipal.getUser().getId(), instanceId, kstDate);
+        DoneResponse doneResponse = myChallengeFacade.getRewards(rewardRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), doneResponse)

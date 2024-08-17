@@ -4,7 +4,6 @@ import static com.genius.gitget.store.item.domain.ItemCategory.CERTIFICATION_PAS
 import static com.genius.gitget.store.item.domain.ItemCategory.POINT_MULTIPLIER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.genius.gitget.admin.topic.repository.TopicRepository;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.likes.repository.LikesRepository;
 import com.genius.gitget.challenge.likes.service.LikesService;
@@ -18,15 +17,16 @@ import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.domain.ItemCategory;
 import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.item.dto.ItemResponse;
+import com.genius.gitget.store.item.facade.StoreFacade;
 import com.genius.gitget.store.item.repository.ItemRepository;
 import com.genius.gitget.store.item.repository.OrdersRepository;
-import com.genius.gitget.store.item.service.ItemService;
 import com.genius.gitget.store.payment.domain.Payment;
 import com.genius.gitget.store.payment.dto.PaymentDetailsResponse;
 import com.genius.gitget.store.payment.dto.PaymentRequest;
 import com.genius.gitget.store.payment.dto.PaymentResponse;
 import com.genius.gitget.store.payment.repository.PaymentRepository;
 import com.genius.gitget.store.payment.service.PaymentService;
+import com.genius.gitget.topic.repository.TopicRepository;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -63,7 +63,7 @@ public class PaymentServiceTest {
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
-    private ItemService itemService;
+    private StoreFacade storeFacade;
     @Autowired
     private ItemRepository itemRepository;
     @Autowired
@@ -89,7 +89,7 @@ public class PaymentServiceTest {
         getSavedOrder(user, item, itemCategory, 0);
         user.updatePoints(1000L);
 
-        ItemResponse itemResponse = itemService.orderItem(user, item.getId());
+        ItemResponse itemResponse = storeFacade.orderItem(user, item.getIdentifier());
         assertThat(itemResponse.getItemCategory()).isEqualTo(itemCategory);
 
         Page<PaymentDetailsResponse> paymentDetails = paymentService.getPaymentDetails(user, PageRequest.of(0, 10));
@@ -115,7 +115,7 @@ public class PaymentServiceTest {
     }
 
     private Orders getSavedOrder(User user, Item item, ItemCategory itemCategory, int count) {
-        Orders orders = Orders.createDefault(count, itemCategory);
+        Orders orders = Orders.of(count, itemCategory);
         orders.setItem(item);
         orders.setUser(user);
         return ordersRepository.save(orders);

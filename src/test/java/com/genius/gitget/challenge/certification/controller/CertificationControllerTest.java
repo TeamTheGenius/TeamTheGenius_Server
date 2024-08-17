@@ -5,16 +5,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.genius.gitget.challenge.certification.service.CertificationService;
-import com.genius.gitget.challenge.certification.service.GithubService;
+import com.genius.gitget.challenge.certification.facade.CertificationFacade;
+import com.genius.gitget.challenge.certification.facade.GithubFacade;
 import com.genius.gitget.challenge.instance.domain.Instance;
 import com.genius.gitget.challenge.instance.domain.Progress;
 import com.genius.gitget.challenge.instance.repository.InstanceRepository;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.util.TokenTestUtil;
-import com.genius.gitget.util.WithMockCustomUser;
+import com.genius.gitget.util.security.TokenTestUtil;
+import com.genius.gitget.util.security.WithMockCustomUser;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -38,9 +38,9 @@ class CertificationControllerTest {
     @Autowired
     TokenTestUtil tokenTestUtil;
     @Autowired
-    CertificationService certificationService;
+    CertificationFacade certificationFacade;
     @Autowired
-    GithubService githubService;
+    GithubFacade githubFacade;
     @Autowired
     InstanceRepository instanceRepository;
     @Autowired
@@ -74,7 +74,7 @@ class CertificationControllerTest {
 
         //then
         mockMvc.perform(post("/api/certification/register/token")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().is2xxSuccessful());
@@ -93,7 +93,7 @@ class CertificationControllerTest {
     @WithMockCustomUser(role = Role.NOT_REGISTERED)
     public void should_throwException_when_JWTNonExist() throws Exception {
         mockMvc.perform(post("/api/certification/register/token")
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andExpect(status().is4xxClientError());
     }
 
@@ -106,7 +106,7 @@ class CertificationControllerTest {
 
         //when & then
         mockMvc.perform(post("/api/certification/register/token")
-                        .cookie(tokenTestUtil.createAccessCookie())
+                        .headers(tokenTestUtil.createAccessHeaders())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().is4xxClientError());
@@ -121,11 +121,11 @@ class CertificationControllerTest {
 
         //when
         User user = userRepository.findByIdentifier(githubId).get();
-        githubService.registerGithubPersonalToken(user, githubToken);
+        githubFacade.registerGithubPersonalToken(user, githubToken);
 
         //then
         mockMvc.perform(get("/api/certification/verify/repository?repo=" + targetRepo)
-                        .cookie(tokenTestUtil.createAccessCookie()))
+                        .headers(tokenTestUtil.createAccessHeaders()))
                 .andExpect(status().is2xxSuccessful());
     }
 

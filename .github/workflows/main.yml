@@ -3,8 +3,8 @@ name: Build and Deploy to EC2
 on:
   push:
     branches: [ "production" ]
-  pull_request:
-    branches: [ "production" ]
+#  pull_request:
+#    branches: [ "production" ]
 
 env:
   AWS_REGION: ap-northeast-2

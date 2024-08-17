@@ -6,6 +6,8 @@ import com.genius.gitget.global.file.domain.FileHolder;
 import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.security.constants.ProviderInfo;
 import com.genius.gitget.global.util.domain.BaseTimeEntity;
+import com.genius.gitget.global.util.exception.BusinessException;
+import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.store.item.domain.Orders;
 import com.genius.gitget.store.payment.domain.Payment;
 import jakarta.persistence.CascadeType;
@@ -111,9 +113,19 @@ public class User extends BaseTimeEntity implements FileHolder {
         this.githubToken = encryptedToken;
     }
 
+    public void hasEnoughPoint(int cost) {
+        if (this.point < cost) {
+            throw new BusinessException(ErrorCode.NOT_ENOUGH_POINT);
+        }
+    }
+
     public long updatePoints(Long amount) {
         this.point += amount;
         return this.point;
+    }
+
+    public boolean isRegistered() {
+        return this.role != Role.NOT_REGISTERED;
     }
 
     @Override

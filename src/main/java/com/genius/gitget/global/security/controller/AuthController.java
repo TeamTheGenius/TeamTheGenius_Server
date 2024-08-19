@@ -41,6 +41,7 @@ public class AuthController {
 
         jwtFacade.generateAccessToken(response, user);
         jwtFacade.generateRefreshToken(response, user);
+        jwtFacade.setReissuedHeader(response);
 
         AuthResponse authResponse = userService.getUserAuthInfo(user.getIdentifier());
 

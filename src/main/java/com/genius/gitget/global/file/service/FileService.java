@@ -20,7 +20,7 @@ public interface FileService {
      * @return base64로 encode한 결과 값(문자열) 반환
      * 파일을 받아오지 못한 경우에는 빈 문자열("") 반환
      */
-    String getEncodedImage(Files files);
+    String getFileAccessURI(Files files);
 
     /**
      * 전달한 파일 저장 후, Files 객체 형성에 필요한 정보를 담은 객체 반환

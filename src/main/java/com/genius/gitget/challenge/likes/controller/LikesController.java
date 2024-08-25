@@ -4,7 +4,8 @@ import com.genius.gitget.challenge.likes.dto.UserLikesAddRequest;
 import com.genius.gitget.challenge.likes.dto.UserLikesAddResponse;
 import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
 import com.genius.gitget.challenge.likes.facade.LikesFacade;
-import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.annotation.GitGetUser;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -15,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,10 +35,10 @@ public class LikesController {
     @GetMapping("/likes")
     public ResponseEntity<PagingResponse<UserLikesResponse>> getLikesListOfUser(
             Pageable pageable,
-            @AuthenticationPrincipal UserPrincipal userPrincipal) {
+            @GitGetUser User user) {
 
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-        Page<UserLikesResponse> likesResponses = likesFacade.getLikesList(userPrincipal.getUser(), pageRequest);
+        Page<UserLikesResponse> likesResponses = likesFacade.getLikesList(user, pageRequest);
 
         return ResponseEntity.ok().body(
                 new PagingResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), likesResponses)
@@ -48,9 +48,9 @@ public class LikesController {
     // 좋아요 목록 추가
     @PostMapping("/likes")
     public ResponseEntity<SingleResponse<UserLikesAddResponse>> addLikes(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @RequestBody UserLikesAddRequest userLikesAddRequest) {
-        UserLikesAddResponse userLikesAddResponse = likesFacade.addLikes(userPrincipal.getUser(),
+        UserLikesAddResponse userLikesAddResponse = likesFacade.addLikes(user,
                 userLikesAddRequest.getIdentifier(),
                 userLikesAddRequest.getInstanceId());
         return ResponseEntity.ok().body(
@@ -61,9 +61,9 @@ public class LikesController {
 
     // 좋아요 목록 삭제
     @DeleteMapping("/likes/{likesId}")
-    public ResponseEntity<CommonResponse> deleteLikes(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<CommonResponse> deleteLikes(@GitGetUser User user,
                                                       @PathVariable(value = "likesId") Long likesId) {
-        likesFacade.deleteLikes(userPrincipal.getUser(), likesId);
+        likesFacade.deleteLikes(user, likesId);
         return ResponseEntity.ok().body(
                 new CommonResponse(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage())
         );

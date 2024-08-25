@@ -1,5 +1,6 @@
 package com.genius.gitget.store.payment.controller;
 
+import com.genius.gitget.global.page.LimitedSizePagination;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -25,6 +26,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping
+    @LimitedSizePagination
     public ResponseEntity<PagingResponse<PaymentDetailsResponse>> getPaymentDetails(@AuthenticationPrincipal
                                                                                     UserPrincipal userPrincipal,
                                                                                     @PageableDefault

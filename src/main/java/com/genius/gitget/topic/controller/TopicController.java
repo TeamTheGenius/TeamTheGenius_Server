@@ -3,6 +3,7 @@ package com.genius.gitget.topic.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.CREATED;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
+import com.genius.gitget.global.page.LimitedSizePagination;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -34,6 +35,7 @@ public class TopicController {
     private final TopicFacade topicFacade;
 
     // 토픽 리스트 요청
+    @LimitedSizePagination
     @GetMapping
     public ResponseEntity<PagingResponse<TopicPagingResponse>> getAllTopics(
             @PageableDefault(size = 5, direction = Sort.Direction.ASC) Pageable pageable) {

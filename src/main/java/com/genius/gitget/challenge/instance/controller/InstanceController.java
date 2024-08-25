@@ -10,6 +10,7 @@ import com.genius.gitget.challenge.instance.dto.crud.InstanceIndexResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.facade.InstanceFacade;
+import com.genius.gitget.global.page.LimitedSizePagination;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -82,6 +83,7 @@ public class InstanceController {
     }
 
     // 인스턴스 리스트 조회
+    @LimitedSizePagination
     @GetMapping("/instance")
     public ResponseEntity<PagingResponse<InstancePagingResponse>> getAllInstances(
             @PageableDefault(size = 5, direction = Sort.Direction.ASC, sort = "id") Pageable pageable) {
@@ -93,6 +95,7 @@ public class InstanceController {
     }
 
     // 특정 토픽에 대한 리스트 조회
+    @LimitedSizePagination
     @GetMapping("topic/instances/{id}")
     public ResponseEntity<PagingResponse<InstancePagingResponse>> getAllInstancesOfSpecificTopic(
             @PageableDefault Pageable pageable, @PathVariable Long id) {

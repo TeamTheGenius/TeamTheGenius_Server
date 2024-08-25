@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.instance.dto.home.HomeInstanceResponse;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchRequest;
 import com.genius.gitget.challenge.instance.dto.search.InstanceSearchResponse;
 import com.genius.gitget.challenge.instance.facade.InstanceHomeFacade;
+import com.genius.gitget.global.page.LimitedSizePagination;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class InstanceHomeController {
     private final InstanceHomeFacade instanceHomeFacade;
 
+    @LimitedSizePagination
     @PostMapping("/search")
     public ResponseEntity<PagingResponse<InstanceSearchResponse>> searchInstances(
             @RequestBody InstanceSearchRequest instanceSearchRequest, Pageable pageable) {
@@ -43,6 +45,7 @@ public class InstanceHomeController {
         );
     }
 
+    @LimitedSizePagination
     @GetMapping("/recommend")
     public ResponseEntity<SlicingResponse<HomeInstanceResponse>> getRecommendInstances(
             Pageable pageable,
@@ -58,6 +61,7 @@ public class InstanceHomeController {
         );
     }
 
+    @LimitedSizePagination
     @GetMapping("/popular")
     public ResponseEntity<SlicingResponse<HomeInstanceResponse>> getPopularInstances(Pageable pageable) {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
@@ -70,6 +74,7 @@ public class InstanceHomeController {
         );
     }
 
+    @LimitedSizePagination
     @GetMapping("/latest")
     public ResponseEntity<SlicingResponse<HomeInstanceResponse>> getLatestInstances(Pageable pageable) {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),

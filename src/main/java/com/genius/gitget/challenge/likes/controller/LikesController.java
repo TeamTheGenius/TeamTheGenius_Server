@@ -4,6 +4,7 @@ import com.genius.gitget.challenge.likes.dto.UserLikesAddRequest;
 import com.genius.gitget.challenge.likes.dto.UserLikesAddResponse;
 import com.genius.gitget.challenge.likes.dto.UserLikesResponse;
 import com.genius.gitget.challenge.likes.facade.LikesFacade;
+import com.genius.gitget.global.page.LimitedSizePagination;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
@@ -32,6 +33,7 @@ public class LikesController {
     private final LikesFacade likesFacade;
 
     // 좋아요 목록 조회
+    @LimitedSizePagination
     @GetMapping("/likes")
     public ResponseEntity<PagingResponse<UserLikesResponse>> getLikesListOfUser(
             Pageable pageable,

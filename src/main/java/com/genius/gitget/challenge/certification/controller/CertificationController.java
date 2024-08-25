@@ -17,6 +17,7 @@ import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.page.LimitedSizePagination;
 import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.global.util.response.dto.SlicingResponse;
@@ -101,6 +102,7 @@ public class CertificationController {
     }
 
     @GetMapping("/week/all/{instanceId}")
+    @LimitedSizePagination
     public ResponseEntity<SlicingResponse<WeekResponse>> getAllUserWeekCertification(
             @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable Long instanceId,

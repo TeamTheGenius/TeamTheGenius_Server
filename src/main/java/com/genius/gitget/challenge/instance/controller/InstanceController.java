@@ -10,11 +10,15 @@ import com.genius.gitget.challenge.instance.dto.crud.InstanceIndexResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstancePagingResponse;
 import com.genius.gitget.challenge.instance.dto.crud.InstanceUpdateRequest;
 import com.genius.gitget.challenge.instance.facade.InstanceFacade;
+import com.genius.gitget.global.page.LimitedSizePagination;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.PagingResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -83,6 +87,7 @@ public class InstanceController {
 
     // 인스턴스 리스트 조회
     @GetMapping("/instance")
+    @LimitedSizePagination
     public ResponseEntity<PagingResponse<InstancePagingResponse>> getAllInstances(
             @PageableDefault(size = 5, direction = Sort.Direction.ASC, sort = "id") Pageable pageable) {
         Page<InstancePagingResponse> instances = instanceFacade.findAllInstances(pageable);
@@ -94,6 +99,7 @@ public class InstanceController {
 
     // 특정 토픽에 대한 리스트 조회
     @GetMapping("topic/instances/{id}")
+    @LimitedSizePagination
     public ResponseEntity<PagingResponse<InstancePagingResponse>> getAllInstancesOfSpecificTopic(
             @PageableDefault Pageable pageable, @PathVariable Long id) {
         PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),

@@ -1,14 +1,23 @@
 package com.genius.gitget.global.util.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.ToString;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import lombok.Getter;
+import lombok.ToString;
 
 @Getter
 @ToString
@@ -16,16 +25,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class BaseTimeEntity {
 
-    // User 테이블
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdDate;
+	// User 테이블
+	@CreatedDate
+	@Column(name = "created_at", updatable = false)
+	private LocalDateTime createdDate;
 
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime modifiedDate;
+	@LastModifiedDate
+	@Column(name = "updated_at")
+	private LocalDateTime modifiedDate;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedDate;
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedDate;
 
 }
+

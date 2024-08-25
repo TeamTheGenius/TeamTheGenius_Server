@@ -1,6 +1,23 @@
 package com.genius.gitget.challenge.instance.domain;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
+import org.hibernate.annotations.DynamicInsert;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.genius.gitget.challenge.certification.util.DateUtil;
 import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.participant.domain.Participant;
@@ -9,6 +26,7 @@ import com.genius.gitget.global.file.domain.Files;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.topic.domain.Topic;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,16 +42,10 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
 
 @Entity
 @Getter
@@ -41,160 +53,159 @@ import org.hibernate.annotations.DynamicInsert;
 @DynamicInsert
 @Table(name = "instance")
 public class Instance implements FileHolder {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "instance_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "instance_id")
+	private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "files_id")
-    private Files files;
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "files_id")
+	private Files files;
 
-    @OneToMany(mappedBy = "instance")
-    private List<Likes> likesList = new ArrayList<>();
+	@OneToMany(mappedBy = "instance")
+	private List<Likes> likesList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "instance")
-    private List<Participant> participantList = new ArrayList<>();
+	@OneToMany(mappedBy = "instance")
+	private List<Participant> participantList = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "topic_id")
-    private Topic topic;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "topic_id")
+	private Topic topic;
 
-    private String title;
+	private String title;
 
-    private String description;
+	private String description;
 
-    private String tags;
+	private String tags;
 
-    private int pointPerPerson;
+	private int pointPerPerson;
 
-    private int participantCount;
+	private int participantCount;
 
-    private String notice;
+	private String notice;
 
-    private String certificationMethod;
+	private String certificationMethod;
 
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    private Progress progress;
+	@NotNull
+	@Enumerated(EnumType.STRING)
+	private Progress progress;
 
-    @Column(name = "started_at")
-    private LocalDateTime startedDate;
+	@Column(name = "started_at")
+	private LocalDateTime startedDate;
 
-    @Column(name = "completed_at")
-    private LocalDateTime completedDate;
+	@Column(name = "completed_at")
+	private LocalDateTime completedDate;
 
-    @Column(name = "instance_uuid")
-    private String instanceUUID;
+	@Column(name = "instance_uuid")
+	private String instanceUUID;
 
-    @Builder
-    public Instance(String title, String description, String tags, int pointPerPerson, Progress progress, String notice,
-                    String certificationMethod,
-                    LocalDateTime startedDate, LocalDateTime completedDate) {
-        this.title = title;
-        this.description = description;
-        this.tags = tags;
-        this.pointPerPerson = pointPerPerson;
-        this.notice = notice;
-        this.certificationMethod = certificationMethod;
-        this.progress = progress;
-        this.startedDate = startedDate;
-        this.completedDate = completedDate;
-    }
+	@Builder
+	public Instance(String title, String description, String tags, int pointPerPerson, Progress progress, String notice,
+		String certificationMethod,
+		LocalDateTime startedDate, LocalDateTime completedDate) {
+		this.title = title;
+		this.description = description;
+		this.tags = tags;
+		this.pointPerPerson = pointPerPerson;
+		this.notice = notice;
+		this.certificationMethod = certificationMethod;
+		this.progress = progress;
+		this.startedDate = startedDate;
+		this.completedDate = completedDate;
+	}
 
+	//== 연관관계 편의 메서드 ==//
+	public void setTopic(Topic topic) {
+		this.topic = topic;
+		if (!topic.getInstanceList().contains(this)) {
+			topic.getInstanceList().add(this);
+		}
+	}
 
-    //== 연관관계 편의 메서드 ==//
-    public void setTopic(Topic topic) {
-        this.topic = topic;
-        if (!topic.getInstanceList().contains(this)) {
-            topic.getInstanceList().add(this);
-        }
-    }
+	/*
+	 * 인스턴스 수정
+	 * */
+	public void updateInstance(String description, String notice, int pointPerPerson, LocalDateTime startedDate,
+		LocalDateTime completedDate, String certificationMethod) {
+		this.description = description;
+		this.notice = notice;
+		this.pointPerPerson = pointPerPerson;
+		this.startedDate = startedDate;
+		this.completedDate = completedDate;
+		this.certificationMethod = certificationMethod;
+	}
 
-    /*
-     * 인스턴스 수정
-     * */
-    public void updateInstance(String description, String notice, int pointPerPerson, LocalDateTime startedDate,
-                               LocalDateTime completedDate, String certificationMethod) {
-        this.description = description;
-        this.notice = notice;
-        this.pointPerPerson = pointPerPerson;
-        this.startedDate = startedDate;
-        this.completedDate = completedDate;
-        this.certificationMethod = certificationMethod;
-    }
+	//== 비지니스 로직 ==//
 
-    //== 비지니스 로직 ==//
+	/*
+	 * 참가자 수 정보 수정
+	 * */
+	public void updateParticipantCount(int amount) {
+		if (amount < 0 && this.participantCount + amount < 0) {
+			return;
+		}
+		this.participantCount += amount;
+	}
 
-    /*
-     * 참가자 수 정보 수정
-     * */
-    public void updateParticipantCount(int amount) {
-        if (amount < 0 && this.participantCount + amount < 0) {
-            return;
-        }
-        this.participantCount += amount;
-    }
+	/*
+	 * 진행 상황 수정
+	 *  */
+	public void updateProgress(Progress progress) {
+		this.progress = progress;
+	}
 
-    /*
-     * 진행 상황 수정
-     *  */
-    public void updateProgress(Progress progress) {
-        this.progress = progress;
-    }
+	public int getLikesCount() {
+		return this.likesList.size();
+	}
 
-    public int getLikesCount() {
-        return this.likesList.size();
-    }
+	@Override
+	public Optional<Files> getFiles() {
+		return Optional.ofNullable(this.files);
+	}
 
-    @Override
-    public Optional<Files> getFiles() {
-        return Optional.ofNullable(this.files);
-    }
+	@Override
+	public void setFiles(Files files) {
+		this.files = files;
+	}
 
-    @Override
-    public void setFiles(Files files) {
-        this.files = files;
-    }
+	/*
+	 * 챌린지 전체 인증 일자 조회
+	 * */
+	public int getTotalAttempt() {
+		return DateUtil.getAttemptCount(startedDate.toLocalDate(), completedDate.toLocalDate());
+	}
 
-    /*
-     * 챌린지 전체 인증 일자 조회
-     * */
-    public int getTotalAttempt() {
-        return DateUtil.getAttemptCount(startedDate.toLocalDate(), completedDate.toLocalDate());
-    }
+	public boolean isActivatedInstance() {
+		return this.progress == Progress.ACTIVITY;
+	}
 
-    public boolean isActivatedInstance() {
-        return this.progress == Progress.ACTIVITY;
-    }
+	/*
+	 * 인스턴스 고유 uuid 설정
+	 * */
+	public void setInstanceUUID(String instanceUUID) {
+		if (this.instanceUUID != null) {
+			throw new BusinessException(ErrorCode.UUID_ALREADY_EXISTS);
+		} else {
+			this.instanceUUID = instanceUUID;
+		}
+	}
 
-    /*
-     * 인스턴스 고유 uuid 설정
-     * */
-    public void setInstanceUUID(String instanceUUID) {
-        if (this.instanceUUID != null) {
-            throw new BusinessException(ErrorCode.UUID_ALREADY_EXISTS);
-        } else {
-            this.instanceUUID = instanceUUID;
-        }
-    }
+	public String getPrTemplate(LocalDate currentDate) {
+		String today = currentDate.toString().replace("-", "");
+		return "GITGET-" + instanceUUID + "-" + today;
+	}
 
-    public String getPrTemplate(LocalDate currentDate) {
-        String today = currentDate.toString().replace("-", "");
-        return "GITGET-" + instanceUUID + "-" + today;
-    }
+	public void validateCertificateCondition(LocalDate targetDate) {
+		if (this.getProgress() != Progress.ACTIVITY) {
+			throw new BusinessException(ErrorCode.NOT_ACTIVITY_INSTANCE);
+		}
 
-    public void validateCertificateCondition(LocalDate targetDate) {
-        if (this.getProgress() != Progress.ACTIVITY) {
-            throw new BusinessException(ErrorCode.NOT_ACTIVITY_INSTANCE);
-        }
+		LocalDate startedDate = this.getStartedDate().toLocalDate().minusDays(1);
+		LocalDate completedDate = this.getCompletedDate().toLocalDate().plusDays(1);
 
-        LocalDate startedDate = this.getStartedDate().toLocalDate().minusDays(1);
-        LocalDate completedDate = this.getCompletedDate().toLocalDate().plusDays(1);
-
-        boolean isValidPeriod = targetDate.isAfter(startedDate) && targetDate.isBefore(completedDate);
-        if (!isValidPeriod) {
-            throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
-        }
-    }
+		boolean isValidPeriod = targetDate.isAfter(startedDate) && targetDate.isBefore(completedDate);
+		if (!isValidPeriod) {
+			throw new BusinessException(ErrorCode.NOT_CERTIFICATE_PERIOD);
+		}
+	}
 }

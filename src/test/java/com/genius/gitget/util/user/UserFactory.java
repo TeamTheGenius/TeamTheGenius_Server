@@ -37,4 +37,12 @@ public class UserFactory {
                 .tags("BE,FE")
                 .build();
     }
+
+    public static User createUnregistered(String identifier) {
+        return User.builder()
+                .identifier(identifier)
+                .role(Role.NOT_REGISTERED)
+                .providerInfo(ProviderInfo.GITHUB)
+                .build();
+    }
 }

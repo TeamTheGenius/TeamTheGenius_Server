@@ -31,7 +31,8 @@ public class UserFacadeService implements UserFacade {
 
     @Override
     public void isNicknameDuplicate(String nickname) {
-        if (userService.findByNickname(nickname).isPresent()) {
+        String target = nickname.trim();
+        if (userService.findByNickname(target).isPresent()) {
             throw new BusinessException(DUPLICATED_NICKNAME);
         }
     }
@@ -63,7 +64,7 @@ public class UserFacadeService implements UserFacade {
     public AuthResponse getUserAuthInfo(String identifier) {
         User user = userService.findByIdentifier(identifier);
         Item usingFrame = ordersService.getUsingFrameItem(user.getId());
-        return new AuthResponse(user.getRole(), usingFrame.getId());
+        return new AuthResponse(user.getRole(), usingFrame.getIdentifier());
     }
 
     @Override

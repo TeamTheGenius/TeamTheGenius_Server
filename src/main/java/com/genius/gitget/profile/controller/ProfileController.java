@@ -2,7 +2,8 @@ package com.genius.gitget.profile.controller;
 
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
-import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.annotation.GitGetUser;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.profile.dto.UserChallengeResultResponse;
@@ -18,7 +19,6 @@ import com.genius.gitget.profile.dto.UserSignoutRequest;
 import com.genius.gitget.profile.service.ProfileFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,9 +35,8 @@ public class ProfileController {
     // 마이페이지 - 사용자 상세 정보 조회
     @GetMapping
     public ResponseEntity<SingleResponse<UserDetailsInformationResponse>> getUserDetailsInformation(
-            @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        UserDetailsInformationResponse userInformation = profileFacade.getUserDetailsInformation(
-                userPrincipal.getUser());
+            @GitGetUser User user) {
+        UserDetailsInformationResponse userInformation = profileFacade.getUserDetailsInformation(user);
         return ResponseEntity.ok()
                 .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         userInformation)
@@ -58,10 +57,10 @@ public class ProfileController {
     // 마이페이지 - 회원 정보 수정
     @PostMapping("/information")
     public ResponseEntity<SingleResponse<UserIndexResponse>> updateUserInformation(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @RequestBody UserInformationUpdateRequest userInformationUpdateRequest) {
 
-        Long userId = profileFacade.updateUserInformation(userPrincipal.getUser(), userInformationUpdateRequest);
+        Long userId = profileFacade.updateUserInformation(user, userInformationUpdateRequest);
         UserIndexResponse userIndexResponse = new UserIndexResponse(userId);
 
         return ResponseEntity.ok().body(
@@ -71,9 +70,8 @@ public class ProfileController {
 
     // 마이페이지 - 관심사 조회
     @GetMapping("/interest")
-    public ResponseEntity<SingleResponse<UserInterestResponse>> getUserInterest(
-            @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        UserInterestResponse userInterest = profileFacade.getUserInterest(userPrincipal.getUser());
+    public ResponseEntity<SingleResponse<UserInterestResponse>> getUserInterest(@GitGetUser User user) {
+        UserInterestResponse userInterest = profileFacade.getUserInterest(user);
 
         return ResponseEntity.ok()
                 .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
@@ -83,9 +81,9 @@ public class ProfileController {
 
     // 마이페이지 - 관심사 수정
     @PostMapping("/interest")
-    public ResponseEntity<CommonResponse> updateUserTags(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<CommonResponse> updateUserTags(@GitGetUser User user,
                                                          @RequestBody UserInterestUpdateRequest userInterestUpdateRequest) {
-        profileFacade.updateUserTags(userPrincipal.getUser(), userInterestUpdateRequest);
+        profileFacade.updateUserTags(user, userInterestUpdateRequest);
 
         return ResponseEntity.ok()
                 .body(new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage()));
@@ -94,10 +92,9 @@ public class ProfileController {
 
     // 마이페이지 - 챌린지 현황
     @GetMapping("/challenges")
-    public ResponseEntity<SingleResponse<UserChallengeResultResponse>> getUserChallengeResult(
-            @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        UserChallengeResultResponse userChallengeResult = profileFacade.getUserChallengeResult(
-                userPrincipal.getUser());
+    public ResponseEntity<SingleResponse<UserChallengeResultResponse>> getUserChallengeResult(@GitGetUser User user) {
+        UserChallengeResultResponse userChallengeResult = profileFacade.getUserChallengeResult(user);
+
         return ResponseEntity.ok()
                 .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),
                         userChallengeResult));
@@ -106,9 +103,9 @@ public class ProfileController {
 
     // 마이페이지 - 탈퇴하기
     @DeleteMapping
-    public ResponseEntity<CommonResponse> deleteUserInformation(@AuthenticationPrincipal UserPrincipal userPrincipal,
+    public ResponseEntity<CommonResponse> deleteUserInformation(@GitGetUser User user,
                                                                 @RequestBody UserSignoutRequest userSignoutRequest) {
-        profileFacade.deleteUserInformation(userPrincipal.getUser(), userSignoutRequest.getReason());
+        profileFacade.deleteUserInformation(user, userSignoutRequest.getReason());
 
         return ResponseEntity.ok()
                 .body(new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage()));
@@ -117,9 +114,8 @@ public class ProfileController {
 
     // 포인트 조회
     @GetMapping("/point")
-    public ResponseEntity<SingleResponse<UserPointResponse>> getUserPoint(
-            @AuthenticationPrincipal UserPrincipal userPrincipal) {
-        UserPointResponse userPoint = profileFacade.getUserPoint(userPrincipal.getUser());
+    public ResponseEntity<SingleResponse<UserPointResponse>> getUserPoint(@GitGetUser User user) {
+        UserPointResponse userPoint = profileFacade.getUserPoint(user);
 
         return ResponseEntity.ok()
                 .body(new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(),

@@ -1,6 +1,7 @@
 package com.genius.gitget.store.payment.controller;
 
-import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.annotation.GitGetUser;
 import com.genius.gitget.global.util.exception.SuccessCode;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -13,7 +14,6 @@ import com.genius.gitget.store.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,9 +29,9 @@ public class PaymentTossController {
 
     @PostMapping
     public ResponseEntity<SingleResponse<PaymentResponse>> requestTossPayment(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @RequestBody PaymentRequest paymentRequest) {
-        PaymentResponse paymentResponse = paymentService.requestTossPayment(userPrincipal.getUser(), paymentRequest);
+        PaymentResponse paymentResponse = paymentService.requestTossPayment(user, paymentRequest);
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SuccessCode.SUCCESS.getStatus(), SuccessCode.SUCCESS.getMessage(), paymentResponse)
         );

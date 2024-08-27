@@ -3,7 +3,8 @@ package com.genius.gitget.store.item.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.certification.util.DateUtil;
-import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.global.util.annotation.GitGetUser;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.ListResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -16,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,15 +29,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class StoreController {
     private final StoreFacade storeFacade;
-//    private final ItemService itemService;
 
     @GetMapping("/items")
     public ResponseEntity<ListResponse<ItemResponse>> getItemList(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @RequestParam String category
     ) {
         ItemCategory itemCategory = ItemCategory.findCategory(category);
-        List<ItemResponse> itemResponses = storeFacade.getItemsByCategory(userPrincipal.getUser(), itemCategory);
+        List<ItemResponse> itemResponses = storeFacade.getItemsByCategory(user, itemCategory);
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponses)
@@ -46,10 +45,10 @@ public class StoreController {
 
     @PostMapping("/items/order/{identifier}")
     public ResponseEntity<SingleResponse<ItemResponse>> purchaseItem(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @PathVariable int identifier
     ) {
-        ItemResponse itemResponse = storeFacade.orderItem(userPrincipal.getUser(), identifier);
+        ItemResponse itemResponse = storeFacade.orderItem(user, identifier);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), itemResponse)
@@ -58,11 +57,11 @@ public class StoreController {
 
     @PostMapping("/items/use/{identifier}")
     public ResponseEntity<CommonResponse> useItem(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @PathVariable int identifier,
             @RequestParam(required = false) Long instanceId
     ) {
-        OrderResponse orderResponse = storeFacade.useItem(userPrincipal.getUser(), identifier,
+        OrderResponse orderResponse = storeFacade.useItem(user, identifier,
                 instanceId, DateUtil.convertToKST(LocalDateTime.now()));
 
         return ResponseEntity.ok().body(
@@ -71,10 +70,8 @@ public class StoreController {
     }
 
     @PostMapping("/items/unuse")
-    public ResponseEntity<ListResponse<ProfileResponse>> unmountItem(
-            @AuthenticationPrincipal UserPrincipal userPrincipal
-    ) {
-        List<ProfileResponse> profileResponses = storeFacade.unmountFrame(userPrincipal.getUser());
+    public ResponseEntity<ListResponse<ProfileResponse>> unmountItem(@GitGetUser User user) {
+        List<ProfileResponse> profileResponses = storeFacade.unmountFrame(user);
 
         return ResponseEntity.ok().body(
                 new ListResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), profileResponses)

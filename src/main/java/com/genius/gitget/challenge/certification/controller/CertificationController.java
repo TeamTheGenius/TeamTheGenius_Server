@@ -17,7 +17,7 @@ import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.challenge.participant.service.ParticipantService;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
-import com.genius.gitget.global.security.domain.UserPrincipal;
+import com.genius.gitget.global.util.annotation.GitGetUser;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
 import com.genius.gitget.global.util.response.dto.SlicingResponse;
 import java.time.LocalDate;
@@ -28,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,11 +60,11 @@ public class CertificationController {
 
     @PostMapping("/today")
     public ResponseEntity<SingleResponse<CertificationResponse>> certificateByGithub(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @RequestBody CertificationRequest certificationRequest
     ) {
         CertificationResponse certificationResponse = certificationFacade.updateCertification(
-                userPrincipal.getUser(), certificationRequest);
+                user, certificationRequest);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), certificationResponse)
@@ -74,10 +73,9 @@ public class CertificationController {
 
     @PostMapping("/pass")
     public ResponseEntity<SingleResponse<ActivatedResponse>> passCertification(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @RequestBody CertificationRequest certificationRequest
     ) {
-        User user = userPrincipal.getUser();
         ActivatedResponse activatedResponse = certificationFacade.passCertification(
                 user.getId(), certificationRequest);
 
@@ -88,11 +86,11 @@ public class CertificationController {
 
     @GetMapping("/week/{instanceId}")
     public ResponseEntity<SingleResponse<WeekResponse>> getWeekCertification(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @PathVariable Long instanceId
     ) {
         LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
-        Participant participant = participantService.findByJoinInfo(userPrincipal.getUser().getId(), instanceId);
+        Participant participant = participantService.findByJoinInfo(user.getId(), instanceId);
         WeekResponse weekResponse = certificationFacade.getMyWeekCertifications(participant.getId(), kstDate);
 
         return ResponseEntity.ok().body(
@@ -102,12 +100,11 @@ public class CertificationController {
 
     @GetMapping("/week/all/{instanceId}")
     public ResponseEntity<SlicingResponse<WeekResponse>> getAllUserWeekCertification(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @PathVariable Long instanceId,
             @PageableDefault Pageable pageable
     ) {
         LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
-        User user = userPrincipal.getUser();
         Slice<WeekResponse> certifications = certificationFacade.getOthersWeekCertifications(
                 user.getId(), instanceId, kstDate, pageable);
 
@@ -134,15 +131,13 @@ public class CertificationController {
 
     @GetMapping("/information/{instanceId}")
     public ResponseEntity<SingleResponse<CertificationInformation>> getCertificationInformation(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            @GitGetUser User user,
             @PathVariable Long instanceId
     ) {
 
         LocalDate kstDate = DateUtil.convertToKST(LocalDateTime.now());
         Instance instance = instanceService.findInstanceById(instanceId);
-        Participant participant = participantService.findByJoinInfo(
-                userPrincipal.getUser().getId(),
-                instanceId);
+        Participant participant = participantService.findByJoinInfo(user.getId(), instanceId);
 
         CertificationInformation certificationInformation = certificationFacade.getCertificationInformation(
                 instance, participant, kstDate);

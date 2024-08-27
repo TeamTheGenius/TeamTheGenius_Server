@@ -5,10 +5,10 @@ import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.service.UserService;
-import com.genius.gitget.global.security.domain.UserPrincipal;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.security.dto.TokenRequest;
 import com.genius.gitget.global.security.service.JwtFacade;
+import com.genius.gitget.global.util.annotation.GitGetUser;
 import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.global.util.response.dto.CommonResponse;
 import com.genius.gitget.global.util.response.dto.SingleResponse;
@@ -16,7 +16,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,10 +50,8 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<CommonResponse> logout(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
-            HttpServletResponse response) {
-        jwtFacade.logout(response, userPrincipal.getUser().getIdentifier());
+    public ResponseEntity<CommonResponse> logout(@GitGetUser User user, HttpServletResponse response) {
+        jwtFacade.logout(response, user.getIdentifier());
 
         return ResponseEntity.ok().body(
                 new CommonResponse(SUCCESS.getStatus(), SUCCESS.getMessage())

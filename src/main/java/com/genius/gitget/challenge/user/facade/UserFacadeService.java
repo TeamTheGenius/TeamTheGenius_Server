@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class UserServiceFacade implements UserFacade {
+public class UserFacadeService implements UserFacade {
     private final UserService userService;
     private final OrdersService ordersService;
 

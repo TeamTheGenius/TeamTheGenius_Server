@@ -72,6 +72,7 @@ public class OrdersService {
         if (usingFrames.isEmpty()) {
             return Item.builder()
                     .itemCategory(ItemCategory.PROFILE_FRAME)
+                    .identifier(null)
                     .build();
         }
         return usingFrames.get(0).getItem();

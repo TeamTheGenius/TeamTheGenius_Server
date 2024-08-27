@@ -64,7 +64,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private User findUserByRefreshToken(String refreshToken) {
         String identifier = jwtFacade.getIdentifierFromRefresh(refreshToken);
-        return userService.findUserByIdentifier(identifier);
+        return userService.findByIdentifier(identifier);
     }
 
     private void setAuthenticationToContext(String accessToken) {

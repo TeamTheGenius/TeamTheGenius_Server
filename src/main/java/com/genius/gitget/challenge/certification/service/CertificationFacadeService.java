@@ -29,11 +29,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GitHub;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -175,7 +180,8 @@ public class CertificationFacadeService implements CertificationFacade {
     @Override
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
-        GitHub gitHub = githubService.getGithubConnection(user);
+        CompletableFuture<GitHub> githubConnection = githubService.getGithubConnection(user);
+        GitHub github = githubConnection.join();
         Instance instance = instanceService.findInstanceById(certificationRequest.instanceId());
         Participant participant = participantService.findByJoinInfo(user.getId(), instance.getId());
 
@@ -184,9 +190,9 @@ public class CertificationFacadeService implements CertificationFacade {
 
         instance.validateCertificateCondition(targetDate);
 
+        List<GHPullRequest> pullRequestByDate = githubService.getPullRequestByDate(github, repositoryName, targetDate);
         List<String> filteredPullRequests = githubService.filterValidPR(
-                githubService.getPullRequestByDate(gitHub, repositoryName, targetDate),
-                instance.getPrTemplate(targetDate)
+            pullRequestByDate, instance.getPrTemplate(targetDate)
         );
 
         certificationService.findOrSave(participant, NOT_YET, targetDate);

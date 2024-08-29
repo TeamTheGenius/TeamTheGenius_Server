@@ -20,6 +20,8 @@ import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesManager;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
+import java.util.concurrent.CompletableFuture;
+
 import org.kohsuke.github.GitHub;
 import org.springframework.stereotype.Component;
 
@@ -100,7 +102,8 @@ public class InstanceDetailFacadeService implements InstanceDetailFacade {
     }
 
     private void validateGithub(User user, String repository) {
-        GitHub gitHub = githubService.getGithubConnection(user);
+        CompletableFuture<GitHub> githubConnection = githubService.getGithubConnection(user);
+        GitHub gitHub = githubConnection.join();
         String repositoryFullName = githubService.getRepoFullName(gitHub, repository);
         githubService.validateGithubRepository(gitHub, repositoryFullName);
     }

@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import org.kohsuke.github.GHPullRequest;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,9 +64,9 @@ public class GithubFacadeService implements GithubFacade {
 	}
 
 	@Override
+	@Cacheable(value = "repositoriesCache", key = "#user.identifier")
 	public List<String> getPublicRepositories(User user) {
-		CompletableFuture<GitHub> githubConnection = githubService.getGithubConnection(user);
-		GitHub gitHub = githubConnection.join();
+		GitHub gitHub = githubService.getGithubConnection(user).join();
 		List<GHRepository> repositoryList = githubService.getRepositoryList(gitHub);
 		return repositoryList.stream()
 			.map(GHRepository::getName)

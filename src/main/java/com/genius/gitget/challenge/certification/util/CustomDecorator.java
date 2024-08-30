@@ -1,4 +1,4 @@
-package com.genius.gitget.challenge.certification.config;
+package com.genius.gitget.challenge.certification.util;
 
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.web.context.request.RequestAttributes;

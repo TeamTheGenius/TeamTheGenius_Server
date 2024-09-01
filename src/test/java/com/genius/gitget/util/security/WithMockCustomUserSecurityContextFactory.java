@@ -3,8 +3,9 @@ package com.genius.gitget.util.security;
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
+import com.genius.gitget.challenge.user.facade.UserFacade;
 import com.genius.gitget.challenge.user.repository.UserRepository;
-import com.genius.gitget.challenge.user.service.UserService;
+import com.genius.gitget.global.security.dto.SignupResponse;
 import com.genius.gitget.global.security.service.CustomUserDetailsService;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +23,7 @@ import org.springframework.security.test.context.support.WithSecurityContextFact
 @Slf4j
 public class WithMockCustomUserSecurityContextFactory implements WithSecurityContextFactory<WithMockCustomUser> {
     private final UserRepository userRepository;
-    private final UserService userService;
+    private final UserFacade userFacade;
     private final CustomUserDetailsService customUserDetailsService;
 
     @Value("${github.yeon-githubId}")
@@ -49,10 +50,11 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
                 .build();
 
         User savedUser = userRepository.save(user);
-        Long signupId = userService.signup(signupRequest);
+        SignupResponse signupResponse = userFacade.signup(signupRequest);
         savedUser.updateRole(customUser.role());
 
-        UserDetails principal = customUserDetailsService.loadUserByUsername(String.valueOf(signupId));
+        Long userId = signupResponse.userId();
+        UserDetails principal = customUserDetailsService.loadUserByUsername(String.valueOf(userId));
         Authentication auth = new UsernamePasswordAuthenticationToken(principal, principal.getPassword(),
                 principal.getAuthorities());
 

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ProfileFacadeService implements ProfileFacade {
@@ -75,6 +76,7 @@ public class ProfileFacadeService implements ProfileFacade {
     }
 
     @Override
+    @Transactional
     public Long updateUserInformation(User user, UserInformationUpdateRequest userInformationUpdateRequest) {
         User findUser = userService.findByIdentifier(user.getIdentifier());
         findUser.updateUserInformation(
@@ -85,6 +87,7 @@ public class ProfileFacadeService implements ProfileFacade {
     }
 
     @Override
+    @Transactional
     public void deleteUserInformation(User user, String reason) {
         User findUser = userService.findByIdentifier(user.getIdentifier());
 
@@ -96,6 +99,7 @@ public class ProfileFacadeService implements ProfileFacade {
     }
 
     @Override
+    @Transactional
     public void updateUserTags(User user, UserInterestUpdateRequest userInterestUpdateRequest) {
         if (userInterestUpdateRequest.getTags() == null) {
             throw new BusinessException();

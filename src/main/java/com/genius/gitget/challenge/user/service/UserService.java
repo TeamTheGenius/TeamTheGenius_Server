@@ -46,6 +46,7 @@ public class UserService {
     }
 
 
+    @Transactional
     public void delete(Long userId, String identifier, String reason) {
         userRepository.deleteById(userId);
         signoutRepository.save(

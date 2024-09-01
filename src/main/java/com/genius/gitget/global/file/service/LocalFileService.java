@@ -45,7 +45,7 @@ public class LocalFileService implements FileService {
 
     @Override
     public String getFileAccessURI(Files files) {
-        return UPLOAD_PATH + files.getFileURI();
+        return files.getFileURI();
     }
 
     @Override

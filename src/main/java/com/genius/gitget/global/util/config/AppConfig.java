@@ -35,7 +35,8 @@ public class AppConfig {
         }
 
         final String bucket = env.getProperty("cloud.aws.s3.bucket");
-        return new S3FileService(s3Config.amazonS3Client(), fileUtil(), bucket);
+        final String cloudFrontDomain = env.getProperty("cloud.aws.cloud-front.domain");
+        return new S3FileService(s3Config.amazonS3Client(), fileUtil(), bucket, cloudFrontDomain);
     }
 
     @Bean

@@ -13,11 +13,8 @@ import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.StandardCopyOption;
-import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.UrlResource;
 import org.springframework.web.multipart.MultipartFile;
 
 public class LocalFileService implements FileService {
@@ -47,15 +44,8 @@ public class LocalFileService implements FileService {
     }
 
     @Override
-    public String getEncodedImage(Files files) {
-        try {
-            UrlResource urlResource = new UrlResource("file:" + files.getFileURI());
-            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
-            return new String(encode, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            //TODO: 불러오는 중의 예외에 대해 Logging 추가하기
-            return "";
-        }
+    public String getFileAccessURI(Files files) {
+        return files.getFileURI();
     }
 
     @Override

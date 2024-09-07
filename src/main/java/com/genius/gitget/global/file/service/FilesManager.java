@@ -124,8 +124,8 @@ public class FilesManager {
     public FileResponse convertToFileResponse(Optional<Files> optionalFiles) {
         return optionalFiles
                 .map(files -> {
-                    String encodedImage = fileService.getEncodedImage(files);
-                    return FileResponse.createExistFile(files.getId(), encodedImage);
+                    String fileAccessURI = fileService.getFileAccessURI(files);
+                    return FileResponse.createExistFile(files.getId(), fileAccessURI);
                 })
                 .orElseGet(FileResponse::createNotExistFile);
     }

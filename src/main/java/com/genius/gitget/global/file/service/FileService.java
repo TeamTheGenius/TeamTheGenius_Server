@@ -14,13 +14,12 @@ import org.springframework.web.multipart.MultipartFile;
 public interface FileService {
 
     /**
-     * Files 내에 저장된 값들을 통해 UrlResource 등으로 다운받은 후, base64로 인코딩한 결과 반환
+     * Files에 저장된 파일의 접근 URI 반환
      *
      * @param files 얻기 원하는 파일의 정보를 담고 있는 Files 객체
-     * @return base64로 encode한 결과 값(문자열) 반환
-     * 파일을 받아오지 못한 경우에는 빈 문자열("") 반환
+     * @return
      */
-    String getEncodedImage(Files files);
+    String getFileAccessURI(Files files);
 
     /**
      * 전달한 파일 저장 후, Files 객체 형성에 필요한 정보를 담은 객체 반환

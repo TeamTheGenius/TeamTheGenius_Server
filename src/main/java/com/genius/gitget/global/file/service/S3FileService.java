@@ -13,32 +13,25 @@ import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.core.io.UrlResource;
+import java.net.URL;
 import org.springframework.web.multipart.MultipartFile;
 
 public class S3FileService implements FileService {
     private final AmazonS3 amazonS3;
     private final FileUtil fileUtil;
     private final String bucket;
-
-    public S3FileService(AmazonS3 amazonS3, FileUtil fileUtil, String bucket) {
+    private final String cloudFrontDomain;
+    public S3FileService(AmazonS3 amazonS3, FileUtil fileUtil, String bucket, String cloudFrontDomain) {
         this.amazonS3 = amazonS3;
         this.fileUtil = fileUtil;
         this.bucket = bucket;
+        this.cloudFrontDomain = cloudFrontDomain;
     }
 
     @Override
-    public String getEncodedImage(Files files) {
-        try {
-            UrlResource urlResource = new UrlResource(amazonS3.getUrl(bucket, files.getFileURI()));
-            byte[] encode = Base64.getEncoder().encode(urlResource.getContentAsByteArray());
-            return new String(encode, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            //TODO: 불러오는 중의 예외에 대해 Logging 추가하기
-            return "";
-        }
+    public String getFileAccessURI(Files files) {
+        URL url = amazonS3.getUrl(bucket, files.getFileURI());
+        return cloudFrontDomain + url.getFile();
     }
 
     @Override

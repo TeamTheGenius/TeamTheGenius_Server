@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableJpaAuditing
 @EnableMongoRepositories
 public class GitgetApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(GitgetApplication.class, args);
     }

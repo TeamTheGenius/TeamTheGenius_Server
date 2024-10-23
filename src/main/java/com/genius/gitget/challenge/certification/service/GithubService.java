@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class GithubService {
 	private final UserService userService;
 
 	@Async("sampleExecutor")
-	public CompletableFuture<GitHub> getGithubConnection(String githubToken) {
+	public CompletableFuture<GitHub> getGithubConnection(String githubToken) throws CompletionException {
 		try {
 			GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
 			gitHub.checkApiUrlValidity();
@@ -50,7 +51,7 @@ public class GithubService {
 	}
 
 	@Async("sampleExecutor")
-	public CompletableFuture<GitHub> getGithubConnection(User user) {
+	public CompletableFuture<GitHub> getGithubConnection(User user) throws CompletionException{
 		try {
 			String githubToken = userService.getGithubToken(user);
 			return getGithubConnection(githubToken);
@@ -60,7 +61,7 @@ public class GithubService {
 	}
 
 	@Async("sampleExecutor")
-	public void validateGithubConnection(GitHub gitHub, String githubId) {
+	public void validateGithubConnection(GitHub gitHub, String githubId) throws CompletionException {
 		try {
 			String accountId = gitHub.getMyself().getLogin();
 			validateGithubAccount(githubId, accountId);
@@ -69,13 +70,13 @@ public class GithubService {
 		};
 	}
 
-	private void validateGithubAccount(String githubId, String accountId) {
+	private void validateGithubAccount(String githubId, String accountId) throws CompletionException {
 		if (!githubId.equals(accountId)) {
 			throw new BusinessException(GITHUB_ID_INCORRECT);
 		}
 	}
 
-	public void validateGithubRepository(GitHub gitHub, String repositoryFullName) {
+	public void validateGithubRepository(GitHub gitHub, String repositoryFullName) throws CompletionException {
 		try {
 			gitHub.getRepository(repositoryFullName);
 		} catch (GHFileNotFoundException e) {
@@ -85,7 +86,7 @@ public class GithubService {
 		}
 	}
 
-	public List<GHRepository> getRepositoryList(GitHub gitHub) {
+	public List<GHRepository> getRepositoryList(GitHub gitHub) throws CompletionException {
 		try {
 			GHRepositorySearchBuilder builder = gitHub.searchRepositories()
 				.user(getGHUser(gitHub).getLogin())
@@ -98,7 +99,7 @@ public class GithubService {
 	}
 
 	public List<GHPullRequest> getPullRequestByDate(GitHub gitHub, String repositoryName,
-		LocalDate kstDate) {
+		LocalDate kstDate) throws CompletionException {
 		try {
 			GHRepository repository = gitHub.getRepository(getRepoFullName(gitHub, repositoryName));
 			GHPullRequestSearchBuilder prSearchBuilder = gitHub.searchPullRequests()

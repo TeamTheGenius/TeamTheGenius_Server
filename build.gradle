@@ -62,11 +62,6 @@ dependencies {
     // Slack
     implementation 'com.slack.api:slack-api-client:1.25.1'
 
-    // cache
-    implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'org.ehcache:ehcache::jakarta'
-    implementation 'javax.cache:cache-api'
-
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'

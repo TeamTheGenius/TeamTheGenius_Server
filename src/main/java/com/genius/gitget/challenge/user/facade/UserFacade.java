@@ -13,4 +13,6 @@ public interface UserFacade {
     AuthResponse getUserAuthInfo(String identifier);
 
     User getAuthUser(String identifier);
+
+    User getGuestUser();
 }

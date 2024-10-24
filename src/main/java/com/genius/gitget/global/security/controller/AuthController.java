@@ -58,4 +58,19 @@ public class AuthController {
     public String healthCheck() {
         return "health-check-ok";
     }
+
+    @PostMapping("/auth/guest")
+    public ResponseEntity<SingleResponse<AuthResponse>> loginWithGuest(HttpServletResponse response) {
+        User authUser = userFacade.getGuestUser();
+
+        jwtFacade.generateAccessToken(response, authUser);
+        jwtFacade.generateRefreshToken(response, authUser);
+        jwtFacade.setReissuedHeader(response);
+
+        AuthResponse authResponse = userFacade.getUserAuthInfo(authUser.getIdentifier());
+
+        return ResponseEntity.ok().body(
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), authResponse)
+        );
+    }
 }

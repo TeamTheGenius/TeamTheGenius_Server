@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserFacadeService implements UserFacade {
     private final UserService userService;
     private final OrdersService ordersService;
+    private final String GUEST_IDENTIFIER = "Guest";
 
     @Value("${admin.githubId}")
     private List<String> adminIds;
@@ -74,5 +75,10 @@ public class UserFacadeService implements UserFacade {
             throw new BusinessException(NOT_AUTHENTICATED_USER);
         }
         return user;
+    }
+
+    @Override
+    public User getGuestUser() {
+        return userService.findByIdentifier(GUEST_IDENTIFIER);
     }
 }

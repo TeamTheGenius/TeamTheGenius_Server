@@ -43,3 +43,16 @@ FROM (SELECT 1                      AS identifier,
              '무섭지롱 프레임',
              'PROFILE_FRAME') AS new_items
 WHERE (SELECT COUNT(*) FROM item) < 3;
+
+INSERT INTO users (`point`, user_id, nickname, information, identifier, tags, provider_info, `role`)
+SELECT 0,
+       104,
+       'Guest',
+       '자기 소개입니다.',
+       'Guest',
+       'Java,Spring',
+       'GITHUB',
+       'USER'
+WHERE NOT EXISTS (SELECT 1
+                  FROM users
+                  WHERE identifier = 'Guest');

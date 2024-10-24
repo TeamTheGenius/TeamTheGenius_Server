@@ -3,6 +3,7 @@ package com.genius.gitget.global.security.controller;
 import static com.genius.gitget.global.util.exception.SuccessCode.SUCCESS;
 
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.dto.LoginRequest;
 import com.genius.gitget.challenge.user.facade.UserFacade;
 import com.genius.gitget.global.security.dto.AuthResponse;
 import com.genius.gitget.global.security.dto.TokenRequest;
@@ -60,8 +61,9 @@ public class AuthController {
     }
 
     @PostMapping("/auth/guest")
-    public ResponseEntity<SingleResponse<AuthResponse>> loginWithGuest(HttpServletResponse response) {
-        User authUser = userFacade.getGuestUser();
+    public ResponseEntity<SingleResponse<AuthResponse>> loginWithGuest(HttpServletResponse response,
+                                                                       @RequestBody LoginRequest loginRequest) {
+        User authUser = userFacade.getGuestUser(loginRequest);
 
         jwtFacade.generateAccessToken(response, authUser);
         jwtFacade.generateRefreshToken(response, authUser);

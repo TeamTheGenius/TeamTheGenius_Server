@@ -30,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +46,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Rollback
 public class ProfileServiceTest {
 
+    static User user1, user2;
+    static Topic topic1;
+    static Instance instance1, instance2, instance3;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -59,10 +63,6 @@ public class ProfileServiceTest {
     ProfileFacade profileFacade;
     @Autowired
     SignoutRepository signoutRepository;
-
-    static User user1, user2;
-    static Topic topic1;
-    static Instance instance1, instance2, instance3;
 
     @BeforeEach
     void setup() {
@@ -88,6 +88,49 @@ public class ProfileServiceTest {
         likesRepository.save(likes3);
     }
 
+    private User getSavedUser(String identifier, ProviderInfo providerInfo, String nickname) {
+        User user = userRepository.save(
+                User.builder()
+                        .identifier(identifier)
+                        .providerInfo(providerInfo)
+                        .role(Role.ADMIN)
+                        .tags("BE,FE")
+                        .nickname(nickname)
+                        .build()
+        );
+        return user;
+    }
+
+    private Topic getSavedTopic(String title, String tags) {
+        Topic topic = topicRepository.save(
+                Topic.builder()
+                        .title(title)
+                        .tags(tags)
+                        .description("토픽 설명")
+                        .pointPerPerson(100)
+                        .build()
+        );
+        return topic;
+    }
+
+    private Instance getSavedInstance(String title, String tags, int participantCnt) {
+        LocalDateTime now = LocalDateTime.now();
+        Instance instance = instanceRepository.save(
+                Instance.builder()
+                        .tags(tags)
+                        .title(title)
+                        .description("description")
+                        .progress(Progress.PREACTIVITY)
+                        .pointPerPerson(100)
+                        .certificationMethod("인증 방법")
+                        .startedDate(now)
+                        .completedDate(now.plusDays(1))
+                        .build()
+        );
+        instance.updateParticipantCount(participantCnt);
+        return instance;
+    }
+
     @Nested
     @DisplayName("유저 상세 정보 조회")
     class Describe_getUserDetailsInformation {
@@ -110,6 +153,9 @@ public class ProfileServiceTest {
             List<Long> userIdList = new ArrayList<>();
             List<User> all = userRepository.findAll();
             for (User user : all) {
+                if (Objects.equals(user.getNickname(), "Guest")) {
+                    continue;
+                }
                 Long id = user.getId();
                 userIdList.add(id);
             }
@@ -225,48 +271,5 @@ public class ProfileServiceTest {
             System.out.println(userChallengeResult.getFail());
             System.out.println(userChallengeResult.getSuccess());
         }
-    }
-
-    private User getSavedUser(String identifier, ProviderInfo providerInfo, String nickname) {
-        User user = userRepository.save(
-                User.builder()
-                        .identifier(identifier)
-                        .providerInfo(providerInfo)
-                        .role(Role.ADMIN)
-                        .tags("BE,FE")
-                        .nickname(nickname)
-                        .build()
-        );
-        return user;
-    }
-
-    private Topic getSavedTopic(String title, String tags) {
-        Topic topic = topicRepository.save(
-                Topic.builder()
-                        .title(title)
-                        .tags(tags)
-                        .description("토픽 설명")
-                        .pointPerPerson(100)
-                        .build()
-        );
-        return topic;
-    }
-
-    private Instance getSavedInstance(String title, String tags, int participantCnt) {
-        LocalDateTime now = LocalDateTime.now();
-        Instance instance = instanceRepository.save(
-                Instance.builder()
-                        .tags(tags)
-                        .title(title)
-                        .description("description")
-                        .progress(Progress.PREACTIVITY)
-                        .pointPerPerson(100)
-                        .certificationMethod("인증 방법")
-                        .startedDate(now)
-                        .completedDate(now.plusDays(1))
-                        .build()
-        );
-        instance.updateParticipantCount(participantCnt);
-        return instance;
     }
 }

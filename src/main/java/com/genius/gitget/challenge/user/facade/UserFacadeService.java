@@ -38,6 +38,7 @@ public class UserFacadeService implements UserFacade {
     }
 
     @Override
+    @Transactional
     public SignupResponse signup(SignupRequest signupRequest) {
         User user = userService.findByIdentifier(signupRequest.identifier());
 

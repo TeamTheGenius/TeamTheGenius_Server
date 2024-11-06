@@ -29,7 +29,7 @@ public class Item extends BaseTimeEntity {
     private List<Orders> ordersList = new ArrayList<>();
 
     @Column(unique = true)
-    private int identifier;
+    private Integer identifier;
 
     private String name;
 
@@ -41,7 +41,7 @@ public class Item extends BaseTimeEntity {
     private String details;
 
     @Builder
-    public Item(String name, int cost, int identifier,
+    public Item(String name, int cost, Integer identifier,
                 ItemCategory itemCategory, String details) {
         this.name = name;
         this.cost = cost;

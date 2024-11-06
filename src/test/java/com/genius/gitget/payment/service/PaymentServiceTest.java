@@ -111,6 +111,7 @@ public class PaymentServiceTest {
                 .itemCategory(itemCategory)
                 .cost(100)
                 .name(itemCategory.getName())
+                .identifier(8)
                 .build());
     }
 

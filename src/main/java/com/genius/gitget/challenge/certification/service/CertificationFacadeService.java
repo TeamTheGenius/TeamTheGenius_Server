@@ -24,6 +24,7 @@ import com.genius.gitget.challenge.user.dto.UserProfileInfo;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.file.dto.FileResponse;
 import com.genius.gitget.global.file.service.FilesManager;
+import com.genius.gitget.store.item.service.OrdersService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,6 +55,7 @@ public class CertificationFacadeService implements CertificationFacade {
     private final ParticipantService participantService;
     private final GithubService githubService;
     private final CertificationService certificationService;
+    private final OrdersService ordersService;
 
     @Override
     public WeekResponse getMyWeekCertifications(Long participantId, LocalDate currentDate) {
@@ -75,7 +77,7 @@ public class CertificationFacadeService implements CertificationFacade {
         LocalDate instanceStartDate = instance.getStartedDate().toLocalDate();
         LocalDate weekStartDate = DateUtil.getWeekStartDate(instanceStartDate, currentDate);
 
-        UserProfileInfo userProfileInfo = userService.getUserProfileInfo(participant.getUser());
+        UserProfileInfo userProfileInfo = getUserProfileInfo(participant.getUser());
 
         if (!instance.isActivatedInstance()) {
             return WeekResponse.create(userProfileInfo, new ArrayList<>());
@@ -88,6 +90,13 @@ public class CertificationFacadeService implements CertificationFacade {
                 certifications, instanceStartDate, currentDate);
 
         return WeekResponse.create(userProfileInfo, weekCertifications);
+    }
+
+    private UserProfileInfo getUserProfileInfo(User user) {
+        Long frameId = ordersService.getUsingFrameItem(user.getId()).getId();
+        FileResponse fileResponse = filesManager.convertToFileResponse(user.getFiles());
+
+        return UserProfileInfo.createByEntity(user, frameId, fileResponse);
     }
 
     private List<CertificationResponse> getWeekCertifications(List<Certification> certifications,

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class ProfileFacadeService implements ProfileFacade {
@@ -59,7 +60,7 @@ public class ProfileFacadeService implements ProfileFacade {
 
     @Override
     public UserDetailsInformationResponse getUserDetailsInformation(User user) {
-        User findUser = userService.findUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findByIdentifier(user.getIdentifier());
 
         int participantCount = 0;
         List<Participant> participantInfoList = findUser.getParticipantList();
@@ -75,8 +76,9 @@ public class ProfileFacadeService implements ProfileFacade {
     }
 
     @Override
+    @Transactional
     public Long updateUserInformation(User user, UserInformationUpdateRequest userInformationUpdateRequest) {
-        User findUser = userService.findUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findByIdentifier(user.getIdentifier());
         findUser.updateUserInformation(
                 userInformationUpdateRequest.getNickname(),
                 userInformationUpdateRequest.getInformation());
@@ -85,8 +87,9 @@ public class ProfileFacadeService implements ProfileFacade {
     }
 
     @Override
+    @Transactional
     public void deleteUserInformation(User user, String reason) {
-        User findUser = userService.findUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findByIdentifier(user.getIdentifier());
 
         filesManager.deleteFile(findUser.getFiles());
         findUser.setFiles(null);
@@ -96,11 +99,12 @@ public class ProfileFacadeService implements ProfileFacade {
     }
 
     @Override
+    @Transactional
     public void updateUserTags(User user, UserInterestUpdateRequest userInterestUpdateRequest) {
         if (userInterestUpdateRequest.getTags() == null) {
             throw new BusinessException();
         }
-        User findUser = userService.findUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findByIdentifier(user.getIdentifier());
         String interest = String.join(",", userInterestUpdateRequest.getTags());
         findUser.updateUserTags(interest);
         userService.save(findUser);
@@ -121,7 +125,7 @@ public class ProfileFacadeService implements ProfileFacade {
 
     @Override
     public UserChallengeResultResponse getUserChallengeResult(User user) {
-        User findUser = userService.findUserByIdentifier(user.getIdentifier());
+        User findUser = userService.findByIdentifier(user.getIdentifier());
         HashMap<JoinResult, List<Long>> participantHashMap = new HashMap<>() {
             {
                 put(READY, new ArrayList<>());

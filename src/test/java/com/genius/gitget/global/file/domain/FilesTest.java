@@ -20,13 +20,13 @@ class FilesTest {
                 .fileType(FileType.INSTANCE)
                 .originalFilename("originalFilename")
                 .savedFilename("savedFilename")
-                .fileURI("fileURI")
+                .fileURI("accessURI")
                 .build();
 
         UpdateDTO updateDTO = UpdateDTO.builder()
                 .savedFilename("new savedFilename")
                 .originalFilename("new originalFilename")
-                .fileURI("new fileURI")
+                .fileURI("new accessURI")
                 .build();
 
         //when

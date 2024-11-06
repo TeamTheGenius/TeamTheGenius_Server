@@ -52,8 +52,8 @@ public class FileTestController {
     ) {
         FileType fileType = FileType.findType(type);
         Files files = filesManager.uploadFile(multipartFile, fileType);
-        String encodedImage = fileService.getEncodedImage(files);
-        FileResponse fileResponse = FileResponse.createExistFile(files.getId(), encodedImage);
+        String accessURI = fileService.getFileAccessURI(files);
+        FileResponse fileResponse = FileResponse.createExistFile(files.getId(), accessURI);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), fileResponse)
@@ -65,8 +65,8 @@ public class FileTestController {
             @PathVariable Long fileId,
             @RequestParam("files") MultipartFile multipartFile) {
         Files files = filesManager.updateFile(fileId, multipartFile);
-        String encodedImage = fileService.getEncodedImage(files);
-        FileResponse fileResponse = FileResponse.createExistFile(files.getId(), encodedImage);
+        String accessURI = fileService.getFileAccessURI(files);
+        FileResponse fileResponse = FileResponse.createExistFile(files.getId(), accessURI);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), fileResponse)
@@ -82,8 +82,8 @@ public class FileTestController {
         Files files = filesManager.findById(fileId);
         Files copiedFile = filesManager.copyFile(files, fileType);
 
-        String encodedImage = fileService.getEncodedImage(copiedFile);
-        FileResponse fileResponse = FileResponse.createExistFile(copiedFile.getId(), encodedImage);
+        String accessURI = fileService.getFileAccessURI(copiedFile);
+        FileResponse fileResponse = FileResponse.createExistFile(copiedFile.getId(), accessURI);
 
         return ResponseEntity.ok().body(
                 new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), fileResponse)

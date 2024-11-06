@@ -2,10 +2,10 @@ package com.genius.gitget.global.file.dto;
 
 public record FileResponse(
         Long fileId,
-        String encodedFile) {
+        String accessURI) {
 
-    public static FileResponse createExistFile(Long filesId, String encodedFile) {
-        return new FileResponse(filesId, encodedFile);
+    public static FileResponse createExistFile(Long filesId, String accessURI) {
+        return new FileResponse(filesId, accessURI);
     }
 
     public static FileResponse createNotExistFile() {

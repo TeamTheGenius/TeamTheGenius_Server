@@ -4,6 +4,6 @@ import com.genius.gitget.challenge.user.domain.Role;
 
 public record AuthResponse(
         Role role,
-        Long frameId
+        Integer frameId
 ) {
 }

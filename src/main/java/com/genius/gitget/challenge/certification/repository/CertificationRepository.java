@@ -15,7 +15,7 @@ public interface CertificationRepository extends JpaRepository<Certification, Lo
     Optional<Certification> findByDate(@Param("targetDate") LocalDate targetDate,
                                        @Param("participantId") Long participantId);
 
-    @Query("select c from Certification c where c.participant.id = :participantId and c.certificatedAt >= :startDate and c.certificatedAt <= :endDate order by c.currentAttempt desc")
+    @Query("select c from Certification c where c.participant.id = :participantId and c.certificatedAt between :startDate AND :endDate order by c.currentAttempt desc")
     List<Certification> findByDuration(@Param("startDate") LocalDate startDate,
                                        @Param("endDate") LocalDate endDate,
                                        @Param("participantId") Long participantId);

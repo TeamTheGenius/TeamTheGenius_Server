@@ -31,7 +31,12 @@ import org.hibernate.annotations.DynamicInsert;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
-@Table(indexes = {@Index(name = "certificated_at_index", columnList = "certificated_at")})
+@Table(indexes = {
+        @Index(
+                name = "idx_participant_cert_attempt",
+                columnList = "participant_id, certificated_at, current_attempt DESC"
+        )
+})
 public class Certification extends BaseTimeEntity {
     @Id
     @Column(name = "certification_id")

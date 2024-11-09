@@ -6,6 +6,7 @@ import com.genius.gitget.challenge.user.domain.User;
 import com.genius.gitget.challenge.user.dto.LoginRequest;
 import com.genius.gitget.challenge.user.facade.UserFacade;
 import com.genius.gitget.global.security.dto.AuthResponse;
+import com.genius.gitget.global.security.dto.GuestResponse;
 import com.genius.gitget.global.security.dto.TokenRequest;
 import com.genius.gitget.global.security.service.JwtFacade;
 import com.genius.gitget.global.util.annotation.GitGetUser;
@@ -61,8 +62,8 @@ public class AuthController {
     }
 
     @PostMapping("/auth/guest")
-    public ResponseEntity<SingleResponse<AuthResponse>> loginWithGuest(HttpServletResponse response,
-                                                                       @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<SingleResponse<GuestResponse>> loginWithGuest(HttpServletResponse response,
+                                                                        @RequestBody LoginRequest loginRequest) {
         User authUser = userFacade.getGuestUser(loginRequest);
 
         jwtFacade.generateAccessToken(response, authUser);
@@ -70,9 +71,10 @@ public class AuthController {
         jwtFacade.setReissuedHeader(response);
 
         AuthResponse authResponse = userFacade.getUserAuthInfo(authUser.getIdentifier());
+        GuestResponse guestResponse = GuestResponse.from(authResponse, authUser.getIdentifier());
 
         return ResponseEntity.ok().body(
-                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), authResponse)
+                new SingleResponse<>(SUCCESS.getStatus(), SUCCESS.getMessage(), guestResponse)
         );
     }
 }

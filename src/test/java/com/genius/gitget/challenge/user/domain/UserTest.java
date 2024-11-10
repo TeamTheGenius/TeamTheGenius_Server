@@ -41,7 +41,7 @@ public class UserTest {
         User savedUser2 = userRepository.save(userB());
 
         List<User> users = userRepository.findAll();
-        assertThat(count(users)).isEqualTo(2);
+        assertThat(count(users)).isEqualTo(3);
         assertThat(savedUser1).isNotSameAs(savedUser2);
     }
 

@@ -2,10 +2,12 @@ package com.genius.gitget.challenge.user.facade;
 
 import static com.genius.gitget.global.util.exception.ErrorCode.ALREADY_REGISTERED;
 import static com.genius.gitget.global.util.exception.ErrorCode.DUPLICATED_NICKNAME;
+import static com.genius.gitget.global.util.exception.ErrorCode.MEMBER_NOT_FOUND;
 import static com.genius.gitget.global.util.exception.ErrorCode.NOT_AUTHENTICATED_USER;
 
 import com.genius.gitget.challenge.user.domain.Role;
 import com.genius.gitget.challenge.user.domain.User;
+import com.genius.gitget.challenge.user.dto.LoginRequest;
 import com.genius.gitget.challenge.user.dto.SignupRequest;
 import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.security.dto.AuthResponse;
@@ -14,6 +16,7 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import com.genius.gitget.store.item.domain.Item;
 import com.genius.gitget.store.item.service.OrdersService;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserFacadeService implements UserFacade {
     private final UserService userService;
     private final OrdersService ordersService;
+
+    @Value("${guest.id}")
+    private String guest_id;
+
+    @Value("${guest.password}")
+    private String guest_password;
 
     @Value("${admin.githubId}")
     private List<String> adminIds;
@@ -75,5 +84,14 @@ public class UserFacadeService implements UserFacade {
             throw new BusinessException(NOT_AUTHENTICATED_USER);
         }
         return user;
+    }
+
+    @Override
+    public User getGuestUser(LoginRequest loginRequest) {
+        if (!Objects.equals(loginRequest.id(), guest_id) || !Objects.equals(loginRequest.password(), guest_password)) {
+            throw new BusinessException(MEMBER_NOT_FOUND);
+        }
+
+        return userService.findByIdentifier(guest_id);
     }
 }

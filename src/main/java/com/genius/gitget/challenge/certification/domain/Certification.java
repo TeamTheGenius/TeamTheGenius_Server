@@ -15,8 +15,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,6 +31,12 @@ import org.hibernate.annotations.DynamicInsert;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicInsert
+@Table(indexes = {
+        @Index(
+                name = "idx_participant_cert_attempt",
+                columnList = "participant_id, certificated_at, current_attempt DESC"
+        )
+})
 public class Certification extends BaseTimeEntity {
     @Id
     @Column(name = "certification_id")

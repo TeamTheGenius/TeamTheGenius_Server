@@ -9,6 +9,7 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kohsuke.github.GHPullRequest;
@@ -84,11 +85,12 @@ class GithubServiceTest {
     public void should_throwException_when_repositoryNameInvalid() {
         //given
         GitHub gitHub = getGitHub();
-        String repositoryName = "fake repository";
+        String repositoryName = githubId + "/fake repository";
 
         //when & then
-        assertThatThrownBy(() -> githubService.validateGithubRepository(gitHub, repositoryName))
-                .isInstanceOf(BusinessException.class);
+        assertThatThrownBy(() -> githubService.validateGithubRepository(gitHub, repositoryName).join())
+                .isInstanceOf(CompletionException.class)
+                .hasCause(new BusinessException(GITHUB_REPOSITORY_INCORRECT));
     }
 
     @Test

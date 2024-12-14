@@ -77,14 +77,17 @@ public class GithubService {
         }
     }
 
-    public void validateGithubRepository(GitHub gitHub, String repositoryFullName) {
-        try {
-            gitHub.getRepository(repositoryFullName);
-        } catch (GHFileNotFoundException e) {
-            throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
-        } catch (IllegalArgumentException | IOException e) {
-            throw new BusinessException(e);
-        }
+    @Async("threadExecutor")
+    public CompletableFuture<Void> validateGithubRepository(GitHub gitHub, String repositoryFullName) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                gitHub.getRepository(repositoryFullName);
+            } catch (GHFileNotFoundException e) {
+                throw new BusinessException(GITHUB_REPOSITORY_INCORRECT);
+            } catch (IllegalArgumentException | IOException e) {
+                throw new BusinessException(e);
+            }
+        });
     }
 
     public List<GHRepository> getRepositoryList(GitHub gitHub) {

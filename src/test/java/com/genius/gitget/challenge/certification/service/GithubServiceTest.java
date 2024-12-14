@@ -40,7 +40,7 @@ class GithubServiceTest {
         //given
 
         //when
-        GitHub gitHub = githubService.getGithubConnection(personalKey);
+        GitHub gitHub = githubService.getGithubConnection(personalKey).join();
 
         //then
         assertThat(gitHub).isNotNull();
@@ -147,6 +147,6 @@ class GithubServiceTest {
     }
 
     private GitHub getGitHub() {
-        return githubService.getGithubConnection(personalKey);
+        return githubService.getGithubConnection(personalKey).join();
     }
 }

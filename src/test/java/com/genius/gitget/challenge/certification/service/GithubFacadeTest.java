@@ -17,6 +17,7 @@ import com.genius.gitget.global.util.exception.ErrorCode;
 import com.genius.gitget.util.user.UserFactory;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -63,7 +64,7 @@ public class GithubFacadeTest {
             public void it_save_token_to_user_entity() {
                 String encrypted = encryptUtil.encrypt(githubToken);
 
-                githubFacade.registerGithubPersonalToken(user, githubToken);
+                githubFacade.registerGithubPersonalToken(user, githubToken).join();
 
                 assertThat(user.getGithubToken()).isEqualTo(encrypted);
             }
@@ -77,9 +78,9 @@ public class GithubFacadeTest {
             public void it_throws_GITHUB_ID_INCORRECT_exception() {
                 user = userRepository.save(UserFactory.createByInfo("incorrectID", Role.USER));
 
-                assertThatThrownBy(() -> githubFacade.registerGithubPersonalToken(user, githubToken))
-                        .isInstanceOf(BusinessException.class)
-                        .hasMessageContaining(ErrorCode.GITHUB_ID_INCORRECT.getMessage());
+                assertThatThrownBy(() -> githubFacade.registerGithubPersonalToken(user, githubToken).join())
+                        .isInstanceOf(CompletionException.class)
+                        .hasCause(new BusinessException(ErrorCode.GITHUB_ID_INCORRECT));
             }
         }
     }

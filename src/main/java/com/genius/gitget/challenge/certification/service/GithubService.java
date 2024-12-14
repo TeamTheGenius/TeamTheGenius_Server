@@ -11,6 +11,8 @@ import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.GHDirection;
 import org.kohsuke.github.GHFileNotFoundException;
@@ -22,6 +24,7 @@ import org.kohsuke.github.GHRepositorySearchBuilder.Sort;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,25 +35,31 @@ public class GithubService {
     private final UserService userService;
 
 
-    public GitHub getGithubConnection(String githubToken) {
-        try {
-            GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
-            gitHub.checkApiUrlValidity();
-            return gitHub;
-        } catch (IOException e) {
-            throw new BusinessException(GITHUB_CONNECTION_FAILED);
-        }
+    @Async("threadExecutor")
+    public CompletableFuture<GitHub> getGithubConnection(String githubToken) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
+                gitHub.checkApiUrlValidity();
+                return gitHub;
+            } catch (IOException e) {
+                throw new CompletionException(new BusinessException(GITHUB_CONNECTION_FAILED));
+            }
+        });
     }
 
-    public GitHub getGithubConnection(User user) {
-        try {
-            String githubToken = userService.getGithubToken(user);
-            GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
-            gitHub.checkApiUrlValidity();
-            return gitHub;
-        } catch (IOException e) {
-            throw new BusinessException(GITHUB_CONNECTION_FAILED);
-        }
+    @Async("threadExecutor")
+    public CompletableFuture<GitHub> getGithubConnection(User user) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                String githubToken = userService.getGithubToken(user);
+                GitHub gitHub = new GitHubBuilder().withOAuthToken(githubToken).build();
+                gitHub.checkApiUrlValidity();
+                return gitHub;
+            } catch (IOException e) {
+                throw new BusinessException(GITHUB_CONNECTION_FAILED);
+            }
+        });
     }
 
     public void validateGithubConnection(GitHub gitHub, String githubId) {

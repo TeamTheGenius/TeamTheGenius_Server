@@ -100,7 +100,7 @@ public class InstanceDetailFacadeService implements InstanceDetailFacade {
     }
 
     private void validateGithub(User user, String repository) {
-        GitHub gitHub = githubService.getGithubConnection(user);
+        GitHub gitHub = githubService.getGithubConnection(user).join();
         String repositoryFullName = githubService.getRepoFullName(gitHub, repository);
         githubService.validateGithubRepository(gitHub, repositoryFullName);
     }

@@ -10,6 +10,7 @@ import com.genius.gitget.challenge.user.service.UserService;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.github.GHPullRequest;
@@ -29,35 +30,39 @@ public class GithubFacadeService implements GithubFacade {
 
     @Override
     @Transactional
-    public void registerGithubPersonalToken(User user, String githubToken) {
-        GitHub gitHub = githubService.getGithubConnection(githubToken);
-        githubService.validateGithubConnection(gitHub, user.getIdentifier());
-
-        String encryptedToken = encryptUtil.encrypt(githubToken);
-        user.updateGithubPersonalToken(encryptedToken);
-        userService.save(user);
+    public CompletableFuture<Void> registerGithubPersonalToken(User user, String githubToken) {
+        return githubService.getGithubConnection(githubToken)
+                .thenCompose(github -> CompletableFuture.runAsync(() -> {
+                    githubService.validateGithubConnection(github, user.getIdentifier());
+                    String encryptedToken = encryptUtil.encrypt(githubToken);
+                    user.updateGithubPersonalToken(encryptedToken);
+                    userService.save(user);
+                }));
     }
 
     @Override
-    public void verifyGithubToken(User user) {
+    public CompletableFuture<Void> verifyGithubToken(User user) {
         String githubToken = encryptUtil.decrypt(user.getGithubToken());
 
-        GitHub gitHub = githubService.getGithubConnection(githubToken);
-        githubService.validateGithubConnection(gitHub, user.getIdentifier());
+        return githubService.getGithubConnection(githubToken)
+                .thenCompose(github -> CompletableFuture.runAsync(() -> {
+                    githubService.validateGithubConnection(github, user.getIdentifier());
+                }));
     }
 
     @Override
     @Transactional
-    public void verifyRepository(User user, String repository) {
-        GitHub gitHub = githubService.getGithubConnection(user);
-
-        String repositoryFullName = githubService.getRepoFullName(gitHub, repository);
-        githubService.validateGithubRepository(gitHub, repositoryFullName);
+    public CompletableFuture<Void> verifyRepository(User user, String repository) {
+        return githubService.getGithubConnection(user)
+                .thenCompose(github -> CompletableFuture.runAsync(() -> {
+                    String repositoryFullName = githubService.getRepoFullName(github, repository);
+                    githubService.validateGithubRepository(github, repositoryFullName);
+                }));
     }
 
     @Override
     public List<String> getPublicRepositories(User user) {
-        GitHub gitHub = githubService.getGithubConnection(user);
+        GitHub gitHub = githubService.getGithubConnection(user).join();
         List<GHRepository> repositoryList = githubService.getRepositoryList(gitHub);
         return repositoryList.stream()
                 .map(GHRepository::getName)
@@ -76,7 +81,7 @@ public class GithubFacadeService implements GithubFacade {
 
     @Override
     public List<PullRequestResponse> getPullRequestListByDate(User user, String repositoryName, LocalDate targetDate) {
-        GitHub gitHub = githubService.getGithubConnection(user);
+        GitHub gitHub = githubService.getGithubConnection(user).join();
 
         List<GHPullRequest> pullRequest = githubService.getPullRequestByDate(gitHub, repositoryName, targetDate);
 

@@ -184,7 +184,7 @@ public class CertificationFacadeService implements CertificationFacade {
     @Override
     @Transactional
     public CertificationResponse updateCertification(User user, CertificationRequest certificationRequest) {
-        GitHub gitHub = githubService.getGithubConnection(user);
+        GitHub gitHub = githubService.getGithubConnection(user).join();
         Instance instance = instanceService.findInstanceById(certificationRequest.instanceId());
         Participant participant = participantService.findByJoinInfo(user.getId(), instance.getId());
 

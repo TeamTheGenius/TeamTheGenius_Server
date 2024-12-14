@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.CompletionException;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -81,6 +82,38 @@ public class GithubFacadeTest {
                 assertThatThrownBy(() -> githubFacade.registerGithubPersonalToken(user, githubToken).join())
                         .isInstanceOf(CompletionException.class)
                         .hasCause(new BusinessException(ErrorCode.GITHUB_ID_INCORRECT));
+            }
+        }
+    }
+
+    @Nested
+    @DisplayName("사용자의 Github token 유효성 확인 시")
+    class context_validate_github_token {
+        @Nested
+        @DisplayName("사용자의 깃허브 토큰이 유효하다면")
+        class describe_token_valid {
+            @BeforeEach
+            void init() {
+                githubFacade.registerGithubPersonalToken(user, githubToken).join();
+            }
+
+            @Test
+            @DisplayName("예외가 발생하지 않는다.")
+            public void it_does_not_throw_exception() {
+                Assertions.assertThatNoException()
+                        .isThrownBy(() -> githubFacade.verifyGithubToken(user));
+            }
+        }
+
+        @Nested
+        @DisplayName("사용자의 깃허브 토큰이 유효하지 않은 경우")
+        class describe_token_invalid {
+            @Test
+            @DisplayName("토큰이 null이거나 빈 문자열인 경우 GITHUB_TOKEN_NOT_FOUND 예외가 발생한다.")
+            public void it_throws_GITHUB_TOKEN_NOT_FOUND_exception() {
+                assertThatThrownBy(() -> githubFacade.verifyGithubToken(user).join())
+                        .isInstanceOf(BusinessException.class)
+                        .hasMessageContaining(GITHUB_TOKEN_NOT_FOUND.getMessage());
             }
         }
     }

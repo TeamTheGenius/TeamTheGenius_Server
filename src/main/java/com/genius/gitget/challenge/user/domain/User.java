@@ -1,5 +1,7 @@
 package com.genius.gitget.challenge.user.domain;
 
+import static com.genius.gitget.global.util.exception.ErrorCode.GITHUB_TOKEN_NOT_FOUND;
+
 import com.genius.gitget.challenge.likes.domain.Likes;
 import com.genius.gitget.challenge.participant.domain.Participant;
 import com.genius.gitget.global.file.domain.FileHolder;
@@ -126,6 +128,13 @@ public class User extends BaseTimeEntity implements FileHolder {
 
     public boolean isRegistered() {
         return this.role != Role.NOT_REGISTERED;
+    }
+
+    public String getGithubToken() {
+        if (this.githubToken == null || this.githubToken.isEmpty()) {
+            throw new BusinessException(GITHUB_TOKEN_NOT_FOUND);
+        }
+        return this.githubToken;
     }
 
     @Override

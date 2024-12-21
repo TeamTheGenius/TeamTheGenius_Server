@@ -13,7 +13,6 @@ import com.genius.gitget.global.file.dto.FileDTO;
 import com.genius.gitget.global.file.dto.UpdateDTO;
 import com.genius.gitget.global.util.exception.BusinessException;
 import java.io.IOException;
-import java.net.URL;
 import org.springframework.web.multipart.MultipartFile;
 
 public class S3FileService implements FileService {
@@ -21,6 +20,7 @@ public class S3FileService implements FileService {
     private final FileUtil fileUtil;
     private final String bucket;
     private final String cloudFrontDomain;
+
     public S3FileService(AmazonS3 amazonS3, FileUtil fileUtil, String bucket, String cloudFrontDomain) {
         this.amazonS3 = amazonS3;
         this.fileUtil = fileUtil;
@@ -30,8 +30,7 @@ public class S3FileService implements FileService {
 
     @Override
     public String getFileAccessURI(Files files) {
-        URL url = amazonS3.getUrl(bucket, files.getFileURI());
-        return cloudFrontDomain + url.getFile();
+        return cloudFrontDomain + files.getFileURI();
     }
 
     @Override

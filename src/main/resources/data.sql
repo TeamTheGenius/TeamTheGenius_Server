@@ -44,9 +44,8 @@ FROM (SELECT 1                      AS identifier,
              'PROFILE_FRAME') AS new_items
 WHERE (SELECT COUNT(*) FROM item) < 3;
 
-INSERT INTO users (`point`, user_id, nickname, information, identifier, tags, provider_info, `role`)
+INSERT INTO users (`point`, nickname, information, identifier, tags, provider_info, `role`)
 SELECT 0,
-       104,
        'Guest',
        '자기 소개입니다.',
        'Guest',
